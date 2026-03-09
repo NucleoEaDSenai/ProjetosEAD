@@ -244,7 +244,7 @@ tr.canc-row td{opacity:.55}
 .fb-dot.sync{background:var(--yel);animation:pulse .8s infinite}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
 /* SETUP MODAL */
-.setup-ov{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:2000;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
+.setup-ov{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:4000;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
 .setup-box{background:#fff;border-radius:16px;padding:36px 40px;width:540px;max-width:96vw;text-align:center}
 .setup-logo{font-family:'Plus Jakarta Sans',sans-serif;font-weight:800;font-size:22px;margin-bottom:6px}
 .setup-sub{color:var(--mu);font-size:13px;margin-bottom:28px;line-height:1.5}
@@ -453,7 +453,7 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
         Firebase não configurado.
       </div>
       <button class="login-btn"
-        onclick="document.getElementById('setupOv').style.display='flex'">
+        onclick="document.getElementById('ovLogin').style.display='none';document.getElementById('setupOv').style.display='flex'">
         🔥 Configurar Firebase
       </button>
     </div>
@@ -2257,6 +2257,7 @@ function conectarFirebase(){
   localStorage.setItem('firjan_fb_domain',  authDomain);
   localStorage.setItem('firjan_fb_project', projectId);
   document.getElementById('setupOv').style.display = 'none';
+  document.getElementById('ovLogin').style.display  = 'none';
   carregarSDKeFire(cfg);
 }
 
