@@ -1,8 +1,20 @@
 <!DOCTYPE html>
+<!--
+  ╔═══════════════════════════════════════════════════════════╗
+  ║  Sistema de Gestão de Projetos EAD                       ║
+  ║  Firjan SENAI — Gerência de Projetos                     ║
+  ║  Autor: Daniel David  |  Versão: 5.0                     ║
+  ║  © 2024–2025 Firjan SENAI. Uso interno.                  ║
+  ╚═══════════════════════════════════════════════════════════╝
+-->
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<meta http-equiv="X-Content-Type-Options" content="nosniff">
+<meta http-equiv="X-Frame-Options" content="SAMEORIGIN">
+<meta name="author" content="Daniel David — Firjan SENAI">
 <title>Projetos Petrobras · Firjan SENAI</title>
 <link href="https://fonts.googleapis.com/css2?family=Plus Jakarta Sans:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
@@ -231,8 +243,6 @@ tr.canc-row td{opacity:.55}
 .fb-dot.offline{background:var(--red)}
 .fb-dot.sync{background:var(--yel);animation:pulse .8s infinite}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
-
-.login-forgot{font-size:11.5px;color:var(--blue);text-align:center;cursor:pointer;text-decoration:underline;background:none;border:none;font-family:inherit;margin-top:4px}
 /* SETUP MODAL */
 .setup-ov{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:2000;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
 .setup-box{background:#fff;border-radius:16px;padding:36px 40px;width:540px;max-width:96vw;text-align:center}
@@ -270,6 +280,12 @@ tr.canc-row td{opacity:.55}
 .login-btn{width:100%;padding:12px;background:var(--cyan);color:#fff;border:none;border-radius:8px;font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:15px;cursor:pointer;margin-top:6px;transition:background .15s}
 .login-btn:hover{background:#000}
 .login-hint{font-size:11.5px;color:var(--mu);margin-top:10px;text-align:center}
+.login-forgot{font-size:11.5px;color:var(--blue);text-align:center;cursor:pointer;
+  text-decoration:underline;background:none;border:none;font-family:inherit;
+  margin-top:4px;display:block;width:100%}
+.login-loading-txt{text-align:center;padding:18px 0;color:var(--mu);font-size:13px}
+.spin{animation:spin 1s linear infinite;display:inline-block}
+@keyframes spin{to{transform:rotate(360deg)}}
 .login-err{color:var(--red);font-size:12px;margin-top:6px;min-height:16px}
 /* USER BADGE no topbar */
 .user-badge{display:flex;align-items:center;gap:7px;background:var(--s2);border-radius:20px;padding:5px 12px 5px 6px;font-size:12.5px;font-weight:500;cursor:pointer;border:1px solid var(--bdr)}
@@ -411,17 +427,39 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
   <div class="login-box">
     <div class="login-logo">FIRJAN SENAI</div>
     <div class="login-title">Gestão de Projetos EAD</div>
-    <div class="login-sub">Entre com sua conta institucional</div>
-    <input class="login-inp" id="loginEmail" type="email" placeholder="E-mail institucional"
-      autocomplete="email"
-      onkeydown="if(event.key==='Enter')document.getElementById('loginSenha').focus()">
-    <input class="login-inp" id="loginSenha" type="password" placeholder="Senha"
-      autocomplete="current-password"
-      onkeydown="if(event.key==='Enter')fazerLogin()">
-    <button class="login-btn" type="button" onclick="fazerLogin()">Entrar →</button>
-    <button class="login-forgot" onclick="recuperarSenha()">Esqueci minha senha</button>
+
+    <!-- estado 1: aguardando Firebase inicializar -->
+    <div id="loginLoading" class="login-loading-txt">
+      <div class="spin" style="font-size:22px;margin-bottom:8px">⏳</div>
+      <div>Conectando ao Firebase...</div>
+    </div>
+
+    <!-- estado 2: form de e-mail/senha -->
+    <div id="loginForm" style="display:none">
+      <div class="login-sub" style="margin-bottom:14px">Entre com sua conta institucional</div>
+      <input class="login-inp" id="loginEmail" type="email" placeholder="E-mail"
+        autocomplete="email"
+        onkeydown="if(event.key==='Enter')document.getElementById('loginSenha').focus()">
+      <input class="login-inp" id="loginSenha" type="password" placeholder="Senha"
+        autocomplete="current-password"
+        onkeydown="if(event.key==='Enter')fazerLogin()">
+      <button class="login-btn" id="loginBtn" type="button" onclick="fazerLogin()">Entrar →</button>
+      <button class="login-forgot" onclick="recuperarSenha()">Esqueci minha senha</button>
+    </div>
+
+    <!-- estado 3: Firebase não configurado -->
+    <div id="loginSemConfig" style="display:none;text-align:center;padding:8px 0">
+      <div style="font-size:13px;color:var(--mu);margin-bottom:14px">
+        Firebase não configurado.
+      </div>
+      <button class="login-btn"
+        onclick="document.getElementById('setupOv').style.display='flex'">
+        🔥 Configurar Firebase
+      </button>
+    </div>
+
     <div class="login-err" id="loginErr"></div>
-    <div class="login-hint" id="loginHint">Use o e-mail e senha cadastrados no Firebase</div>
+    <div class="login-hint" id="loginHint"></div>
   </div>
 </div>
 <!-- MODAL MOTIVO DE ATRASO -->
@@ -804,17 +842,14 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
 <div class="setup-ov" id="setupOv" style="display:none">
   <div class="setup-box">
     <div class="setup-logo">🔥 Configurar Firebase</div>
-    <div class="setup-sub">Cole as configurações do seu projeto Firebase.<br>Encontre em: Configurações do projeto → Seus apps → SDK.</div>
-    <div class="setup-step">
-      <strong>Como obter as configurações:</strong><br>
-      1. Acesse <code>console.firebase.google.com</code><br>
-      2. Selecione seu projeto → ⚙️ Configurações → <code>Seus apps</code><br>
-      3. Clique em <code>&lt;/&gt; Web</code> → copie o objeto <code>firebaseConfig</code>
+    <div class="setup-sub">
+      Cole as configurações do seu projeto Firebase.<br>
+      <strong>console.firebase.google.com → ⚙️ Configurações → Seus apps → &lt;/&gt; Web</strong>
     </div>
-    <input class="setup-inp" id="setupApiKey"     placeholder="apiKey (AIzaSy...)" autocomplete="off">
-    <input class="setup-inp" id="setupAuthDomain" placeholder="authDomain (projeto.firebaseapp.com)" autocomplete="off">
-    <input class="setup-inp" id="setupDbUrl"      placeholder="databaseURL (https://projeto-rtdb.firebaseio.com)" autocomplete="off">
-    <input class="setup-inp" id="setupProjectId"  placeholder="projectId (nome-do-projeto)" autocomplete="off">
+    <input class="setup-inp" id="setupApiKey"     placeholder="apiKey  (AIzaSy...)" autocomplete="off">
+    <input class="setup-inp" id="setupAuthDomain" placeholder="authDomain  (projeto.firebaseapp.com)" autocomplete="off">
+    <input class="setup-inp" id="setupDbUrl"      placeholder="databaseURL  (https://projeto-rtdb.firebaseio.com)" autocomplete="off">
+    <input class="setup-inp" id="setupProjectId"  placeholder="projectId  (nome-do-projeto)" autocomplete="off">
     <div class="setup-err" id="setupErr"></div>
     <button class="setup-btn" onclick="conectarFirebase()">🔗 Conectar e Salvar</button>
   </div>
@@ -2125,56 +2160,80 @@ function carregarScript(src){
 }
 
 function carregarSDKeFire(cfg){
-  // cfg pode ser:
-  //   objeto { apiKey, authDomain, databaseURL, projectId }  → vindo de conectarFirebase()
-  //   string (URL)  → compatibilidade com versões antigas salvas no localStorage
+  // cfg: objeto {apiKey,authDomain,databaseURL,projectId} ou string URL (legado)
   let config;
   if(typeof cfg === 'object' && cfg !== null){
-    // Objeto completo passado diretamente — usar como está
     config = {
-      apiKey:      cfg.apiKey,
-      authDomain:  cfg.authDomain,
-      databaseURL: cfg.databaseURL,
-      projectId:   cfg.projectId,
+      apiKey:      cfg.apiKey      || '',
+      authDomain:  cfg.authDomain  || '',
+      databaseURL: cfg.databaseURL || '',
+      projectId:   cfg.projectId   || '',
     };
   } else {
-    // Apenas URL (legado ou recarregamento de sessão)
-    // Demais campos foram salvos no localStorage por conectarFirebase()
     config = {
-      databaseURL: cfg,
+      databaseURL: cfg || '',
       apiKey:      localStorage.getItem('firjan_fb_apikey')  || '',
       authDomain:  localStorage.getItem('firjan_fb_domain')  || '',
       projectId:   localStorage.getItem('firjan_fb_project') || '',
     };
   }
 
+  // Sem apiKey → mostrar tela de configuração
   if(!config.apiKey){
-    // Configuração incompleta — mostrar setup
-    document.getElementById('setupOv').style.display = 'flex';
+    _loginEstado('semconfig');
     renderAll();
     return;
   }
 
+  // Mostrar "Conectando..." enquanto o SDK carrega
+  _loginEstado('loading');
   setStatus('sync','Conectando...');
+
   const base = 'https://www.gstatic.com/firebasejs/10.12.0';
   carregarScript(base + '/firebase-app-compat.js')
     .then(() => carregarScript(base + '/firebase-auth-compat.js'))
     .then(() => carregarScript(base + '/firebase-database-compat.js'))
     .then(() => {
       let app;
-      try {
-        app = firebase.app('firjan-ead');
-      } catch(e){
-        app = firebase.initializeApp(config, 'firjan-ead');
-      }
+      try  { app = firebase.app('firjan-ead'); }
+      catch(e){ app = firebase.initializeApp(config, 'firjan-ead'); }
       fbAuth = firebase.auth(app);
-      iniciarAuthListener(app);
+      // onAuthStateChanged decide: mostrar form ou entrar direto
+      fbAuth.onAuthStateChanged(user => {
+        if(user){
+          fbCurrentUser = user;
+          const nome = user.displayName || user.email.split('@')[0];
+          document.getElementById('ovLogin').style.display = 'none';
+          atualizarUserBadge(nome, user.email);
+          showToast('👋 Bem-vindo, ' + nome.split(' ')[0] + '!');
+          const btn = document.getElementById('loginBtn');
+          if(btn){ btn.textContent = 'Entrar →'; btn.disabled = false; }
+          escutarFirebase(firebase.database(app));
+        } else {
+          fbCurrentUser = null;
+          // Firebase pronto → mostrar form de login
+          _loginEstado('form');
+        }
+      });
     })
     .catch(e => {
-      setStatus('offline','Sem conexão — modo local ativo');
       console.warn('Firebase SDK não carregou:', e);
+      setStatus('offline','Sem conexão — modo local ativo');
+      _loginEstado('semconfig');
       renderAll();
     });
+}
+
+// Controla qual painel do modal de login é visível
+function _loginEstado(estado){
+  const ov       = document.getElementById('ovLogin');
+  const loading  = document.getElementById('loginLoading');
+  const form     = document.getElementById('loginForm');
+  const semCfg   = document.getElementById('loginSemConfig');
+  if(ov) ov.style.display = 'flex';
+  if(loading) loading.style.display = estado === 'loading'   ? 'block' : 'none';
+  if(form)    form.style.display    = estado === 'form'      ? 'block' : 'none';
+  if(semCfg)  semCfg.style.display  = estado === 'semconfig' ? 'block' : 'none';
 }
 
 // ── SETUP MODAL ──
@@ -2185,21 +2244,18 @@ function conectarFirebase(){
   const projectId  = document.getElementById('setupProjectId').value.trim();
   const err        = document.getElementById('setupErr');
   err.textContent  = '';
-
   if(!apiKey)     { err.textContent = '⚠️ apiKey obrigatório.'; return; }
   if(!authDomain) { err.textContent = '⚠️ authDomain obrigatório.'; return; }
-  if(!url || !url.includes('firebaseio.com')) {
+  if(!url || !url.includes('firebaseio.com')){
     err.textContent = '⚠️ databaseURL inválida. Formato: https://projeto-rtdb.firebaseio.com';
     return;
   }
   if(!projectId)  { err.textContent = '⚠️ projectId obrigatório.'; return; }
-
   const cfg = { apiKey, authDomain, databaseURL: url, projectId };
   localStorage.setItem(CFG_KEY,             url);
   localStorage.setItem('firjan_fb_apikey',  apiKey);
   localStorage.setItem('firjan_fb_domain',  authDomain);
   localStorage.setItem('firjan_fb_project', projectId);
-
   document.getElementById('setupOv').style.display = 'none';
   carregarSDKeFire(cfg);
 }
@@ -2451,11 +2507,12 @@ function duplicarProjeto(id){
 // ══════════════════════════════════════════════
 //  LOGIN — nome + senha
 // ══════════════════════════════════════════════
-// ── FIREBASE AUTH ─────────────────────────────────────────────────────────────
-// Usuários gerenciados pelo Firebase Authentication (console.firebase.google.com)
+// ── FIREBASE AUTH ──────────────────────────────────────────────────────────
+// Usuários gerenciados pelo Firebase Authentication.
 // Nenhuma senha armazenada neste arquivo.
-let fbAuth = null;        // instância firebase.auth()
-let fbCurrentUser = null; // usuário autenticado atual
+// Gerencie usuários em: console.firebase.google.com → Authentication → Usuários
+let fbAuth        = null;  // instância firebase.auth()
+let fbCurrentUser = null;  // usuário autenticado atual
 
 function iniciais(nome){
   if(!nome) return '?';
@@ -2466,25 +2523,24 @@ function fazerLogin(){
   const email = document.getElementById('loginEmail').value.trim();
   const senha  = document.getElementById('loginSenha').value;
   const err    = document.getElementById('loginErr');
-  const hint   = document.getElementById('loginHint');
   err.textContent = '';
   if(!email || !senha){ err.textContent = 'Preencha e-mail e senha.'; return; }
-  if(!fbAuth){ err.textContent = '⚠️ Firebase não inicializado. Configure a conexão primeiro.'; return; }
-  const btn = document.querySelector('.login-btn');
+  if(!fbAuth){
+    err.textContent = '⚠️ Aguarde, conectando ao Firebase...';
+    return;
+  }
+  const btn = document.getElementById('loginBtn');
   if(btn){ btn.textContent = 'Entrando…'; btn.disabled = true; }
   fbAuth.signInWithEmailAndPassword(email, senha)
-    .then(uc => {
-      // onAuthStateChanged cuida do restante
-    })
     .catch(e => {
       const msgs = {
         'auth/user-not-found':     '❌ Usuário não encontrado.',
         'auth/wrong-password':     '❌ Senha incorreta.',
         'auth/invalid-email':      '❌ E-mail inválido.',
-        'auth/too-many-requests':  '⚠️ Muitas tentativas. Tente mais tarde.',
         'auth/invalid-credential': '❌ E-mail ou senha incorretos.',
+        'auth/too-many-requests':  '⚠️ Muitas tentativas. Tente mais tarde.',
       };
-      err.textContent = msgs[e.code] || ('❌ Erro: ' + e.message);
+      err.textContent = msgs[e.code] || ('❌ ' + e.message);
       if(btn){ btn.textContent = 'Entrar →'; btn.disabled = false; }
     });
 }
@@ -2492,53 +2548,13 @@ function fazerLogin(){
 function fazerLogout(){
   if(!confirm('Sair do sistema?')) return;
   if(fbAuth){
-    fbAuth.signOut().then(() => mostrarLogin()).catch(() => mostrarLogin());
+    fbAuth.signOut()
+      .then(() => _loginEstado('form'))
+      .catch(() => _loginEstado('form'));
   } else {
-    mostrarLogin();
+    _loginEstado('form');
   }
 }
-
-// ── FIREBASE AUTH LISTENER ─────────────────────────────────────────────────
-function iniciarAuthListener(app){
-  fbAuth.onAuthStateChanged(user => {
-    if(user){
-      // Usuário autenticado
-      fbCurrentUser = user;
-      const nome = user.displayName || user.email.split('@')[0];
-      document.getElementById('ovLogin').style.display = 'none';
-      atualizarUserBadge(nome, user.email);
-      showToast('👋 Bem-vindo, ' + nome.split(' ')[0] + '!');
-      const btn = document.querySelector('.login-btn');
-      if(btn){ btn.textContent = 'Entrar →'; btn.disabled = false; }
-      // Iniciar database só após autenticação
-      escutarFirebase(firebase.database(app));
-    } else {
-      // Sem usuário — mostrar login
-      fbCurrentUser = null;
-      mostrarLogin();
-    }
-  });
-}
-
-// ── LOGIN COM GOOGLE ───────────────────────────────────────────────────────
-
-
-// ── RECUPERAR SENHA ────────────────────────────────────────────────────────
-function recuperarSenha(){
-  const email = document.getElementById('loginEmail').value.trim();
-  const err   = document.getElementById('loginErr');
-  const hint  = document.getElementById('loginHint');
-  if(!email){ err.textContent = 'Digite seu e-mail acima para recuperar a senha.'; return; }
-  if(!fbAuth){ err.textContent = '⚠️ Firebase não inicializado.'; return; }
-  fbAuth.sendPasswordResetEmail(email)
-    .then(() => {
-      err.textContent = '';
-      hint.textContent = '✅ E-mail de recuperação enviado para ' + email;
-      hint.style.color = 'var(--green)';
-    })
-    .catch(e => { err.textContent = '❌ ' + e.message; });
-}
-
 
 function atualizarUserBadge(nome, email){
   const av  = document.getElementById('userAv');
@@ -2549,11 +2565,30 @@ function atualizarUserBadge(nome, email){
   if(bdg) bdg.title = (email || nome) + ' · Clique para sair';
 }
 
+function recuperarSenha(){
+  const email = document.getElementById('loginEmail').value.trim();
+  const err   = document.getElementById('loginErr');
+  const hint  = document.getElementById('loginHint');
+  if(!email){ err.textContent = 'Digite seu e-mail acima primeiro.'; return; }
+  if(!fbAuth){ err.textContent = '⚠️ Aguarde, conectando...'; return; }
+  fbAuth.sendPasswordResetEmail(email)
+    .then(() => {
+      err.textContent = '';
+      hint.textContent = '✅ E-mail de recuperação enviado para ' + email;
+      hint.style.color = 'var(--green)';
+    })
+    .catch(e => { err.textContent = '❌ ' + e.message; });
+}
+
 function mostrarLogin(){
-  const el=document.getElementById('ovLogin');
-  if(el) el.style.display='flex';
-  ['loginNome','loginSenha'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
-  const err=document.getElementById('loginErr');if(err)err.textContent='';
+  _loginEstado('form');
+  ['loginEmail','loginSenha'].forEach(id => {
+    const el = document.getElementById(id); if(el) el.value = '';
+  });
+  const err = document.getElementById('loginErr');
+  if(err) err.textContent = '';
+  const hint = document.getElementById('loginHint');
+  if(hint){ hint.textContent = ''; hint.style.color = ''; }
 }
 
 
@@ -2572,15 +2607,14 @@ initDark();
 document.getElementById('topDate').textContent=
   new Date().toLocaleDateString('pt-BR',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
 
-// ── INIT FIREBASE AUTH ────────────────────────────────────────────────────
-// Sessão gerenciada pelo Firebase Authentication — sem localStorage de senha
-const savedCfg = localStorage.getItem(CFG_KEY);
-if(savedCfg){
-  // URL ou config salva → carregar SDK e iniciar auth listener
-  carregarSDKeFire(savedCfg);
+// ── INIT — sessão gerenciada pelo Firebase Authentication ──────────────────
+const savedUrl = localStorage.getItem(CFG_KEY);
+if(savedUrl){
+  // Config salva → carrega SDK → onAuthStateChanged decide o próximo estado
+  carregarSDKeFire(savedUrl);
 } else {
-  // Sem Firebase configurado → mostrar login (que avisa sobre setup)
-  mostrarLogin();
+  // Sem config → mostrar botão de configuração
+  _loginEstado('semconfig');
   renderAll();
 }
 
