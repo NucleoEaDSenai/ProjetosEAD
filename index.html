@@ -2125,8 +2125,36 @@ function carregarScript(src){
 }
 
 function carregarSDKeFire(cfg){
-  // cfg = { url, apiKey, authDomain, projectId } ou só string url (legado)
-  const url = typeof cfg === 'string' ? cfg : cfg.url;
+  // cfg pode ser:
+  //   objeto { apiKey, authDomain, databaseURL, projectId }  → vindo de conectarFirebase()
+  //   string (URL)  → compatibilidade com versões antigas salvas no localStorage
+  let config;
+  if(typeof cfg === 'object' && cfg !== null){
+    // Objeto completo passado diretamente — usar como está
+    config = {
+      apiKey:      cfg.apiKey,
+      authDomain:  cfg.authDomain,
+      databaseURL: cfg.databaseURL,
+      projectId:   cfg.projectId,
+    };
+  } else {
+    // Apenas URL (legado ou recarregamento de sessão)
+    // Demais campos foram salvos no localStorage por conectarFirebase()
+    config = {
+      databaseURL: cfg,
+      apiKey:      localStorage.getItem('firjan_fb_apikey')  || '',
+      authDomain:  localStorage.getItem('firjan_fb_domain')  || '',
+      projectId:   localStorage.getItem('firjan_fb_project') || '',
+    };
+  }
+
+  if(!config.apiKey){
+    // Configuração incompleta — mostrar setup
+    document.getElementById('setupOv').style.display = 'flex';
+    renderAll();
+    return;
+  }
+
   setStatus('sync','Conectando...');
   const base = 'https://www.gstatic.com/firebasejs/10.12.0';
   carregarScript(base + '/firebase-app-compat.js')
@@ -2134,14 +2162,9 @@ function carregarSDKeFire(cfg){
     .then(() => carregarScript(base + '/firebase-database-compat.js'))
     .then(() => {
       let app;
-      try { app = firebase.app('firjan-ead'); }
-      catch(e){
-        const config = typeof cfg === 'object' ? cfg : {
-          databaseURL:  url,
-          apiKey:       localStorage.getItem('firjan_fb_apikey') || 'placeholder',
-          authDomain:   localStorage.getItem('firjan_fb_domain') || '',
-          projectId:    localStorage.getItem('firjan_fb_project') || '',
-        };
+      try {
+        app = firebase.app('firjan-ead');
+      } catch(e){
         app = firebase.initializeApp(config, 'firjan-ead');
       }
       fbAuth = firebase.auth(app);
