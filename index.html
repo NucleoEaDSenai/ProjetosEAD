@@ -1805,18 +1805,30 @@ const ETAPA_COL_MAP = [
   {etapa:15, col:13},  // Instalação SIRH       → Upload BDOC
 ];
 
-function avancarColuna(p){
+function calcColIdeal(p){
+  // Descobre qual coluna o projeto deve ocupar com base nas etapas ATUALMENTE concluídas.
+  // Regra: a coluna é determinada pelo maior map.col cujas etapas gatilho estão feitas.
+  // Se nenhuma etapa gatilho estiver feita, volta para col 0 (início).
   const etapas = p.etapas||[];
-  let novaCol = p.col;
+
+  // Col base: col 0 se nenhum gatilho ativo, senão menor col antes do primeiro gatilho
+  let melhorCol = 0;
   for(const map of ETAPA_COL_MAP){
     const et = etapas[map.etapa];
-    if(et && et.done && map.col > novaCol) novaCol = map.col;
+    if(et && et.done) melhorCol = Math.max(melhorCol, map.col);
   }
-  if(etapas.length>0 && etapas.every(e=>e.done) && novaCol<13) novaCol=13;
+  // Todas concluídas → col 13
+  if(etapas.length > 0 && etapas.every(e => e.done)) melhorCol = 13;
+  return melhorCol;
+}
+
+function avancarColuna(p){
+  const novaCol = calcColIdeal(p);
   if(novaCol !== p.col){
+    const avancou = novaCol > p.col;
     p.col = novaCol;
     const colNome = COLUNAS.find(c=>c.k===novaCol)?.l||'';
-    showToast('📌 '+(p.nome.length>22?p.nome.slice(0,20)+'…':p.nome)+' → '+colNome);
+    showToast((avancou ? '📌 ' : '↩️ ') + (p.nome.length>22?p.nome.slice(0,20)+'…':p.nome)+' → '+colNome);
     return true;
   }
   return false;
@@ -1838,6 +1850,7 @@ function toggleE(pid,idx){
   p.pct=Math.round(p.etapas.filter(x=>x.done).length/p.etapas.length*100);
   if(p.pct===100){if(!p.termino)p.termino=td();}
   else{p.termino='';}
+  // Avança OU recua a coluna conforme estado atual das etapas
   avancarColuna(p);
   fbSalvarProjeto(p);
   renderAll();
