@@ -417,6 +417,11 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
 
 
 </style>
+<!-- SheetJS (XLSX) -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<!-- jsPDF + AutoTable -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
 </head>
 <body>
 <a class="skip-link" href="#main-content">Pular para o conteúdo</a>
@@ -509,7 +514,16 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
         <input id="searchInp" placeholder="Buscar projeto..." oninput="buscarGlobal(this.value)" onblur="setTimeout(()=>fecharBusca(),180)">
         <div class="search-drop" id="searchDrop"></div>
       </div>
-      <button class="btn bg2 bsm" onclick="exportCSV()" aria-label="Exportar projetos em CSV">⬇️ Exportar CSV</button>
+      <div style="position:relative;display:inline-block" id="exportMenuWrap">
+        <button class="btn bg2 bsm" onclick="toggleExportMenu()" aria-label="Exportar dados" aria-haspopup="true" aria-expanded="false" id="btnExport">⬇️ Exportar ▾</button>
+        <div id="exportMenu" style="display:none;position:absolute;right:0;top:calc(100% + 6px);background:#fff;border:1px solid var(--bdr);border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.12);z-index:999;min-width:210px;overflow:hidden">
+          <div onclick="exportXLSX();toggleExportMenu()" style="padding:11px 16px;cursor:pointer;font-size:13px;display:flex;align-items:center;gap:9px;transition:background .15s" onmouseover="this.style.background='var(--s2)'" onmouseout="this.style.background=''">📊 <span><strong>Exportar XLSX</strong><br><small style="color:var(--mu)">Planilha completa com etapas e atrasos</small></span></div>
+          <div style="border-top:1px solid var(--bdr);margin:0"></div>
+          <div onclick="exportPDFLista();toggleExportMenu()" style="padding:11px 16px;cursor:pointer;font-size:13px;display:flex;align-items:center;gap:9px;transition:background .15s" onmouseover="this.style.background='var(--s2)'" onmouseout="this.style.background=''">📋 <span><strong>PDF — Lista de Projetos</strong><br><small style="color:var(--mu)">Tabela geral + KPIs + atrasos</small></span></div>
+          <div style="border-top:1px solid var(--bdr);margin:0"></div>
+          <div onclick="toggleExportMenu()" style="padding:11px 16px;cursor:pointer;font-size:13px;display:flex;align-items:center;gap:9px;color:var(--mu)" onmouseover="this.style.background='var(--s2)'" onmouseout="this.style.background=''">📄 <span>PDF — Ficha do Projeto<br><small>Abra o projeto e use o botão interno</small></span></div>
+        </div>
+      </div>
       <div class="user-badge" id="userBadge" onclick="fazerLogout()" title="Clique para sair" aria-label="Usuário logado — clique para sair">
         <div class="user-av" id="userAv">?</div>
         <span id="userNome">...</span>
@@ -780,8 +794,8 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
             <option value="13">Upload BDOC - Files e Scorm</option>
           </select>
         </div>
-        <div class="fg"><label class="fl">Data de Início Real</label><div style="display:flex;gap:5px"><input class="fi" type="number" id="fi_d" placeholder="DD" min="1" max="31" style="width:58px" onchange="onDataProjetoChange()"><input class="fi" type="number" id="fi_m" placeholder="MM" min="1" max="12" style="width:58px" onchange="onDataProjetoChange()"><input class="fi" type="number" id="fi_a" placeholder="AAAA" min="2020" max="2099" style="width:80px" onchange="onDataProjetoChange()"></div></div>
-        <div class="fg"><label class="fl">Prazo de Entrega</label><div style="display:flex;gap:5px"><input class="fi" type="number" id="fp_d" placeholder="DD" min="1" max="31" style="width:58px" onchange="onDataProjetoChange()"><input class="fi" type="number" id="fp_m" placeholder="MM" min="1" max="12" style="width:58px" onchange="onDataProjetoChange()"><input class="fi" type="number" id="fp_a" placeholder="AAAA" min="2020" max="2099" style="width:80px" onchange="onDataProjetoChange()"></div></div>
+        <div class="fg"><label class="fl">Data de Início Real</label><div style="display:flex;gap:5px"><input class="fi" type="number" id="fi_d" placeholder="DD" min="1" max="31" style="width:58px"><input class="fi" type="number" id="fi_m" placeholder="MM" min="1" max="12" style="width:58px"><input class="fi" type="number" id="fi_a" placeholder="AAAA" min="2020" max="2099" style="width:80px"></div></div>
+        <div class="fg"><label class="fl">Prazo de Entrega</label><div style="display:flex;gap:5px"><input class="fi" type="number" id="fp_d" placeholder="DD" min="1" max="31" style="width:58px"><input class="fi" type="number" id="fp_m" placeholder="MM" min="1" max="12" style="width:58px"><input class="fi" type="number" id="fp_a" placeholder="AAAA" min="2020" max="2099" style="width:80px"></div></div>
         <div class="fg ff"><label class="fl">Observação sobre Prazo</label><textarea class="fta" id="fpo" placeholder="Ex: cliente solicitou extensão..."></textarea></div>
       </div>
     </div>
@@ -791,16 +805,7 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
         <label class="fl">Responsável(is) — selecione um ou mais</label>
         <div class="resp-wrap" id="respChips"></div>
       </div>
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;flex-wrap:wrap;gap:8px">
-        <div style="font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:11px;color:var(--mu);text-transform:uppercase;letter-spacing:.5px">Etapas de Produção</div>
-        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
-          <span id="sugestaoStatus" style="font-size:11px;color:var(--mu);font-style:italic"></span>
-          <button type="button" id="btnSugerirPrazos" onclick="sugerirPrazos()"
-            style="font-size:11.5px;padding:5px 12px;background:var(--blue);color:#fff;border:none;border-radius:7px;cursor:pointer;display:flex;align-items:center;gap:5px;font-weight:600">
-            ⚡ Sugerir Prazos
-          </button>
-        </div>
-      </div>
+      <div style="font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:11px;margin-bottom:8px;color:var(--mu);text-transform:uppercase;letter-spacing:.5px">Etapas de Produção</div>
       <div id="etapasForm"></div>
     </div>
   </div>
@@ -1749,6 +1754,7 @@ function openDet(id){
     ${!p.cancelado?`<button class="btn bgray" onclick="abrirCanc(${p.id})">🚫 Cancelar Projeto</button>`:''}
     <button class="btn bg2" onclick="cm('ovDet');duplicarProjeto(${p.id})" title="Criar cópia deste projeto">📋 Duplicar</button>
     <button class="btn bb" onclick="cm('ovDet');openEdit(${p.id})">✏️ Editar</button>
+    <button class="btn" style="background:var(--red);color:#fff" onclick="exportPDFFicha(${p.id})">📄 Exportar PDF</button>
     <button class="btn bd" onclick="cm('ovDet');delP(${p.id})">🗑️ Remover Projeto</button>
   `;
   document.getElementById('ovDet').classList.add('on');
@@ -1931,143 +1937,6 @@ function buildEF(etapas){
     </tbody></table>`;
 }
 
-// ── SUGESTÃO AUTOMÁTICA DE PRAZOS POR ETAPA ──────────────────────────────────
-
-// Pesos relativos de cada etapa (%) — soma = 100
-// Refletem a complexidade e duração típica de cada fase em projetos EAD
-const ETPS_PESOS = [3, 10, 5, 4, 2, 6, 10, 6, 12, 2, 5, 8, 6, 5, 8, 8];
-
-// Avança uma data ignorando finais de semana (sab/dom)
-function addDiasUteis(dataIso, dias) {
-  const d = new Date(dataIso + 'T12:00:00');
-  let adicionados = 0;
-  while (adicionados < dias) {
-    d.setDate(d.getDate() + 1);
-    const dow = d.getDay();
-    if (dow !== 0 && dow !== 6) adicionados++;
-  }
-  return d.toISOString().split('T')[0];
-}
-
-// Conta dias úteis entre duas datas ISO
-function diasUteisEntre(inicioIso, fimIso) {
-  const d = new Date(inicioIso + 'T12:00:00');
-  const fim = new Date(fimIso + 'T12:00:00');
-  let count = 0;
-  while (d < fim) {
-    d.setDate(d.getDate() + 1);
-    const dow = d.getDay();
-    if (dow !== 0 && dow !== 6) count++;
-  }
-  return count;
-}
-
-// Distribui prazos proporcionalmente entre início e prazo de entrega
-function calcularPrazosEtapas(inicioIso, prazoIso) {
-  const totalDias = diasUteisEntre(inicioIso, prazoIso);
-  if (totalDias <= 0) return null;
-  const totalPeso = ETPS_PESOS.reduce((a, b) => a + b, 0);
-  const prazos = [];
-  let cursor = inicioIso;
-  ETPS_PESOS.forEach(peso => {
-    const diasEtapa = Math.max(1, Math.round((peso / totalPeso) * totalDias));
-    cursor = addDiasUteis(cursor, diasEtapa);
-    // Nunca ultrapassar o prazo final
-    if (cursor > prazoIso) cursor = prazoIso;
-    prazos.push(cursor);
-  });
-  return prazos;
-}
-
-// Verifica se algum prazo de etapa já está preenchido
-function algumPrazoPreenchido() {
-  return ETPS_DEF.some((_, i) => {
-    const d = document.getElementById('ep_d_' + i)?.value;
-    const m = document.getElementById('ep_m_' + i)?.value;
-    const a = document.getElementById('ep_a_' + i)?.value;
-    return d || m || a;
-  });
-}
-
-// Aplica array de datas ISO nos campos de prazo de etapa
-function aplicarPrazosNaTabela(prazos) {
-  prazos.forEach((iso, i) => {
-    const el_d = document.getElementById('ep_d_' + i);
-    const el_m = document.getElementById('ep_m_' + i);
-    const el_a = document.getElementById('ep_a_' + i);
-    if (!el_d) return;
-    const [y, mo, dy] = iso.split('-');
-    el_d.value = parseInt(dy);
-    el_m.value = parseInt(mo);
-    el_a.value = parseInt(y);
-    // Destaque visual momentâneo
-    [el_d, el_m, el_a].forEach(el => {
-      el.style.transition = 'background .3s';
-      el.style.background = '#EFF6FF';
-      setTimeout(() => { el.style.background = ''; }, 1200);
-    });
-  });
-}
-
-// Atualiza o status textual ao lado do botão
-function setSugestaoStatus(msg, cor) {
-  const el = document.getElementById('sugestaoStatus');
-  if (!el) return;
-  el.textContent = msg;
-  el.style.color = cor || 'var(--mu)';
-}
-
-// Lógica principal do botão ⚡ Sugerir Prazos
-function sugerirPrazos(silencioso) {
-  const inicio = getDateField('fi');
-  const prazo  = getDateField('fp');
-
-  if (!inicio || !prazo) {
-    setSugestaoStatus('⚠️ Preencha Início e Prazo de Entrega primeiro.', 'var(--org)');
-    if (!silencioso) showToast('⚠️ Informe Data de Início e Prazo de Entrega na aba Datas & Prazos');
-    return;
-  }
-  if (inicio >= prazo) {
-    setSugestaoStatus('⚠️ Início deve ser anterior ao Prazo.', 'var(--red)');
-    if (!silencioso) showToast('⚠️ A data de início deve ser anterior ao prazo de entrega');
-    return;
-  }
-
-  // Confirmação se já existem prazos preenchidos (só no clique manual)
-  if (!silencioso && algumPrazoPreenchido()) {
-    if (!confirm('Alguns prazos de etapa já estão preenchidos.\nDeseja sobrescrever com os prazos sugeridos automaticamente?')) return;
-  }
-
-  const prazos = calcularPrazosEtapas(inicio, prazo);
-  if (!prazos) { setSugestaoStatus('', ''); return; }
-
-  aplicarPrazosNaTabela(prazos);
-
-  const totalDias = diasUteisEntre(inicio, prazo);
-  setSugestaoStatus(`✅ Distribuídos em ${totalDias} dias úteis`, '#1A8A4A');
-  if (!silencioso) showToast('✅ Prazos sugeridos aplicados com sucesso!');
-}
-
-// Recalcula silenciosamente ao mudar datas no Tab 1
-// Só aplica se nenhum prazo estiver preenchido (não sobrescreve edições manuais)
-function onDataProjetoChange() {
-  const inicio = getDateField('fi');
-  const prazo  = getDateField('fp');
-  if (!inicio || !prazo || inicio >= prazo) {
-    setSugestaoStatus('', '');
-    return;
-  }
-  // Se já tem prazos preenchidos manualmente, apenas avisa que pode recalcular
-  if (algumPrazoPreenchido()) {
-    setSugestaoStatus('📅 Datas alteradas — clique ⚡ para recalcular', 'var(--org)');
-    return;
-  }
-  // Sem prazos preenchidos: aplica automaticamente e silenciosamente
-  sugerirPrazos(true);
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-
 function openNew(){
   editId=null; currentTags=[];
   document.getElementById('mNewTitle').textContent='Novo Projeto EAD';
@@ -2080,7 +1949,6 @@ function openNew(){
   stab(0,document.querySelectorAll('.tab')[0]);
   buildRespChips([]);
   buildEF(ETPS_DEF.map(e=>({...e,prazo:null})));
-  setSugestaoStatus('💡 Preencha Início e Prazo de Entrega para sugestão automática', 'var(--mu)');
   document.getElementById('ovNew').classList.add('on');
   setTimeout(()=>{const f=document.querySelector('#ovNew .fi');if(f)f.focus();},80);
 }
@@ -2101,7 +1969,6 @@ function openEdit(id){
   stab(0,document.querySelectorAll('.tab')[0]);
   buildRespChips(p.resps||[]);
   buildEF(p.etapas||ETPS_DEF.map(e=>({...e,prazo:null})));
-  setSugestaoStatus('', '');
   document.getElementById('ovNew').classList.add('on');
 }
 
@@ -2163,7 +2030,350 @@ function delP(id){
 }
 function cm(id){document.getElementById(id).classList.remove('on')}
 
-// ── CSV ──
+// ── EXPORTAÇÃO ─────────────────────────────────────────────────────────────
+
+// Dropdown toggle
+function toggleExportMenu(){
+  const m = document.getElementById('exportMenu');
+  const btn = document.getElementById('btnExport');
+  const open = m.style.display === 'block';
+  m.style.display = open ? 'none' : 'block';
+  btn.setAttribute('aria-expanded', String(!open));
+  if(!open){
+    const close = (e)=>{ if(!document.getElementById('exportMenuWrap').contains(e.target)){ m.style.display='none'; document.removeEventListener('click',close); } };
+    setTimeout(()=>document.addEventListener('click',close),0);
+  }
+}
+
+// Utilitário: converte data ISO para DD/MM/AAAA
+function isoToBR(iso){ if(!iso) return '—'; const[y,m,d]=iso.split('-'); return `${d}/${m}/${y}`; }
+
+// Utilitário: situação legível
+function sitLabel(p){
+  if(p.cancelado) return 'Cancelado';
+  const s=calcSit(p);
+  return {andamento:'Em Andamento',atrasado:'Atrasado',concluido:'Concluído',aguardando:'Aguardando'}[s]||s;
+}
+
+// ── XLSX ──────────────────────────────────────────────────────────────────────
+function exportXLSX(){
+  if(typeof XLSX === 'undefined'){ showToast('⚠️ Biblioteca XLSX não carregada ainda, aguarde.'); return; }
+  const todos = activeDB().concat(cancelDB());
+  const wb = XLSX.utils.book_new();
+
+  // ── Aba 1: Projetos (dados básicos) ──
+  const hdrP = ['ID','Nome','Recursos','Tags','Situação','Coluna','Responsáveis','Prioridade','Criado','Início','Prazo','Término','% Concluído','Atraso Eq (d)','Aguard. Cliente (d)','Observação Prazo'];
+  const rowsP = todos.map(p=>{
+    const{eq,cl}=delInf(p);
+    return [p.id, p.nome, (p.recursos||[]).join('; '), (p.tags||[]).join('; '),
+      sitLabel(p), colLabel(p.col), (p.resps||[]).join('; '), p.prioridade||'',
+      isoToBR(p.criado), isoToBR(p.inicio), isoToBR(p.prazo), isoToBR(p.termino),
+      p.pct, eq, cl, p.prazObs||''];
+  });
+  const wsP = XLSX.utils.aoa_to_sheet([hdrP, ...rowsP]);
+  // Larguras de coluna
+  wsP['!cols'] = [8,40,30,20,16,28,30,12,12,12,12,12,14,14,16,30].map(w=>({wch:w}));
+  // Estilo cabeçalho (SheetJS community não suporta estilos — deixamos sem)
+  XLSX.utils.book_append_sheet(wb, wsP, 'Projetos');
+
+  // ── Aba 2: Etapas por projeto ──
+  const hdrE = ['Projeto','Situação Projeto','Etapa','Nº','Responsável','Prazo Etapa','Concluída em','Concluída?','Dias Atraso','Motivo Atraso'];
+  const rowsE = [];
+  todos.forEach(p=>{
+    (p.etapas||[]).forEach((e,i)=>{
+      let diasAt = 0;
+      if(e.done && e.fim && e.prazo && e.fim > e.prazo)
+        diasAt = Math.round((new Date(e.fim)-new Date(e.prazo))/864e5);
+      else if(!e.done && e.prazo && new Date(e.prazo)<new Date())
+        diasAt = Math.round((new Date()-new Date(e.prazo))/864e5);
+      rowsE.push([
+        p.nome, sitLabel(p), e.lb, i+1,
+        e.r==='cl'?'🏢 Cliente':'👥 Equipe',
+        isoToBR(e.prazo), isoToBR(e.fim),
+        e.done?'Sim':'Não',
+        diasAt||'', e.atrasoMotivo||''
+      ]);
+    });
+  });
+  const wsE = XLSX.utils.aoa_to_sheet([hdrE, ...rowsE]);
+  wsE['!cols'] = [40,16,36,6,14,14,14,10,12,40].map(w=>({wch:w}));
+  XLSX.utils.book_append_sheet(wb, wsE, 'Etapas');
+
+  // ── Aba 3: Atrasos ──
+  const hdrA = ['Projeto','Situação Projeto','Etapa','Responsável','Prazo Etapa','Dias de Atraso','Status Etapa','Motivo'];
+  const rowsA = [];
+  todos.forEach(p=>{
+    (p.etapas||[]).forEach(e=>{
+      if(!e.prazo && !e.fim) return;
+      let diasAt=0, statusEt='';
+      if(e.done && e.fim && e.prazo && e.fim > e.prazo){
+        diasAt=Math.round((new Date(e.fim)-new Date(e.prazo))/864e5);
+        statusEt='Concluída com atraso';
+      } else if(!e.done && e.prazo && new Date(e.prazo)<new Date()){
+        diasAt=Math.round((new Date()-new Date(e.prazo))/864e5);
+        statusEt='Em aberto — atrasada';
+      } else return;
+      rowsA.push([p.nome, sitLabel(p), e.lb,
+        e.r==='cl'?'Cliente':'Equipe',
+        isoToBR(e.prazo), diasAt, statusEt, e.atrasoMotivo||'—']);
+    });
+  });
+  rowsA.sort((a,b)=>b[5]-a[5]); // mais atrasado primeiro
+  const wsA = XLSX.utils.aoa_to_sheet([hdrA, ...rowsA]);
+  wsA['!cols'] = [40,16,36,10,14,14,22,40].map(w=>({wch:w}));
+  XLSX.utils.book_append_sheet(wb, wsA, 'Atrasos');
+
+  XLSX.writeFile(wb, `projetos-ead-${td()}.xlsx`);
+  showToast('📊 XLSX exportado com 3 abas!');
+}
+
+// ── PDF FICHA DO PROJETO ──────────────────────────────────────────────────────
+function exportPDFFicha(id){
+  if(typeof jspdf === 'undefined'){ showToast('⚠️ Biblioteca PDF não carregada ainda.'); return; }
+  const p = DB.find(x=>x.id===id); if(!p) return;
+  const { jsPDF } = jspdf;
+  const doc = new jsPDF({ orientation:'portrait', unit:'mm', format:'a4' });
+  const PW = 210, ML = 15, MR = 15, TW = PW - ML - MR;
+  let y = 0;
+
+  // ── Cabeçalho ──
+  doc.setFillColor(0, 61, 165); // azul Firjan
+  doc.rect(0, 0, PW, 28, 'F');
+  doc.setTextColor(255,255,255);
+  doc.setFont('helvetica','bold'); doc.setFontSize(16);
+  doc.text('Firjan SENAI — Sistema de Gestão EAD', ML, 12);
+  doc.setFontSize(10); doc.setFont('helvetica','normal');
+  doc.text('Ficha do Projeto', ML, 19);
+  doc.text(`Gerado em ${isoToBR(td())}`, PW - MR, 19, {align:'right'});
+  y = 36;
+
+  // ── Nome do projeto ──
+  doc.setTextColor(0,0,0);
+  doc.setFont('helvetica','bold'); doc.setFontSize(14);
+  doc.text(p.nome, ML, y); y += 7;
+
+  // ── Badges situação + prioridade ──
+  const sit = sitLabel(p);
+  const sitColors = {
+    'Em Andamento':[217,119,6], 'Atrasado':[220,38,38],
+    'Concluído':[26,138,74], 'Aguardando':[107,114,128], 'Cancelado':[107,114,128]
+  };
+  const [sr,sg,sb] = sitColors[sit]||[100,100,100];
+  doc.setFillColor(sr,sg,sb); doc.setTextColor(255,255,255);
+  doc.setFontSize(9); doc.setFont('helvetica','bold');
+  doc.roundedRect(ML, y-4, 32, 6, 1.5, 1.5, 'F');
+  doc.text(sit, ML+2, y); y += 9;
+
+  // ── Linha divisória ──
+  doc.setDrawColor(220,220,220); doc.setLineWidth(0.4);
+  doc.line(ML, y, ML+TW, y); y += 6;
+
+  // ── Dados gerais ──
+  doc.setTextColor(0,0,0); doc.setFontSize(9);
+  const campos = [
+    ['Coluna / Status', colLabel(p.col)],
+    ['Prioridade',      p.prioridade ? p.prioridade.charAt(0).toUpperCase()+p.prioridade.slice(1) : '—'],
+    ['Responsáveis',    (p.resps||[]).join(', ')||'—'],
+    ['Recursos',        (p.recursos||[]).join(', ')||'—'],
+    ['Data de Criação', isoToBR(p.criado)],
+    ['Início',          isoToBR(p.inicio)||'—'],
+    ['Prazo de Entrega',isoToBR(p.prazo)||'—'],
+    ['Término Real',    isoToBR(p.termino)||'—'],
+    ['% Concluído',     p.pct+'%'],
+    ['Descrição',       p.desc||'—'],
+  ];
+  if(p.cancelado) campos.push(['Motivo Cancelamento', p.cancelEm ? `${p.cancelReason||'—'} (${isoToBR(p.cancelEm)})` : p.cancelReason||'—']);
+  campos.forEach(([lbl,val])=>{
+    if(y > 270){ doc.addPage(); y=20; }
+    doc.setFont('helvetica','bold'); doc.setTextColor(80,80,80);
+    doc.text(lbl+':', ML, y);
+    doc.setFont('helvetica','normal'); doc.setTextColor(0,0,0);
+    const lines = doc.splitTextToSize(String(val), TW-42);
+    doc.text(lines, ML+42, y);
+    y += Math.max(6, lines.length * 5);
+  });
+  y += 4;
+
+  // ── Etapas ──
+  if(y > 240){ doc.addPage(); y=20; }
+  doc.setFillColor(0,61,165); doc.setTextColor(255,255,255);
+  doc.setFont('helvetica','bold'); doc.setFontSize(10);
+  doc.rect(ML, y-4, TW, 8, 'F');
+  doc.text('Etapas de Produção', ML+2, y+0.5); y+=10;
+
+  const etHdr = [['#','Etapa','Resp.','Prazo','Conclusão','✓','Atraso','Motivo']];
+  const etRows = (p.etapas||[]).map((e,i)=>{
+    let diasAt='';
+    if(e.done&&e.fim&&e.prazo&&e.fim>e.prazo) diasAt=Math.round((new Date(e.fim)-new Date(e.prazo))/864e5)+'d';
+    else if(!e.done&&e.prazo&&new Date(e.prazo)<new Date()) diasAt=Math.round((new Date()-new Date(e.prazo))/864e5)+'d ⚠';
+    return [i+1, e.lb, e.r==='cl'?'Cliente':'Equipe', isoToBR(e.prazo), isoToBR(e.fim), e.done?'✓':'', diasAt, e.atrasoMotivo||''];
+  });
+  doc.autoTable({
+    head: etHdr, body: etRows, startY: y,
+    margin:{left:ML,right:MR},
+    styles:{fontSize:8, cellPadding:2},
+    headStyles:{fillColor:[0,61,165], textColor:255, fontStyle:'bold'},
+    alternateRowStyles:{fillColor:[245,247,250]},
+    columnStyles:{
+      0:{cellWidth:8},1:{cellWidth:50},2:{cellWidth:16},
+      3:{cellWidth:20},4:{cellWidth:20},5:{cellWidth:8},
+      6:{cellWidth:16},7:{cellWidth:42}
+    },
+    didParseCell(data){
+      if(data.section==='body'&&data.column.index===5&&data.cell.raw==='✓')
+        data.cell.styles.textColor=[26,138,74];
+      if(data.section==='body'&&data.column.index===6&&String(data.cell.raw).includes('⚠'))
+        data.cell.styles.textColor=[220,38,38];
+    }
+  });
+  y = doc.lastAutoTable.finalY + 8;
+
+  // ── Rodapé ──
+  const pages = doc.internal.getNumberOfPages();
+  for(let i=1;i<=pages;i++){
+    doc.setPage(i);
+    doc.setFontSize(8); doc.setTextColor(150,150,150);
+    doc.setFont('helvetica','normal');
+    doc.text(`© ${new Date().getFullYear()} Firjan SENAI — Uso interno`, ML, 290);
+    doc.text(`Pág. ${i}/${pages}`, PW-MR, 290, {align:'right'});
+  }
+
+  doc.save(`ficha-${p.nome.replace(/[^a-zA-Z0-9]/g,'-')}-${td()}.pdf`);
+  showToast('📄 PDF da ficha exportado!');
+}
+
+// ── PDF LISTA GERAL (Projetos + KPIs + Atrasos) ───────────────────────────────
+function exportPDFLista(){
+  if(typeof jspdf === 'undefined'){ showToast('⚠️ Biblioteca PDF não carregada ainda.'); return; }
+  const { jsPDF } = jspdf;
+  const doc = new jsPDF({ orientation:'landscape', unit:'mm', format:'a4' });
+  const PW=297, PH=210, ML=12, MR=12, TW=PW-ML-MR;
+  let y=0;
+
+  function cabecalho(titulo){
+    doc.setFillColor(0,61,165);
+    doc.rect(0,0,PW,22,'F');
+    doc.setTextColor(255,255,255);
+    doc.setFont('helvetica','bold'); doc.setFontSize(13);
+    doc.text('Firjan SENAI — Sistema de Gestão EAD', ML, 10);
+    doc.setFontSize(9); doc.setFont('helvetica','normal');
+    doc.text(titulo, ML, 17);
+    doc.text(`Gerado em ${isoToBR(td())}`, PW-MR, 17,{align:'right'});
+  }
+
+  // ══ PÁGINA 1: Lista de projetos ══
+  cabecalho('Lista Geral de Projetos'); y=30;
+  const todos = activeDB().concat(cancelDB());
+  const hdrL=[['ID','Nome','Recursos','Responsáveis','Situação','Coluna','Início','Prazo','Término','%']];
+  const rowsL=todos.map(p=>[
+    p.id, p.nome, (p.recursos||[]).join(', '),
+    (p.resps||[]).join(', '), sitLabel(p),
+    colLabel(p.col), isoToBR(p.inicio), isoToBR(p.prazo), isoToBR(p.termino), p.pct+'%'
+  ]);
+  doc.autoTable({
+    head:hdrL, body:rowsL, startY:y,
+    margin:{left:ML,right:MR},
+    styles:{fontSize:8,cellPadding:2,overflow:'ellipsize'},
+    headStyles:{fillColor:[0,61,165],textColor:255,fontStyle:'bold'},
+    alternateRowStyles:{fillColor:[245,247,250]},
+    columnStyles:{
+      0:{cellWidth:10},1:{cellWidth:52},2:{cellWidth:40},3:{cellWidth:35},
+      4:{cellWidth:22},5:{cellWidth:42},6:{cellWidth:18},7:{cellWidth:18},8:{cellWidth:18},9:{cellWidth:12}
+    },
+    didParseCell(data){
+      if(data.section==='body'&&data.column.index===4){
+        const cores={
+          'Atrasado':[220,38,38],'Em Andamento':[217,119,6],
+          'Concluído':[26,138,74],'Aguardando':[107,114,128],'Cancelado':[107,114,128]
+        };
+        const c=cores[data.cell.raw];
+        if(c){data.cell.styles.textColor=c;data.cell.styles.fontStyle='bold';}
+      }
+    }
+  });
+  y=doc.lastAutoTable.finalY+10;
+
+  // ── KPIs resumo (na mesma página se couber, senão nova) ──
+  if(y>170){doc.addPage();cabecalho('KPIs & Indicadores');y=30;}
+  else {
+    doc.setFillColor(240,244,255); doc.rect(ML,y,TW,8,'F');
+    doc.setFont('helvetica','bold'); doc.setFontSize(10); doc.setTextColor(0,61,165);
+    doc.text('KPIs & Indicadores', ML+2, y+5.5); y+=12;
+  }
+  const act=activeDB();
+  const total=act.length||1;
+  const conc=act.filter(p=>calcSit(p)==='concluido').length;
+  const atras=act.filter(p=>calcSit(p)==='atrasado').length;
+  const avg=Math.round(act.reduce((a,p)=>a+p.pct,0)/total);
+  const kpiData=[
+    ['Total de Projetos Ativos',String(act.length)],
+    ['Concluídos',conc+' ('+Math.round(conc/total*100)+'%)'],
+    ['Atrasados',atras+' ('+Math.round(atras/total*100)+'%)'],
+    ['Progresso Médio',avg+'%'],
+  ];
+  doc.autoTable({
+    head:[['Indicador','Valor']],body:kpiData,startY:y,
+    margin:{left:ML,right:MR+180},
+    styles:{fontSize:9,cellPadding:3},
+    headStyles:{fillColor:[0,61,165],textColor:255,fontStyle:'bold'},
+    columnStyles:{0:{cellWidth:60},1:{cellWidth:30,halign:'center',fontStyle:'bold'}},
+  });
+  y=doc.lastAutoTable.finalY+10;
+
+  // ══ NOVA PÁGINA: Atrasos ══
+  doc.addPage(); cabecalho('Relatório de Atrasos'); y=30;
+  const hdrA=[['Projeto','Situação Proj.','Etapa','Resp.','Prazo Etapa','Dias Atraso','Status','Motivo']];
+  const rowsA=[];
+  todos.forEach(p=>{
+    (p.etapas||[]).forEach(e=>{
+      if(!e.prazo&&!e.fim) return;
+      let diasAt=0,statusEt='';
+      if(e.done&&e.fim&&e.prazo&&e.fim>e.prazo){
+        diasAt=Math.round((new Date(e.fim)-new Date(e.prazo))/864e5);
+        statusEt='Concluída c/ atraso';
+      } else if(!e.done&&e.prazo&&new Date(e.prazo)<new Date()){
+        diasAt=Math.round((new Date()-new Date(e.prazo))/864e5);
+        statusEt='Em aberto — atrasada';
+      } else return;
+      rowsA.push([p.nome,sitLabel(p),e.lb,e.r==='cl'?'Cliente':'Equipe',isoToBR(e.prazo),diasAt+'d',statusEt,e.atrasoMotivo||'—']);
+    });
+  });
+  rowsA.sort((a,b)=>parseInt(b[5])-parseInt(a[5]));
+  if(rowsA.length===0) rowsA.push(['Nenhum atraso registrado','','','','','','','']);
+  doc.autoTable({
+    head:hdrA,body:rowsA,startY:y,
+    margin:{left:ML,right:MR},
+    styles:{fontSize:8,cellPadding:2,overflow:'ellipsize'},
+    headStyles:{fillColor:[220,38,38],textColor:255,fontStyle:'bold'},
+    alternateRowStyles:{fillColor:[255,247,247]},
+    columnStyles:{
+      0:{cellWidth:52},1:{cellWidth:22},2:{cellWidth:48},3:{cellWidth:18},
+      4:{cellWidth:22},5:{cellWidth:20,halign:'center'},6:{cellWidth:32},7:{cellWidth:55}
+    },
+    didParseCell(data){
+      if(data.section==='body'&&data.column.index===5){
+        const d=parseInt(data.cell.raw);
+        if(d>10) data.cell.styles.textColor=[220,38,38];
+        else if(d>5) data.cell.styles.textColor=[217,119,6];
+        data.cell.styles.fontStyle='bold';
+      }
+    }
+  });
+
+  // ── Rodapé todas as páginas ──
+  const pages=doc.internal.getNumberOfPages();
+  for(let i=1;i<=pages;i++){
+    doc.setPage(i);
+    doc.setFontSize(7.5); doc.setTextColor(150,150,150); doc.setFont('helvetica','normal');
+    doc.text(`© ${new Date().getFullYear()} Firjan SENAI — Uso interno exclusivo`,ML,PH-5);
+    doc.text(`Pág. ${i}/${pages}`,PW-MR,PH-5,{align:'right'});
+  }
+
+  doc.save(`relatorio-projetos-ead-${td()}.pdf`);
+  showToast('📋 PDF completo exportado!');
+}
+
+// ── CSV (mantido como fallback interno) ──
 function exportCSV(){
   const hdr='ID,Nome,Recursos,Tags,Situação,Coluna,Responsáveis,Criado,Início,Prazo,Término,% Concluído,Atraso Eq(d),Aguard.Cl(d)';
   const rows=activeDB().concat(cancelDB()).map(p=>{
