@@ -794,8 +794,8 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
             <option value="13">Upload BDOC - Files e Scorm</option>
           </select>
         </div>
-        <div class="fg"><label class="fl">Data de Início Real</label><div style="display:flex;gap:5px"><input class="fi" type="number" id="fi_d" placeholder="DD" min="1" max="31" style="width:58px"><input class="fi" type="number" id="fi_m" placeholder="MM" min="1" max="12" style="width:58px"><input class="fi" type="number" id="fi_a" placeholder="AAAA" min="2020" max="2099" style="width:80px"></div></div>
-        <div class="fg"><label class="fl">Prazo de Entrega</label><div style="display:flex;gap:5px"><input class="fi" type="number" id="fp_d" placeholder="DD" min="1" max="31" style="width:58px"><input class="fi" type="number" id="fp_m" placeholder="MM" min="1" max="12" style="width:58px"><input class="fi" type="number" id="fp_a" placeholder="AAAA" min="2020" max="2099" style="width:80px"></div></div>
+        <div class="fg"><label class="fl">Data de Início Real</label><div style="display:flex;gap:5px"><input class="fi" type="number" id="fi_d" placeholder="DD" min="1" max="31" style="width:58px" onchange="onDataProjetoChange()"><input class="fi" type="number" id="fi_m" placeholder="MM" min="1" max="12" style="width:58px" onchange="onDataProjetoChange()"><input class="fi" type="number" id="fi_a" placeholder="AAAA" min="2020" max="2099" style="width:80px" onchange="onDataProjetoChange()"></div></div>
+        <div class="fg"><label class="fl">Prazo de Entrega</label><div style="display:flex;gap:5px"><input class="fi" type="number" id="fp_d" placeholder="DD" min="1" max="31" style="width:58px" onchange="onDataProjetoChange()"><input class="fi" type="number" id="fp_m" placeholder="MM" min="1" max="12" style="width:58px" onchange="onDataProjetoChange()"><input class="fi" type="number" id="fp_a" placeholder="AAAA" min="2020" max="2099" style="width:80px" onchange="onDataProjetoChange()"></div></div>
         <div class="fg ff"><label class="fl">Observação sobre Prazo</label><textarea class="fta" id="fpo" placeholder="Ex: cliente solicitou extensão..."></textarea></div>
       </div>
     </div>
@@ -805,7 +805,16 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
         <label class="fl">Responsável(is) — selecione um ou mais</label>
         <div class="resp-wrap" id="respChips"></div>
       </div>
-      <div style="font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:11px;margin-bottom:8px;color:var(--mu);text-transform:uppercase;letter-spacing:.5px">Etapas de Produção</div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;flex-wrap:wrap;gap:8px">
+        <div style="font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:11px;color:var(--mu);text-transform:uppercase;letter-spacing:.5px">Etapas de Produção</div>
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+          <span id="sugestaoStatus" style="font-size:11px;color:var(--mu);font-style:italic"></span>
+          <button type="button" id="btnSugerirPrazos" onclick="sugerirPrazos()"
+            style="font-size:11.5px;padding:5px 12px;background:var(--blue);color:#fff;border:none;border-radius:7px;cursor:pointer;display:flex;align-items:center;gap:5px;font-weight:600">
+            ⚡ Sugerir Prazos
+          </button>
+        </div>
+      </div>
       <div id="etapasForm"></div>
     </div>
   </div>
@@ -1937,6 +1946,119 @@ function buildEF(etapas){
     </tbody></table>`;
 }
 
+// ── SUGESTÃO AUTOMÁTICA DE PRAZOS POR ETAPA ──────────────────────────────────
+
+const ETPS_PESOS = [3, 10, 5, 4, 2, 6, 10, 6, 12, 2, 5, 8, 6, 5, 8, 8];
+
+function addDiasUteis(dataIso, dias) {
+  const d = new Date(dataIso + 'T12:00:00');
+  let adicionados = 0;
+  while (adicionados < dias) {
+    d.setDate(d.getDate() + 1);
+    const dow = d.getDay();
+    if (dow !== 0 && dow !== 6) adicionados++;
+  }
+  return d.toISOString().split('T')[0];
+}
+
+function diasUteisEntre(inicioIso, fimIso) {
+  const d = new Date(inicioIso + 'T12:00:00');
+  const fim = new Date(fimIso + 'T12:00:00');
+  let count = 0;
+  while (d < fim) {
+    d.setDate(d.getDate() + 1);
+    const dow = d.getDay();
+    if (dow !== 0 && dow !== 6) count++;
+  }
+  return count;
+}
+
+function calcularPrazosEtapas(inicioIso, prazoIso) {
+  const totalDias = diasUteisEntre(inicioIso, prazoIso);
+  if (totalDias <= 0) return null;
+  const totalPeso = ETPS_PESOS.reduce((a, b) => a + b, 0);
+  const prazos = [];
+  let cursor = inicioIso;
+  ETPS_PESOS.forEach(peso => {
+    const diasEtapa = Math.max(1, Math.round((peso / totalPeso) * totalDias));
+    cursor = addDiasUteis(cursor, diasEtapa);
+    if (cursor > prazoIso) cursor = prazoIso;
+    prazos.push(cursor);
+  });
+  return prazos;
+}
+
+function algumPrazoPreenchido() {
+  return ETPS_DEF.some((_, i) => {
+    const d = document.getElementById('ep_d_' + i)?.value;
+    const m = document.getElementById('ep_m_' + i)?.value;
+    const a = document.getElementById('ep_a_' + i)?.value;
+    return d || m || a;
+  });
+}
+
+function aplicarPrazosNaTabela(prazos) {
+  prazos.forEach((iso, i) => {
+    const el_d = document.getElementById('ep_d_' + i);
+    const el_m = document.getElementById('ep_m_' + i);
+    const el_a = document.getElementById('ep_a_' + i);
+    if (!el_d) return;
+    const [y, mo, dy] = iso.split('-');
+    el_d.value = parseInt(dy);
+    el_m.value = parseInt(mo);
+    el_a.value = parseInt(y);
+    [el_d, el_m, el_a].forEach(el => {
+      el.style.transition = 'background .3s';
+      el.style.background = '#EFF6FF';
+      setTimeout(() => { el.style.background = ''; }, 1200);
+    });
+  });
+}
+
+function setSugestaoStatus(msg, cor) {
+  const el = document.getElementById('sugestaoStatus');
+  if (!el) return;
+  el.textContent = msg;
+  el.style.color = cor || 'var(--mu)';
+}
+
+function sugerirPrazos(silencioso) {
+  const inicio = getDateField('fi');
+  const prazo  = getDateField('fp');
+  if (!inicio || !prazo) {
+    setSugestaoStatus('⚠️ Preencha Início e Prazo de Entrega primeiro.', 'var(--org)');
+    if (!silencioso) showToast('⚠️ Informe Data de Início e Prazo de Entrega na aba Datas & Prazos');
+    return;
+  }
+  if (inicio >= prazo) {
+    setSugestaoStatus('⚠️ Início deve ser anterior ao Prazo.', 'var(--red)');
+    if (!silencioso) showToast('⚠️ A data de início deve ser anterior ao prazo de entrega');
+    return;
+  }
+  if (!silencioso && algumPrazoPreenchido()) {
+    if (!confirm('Alguns prazos de etapa já estão preenchidos.\nDeseja sobrescrever com os prazos sugeridos automaticamente?')) return;
+  }
+  const prazos = calcularPrazosEtapas(inicio, prazo);
+  if (!prazos) { setSugestaoStatus('', ''); return; }
+  aplicarPrazosNaTabela(prazos);
+  const totalDias = diasUteisEntre(inicio, prazo);
+  setSugestaoStatus(`✅ Distribuídos em ${totalDias} dias úteis`, '#1A8A4A');
+  if (!silencioso) showToast('✅ Prazos sugeridos aplicados com sucesso!');
+}
+
+function onDataProjetoChange() {
+  const inicio = getDateField('fi');
+  const prazo  = getDateField('fp');
+  if (!inicio || !prazo || inicio >= prazo) { setSugestaoStatus('', ''); return; }
+  if (algumPrazoPreenchido()) {
+    setSugestaoStatus('📅 Datas alteradas — clique ⚡ para recalcular', 'var(--org)');
+    return;
+  }
+  sugerirPrazos(true);
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+
 function openNew(){
   editId=null; currentTags=[];
   document.getElementById('mNewTitle').textContent='Novo Projeto EAD';
@@ -1949,6 +2071,7 @@ function openNew(){
   stab(0,document.querySelectorAll('.tab')[0]);
   buildRespChips([]);
   buildEF(ETPS_DEF.map(e=>({...e,prazo:null})));
+  setSugestaoStatus('💡 Preencha Início e Prazo de Entrega para sugestão automática', 'var(--mu)');
   document.getElementById('ovNew').classList.add('on');
   setTimeout(()=>{const f=document.querySelector('#ovNew .fi');if(f)f.focus();},80);
 }
@@ -1969,6 +2092,7 @@ function openEdit(id){
   stab(0,document.querySelectorAll('.tab')[0]);
   buildRespChips(p.resps||[]);
   buildEF(p.etapas||ETPS_DEF.map(e=>({...e,prazo:null})));
+  setSugestaoStatus('', '');
   document.getElementById('ovNew').classList.add('on');
 }
 
