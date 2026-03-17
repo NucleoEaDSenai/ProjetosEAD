@@ -160,6 +160,17 @@ tr:hover td{background:#FAFAF9}
 .et tr.done-row td{background:#F0FDF4}
 .et tr.done-row td:first-child span{text-decoration:line-through;color:var(--mu)}
 .et tr.ov-row td{background:#FFF5F5}
+.et-lb-input{border:1px solid transparent;border-radius:5px;padding:4px 6px;font-size:12px;font-family:'Plus Jakarta Sans',sans-serif;background:transparent;color:var(--txt);width:100%;min-width:140px;outline:none;transition:border-color .15s,background .15s}
+.et-lb-input:hover{border-color:var(--bdr);background:var(--bg)}
+.et-lb-input:focus{border-color:var(--blue);background:#fff}
+.et-btn{width:24px;height:24px;border:none;border-radius:5px;cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .15s,opacity .15s;background:transparent;opacity:.5}
+.et-btn:hover{opacity:1}
+.et-btn-del{color:var(--red)}
+.et-btn-del:hover{background:#FEE2E2}
+.et-btn-up,.et-btn-dn{color:var(--mu)}
+.et-btn-up:hover,.et-btn-dn:hover{background:var(--s2)}
+.et-add-row{border-top:2px dashed var(--bdr)!important}
+.et-add-row td{padding:8px 9px}
 .chk{width:16px;height:16px;border-radius:50%;border:2px solid var(--bdr);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:9px;flex-shrink:0;transition:all .2s}
 .chk.done{background:var(--green);border-color:var(--green);color:#fff}
 .chk.cwait{background:var(--yel);border-color:var(--yel);color:#fff}
@@ -747,15 +758,49 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
     <div id="tab0">
       <div class="fg2">
         <div class="fg ff"><label class="fl">Nome do Projeto / Curso *</label><input class="fi" id="fn" placeholder="Ex: Segurança do Trabalho — Módulo 3" aria-required="true" aria-label="Nome do projeto"></div>
-        <div class="fg">
-          <label class="fl" for="fPrio">Prioridade</label>
-          <select class="prio-select" id="fPrio" aria-label="Prioridade do projeto">
-            <option value="">— Sem prioridade —</option>
-            <option value="urgente">🔴 Urgente</option>
-            <option value="alta">🟠 Alta</option>
-            <option value="media">🟡 Média</option>
-            <option value="baixa">🔵 Baixa</option>
-          </select>
+        <div class="fg2" style="grid-template-columns:1fr 1fr 1fr;gap:10px">
+          <div class="fg">
+            <label class="fl" for="fPrio">Prioridade</label>
+            <select class="prio-select" id="fPrio" aria-label="Prioridade do projeto" style="width:100%">
+              <option value="">— Sem prioridade —</option>
+              <option value="urgente">🔴 Urgente</option>
+              <option value="alta">🟠 Alta</option>
+              <option value="media">🟡 Média</option>
+              <option value="baixa">🔵 Baixa</option>
+            </select>
+          </div>
+          <div class="fg">
+            <label class="fl" for="fRP">RP</label>
+            <select class="prio-select" id="fRP" aria-label="RP do projeto" style="width:100%">
+              <option value="">— Sem RP —</option>
+              <option value="Daniela">Daniela</option>
+              <option value="Betty">Betty</option>
+              <option value="Rodrigo">Rodrigo</option>
+              <option value="Thiago">Thiago</option>
+              <option value="Fernanda">Fernanda</option>
+              <option value="Jean">Jean</option>
+              <option value="Wellington">Wellington</option>
+              <option value="Renato">Renato</option>
+            </select>
+          </div>
+          <div class="fg">
+            <label class="fl" for="fAcademia">Academia</label>
+            <select class="prio-select" id="fAcademia" aria-label="Academia do projeto" style="width:100%">
+              <option value="">— Sem Academia —</option>
+              <option value="SMS">SMS</option>
+              <option value="FSGC">FSGC</option>
+              <option value="GPTDI">GPTDI</option>
+              <option value="CCT-OM">CCT-OM</option>
+              <option value="CCT-FSGC">CCT-FSGC</option>
+              <option value="CL">CL</option>
+              <option value="COA/T&D">COA/T&D</option>
+              <option value="GL">GL</option>
+              <option value="ITD">ITD</option>
+              <option value="Local">Local</option>
+              <option value="POÇOS">POÇOS</option>
+              <option value="PPRG">PPRG</option>
+            </select>
+          </div>
         </div>
         <div class="fg ff">
           <label class="fl">Tipos de Recurso — selecione um ou mais</label>
@@ -1703,7 +1748,7 @@ function openDet(id){
   document.getElementById('detBody').innerHTML=`
     <div class="dl2r">
       <div>
-        ${p.prioridade?dl2('Prioridade',prioBadge(p.prioridade)):''}${dl2('Recursos',recTags(p.recursos))}
+        ${p.prioridade?dl2('Prioridade',prioBadge(p.prioridade)):''}${p.rp?dl2('RP',`<span style="font-weight:600">${p.rp}</span>`):''}${p.academia?dl2('Academia',`<span style="font-weight:600">${p.academia}</span>`):''}${dl2('Recursos',recTags(p.recursos))}
         ${dl2('Coluna',`<span style="display:inline-flex;align-items:center;gap:5px"><span style="width:8px;height:8px;border-radius:50%;background:${colDot(p.col)};display:inline-block"></span>${colLabel(p.col)}</span>`)}
         ${dl2('Situação',sitBdg(p))}
 
@@ -1937,26 +1982,135 @@ function getSelectedResps(){
   return [...document.querySelectorAll('#respChips .resp-chip.sel')].map(el=>el.textContent);
 }
 
+// Estado temporário das etapas no formulário (array mutável durante edição)
+let _efEtapas = [];
+
 function buildEF(etapas){
-  document.getElementById('etapasForm').innerHTML=`
-    <table class="et"><thead><tr><th>#</th><th>Etapa</th><th>Responsável</th><th>Prazo da Etapa</th></tr></thead><tbody>
-    ${etapas.map((e,i)=>`<tr>
-      <td style="color:var(--mu);font-size:11px">${i+1}</td>
-      <td>${e.lb}</td>
-      <td><select class="iis" id="er${i}">
-        <option value="eq" ${e.r==='eq'?'selected':''}>👥 Equipe</option>
-        <option value="cl" ${e.r==='cl'?'selected':''}>🏢 Cliente</option>
-      </select></td>
-      <td><div style="display:flex;gap:3px">
-        <input class="fi ii" type="number" id="ep_d_${i}" placeholder="DD" min="1" max="31"
-          value="${e.prazo?parseInt(e.prazo.split('-')[2]):''}" style="width:50px;padding:5px 4px;font-size:11.5px">
-        <input class="fi ii" type="number" id="ep_m_${i}" placeholder="MM" min="1" max="12"
-          value="${e.prazo?parseInt(e.prazo.split('-')[1]):''}" style="width:50px;padding:5px 4px;font-size:11.5px">
-        <input class="fi ii" type="number" id="ep_a_${i}" placeholder="AAAA" min="2020" max="2099"
-          value="${e.prazo?parseInt(e.prazo.split('-')[0]):''}" style="width:62px;padding:5px 4px;font-size:11.5px">
-      </div></td>
-    </tr>`).join('')}
-    </tbody></table>`;
+  _efEtapas = etapas.map(e=>({...e})); // cópia mutável
+  _renderEF();
+}
+
+function _renderEF(){
+  const wrap = document.getElementById('etapasForm');
+  if(!wrap) return;
+  wrap.innerHTML = `
+    <table class="et">
+      <thead><tr>
+        <th style="width:28px">#</th>
+        <th>Etapa</th>
+        <th style="width:110px">Responsável</th>
+        <th style="width:185px">Prazo da Etapa</th>
+        <th style="width:72px;text-align:center">Ações</th>
+      </tr></thead>
+      <tbody>
+        ${_efEtapas.map((e,i) => `<tr>
+          <td style="color:var(--mu);font-size:11px;text-align:center">${i+1}</td>
+          <td>
+            <input class="et-lb-input" id="ef_lb_${i}" value="${(e.lb||'').replace(/"/g,'&quot;')}"
+              placeholder="Nome da etapa" title="Clique para editar o nome">
+          </td>
+          <td>
+            <select class="iis" id="er${i}" style="width:100%">
+              <option value="eq" ${e.r==='eq'?'selected':''}>👥 Equipe</option>
+              <option value="cl" ${e.r==='cl'?'selected':''}>🏢 Cliente</option>
+            </select>
+          </td>
+          <td>
+            <div style="display:flex;gap:3px">
+              <input class="fi ii" type="number" id="ep_d_${i}" placeholder="DD" min="1" max="31"
+                value="${e.prazo?parseInt(e.prazo.split('-')[2]):''}" style="width:48px;padding:5px 4px;font-size:11.5px">
+              <input class="fi ii" type="number" id="ep_m_${i}" placeholder="MM" min="1" max="12"
+                value="${e.prazo?parseInt(e.prazo.split('-')[1]):''}" style="width:48px;padding:5px 4px;font-size:11.5px">
+              <input class="fi ii" type="number" id="ep_a_${i}" placeholder="AAAA" min="2020" max="2099"
+                value="${e.prazo?parseInt(e.prazo.split('-')[0]):''}" style="width:60px;padding:5px 4px;font-size:11.5px">
+            </div>
+          </td>
+          <td>
+            <div style="display:flex;align-items:center;justify-content:center;gap:2px">
+              <button type="button" class="et-btn et-btn-up" onclick="_efMover(${i},-1)"
+                title="Mover para cima" ${i===0?'disabled style="opacity:.2;cursor:default"':''}>▲</button>
+              <button type="button" class="et-btn et-btn-dn" onclick="_efMover(${i},1)"
+                title="Mover para baixo" ${i===_efEtapas.length-1?'disabled style="opacity:.2;cursor:default"':''}>▼</button>
+              <button type="button" class="et-btn et-btn-del" onclick="_efDel(${i})"
+                title="Remover etapa">✕</button>
+            </div>
+          </td>
+        </tr>`).join('')}
+        <tr class="et-add-row">
+          <td colspan="5">
+            <button type="button" onclick="_efAdd()"
+              style="background:none;border:none;color:var(--blue);font-size:12px;font-family:'Plus Jakarta Sans',sans-serif;font-weight:600;cursor:pointer;padding:2px 4px;display:flex;align-items:center;gap:5px">
+              ＋ Adicionar etapa
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>`;
+}
+
+// Lê estado atual dos inputs para _efEtapas antes de operar
+function _efSync(){
+  _efEtapas = _efEtapas.map((e,i)=>({
+    ...e,
+    lb: document.getElementById('ef_lb_'+i)?.value.trim() || e.lb,
+    r:  document.getElementById('er'+i)?.value || e.r,
+    prazo: dma2iso(
+      document.getElementById('ep_d_'+i)?.value,
+      document.getElementById('ep_m_'+i)?.value,
+      document.getElementById('ep_a_'+i)?.value
+    ) || e.prazo || null,
+  }));
+}
+
+function _efDel(i){
+  if(_efEtapas.length <= 1){ showToast('⚠️ O projeto precisa ter ao menos uma etapa.'); return; }
+  if(!confirm(`Remover a etapa "${_efEtapas[i].lb}"?`)) return;
+  _efSync();
+  _efEtapas.splice(i,1);
+  _renderEF();
+  setSugestaoStatus('','');
+}
+
+function _efMover(i, dir){
+  _efSync();
+  const j = i + dir;
+  if(j < 0 || j >= _efEtapas.length) return;
+  [_efEtapas[i], _efEtapas[j]] = [_efEtapas[j], _efEtapas[i]];
+  _renderEF();
+  // Manter foco no botão de mover correspondente
+  setTimeout(()=>{
+    const btn = document.querySelector(dir===-1?`tr:nth-child(${j+1}) .et-btn-up`:`tr:nth-child(${j+1}) .et-btn-dn`);
+    if(btn) btn.focus();
+  },0);
+}
+
+function _efAdd(){
+  _efSync();
+  _efEtapas.push({lb:'Nova Etapa', r:'eq', prazo:null, inicio:null, fim:null, done:false});
+  _renderEF();
+  // Foco no nome da nova etapa
+  setTimeout(()=>{
+    const inp = document.getElementById('ef_lb_'+(_efEtapas.length-1));
+    if(inp){ inp.focus(); inp.select(); }
+  },0);
+}
+
+// Lê as etapas do formulário para o salvar() — substitui a leitura via ETPS_DEF
+function getEtapasDoForm(projAnterior){
+  _efSync();
+  return _efEtapas.map((e,i)=>{
+    const old = projAnterior?.etapas?.find((_,oi)=>oi===i) || {};
+    return {
+      lb:    e.lb || `Etapa ${i+1}`,
+      r:     e.r  || 'eq',
+      prazo: e.prazo || null,
+      inicio:e.prazo || null,
+      fim:   old.fim  || null,
+      done:  old.done || false,
+      atrasoMotivo: old.atrasoMotivo || null,
+      diasCl: old.diasCl || null,
+    };
+  });
 }
 
 // ── SUGESTÃO AUTOMÁTICA DE PRAZOS POR ETAPA ──────────────────────────────────
@@ -1989,10 +2143,15 @@ function diasUteisEntre(inicioIso, fimIso) {
 function calcularPrazosEtapas(inicioIso, prazoIso) {
   const totalDias = diasUteisEntre(inicioIso, prazoIso);
   if (totalDias <= 0) return null;
-  const totalPeso = ETPS_PESOS.reduce((a, b) => a + b, 0);
+  // Usa pesos fixos para as 16 etapas padrão; se houver mais/menos, distribui igual
+  const n = _efEtapas.length;
+  const pesos = n === ETPS_PESOS.length
+    ? ETPS_PESOS
+    : Array(n).fill(Math.round(100 / n));
+  const totalPeso = pesos.reduce((a, b) => a + b, 0);
   const prazos = [];
   let cursor = inicioIso;
-  ETPS_PESOS.forEach(peso => {
+  pesos.forEach(peso => {
     const diasEtapa = Math.max(1, Math.round((peso / totalPeso) * totalDias));
     cursor = addDiasUteis(cursor, diasEtapa);
     if (cursor > prazoIso) cursor = prazoIso;
@@ -2002,7 +2161,7 @@ function calcularPrazosEtapas(inicioIso, prazoIso) {
 }
 
 function algumPrazoPreenchido() {
-  return ETPS_DEF.some((_, i) => {
+  return _efEtapas.some((_, i) => {
     const d = document.getElementById('ep_d_' + i)?.value;
     const m = document.getElementById('ep_m_' + i)?.value;
     const a = document.getElementById('ep_a_' + i)?.value;
@@ -2077,6 +2236,8 @@ function openNew(){
   document.getElementById('mNewTitle').textContent='Novo Projeto EAD';
   ['fn','fd','fpo'].forEach(id=>document.getElementById(id).value='');
   const prioEl=document.getElementById('fPrio');if(prioEl)prioEl.value='';
+  const rpEl=document.getElementById('fRP');if(rpEl)rpEl.value='';
+  const acadEl=document.getElementById('fAcademia');if(acadEl)acadEl.value='';
   buildRecChips([]);
   iso2dma(td(),'fcr');
   ['fi','fp','fte'].forEach(p=>iso2dma('',p));
@@ -2094,6 +2255,8 @@ function openEdit(id){
   editId=id; document.getElementById('mNewTitle').textContent='Editar Projeto';
   document.getElementById('fn').value=p.nome;
   const _pe=document.getElementById('fPrio');if(_pe)_pe.value=p.prioridade||'';
+  const _rp=document.getElementById('fRP');if(_rp)_rp.value=p.rp||'';
+  const _ac=document.getElementById('fAcademia');if(_ac)_ac.value=p.academia||'';
   buildRecChips(p.recursos||[]);
   document.getElementById('fd').value=p.desc||'';
   document.getElementById('fcol').value=p.col;
@@ -2115,14 +2278,8 @@ function salvar(){
   const resps=getSelectedResps();
   if(!resps.length){showToast('❌ Selecione ao menos um responsável');return;}
 
-  const etapas=ETPS_DEF.map((e,i)=>{
-    const old=editId?(DB.find(x=>x.id===editId)?.etapas[i]||{}):{}; 
-    const epD=document.getElementById('ep_d_'+i)?.value;
-    const epM=document.getElementById('ep_m_'+i)?.value;
-    const epA=document.getElementById('ep_a_'+i)?.value;
-    const prazoVal=dma2iso(epD,epM,epA)||null;
-    return{lb:e.lb,r:document.getElementById('er'+i)?.value||e.r,prazo:prazoVal,inicio:prazoVal,fim:old.fim||null,done:old.done||false};
-  });
+  const projAnterior2 = editId ? DB.find(x=>x.id===editId) : null;
+  const etapas = getEtapasDoForm(projAnterior2);
 
   const col=parseInt(document.getElementById('fcol').value||'0');
   const projAtual=editId?DB.find(x=>x.id===editId):null;
@@ -2146,6 +2303,8 @@ function salvar(){
     editadoPor:editId?usuarioAtual:(projAnterior?.editadoPor||null),
     comentarios:projAnterior?.comentarios||[],
     prioridade:document.getElementById('fPrio')?.value||'',
+    rp:document.getElementById('fRP')?.value||'',
+    academia:document.getElementById('fAcademia')?.value||'',
     tags:[...currentTags],
     historico:projAnterior?.historico||[],
     etapas,
@@ -2199,17 +2358,18 @@ function exportXLSX(){
   const wb = XLSX.utils.book_new();
 
   // ── Aba 1: Projetos (dados básicos) ──
-  const hdrP = ['ID','Nome','Recursos','Tags','Situação','Coluna','Responsáveis','Prioridade','Criado','Início','Prazo','Término','% Concluído','Atraso Eq (d)','Aguard. Cliente (d)','Observação Prazo'];
+  const hdrP = ['ID','Nome','Recursos','Tags','Situação','Coluna','Responsáveis','Prioridade','RP','Academia','Criado','Início','Prazo','Término','% Concluído','Atraso Eq (d)','Aguard. Cliente (d)','Observação Prazo'];
   const rowsP = todos.map(p=>{
     const{eq,cl}=delInf(p);
     return [p.id, p.nome, (p.recursos||[]).join('; '), (p.tags||[]).join('; '),
       sitLabel(p), colLabel(p.col), (p.resps||[]).join('; '), p.prioridade||'',
+      p.rp||'', p.academia||'',
       isoToBR(p.criado), isoToBR(p.inicio), isoToBR(p.prazo), isoToBR(p.termino),
       p.pct, eq, cl, p.prazObs||''];
   });
   const wsP = XLSX.utils.aoa_to_sheet([hdrP, ...rowsP]);
   // Larguras de coluna
-  wsP['!cols'] = [8,40,30,20,16,28,30,12,12,12,12,12,14,14,16,30].map(w=>({wch:w}));
+  wsP['!cols'] = [8,40,30,20,16,28,30,12,14,16,12,12,12,12,14,14,16,30].map(w=>({wch:w}));
   // Estilo cabeçalho (SheetJS community não suporta estilos — deixamos sem)
   XLSX.utils.book_append_sheet(wb, wsP, 'Projetos');
 
@@ -2310,6 +2470,8 @@ function exportPDFFicha(id){
   const campos = [
     ['Coluna / Status', colLabel(p.col)],
     ['Prioridade',      p.prioridade ? p.prioridade.charAt(0).toUpperCase()+p.prioridade.slice(1) : '—'],
+    ['RP',             p.rp||'—'],
+    ['Academia',       p.academia||'—'],
     ['Responsáveis',    (p.resps||[]).join(', ')||'—'],
     ['Recursos',        (p.recursos||[]).join(', ')||'—'],
     ['Data de Criação', isoToBR(p.criado)],
