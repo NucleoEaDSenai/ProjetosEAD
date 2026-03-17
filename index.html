@@ -339,6 +339,18 @@ tr.canc-row td{opacity:.55}
 .hom-status-ok{background:#DCFCE7;color:#15803D}
 .hom-status-pend{background:#FEF9C3;color:#854D0E}
 .hom-empty{text-align:center;padding:48px 20px;color:var(--mu);font-size:13px}
+.hom-card-head{cursor:pointer;user-select:none}
+.hom-card-head:hover{filter:brightness(1.08)}
+.hom-chevron{font-size:13px;transition:transform .25s;display:inline-block;margin-left:6px}
+.hom-chevron.open{transform:rotate(180deg)}
+.hom-body{overflow:hidden;transition:max-height .3s ease,opacity .25s ease;max-height:0;opacity:0}
+.hom-body.open{max-height:2000px;opacity:1}
+.hom-sec-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--mu);padding:10px 14px 4px;background:var(--s2);border-bottom:1px solid var(--bdr);grid-column:span 4}
+.hom-instalado .hom-card-head{background:linear-gradient(135deg,#14532D,#15803d)}
+.hom-resumo{display:flex;flex-wrap:wrap;gap:10px;padding:10px 14px;background:var(--s2);border-top:1px solid var(--bdr)}
+.hom-resumo-item{font-size:11.5px;display:flex;gap:4px;align-items:center}
+.hom-resumo-label{color:var(--mu);font-weight:600}
+.hom-resumo-val{color:var(--txt)}
 
 /* ═══ MODO ESCURO ═══ */
 body.dark{
@@ -2883,6 +2895,8 @@ function salvarHomolog(pid){
   h.pacoteScorm   = g('pacoteScorm');
   h.solicitante   = g('solicitante');
   h.enviadaPor    = g('enviadaPor');
+  h.rt            = g('rt');
+  h.academia      = g('academia');
   h.conclusao     = g('conclusao');
   h.notaCorte     = g('notaCorte');
   h.novoManut     = g('novoManut');
@@ -2890,6 +2904,7 @@ function salvarHomolog(pid){
   h.dtAutorizacao = g('dtAutorizacao');
   h.dtInstalacao  = g('dtInstalacao');
   h.servico       = g('servico');
+  h.preenchido    = true; // marca que o usuário já iniciou o preenchimento
 
   p.homolog = h;
   fbSalvarProjeto(p);
@@ -2906,136 +2921,171 @@ function _homInput(pid, fld, val, type='text', placeholder=''){
   return `<input type="${type}" id="hom_${pid}_${fld}" value="${val||''}" placeholder="${placeholder}" style="width:100%">`;
 }
 
+function toggleHomolog(id){
+  const body   = document.getElementById('hom_body_'+id);
+  const chev   = document.getElementById('hom_chev_'+id);
+  if(!body) return;
+  const aberto = body.classList.contains('open');
+  body.classList.toggle('open', !aberto);
+  if(chev) chev.classList.toggle('open', !aberto);
+}
+
 function buildHomologCard(p){
   const h = p.homolog || {};
-
-  // Status: completo se tiver data de instalação
   const completo = !!(h.dtInstalacao);
+
   const statusBdg = completo
     ? `<span class="hom-badge hom-status-ok">✅ Instalado</span>`
     : `<span class="hom-badge hom-status-pend">⏳ Pendente</span>`;
 
-  const acadBdg  = p.academia ? `<span class="hom-badge">${p.academia}</span>` : '';
-  const rpBdg    = p.rp       ? `<span class="hom-badge">RP: ${p.rp}</span>`  : '';
+  const acadBdg = p.academia ? `<span class="hom-badge">${p.academia}</span>` : '';
+  const rpBdg   = p.rp       ? `<span class="hom-badge">RP: ${p.rp}</span>`  : '';
 
-  const SOLICITANTES  = ['','Maria Emília','Simone','Thiago','Mateus','Daniel','Claudio','Fabiana','Marise'];
-  const ENVIADA_POR   = ['','Thiago','Mateus','Daniel','Claudio'];
-  const CONCLUSAO     = ['','Navegação','Avaliação'];
-  const NOVO_MANUT    = ['','Novo','Manutenção'];
-  const SERVICOS      = ['','Básico','Intermediário','Avançado','Encapsulamento','Manutenção','Autoria Digital','Versionamento'];
+  // Mini resumo visível quando recolhido (só mostra se já tem dados)
+  const temDados = h.preenchido;
+  const resumo = temDados ? `
+    <div class="hom-resumo">
+      ${h.idCurso      ? `<span class="hom-resumo-item"><span class="hom-resumo-label">ID:</span><span class="hom-resumo-val">${h.idCurso}</span></span>` : ''}
+      ${h.solicitante  ? `<span class="hom-resumo-item"><span class="hom-resumo-label">Solicitante:</span><span class="hom-resumo-val">${h.solicitante}</span></span>` : ''}
+      ${h.servico      ? `<span class="hom-resumo-item"><span class="hom-resumo-label">Serviço:</span><span class="hom-resumo-val">${h.servico}</span></span>` : ''}
+      ${h.novoManut    ? `<span class="hom-resumo-item"><span class="hom-resumo-label">Tipo:</span><span class="hom-resumo-val">${h.novoManut}</span></span>` : ''}
+      ${h.dtHomolog    ? `<span class="hom-resumo-item"><span class="hom-resumo-label">Homolog.:</span><span class="hom-resumo-val">${h.dtHomolog.split('-').reverse().join('/')}</span></span>` : ''}
+      ${h.dtInstalacao ? `<span class="hom-resumo-item"><span class="hom-resumo-label">Instalação:</span><span class="hom-resumo-val">${h.dtInstalacao.split('-').reverse().join('/')}</span></span>` : ''}
+    </div>` : '';
+
+  const SOLICITANTES = ['','Maria Emília','Simone','Thiago','Mateus','Daniel','Claudio','Fabiana','Marise'];
+  const ENVIADA_POR  = ['','Thiago','Mateus','Daniel','Claudio'];
+  const CONCLUSAO    = ['','Navegação','Avaliação'];
+  const NOVO_MANUT   = ['','Novo','Manutenção'];
+  const SERVICOS     = ['','Básico','Intermediário','Avançado','Encapsulamento','Manutenção','Autoria Digital','Versionamento'];
 
   return `
-  <div class="hom-card" id="homcard_${p.id}">
-    <div class="hom-card-head">
-      <div class="hom-card-title">📂 ${p.nome}</div>
-      <div class="hom-card-badges">
+  <div class="hom-card ${completo?'hom-instalado':''}" id="homcard_${p.id}">
+
+    <div class="hom-card-head" onclick="toggleHomolog(${p.id})" title="Clique para expandir / recolher">
+      <div class="hom-card-title">
+        📂 ${p.nome}
+        <span class="hom-chevron" id="hom_chev_${p.id}">▼</span>
+      </div>
+      <div class="hom-card-badges" onclick="event.stopPropagation()">
         ${rpBdg}${acadBdg}${statusBdg}
-        <button onclick="openDet(${p.id})" style="background:rgba(255,255,255,.15);border:none;color:#fff;padding:3px 10px;border-radius:6px;cursor:pointer;font-size:11.5px;font-family:'Plus Jakarta Sans',sans-serif">Ver Projeto ↗</button>
+        <button onclick="openDet(${p.id})" style="background:rgba(255,255,255,.15);border:none;color:#fff;padding:3px 10px;border-radius:6px;cursor:pointer;font-size:11.5px;font-family:'Plus Jakarta Sans',sans-serif">Ver ↗</button>
       </div>
     </div>
-    <div class="hom-grid">
 
-      <div class="hom-field">
-        <div class="hom-field-label">Nome do Curso</div>
-        <div class="hom-field-val" style="font-weight:600;font-size:13px">${p.nome}</div>
+    ${resumo}
+
+    <div class="hom-body" id="hom_body_${p.id}">
+      <div class="hom-grid">
+
+        <div class="hom-sec-title">📋 Identificação</div>
+
+        <div class="hom-field">
+          <div class="hom-field-label">Nome do Curso</div>
+          <div class="hom-field-val" style="font-weight:600">${p.nome}</div>
+        </div>
+        <div class="hom-field">
+          <div class="hom-field-label">ID do Curso</div>
+          <div class="hom-field-val">${_homInput(p.id,'idCurso',h.idCurso,'text','Ex: 12345')}</div>
+        </div>
+        <div class="hom-field">
+          <div class="hom-field-label">Pacote SCORM</div>
+          <div class="hom-field-val">${_homInput(p.id,'pacoteScorm',h.pacoteScorm,'text','Ex: curso_v1.zip')}</div>
+        </div>
+        <div class="hom-field">
+          <div class="hom-field-label">Nota de Corte</div>
+          <div class="hom-field-val">${_homInput(p.id,'notaCorte',h.notaCorte,'text','Ex: 70')}</div>
+        </div>
+
+        <div class="hom-sec-title">👥 Responsáveis</div>
+
+        <div class="hom-field">
+          <div class="hom-field-label">Solicitante</div>
+          <div class="hom-field-val">${_homSel(p.id,'solicitante',SOLICITANTES,h.solicitante||'')}</div>
+        </div>
+        <div class="hom-field">
+          <div class="hom-field-label">Enviada Por</div>
+          <div class="hom-field-val">${_homSel(p.id,'enviadaPor',ENVIADA_POR,h.enviadaPor||'')}</div>
+        </div>
+        <div class="hom-field">
+          <div class="hom-field-label">RT</div>
+          <div class="hom-field-val">${_homInput(p.id,'rt',h.rt||p.rp||'','text','Responsável Técnico')}</div>
+        </div>
+        <div class="hom-field">
+          <div class="hom-field-label">Academia</div>
+          <div class="hom-field-val">${_homInput(p.id,'academia',h.academia||p.academia||'','text','Academia')}</div>
+        </div>
+
+        <div class="hom-sec-title">⚙️ Configurações do Curso</div>
+
+        <div class="hom-field">
+          <div class="hom-field-label">Conclusão</div>
+          <div class="hom-field-val">${_homSel(p.id,'conclusao',CONCLUSAO,h.conclusao||'')}</div>
+        </div>
+        <div class="hom-field">
+          <div class="hom-field-label">Novo ou Manutenção</div>
+          <div class="hom-field-val">${_homSel(p.id,'novoManut',NOVO_MANUT,h.novoManut||'')}</div>
+        </div>
+        <div class="hom-field">
+          <div class="hom-field-label">Serviço</div>
+          <div class="hom-field-val">${_homSel(p.id,'servico',SERVICOS,h.servico||'')}</div>
+        </div>
+        <div class="hom-field"></div>
+
+        <div class="hom-sec-title">📅 Datas</div>
+
+        <div class="hom-field">
+          <div class="hom-field-label">📅 Homologação</div>
+          <div class="hom-field-val">${_homInput(p.id,'dtHomolog',h.dtHomolog,'date','')}</div>
+        </div>
+        <div class="hom-field">
+          <div class="hom-field-label">✅ Autorização</div>
+          <div class="hom-field-val">${_homInput(p.id,'dtAutorizacao',h.dtAutorizacao,'date','')}</div>
+        </div>
+        <div class="hom-field">
+          <div class="hom-field-label">🖥️ Instalação SIRH</div>
+          <div class="hom-field-val">${_homInput(p.id,'dtInstalacao',h.dtInstalacao,'date','')}</div>
+        </div>
+        <div class="hom-field"></div>
+
       </div>
-
-      <div class="hom-field">
-        <div class="hom-field-label">ID do Curso</div>
-        <div class="hom-field-val">${_homInput(p.id,'idCurso',h.idCurso,'text','Ex: 12345')}</div>
+      <div class="hom-foot">
+        <span style="font-size:11px;color:var(--mu);align-self:center">
+          ${temDados ? 'Dados salvos — edite e salve novamente para atualizar' : 'Preencha os campos e salve'}
+        </span>
+        <button onclick="salvarHomolog(${p.id})"
+          style="padding:7px 18px;background:var(--blue);color:#fff;border:none;border-radius:7px;cursor:pointer;font-size:12.5px;font-weight:600;font-family:'Plus Jakarta Sans',sans-serif">
+          💾 Salvar
+        </button>
       </div>
-
-      <div class="hom-field">
-        <div class="hom-field-label">Pacote SCORM</div>
-        <div class="hom-field-val">${_homInput(p.id,'pacoteScorm',h.pacoteScorm,'text','Ex: curso_v1.zip')}</div>
-      </div>
-
-      <div class="hom-field">
-        <div class="hom-field-label">Solicitante</div>
-        <div class="hom-field-val">${_homSel(p.id,'solicitante',SOLICITANTES,h.solicitante||'')}</div>
-      </div>
-
-      <div class="hom-field">
-        <div class="hom-field-label">Enviada Por</div>
-        <div class="hom-field-val">${_homSel(p.id,'enviadaPor',ENVIADA_POR,h.enviadaPor||'')}</div>
-      </div>
-
-      <div class="hom-field">
-        <div class="hom-field-label">RT</div>
-        <div class="hom-field-val">${_homInput(p.id,'rt',h.rt||p.rp||'','text','Responsável Técnico')}</div>
-      </div>
-
-      <div class="hom-field">
-        <div class="hom-field-label">Academia</div>
-        <div class="hom-field-val">${_homInput(p.id,'academia',h.academia||p.academia||'','text','Academia')}</div>
-      </div>
-
-      <div class="hom-field">
-        <div class="hom-field-label">Conclusão</div>
-        <div class="hom-field-val">${_homSel(p.id,'conclusao',CONCLUSAO,h.conclusao||'')}</div>
-      </div>
-
-      <div class="hom-field">
-        <div class="hom-field-label">Nota de Corte</div>
-        <div class="hom-field-val">${_homInput(p.id,'notaCorte',h.notaCorte,'text','Ex: 70')}</div>
-      </div>
-
-      <div class="hom-field">
-        <div class="hom-field-label">Novo ou Manutenção</div>
-        <div class="hom-field-val">${_homSel(p.id,'novoManut',NOVO_MANUT,h.novoManut||'')}</div>
-      </div>
-
-      <div class="hom-field">
-        <div class="hom-field-label">Serviço</div>
-        <div class="hom-field-val">${_homSel(p.id,'servico',SERVICOS,h.servico||'')}</div>
-      </div>
-
-      <div class="hom-field" style="grid-column:span 1"></div>
-
-      <div class="hom-field">
-        <div class="hom-field-label">📅 Homologação (data)</div>
-        <div class="hom-field-val">${_homInput(p.id,'dtHomolog',h.dtHomolog,'date','')}</div>
-      </div>
-
-      <div class="hom-field">
-        <div class="hom-field-label">✅ Autorização (data)</div>
-        <div class="hom-field-val">${_homInput(p.id,'dtAutorizacao',h.dtAutorizacao,'date','')}</div>
-      </div>
-
-      <div class="hom-field">
-        <div class="hom-field-label">🖥️ Instalação SIRH (data)</div>
-        <div class="hom-field-val">${_homInput(p.id,'dtInstalacao',h.dtInstalacao,'date','')}</div>
-      </div>
-
-      <div class="hom-field" style="grid-column:span 1"></div>
-
     </div>
-    <div class="hom-foot">
-      <span style="font-size:11px;color:var(--mu);align-self:center">
-        ${h.dtHomolog||h.dtAutorizacao||h.dtInstalacao
-          ? `Última atualização salva`
-          : `Preencha os campos e salve`}
-      </span>
-      <button onclick="salvarHomolog(${p.id})"
-        style="padding:7px 18px;background:var(--blue);color:#fff;border:none;border-radius:7px;cursor:pointer;font-size:12.5px;font-weight:600;font-family:'Plus Jakarta Sans',sans-serif">
-        💾 Salvar
-      </button>
-    </div>
+
   </div>`;
 }
 
 function rHomologacoes(){
-  // Projetos na col 11 (Homologação/Instalação) — ativos
-  const lista = activeDB().filter(p => p.col === 11);
+  const todos = activeDB().concat(cancelDB());
+
+  // Aparece na lista: está na col 11 OU já teve dados de homologação preenchidos
+  const lista = todos.filter(p => p.col === 11 || p.homolog?.preenchido);
+
+  // Ordena: pendentes (sem instalação) primeiro, instalados depois; dentro de cada grupo por nome
+  lista.sort((a,b) => {
+    const aInst = !!(a.homolog?.dtInstalacao);
+    const bInst = !!(b.homolog?.dtInstalacao);
+    if(aInst !== bInst) return aInst ? 1 : -1;
+    return a.nome.localeCompare(b.nome);
+  });
+
+  const pendentes  = lista.filter(p => !(p.homolog?.dtInstalacao)).length;
+  const instalados = lista.filter(p =>   p.homolog?.dtInstalacao).length;
 
   const statsEl = document.getElementById('homologStats');
   if(statsEl){
-    const pendentes  = lista.filter(p => !(p.homolog?.dtInstalacao)).length;
-    const instalados = lista.filter(p =>   p.homolog?.dtInstalacao).length;
     statsEl.innerHTML = `
       <div class="sc" style="border-left:4px solid var(--blue)">
-        <div class="sc-l">Na Fila</div><div class="sc-v">${lista.length}</div>
-        <div class="sc-s">em homologação</div><div class="sc-i">🔖</div>
+        <div class="sc-l">Total Registrados</div><div class="sc-v">${lista.length}</div>
+        <div class="sc-s">no histórico</div><div class="sc-i">🔖</div>
       </div>
       <div class="sc" style="border-left:4px solid var(--yel)">
         <div class="sc-l">Aguardando Instalação</div><div class="sc-v">${pendentes}</div>
@@ -3049,15 +3099,33 @@ function rHomologacoes(){
 
   const listaEl = document.getElementById('homologLista');
   if(!listaEl) return;
+
   if(lista.length === 0){
     listaEl.innerHTML = `<div class="hom-empty">
       <div style="font-size:32px;margin-bottom:10px">🔖</div>
-      <div style="font-weight:600;margin-bottom:6px">Nenhum projeto em Homologação</div>
-      <div>Quando um projeto chegar na coluna <strong>Homologação/Instalação</strong> no Kanban, ele aparecerá aqui.</div>
+      <div style="font-weight:600;margin-bottom:6px">Nenhum projeto em Homologação ainda</div>
+      <div>Quando um projeto chegar na coluna <strong>Homologação/Instalação</strong> no Kanban, ele aparecerá aqui automaticamente.</div>
     </div>`;
     return;
   }
-  listaEl.innerHTML = lista.map(p => buildHomologCard(p)).join('');
+
+  // Separar em dois grupos para exibição
+  const emAndamento = lista.filter(p => !(p.homolog?.dtInstalacao));
+  const concluidos  = lista.filter(p =>   p.homolog?.dtInstalacao);
+
+  let html = '';
+
+  if(emAndamento.length > 0){
+    html += `<div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--mu);margin-bottom:10px;margin-top:4px">⏳ Em andamento (${emAndamento.length})</div>`;
+    html += emAndamento.map(p => buildHomologCard(p)).join('');
+  }
+
+  if(concluidos.length > 0){
+    html += `<div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--green);margin-bottom:10px;margin-top:${emAndamento.length?'24px':'4px'}">✅ Instalados (${concluidos.length})</div>`;
+    html += concluidos.map(p => buildHomologCard(p)).join('');
+  }
+
+  listaEl.innerHTML = html;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
