@@ -1823,7 +1823,7 @@ function adicionarComent(pid){
   if(!txt){showToast('⚠️ Escreva algo antes de enviar');return;}
   const p=DB.find(x=>x.id===pid);if(!p)return;
   if(!p.comentarios)p.comentarios=[];
-  const autor=localStorage.getItem('firjan_user')||'Desconhecido';
+  const autor=nomeUsuarioAtual();
   const agora=new Date();
   const dt=agora.toLocaleDateString('pt-BR')+' '+agora.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
   p.comentarios.push({autor,dt,txt});
@@ -2287,7 +2287,7 @@ function salvar(){
   const prazo=getDateField('fp');
   const inicio=getDateField('fi');
 
-  const usuarioAtual = localStorage.getItem('firjan_user')||'Desconhecido';
+  const usuarioAtual = nomeUsuarioAtual();
   const projAnterior = editId?DB.find(x=>x.id===editId):null;
   const proj={
     id:editId||NXT++, nome,
@@ -2860,6 +2860,10 @@ function carregarSDKeFire(cfg){
         if(user){
           fbCurrentUser = user;
           const nome = user.displayName || user.email.split('@')[0];
+          // Persiste nome e email para uso no histórico mesmo após reload
+          localStorage.setItem('firjan_user', nome);
+          localStorage.setItem('firjan_user_email', user.email||'');
+          localStorage.setItem('firjan_login_ts', String(Date.now()));
           document.getElementById('ovLogin').style.display = 'none';
           atualizarUserBadge(nome, user.email);
           showToast('👋 Bem-vindo, ' + nome.split(' ')[0] + '!');
@@ -3045,7 +3049,7 @@ function dtAgora(){
 }
 function registrarHistorico(proj, acao, desc){
   if(!proj.historico) proj.historico = [];
-  const usuario = localStorage.getItem('firjan_user') || 'Desconhecido';
+  const usuario = nomeUsuarioAtual();
   proj.historico.unshift({usuario, acao, dt: dtAgora(), desc: desc || ''});
   if(proj.historico.length > 100) proj.historico = proj.historico.slice(0, 100);
 }
@@ -3143,7 +3147,7 @@ function rCarga(){
 function duplicarProjeto(id){
   const orig = DB.find(p => p.id === id); if(!orig) return;
   if(!confirm(`Duplicar "${orig.nome}"?\nUma cópia será criada com as mesmas etapas e dados, sem o histórico de execução.`)) return;
-  const usuario = localStorage.getItem('firjan_user') || 'Desconhecido';
+  const usuario = nomeUsuarioAtual();
   const novo = JSON.parse(JSON.stringify(orig));
   novo.id = NXT++;
   novo.nome = 'Cópia de ' + orig.nome;
@@ -3171,6 +3175,33 @@ function duplicarProjeto(id){
 // Gerencie usuários em: console.firebase.google.com → Authentication → Usuários
 let fbAuth        = null;  // instância firebase.auth()
 let fbCurrentUser = null;  // usuário autenticado atual
+
+// Mapa e-mail → nome da equipe
+const EMAIL_NOMES = {
+  'tlutz@firjan.com.br':       'Tatiana',
+  'thioliveira@firjan.com.br': 'Thiago',
+  'sbcastro@firjan.com.br':    'Simone',
+  'mrgrodrigues@firjan.com.br':'Mariana',
+  'mlpeixoto@firjan.com.br':   'Mateus',
+  'mgouffier@firjan.com.br':   'Maria Julia',
+  'mepessanha@firjan.com.br':  'Maria Emilia',
+  'mclopes@firjan.com.br':     'Marise',
+  'fiino@firjan.com.br':       'Fatima',
+  'fcribeiro@firjan.com.br':   'Fabiana',
+  'dandasilva@firjan.com.br':  'Daniel',
+  'chimmelsbach@firjan.com.br':'Claudio',
+};
+
+// Retorna sempre o melhor nome disponível para o usuário logado
+function nomeUsuarioAtual(){
+  if(fbCurrentUser){
+    const email = (fbCurrentUser.email||'').toLowerCase();
+    return EMAIL_NOMES[email]
+      || fbCurrentUser.displayName
+      || email.split('@')[0];
+  }
+  return localStorage.getItem('firjan_user') || 'Desconhecido';
+}
 
 function iniciais(nome){
   if(!nome) return '?';
