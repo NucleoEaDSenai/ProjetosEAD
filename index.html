@@ -315,6 +315,13 @@ tr.canc-row td{opacity:.55}
 .coment-ta:focus{border-color:var(--blue)}
 /* AUTORIA no card kanban */
 .kcard-autoria{font-size:10px;color:var(--mu);margin-top:4px;display:flex;gap:8px;flex-wrap:wrap}
+.kc[data-col="14"]{background:linear-gradient(160deg,#F5F3FF 0%,#EDE9FE 100%);border:1.5px solid #C4B5FD}
+.kc[data-col="14"] .kc-t{color:#6D28D9}
+.kc[data-col="14"] .kcard{border-left:3px solid #7C3AED}
+.btn-medicao{width:100%;margin-top:8px;padding:7px 10px;background:linear-gradient(135deg,#1A8A4A,#15803d);color:#fff;border:none;border-radius:7px;font-size:11.5px;font-weight:700;font-family:'Plus Jakarta Sans',sans-serif;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;transition:opacity .15s,transform .15s}
+.btn-medicao:hover{opacity:.88;transform:translateY(-1px)}
+.badge-medicao-ok{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:12px;background:#DCFCE7;color:#15803D;font-size:11px;font-weight:700}
+.badge-medicao-pend{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:12px;background:#FEF9C3;color:#854D0E;font-size:11px;font-weight:700}
 
 /* ═══ MODO ESCURO ═══ */
 body.dark{
@@ -507,6 +514,7 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
     <div class="sb-sec">Análise</div>
     <div class="si" role="menuitem" tabindex="0" aria-label="KPIs e Indicadores" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();nav('kpis')}"" onclick="nav('kpis')"><span class="si-ic">📈</span><span>KPIs &amp; Indicadores</span></div>
     <div class="si" role="menuitem" tabindex="0" aria-label="Relatório de Atrasos" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();nav('atrasos')}"" onclick="nav('atrasos')"><span class="si-ic">⚠️</span><span>Rel. de Atrasos</span></div>
+    <div class="si" role="menuitem" tabindex="0" aria-label="Medição" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();nav('medicao')}"" onclick="nav('medicao')"><span class="si-ic">📐</span><span>Medição</span></div>
     <div class="si" role="menuitem" tabindex="0" aria-label="Projetos Cancelados" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();nav('cancelados')}"" onclick="nav('cancelados')"><span class="si-ic">🚫</span><span>Cancelados</span></div>
     <div class="sb-sec">Equipe</div>
     <div class="si" role="menuitem" tabindex="0" aria-label="Carga da Equipe" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();nav('carga')}"" onclick="nav('carga')"><span class="si-ic">👥</span><span>Carga da Equipe</span></div>
@@ -709,6 +717,21 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
       </table></div>
     </div>
 
+    <!-- MEDIÇÃO -->
+    <div class="view" id="view-medicao">
+      <div class="st" style="margin-bottom:6px">📐 Medição</div>
+      <div style="font-size:12.5px;color:var(--mu);margin-bottom:20px">Projetos com todas as etapas concluídas e enviados para medição.</div>
+      <div id="medicaoStats" style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:22px"></div>
+      <div class="tw"><table>
+        <thead><tr>
+          <th>Projeto</th><th>Responsáveis</th><th>Recursos</th>
+          <th>Concluído em</th><th>Enviado para Medição em</th>
+          <th style="text-align:center">Medição Feita</th><th></th>
+        </tr></thead>
+        <tbody id="medicaoTbl"></tbody>
+      </table></div>
+    </div>
+
     <!-- CARGA DA EQUIPE -->
     <div class="view" id="view-carga">
       <div class="st" style="margin-bottom:6px">👥 Dashboard de Carga da Equipe</div>
@@ -837,6 +860,7 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
             <option value="11">Homologação/Instalação</option>
             <option value="12">Pré-Medição</option>
             <option value="13">Upload BDOC - Files e Scorm</option>
+            <option value="14">Projetos Concluídos</option>
           </select>
         </div>
         <div class="fg"><label class="fl">Data de Início Real</label><div style="display:flex;gap:5px"><input class="fi" type="number" id="fi_d" placeholder="DD" min="1" max="31" style="width:58px" onchange="onDataProjetoChange()"><input class="fi" type="number" id="fi_m" placeholder="MM" min="1" max="12" style="width:58px" onchange="onDataProjetoChange()"><input class="fi" type="number" id="fi_a" placeholder="AAAA" min="2020" max="2099" style="width:80px" onchange="onDataProjetoChange()"></div></div>
@@ -949,6 +973,7 @@ const COLUNAS = [
   {k:11, l:'Homologação/Instalação',           dot:'#84CC16'},
   {k:12, l:'Pré-Medição',                      dot:'#22C55E'},
   {k:13, l:'Upload BDOC - Files e Scorm',      dot:'#1A8A4A'},
+  {k:14, l:'Projetos Concluídos',                 dot:'#7C3AED'},
 ];
 
 const ETPS_DEF = [
@@ -1048,7 +1073,7 @@ function colDot(k){return COLUNAS[k]?.dot||'#ccc'}
 // Situação automática baseada em datas e etapas
 function calcSit(p){
   if(p.cancelado) return 'cancelado';
-  if(p.pct===100 || p.col===13) return 'concluido';
+  if(p.pct===100 || p.col===13 || p.col===14) return 'concluido';
   // atraso: prazo passou e não concluído
   if(p.prazo && new Date(p.prazo)<new Date() && p.pct<100) return 'atrasado';
   // em andamento: tem data de início ou etapas em curso
@@ -1095,7 +1120,7 @@ let DB=[];
 let NXT=1, editId=null, cancId=null, dragId=null;
 
 // ── NAV ──
-const PT={kanban:'Quadro Kanban',projetos:'Lista de Projetos',timeline:'Cronograma',kpis:'KPIs & Indicadores',atrasos:'Relatório de Atrasos',cancelados:'Projetos Cancelados',carga:'Carga da Equipe',historico:'Histórico de Edições',carga:'Carga da Equipe',historico:'Histórico de Edições'};
+const PT={kanban:'Quadro Kanban',projetos:'Lista de Projetos',timeline:'Cronograma',kpis:'KPIs & Indicadores',atrasos:'Relatório de Atrasos',cancelados:'Projetos Cancelados',medicao:'Medição',carga:'Carga da Equipe',historico:'Histórico de Edições'};
 function nav(id){
   document.querySelectorAll('.view').forEach(v=>v.classList.remove('on'));
   document.getElementById('view-'+id).classList.add('on');
@@ -1171,6 +1196,13 @@ function rKanban(){
             <span style="font-size:10.5px;font-weight:600;color:var(--mu)">${p.pct}%</span>
           </div>
           ${p.criadoPor?`<div class="kcard-autoria"><span>✏️ ${p.criadoPor}</span>${p.editadoPor&&p.editadoPor!==p.criadoPor?`<span>· editado: ${p.editadoPor}</span>`:''}</div>`:''}
+          ${p.col===13 && (p.etapas||[]).length>0 && (p.etapas||[]).every(e=>e.done) && !p.enviadoMedicao
+            ? `<button class="btn-medicao" onclick="event.stopPropagation();enviarMedicao(${p.id})">📐 Enviar para Medição</button>`
+            : p.enviadoMedicao && !p.medicaoFeita
+              ? `<span class="badge-medicao-pend">⏳ Aguardando Medição</span>`
+              : p.medicaoFeita
+                ? `<span class="badge-medicao-ok">✅ Medição Concluída</span>`
+                : ''}
         </div>`;
       }).join('')}
     </div>`;
@@ -1250,10 +1282,10 @@ function onDrop(e,col){
   p.col=newCol;
   // auto início
   if(oldCol===0&&!p.inicio) p.inicio=td();
-  // auto concluído se Upload BDOC (col 13)
-  if(newCol===13){if(!p.termino)p.termino=td();p.pct=100;}
-  // volta de 13
-  if(oldCol===13&&newCol!==13){p.termino='';if(p.pct===100)p.pct=90;}
+  // auto concluído se Upload BDOC (col 13) ou Projetos Concluídos (col 14)
+  if(newCol===13||newCol===14){if(!p.termino)p.termino=td();p.pct=100;}
+  // volta de 13/14
+  if((oldCol===13||oldCol===14)&&newCol!==13&&newCol!==14){p.termino='';if(p.pct===100)p.pct=90;}
   fbSalvarProjeto(p);
   renderAll();
   showToast(`✅ "${p.nome.length>28?p.nome.slice(0,26)+'…':p.nome}" → ${colLabel(newCol)}`);
@@ -2688,7 +2720,92 @@ function exportCSV(){
 function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('on');setTimeout(()=>t.classList.remove('on'),3500)}
 
 // ── RENDER ALL ──
-function renderAll(){rDash();rKanban();rList();rTimeline();rKPIs();rAtrasos();rCancelados();rCarga();rHistorico();}
+// ── MEDIÇÃO ──────────────────────────────────────────────────────────────────
+
+function enviarMedicao(id){
+  const p = DB.find(x=>x.id===id); if(!p) return;
+  if(!confirm(`Enviar "${p.nome}" para a fila de Medição?`)) return;
+  p.enviadoMedicao = td();
+  p.medicaoFeita   = false;
+  p.medicaoFeitaEm = null;
+  fbSalvarProjeto(p);
+  renderAll();
+  showToast('📐 Projeto enviado para Medição!');
+}
+
+function confirmarMedicao(id){
+  const p = DB.find(x=>x.id===id); if(!p) return;
+  if(p.medicaoFeita){
+    if(!confirm(`Desmarcar a medição de "${p.nome}"?`)) return;
+    p.medicaoFeita   = false;
+    p.medicaoFeitaEm = null;
+    p.col = 13; // volta para Upload BDOC
+    fbSalvarProjeto(p);
+    renderAll();
+    showToast('↩️ Medição desmarcada — projeto retornou para Upload BDOC.');
+    return;
+  }
+  if(!confirm(`Confirmar que a medição de "${p.nome}" foi realizada?`)) return;
+  p.medicaoFeita   = true;
+  p.medicaoFeitaEm = td();
+  p.col = 14; // move para Projetos Concluídos
+  fbSalvarProjeto(p);
+  renderAll();
+  showToast('🎉 Medição confirmada! Projeto movido para Projetos Concluídos.');
+}
+
+function rMedicao(){
+  const lista = activeDB().concat(cancelDB()).filter(p => p.enviadoMedicao);
+  const pendentes  = lista.filter(p => !p.medicaoFeita).length;
+  const concluidas = lista.filter(p =>  p.medicaoFeita).length;
+
+  const statsEl = document.getElementById('medicaoStats');
+  if(statsEl) statsEl.innerHTML = `
+    <div class="sc cp"><div class="sc-l">Total na Medição</div><div class="sc-v">${lista.length}</div><div class="sc-s">projetos enviados</div><div class="sc-i">📐</div></div>
+    <div class="sc cy"><div class="sc-l">Aguardando Medição</div><div class="sc-v">${pendentes}</div><div class="sc-s">a medir</div><div class="sc-i">⏳</div></div>
+    <div class="sc cg"><div class="sc-l">Medição Concluída</div><div class="sc-v">${concluidas}</div><div class="sc-s">já medidos</div><div class="sc-i">✅</div></div>
+  `;
+
+  const tbl = document.getElementById('medicaoTbl');
+  if(!tbl) return;
+  if(lista.length === 0){
+    tbl.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:28px;color:var(--mu)">Nenhum projeto enviado para medição ainda.</td></tr>';
+    return;
+  }
+  // Pendentes primeiro, depois concluídos
+  const sorted = [...lista].sort((a,b) => {
+    if(a.medicaoFeita === b.medicaoFeita) return (b.enviadoMedicao||'').localeCompare(a.enviadoMedicao||'');
+    return a.medicaoFeita ? 1 : -1;
+  });
+  tbl.innerHTML = sorted.map(p => `
+    <tr style="${p.medicaoFeita?'opacity:.7':''}">
+      <td>
+        <span style="font-weight:600;cursor:pointer;color:var(--blue)" onclick="openDet(${p.id})">${p.nome}</span>
+        ${p.cancelado?'<span style="font-size:10px;color:var(--mu);margin-left:6px">(cancelado)</span>':''}
+      </td>
+      <td>${avList(p.resps)}</td>
+      <td>${recTags(p.recursos)}</td>
+      <td style="white-space:nowrap">${fd(p.termino||p.enviadoMedicao)}</td>
+      <td style="white-space:nowrap">${fd(p.enviadoMedicao)}</td>
+      <td style="text-align:center">
+        ${p.medicaoFeita
+          ? `<span class="badge-medicao-ok">✅ Feita em ${fd(p.medicaoFeitaEm)}</span>`
+          : `<span class="badge-medicao-pend">⏳ Pendente</span>`}
+      </td>
+      <td style="text-align:center">
+        <button onclick="confirmarMedicao(${p.id})"
+          style="padding:5px 12px;border:none;border-radius:6px;cursor:pointer;font-size:11.5px;font-weight:600;font-family:'Plus Jakarta Sans',sans-serif;
+          background:${p.medicaoFeita?'var(--s2)':'var(--green)'};color:${p.medicaoFeita?'var(--mu)':'#fff'};transition:opacity .15s"
+          title="${p.medicaoFeita?'Desmarcar medição':'Confirmar medição feita'}">
+          ${p.medicaoFeita ? '↩️ Desmarcar' : '✅ Confirmar'}
+        </button>
+      </td>
+    </tr>`).join('');
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+
+function renderAll(){rDash();rKanban();rList();rTimeline();rKPIs();rAtrasos();rCancelados();rMedicao();rCarga();rHistorico();}
 
 // ══════════════════════════════════════════════
 //  FIREBASE — PERSISTÊNCIA EM TEMPO REAL
@@ -2712,11 +2829,14 @@ function setStatus(state, msg){
 // ── NORMALIZAR campos do projeto ──
 function normalizar(p){
   if(!p) return p;
-  p.resps     = p.resps    || [];
-  p.recursos  = p.recursos || [];
-  p.etapas    = p.etapas   || [];
-  p.col       = typeof p.col === 'string' ? parseInt(p.col) : (p.col || 0);
-  p.cancelado = !!p.cancelado;
+  p.resps          = p.resps    || [];
+  p.recursos       = p.recursos || [];
+  p.etapas         = p.etapas   || [];
+  p.col            = typeof p.col === 'string' ? parseInt(p.col) : (p.col || 0);
+  p.cancelado      = !!p.cancelado;
+  p.enviadoMedicao = p.enviadoMedicao || null; // ISO date ou null
+  p.medicaoFeita   = !!p.medicaoFeita;
+  p.medicaoFeitaEm = p.medicaoFeitaEm || null;
   return p;
 }
 
