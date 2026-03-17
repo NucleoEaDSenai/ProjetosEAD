@@ -566,9 +566,9 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
       <div style="position:relative;display:inline-block" id="exportMenuWrap">
         <button class="btn bg2 bsm" onclick="toggleExportMenu()" aria-label="Exportar dados" aria-haspopup="true" aria-expanded="false" id="btnExport">⬇️ Exportar ▾</button>
         <div id="exportMenu" style="display:none;position:absolute;right:0;top:calc(100% + 6px);background:#fff;border:1px solid var(--bdr);border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.12);z-index:999;min-width:210px;overflow:hidden">
-          <div onclick="exportXLSX();toggleExportMenu()" style="padding:11px 16px;cursor:pointer;font-size:13px;display:flex;align-items:center;gap:9px;transition:background .15s" onmouseover="this.style.background='var(--s2)'" onmouseout="this.style.background=''">📊 <span><strong>Exportar XLSX</strong><br><small style="color:var(--mu)">Planilha completa com etapas e atrasos</small></span></div>
+          <div onclick="exportXLSX();toggleExportMenu()" style="padding:11px 16px;cursor:pointer;font-size:13px;display:flex;align-items:center;gap:9px;transition:background .15s" onmouseover="this.style.background='var(--s2)'" onmouseout="this.style.background=''">📊 <span><strong>Exportar XLSX</strong><br><small style="color:var(--mu)">Projetos, Etapas, Atrasos, Homologações e Medição</small></span></div>
           <div style="border-top:1px solid var(--bdr);margin:0"></div>
-          <div onclick="exportPDFLista();toggleExportMenu()" style="padding:11px 16px;cursor:pointer;font-size:13px;display:flex;align-items:center;gap:9px;transition:background .15s" onmouseover="this.style.background='var(--s2)'" onmouseout="this.style.background=''">📋 <span><strong>PDF — Lista de Projetos</strong><br><small style="color:var(--mu)">Tabela geral + KPIs + atrasos</small></span></div>
+          <div onclick="exportPDFLista();toggleExportMenu()" style="padding:11px 16px;cursor:pointer;font-size:13px;display:flex;align-items:center;gap:9px;transition:background .15s" onmouseover="this.style.background='var(--s2)'" onmouseout="this.style.background=''">📋 <span><strong>PDF — Lista de Projetos</strong><br><small style="color:var(--mu)">Projetos + KPIs + Atrasos + Homologações + Medição</small></span></div>
           <div style="border-top:1px solid var(--bdr);margin:0"></div>
           <div onclick="toggleExportMenu()" style="padding:11px 16px;cursor:pointer;font-size:13px;display:flex;align-items:center;gap:9px;color:var(--mu)" onmouseover="this.style.background='var(--s2)'" onmouseout="this.style.background=''">📄 <span>PDF — Ficha do Projeto<br><small>Abra o projeto e use o botão interno</small></span></div>
         </div>
@@ -2531,8 +2531,46 @@ function exportXLSX(){
   wsA['!cols'] = [40,16,36,10,14,14,22,40].map(w=>({wch:w}));
   XLSX.utils.book_append_sheet(wb, wsA, 'Atrasos');
 
+  // ── Aba 4: Homologações ──
+  const hdrH = ['Projeto','Situação','RP','Academia','ID Curso','Pacote SCORM','Solicitante','Enviada Por','RT','Conclusão','Nota de Corte','Novo/Manutenção','Serviço','Dt. Homologação','Dt. Autorização','Dt. Instalação SIRH','Status'];
+  const todosTodos = activeDB().concat(cancelDB());
+  const rowsH = todosTodos
+    .filter(p => p.col === 11 || p.homolog?.preenchido)
+    .map(p => {
+      const h = p.homolog || {};
+      return [
+        p.nome, sitLabel(p), p.rp||'', p.academia||'',
+        h.idCurso||'', h.pacoteScorm||'', h.solicitante||'', h.enviadaPor||'',
+        h.rt||'', h.conclusao||'', h.notaCorte||'', h.novoManut||'', h.servico||'',
+        isoToBR(h.dtHomolog), isoToBR(h.dtAutorizacao), isoToBR(h.dtInstalacao),
+        h.dtInstalacao ? 'Instalado' : 'Pendente'
+      ];
+    });
+  if(rowsH.length === 0) rowsH.push(['Nenhuma homologação registrada']);
+  const wsH = XLSX.utils.aoa_to_sheet([hdrH, ...rowsH]);
+  wsH['!cols'] = [44,16,14,14,14,22,16,16,16,14,14,16,18,18,18,18,12].map(w=>({wch:w}));
+  XLSX.utils.book_append_sheet(wb, wsH, 'Homologações');
+
+  // ── Aba 5: Medição ──
+  const hdrM = ['Projeto','Situação','Responsáveis','Recursos','Coluna Atual','Enviado p/ Medição em','Medição Feita?','Medição Concluída em'];
+  const rowsM = todosTodos
+    .filter(p => p.enviadoMedicao)
+    .sort((a,b) => (a.medicaoFeita===b.medicaoFeita) ? 0 : a.medicaoFeita ? 1 : -1)
+    .map(p => [
+      p.nome, sitLabel(p),
+      (p.resps||[]).join('; '), (p.recursos||[]).join('; '),
+      colLabel(p.col),
+      isoToBR(p.enviadoMedicao),
+      p.medicaoFeita ? 'Sim' : 'Não',
+      isoToBR(p.medicaoFeitaEm)
+    ]);
+  if(rowsM.length === 0) rowsM.push(['Nenhum projeto enviado para medição']);
+  const wsM = XLSX.utils.aoa_to_sheet([hdrM, ...rowsM]);
+  wsM['!cols'] = [44,16,30,30,28,22,14,22].map(w=>({wch:w}));
+  XLSX.utils.book_append_sheet(wb, wsM, 'Medição');
+
   XLSX.writeFile(wb, `projetos-ead-${td()}.xlsx`);
-  showToast('📊 XLSX exportado com 3 abas!');
+  showToast('📊 XLSX exportado com 5 abas!');
 }
 
 // ── PDF FICHA DO PROJETO ──────────────────────────────────────────────────────
@@ -2765,6 +2803,77 @@ function exportPDFLista(){
         const d=parseInt(data.cell.raw);
         if(d>10) data.cell.styles.textColor=[220,38,38];
         else if(d>5) data.cell.styles.textColor=[217,119,6];
+        data.cell.styles.fontStyle='bold';
+      }
+    }
+  });
+
+  // ══ NOVA PÁGINA: Homologações ══
+  doc.addPage(); cabecalho('Homologações'); y=30;
+  const todosTodos2 = activeDB().concat(cancelDB());
+  const homList = todosTodos2.filter(p => p.col === 11 || p.homolog?.preenchido)
+    .sort((a,b) => {
+      const ai = !!(a.homolog?.dtInstalacao), bi = !!(b.homolog?.dtInstalacao);
+      if(ai !== bi) return ai ? 1 : -1;
+      return a.nome.localeCompare(b.nome);
+    });
+  const hdrHpdf = [['Projeto','RP','Academia','Solicitante','Serviço','Tipo','Conclusão','Dt. Homolog.','Dt. Autor.','Dt. Instal.','Status']];
+  const rowsHpdf = homList.map(p => {
+    const h = p.homolog || {};
+    return [
+      p.nome, p.rp||'—', p.academia||'—',
+      h.solicitante||'—', h.servico||'—', h.novoManut||'—', h.conclusao||'—',
+      isoToBR(h.dtHomolog)||'—', isoToBR(h.dtAutorizacao)||'—', isoToBR(h.dtInstalacao)||'—',
+      h.dtInstalacao ? 'Instalado' : 'Pendente'
+    ];
+  });
+  if(rowsHpdf.length === 0) rowsHpdf.push(['Nenhuma homologação registrada','','','','','','','','','','']);
+  doc.autoTable({
+    head:hdrHpdf, body:rowsHpdf, startY:y,
+    margin:{left:ML,right:MR},
+    styles:{fontSize:7.5,cellPadding:2,overflow:'ellipsize'},
+    headStyles:{fillColor:[0,61,165],textColor:255,fontStyle:'bold'},
+    alternateRowStyles:{fillColor:[240,244,255]},
+    columnStyles:{
+      0:{cellWidth:52},1:{cellWidth:16},2:{cellWidth:16},3:{cellWidth:20},
+      4:{cellWidth:20},5:{cellWidth:18},6:{cellWidth:18},
+      7:{cellWidth:22},8:{cellWidth:22},9:{cellWidth:22},10:{cellWidth:18}
+    },
+    didParseCell(data){
+      if(data.section==='body'&&data.column.index===10){
+        if(data.cell.raw==='Instalado') data.cell.styles.textColor=[26,138,74];
+        else data.cell.styles.textColor=[217,119,6];
+        data.cell.styles.fontStyle='bold';
+      }
+    }
+  });
+
+  // ══ NOVA PÁGINA: Medição ══
+  doc.addPage(); cabecalho('Medição'); y=30;
+  const medicList = todosTodos2.filter(p => p.enviadoMedicao)
+    .sort((a,b) => (a.medicaoFeita===b.medicaoFeita) ? 0 : a.medicaoFeita ? 1 : -1);
+  const hdrMpdf = [['Projeto','Responsáveis','Recursos','Coluna Atual','Enviado em','Medição Feita?','Concluído em']];
+  const rowsMpdf = medicList.map(p => [
+    p.nome, (p.resps||[]).join(', '), (p.recursos||[]).join(', '),
+    colLabel(p.col), isoToBR(p.enviadoMedicao),
+    p.medicaoFeita ? 'Sim' : 'Não',
+    isoToBR(p.medicaoFeitaEm)||'—'
+  ]);
+  if(rowsMpdf.length === 0) rowsMpdf.push(['Nenhum projeto enviado para medição','','','','','','']);
+  doc.autoTable({
+    head:hdrMpdf, body:rowsMpdf, startY:y,
+    margin:{left:ML,right:MR},
+    styles:{fontSize:8,cellPadding:2,overflow:'ellipsize'},
+    headStyles:{fillColor:[124,58,237],textColor:255,fontStyle:'bold'},
+    alternateRowStyles:{fillColor:[245,243,255]},
+    columnStyles:{
+      0:{cellWidth:60},1:{cellWidth:45},2:{cellWidth:45},
+      3:{cellWidth:42},4:{cellWidth:22},5:{cellWidth:22},6:{cellWidth:22}
+    },
+    didParseCell(data){
+      if(data.section==='body'&&data.column.index===5){
+        if(data.cell.raw==='Sim') data.cell.styles.textColor=[26,138,74];
+        else data.cell.styles.textColor=[217,119,6];
         data.cell.styles.fontStyle='bold';
       }
     }
