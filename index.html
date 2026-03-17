@@ -1098,7 +1098,7 @@ function delInf(p){
   (p.etapas||[]).forEach(e=>{
     if(!e.done&&e.prazo&&new Date(e.prazo)<new Date()){
       const d=dd(e.prazo,td());
-      if(e.r==='eq')eq+=d; else cl+=d;
+      if(e.r!=='cl')eq+=d; else cl+=d;
     }
   });
   if(!eq&&calcSit(p)==='atrasado') eq=dd(p.prazo,td());
@@ -1584,7 +1584,7 @@ function rAtrasos(){
           statusEtapa = 'concluida_atraso';
           fimRef = e.fim;
           totalHistorico++;
-          if(e.r==='eq') totalEq++; else totalCl++;
+          if(e.r!=='cl') totalEq++; else totalCl++;
         } else {
           // Concluída no prazo — aparece no histórico só se filtro for "todos"
           // Não incluir linhas sem atraso para não poluir
@@ -1599,7 +1599,7 @@ function rAtrasos(){
         diasAtraso = Math.round((new Date() - new Date(base)) / 864e5);
         statusEtapa = 'aberta_atraso';
         totalAberto++;
-        if(e.r==='eq') totalEq++; else totalCl++;
+        if(e.r!=='cl') totalEq++; else totalCl++;
       } else {
         return; // sem atraso
       }
@@ -1651,7 +1651,7 @@ function rAtrasos(){
     : rows.map(r => {
         const respBdg = r.r==='cl'
           ? '<span class="db dcl" style="font-size:11px">🏢 Cliente</span>'
-          : '<span class="db deq" style="font-size:11px">👥 Equipe</span>';
+          : `<span class="db deq" style="font-size:11px">👤 ${r.r==='eq'?'Equipe':r.r}</span>`;
         const statusBdg = r.statusEtapa==='concluida_atraso'
           ? `<span class="sit sit-done" style="font-size:11px">✓ Concluída</span>`
           : `<span class="sit sit-ov" style="font-size:11px">⚠️ Em aberto</span>`;
@@ -1738,8 +1738,7 @@ function openDet(id){
       </div></td>
       <td>
         <select class="iis" onchange="setER(${id},${i},this.value)">
-          <option value="eq" ${e.r==='eq'?'selected':''}>👥 Equipe</option>
-          <option value="cl" ${e.r==='cl'?'selected':''}>🏢 Cliente</option>
+          ${detRespOpts(p.resps||[], e.r)}
         </select>
       </td>
       <td>
@@ -1761,7 +1760,7 @@ function openDet(id){
       <td style="white-space:nowrap;color:var(--green)">${fd(e.fim)||'—'}</td>
       <td>${sitEtapa(e)}</td>
       <td style="min-width:160px;font-size:11.5px;vertical-align:middle">
-        ${e.done && e.r==='eq' && e.prazo && e.fim && new Date(e.prazo)<new Date(e.fim)
+        ${e.done && e.r!=='cl' && e.prazo && e.fim && new Date(e.prazo)<new Date(e.fim)
           ? e.atrasoMotivo
             ? `<span style="color:var(--red)" title="${e.atrasoMotivo}">⚠️ ${e.atrasoMotivo.length>38?e.atrasoMotivo.slice(0,36)+'…':e.atrasoMotivo}</span>`
             : '<span style="color:var(--mu);font-style:italic">sem motivo registrado</span>'
@@ -1933,7 +1932,7 @@ function toggleE(pid,idx){
   renderAll();
 
   // Etapa da equipe concluída com atraso → abrir modal de motivo
-  if(e.done && e.r==='eq' && e.prazo && new Date(e.prazo)<new Date()){
+  if(e.done && e.r!=='cl' && e.prazo && new Date(e.prazo)<new Date()){
     _motivoPid=pid; _motivoIdx=idx;
     const d=Math.round((new Date()-new Date(e.prazo))/(864e5));
     document.getElementById('motivoDesc').textContent=
@@ -1972,6 +1971,24 @@ function setEPdma(pid,idx){
   const iso=dma2iso(d,m,a);
   if(iso) setEP(pid,idx,iso);
 }
+// Gera options do select de responsável na ficha de detalhe
+// recebe array de nomes alocados no projeto e valor atual da etapa
+function detRespOpts(resps, valorAtual){
+  const opts = [];
+  if(resps.length > 0){
+    resps.forEach(nome => {
+      const sel = (valorAtual === nome) ? 'selected' : '';
+      opts.push(`<option value="${nome}" ${sel}>👤 ${nome}</option>`);
+    });
+  } else {
+    const sel = (valorAtual === 'eq' || !valorAtual) ? 'selected' : '';
+    opts.push(`<option value="eq" ${sel}>👥 Equipe</option>`);
+  }
+  const selCl = (valorAtual === 'cl') ? 'selected' : '';
+  opts.push(`<option value="cl" ${selCl}>🏢 Cliente</option>`);
+  return opts.join('');
+}
+
 function setER(pid,idx,v){const p=DB.find(x=>x.id===pid);if(!p)return;p.etapas[idx].r=v;fbSalvarProjeto(p);renderAll();openDet(pid);}
 
 // ── CANCELAR ──
@@ -2017,6 +2034,31 @@ function getSelectedResps(){
 // Estado temporário das etapas no formulário (array mutável durante edição)
 let _efEtapas = [];
 
+// Gera as <option> do select de responsável por etapa
+// com base nos responsáveis alocados no projeto (lidos dos chips selecionados)
+function _efRespOpts(valorAtual){
+  const resps = getSelectedResps(); // nomes já selecionados nos chips
+  const opts = [];
+
+  // Opções de equipe: cada responsável alocado
+  if(resps.length > 0){
+    resps.forEach(nome => {
+      const sel = (valorAtual === nome) ? 'selected' : '';
+      opts.push(`<option value="${nome}" ${sel}>👤 ${nome}</option>`);
+    });
+  } else {
+    // Fallback se nenhum responsável selecionado ainda
+    const sel = (valorAtual === 'eq' || !valorAtual || valorAtual === '') ? 'selected' : '';
+    opts.push(`<option value="eq" ${sel}>👥 Equipe</option>`);
+  }
+
+  // Sempre adiciona Cliente ao final
+  const selCl = (valorAtual === 'cl') ? 'selected' : '';
+  opts.push(`<option value="cl" ${selCl}>🏢 Cliente</option>`);
+
+  return opts.join('');
+}
+
 function buildEF(etapas){
   _efEtapas = etapas.map(e=>({...e})); // cópia mutável
   _renderEF();
@@ -2043,8 +2085,7 @@ function _renderEF(){
           </td>
           <td>
             <select class="iis" id="er${i}" style="width:100%">
-              <option value="eq" ${e.r==='eq'?'selected':''}>👥 Equipe</option>
-              <option value="cl" ${e.r==='cl'?'selected':''}>🏢 Cliente</option>
+              ${_efRespOpts(e.r)}
             </select>
           </td>
           <td>
@@ -2417,7 +2458,7 @@ function exportXLSX(){
         diasAt = Math.round((new Date()-new Date(e.prazo))/864e5);
       rowsE.push([
         p.nome, sitLabel(p), e.lb, i+1,
-        e.r==='cl'?'🏢 Cliente':'👥 Equipe',
+        e.r==='cl'?'🏢 Cliente':`👤 ${e.r==='eq'?'Equipe':e.r}`,
         isoToBR(e.prazo), isoToBR(e.fim),
         e.done?'Sim':'Não',
         diasAt||'', e.atrasoMotivo||''
@@ -2443,7 +2484,7 @@ function exportXLSX(){
         statusEt='Em aberto — atrasada';
       } else return;
       rowsA.push([p.nome, sitLabel(p), e.lb,
-        e.r==='cl'?'Cliente':'Equipe',
+        e.r==='cl'?'Cliente':(e.r==='eq'?'Equipe':e.r),
         isoToBR(e.prazo), diasAt, statusEt, e.atrasoMotivo||'—']);
     });
   });
@@ -2537,7 +2578,7 @@ function exportPDFFicha(id){
     let diasAt='';
     if(e.done&&e.fim&&e.prazo&&e.fim>e.prazo) diasAt=Math.round((new Date(e.fim)-new Date(e.prazo))/864e5)+'d';
     else if(!e.done&&e.prazo&&new Date(e.prazo)<new Date()) diasAt=Math.round((new Date()-new Date(e.prazo))/864e5)+'d ⚠';
-    return [i+1, e.lb, e.r==='cl'?'Cliente':'Equipe', isoToBR(e.prazo), isoToBR(e.fim), e.done?'✓':'', diasAt, e.atrasoMotivo||''];
+    return [i+1, e.lb, e.r==='cl'?'Cliente':(e.r==='eq'?'Equipe':e.r), isoToBR(e.prazo), isoToBR(e.fim), e.done?'✓':'', diasAt, e.atrasoMotivo||''];
   });
   doc.autoTable({
     head: etHdr, body: etRows, startY: y,
@@ -2666,7 +2707,7 @@ function exportPDFLista(){
         diasAt=Math.round((new Date()-new Date(e.prazo))/864e5);
         statusEt='Em aberto — atrasada';
       } else return;
-      rowsA.push([p.nome,sitLabel(p),e.lb,e.r==='cl'?'Cliente':'Equipe',isoToBR(e.prazo),diasAt+'d',statusEt,e.atrasoMotivo||'—']);
+      rowsA.push([p.nome,sitLabel(p),e.lb,e.r==='cl'?'Cliente':(e.r==='eq'?'Equipe':e.r),isoToBR(e.prazo),diasAt+'d',statusEt,e.atrasoMotivo||'—']);
     });
   });
   rowsA.sort((a,b)=>parseInt(b[5])-parseInt(a[5]));
