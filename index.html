@@ -447,6 +447,29 @@ body.dark .carga-card{background:var(--surface);border-color:var(--bdr)}
 /* ═══ ACESSIBILIDADE — WCAG 2.1 AA ═══ */
 /* Skip link */
 .skip-link{position:absolute;top:-100px;left:8px;background:var(--blue);color:#fff;padding:8px 16px;border-radius:0 0 8px 8px;font-weight:700;font-size:13px;z-index:9999;text-decoration:none;transition:top .15s}
+/* NOTIFICAÇÕES */
+.notif-bell{position:relative;cursor:pointer;display:flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:8px;transition:background .15s;color:var(--txt)}
+.notif-bell:hover{background:var(--s2)}
+.notif-badge{position:absolute;top:3px;right:3px;background:var(--red);color:#fff;border-radius:10px;font-size:9.5px;font-weight:800;padding:1px 5px;min-width:16px;text-align:center;line-height:14px;pointer-events:none}
+.notif-panel{position:absolute;top:calc(100% + 10px);right:0;width:380px;background:#fff;border:1px solid var(--bdr);border-radius:12px;box-shadow:0 12px 40px rgba(0,0,0,.14);z-index:999;overflow:hidden}
+.notif-panel-head{padding:13px 16px;border-bottom:1px solid var(--bdr);display:flex;align-items:center;justify-content:space-between}
+.notif-panel-title{font-weight:700;font-size:13.5px}
+.notif-panel-actions{display:flex;gap:8px}
+.notif-panel-action{font-size:11.5px;color:var(--blue);cursor:pointer;background:none;border:none;padding:0;font-family:'Plus Jakarta Sans',sans-serif;font-weight:600}
+.notif-panel-action:hover{text-decoration:underline}
+.notif-list{max-height:380px;overflow-y:auto}
+.notif-item{padding:12px 16px;border-bottom:1px solid var(--bdr);display:flex;gap:10px;align-items:flex-start;transition:background .15s}
+.notif-item:last-child{border-bottom:none}
+.notif-item.unread{background:#F0F6FF}
+.notif-item.read{background:#fff;opacity:.75}
+.notif-icon{font-size:18px;flex-shrink:0;margin-top:1px}
+.notif-content{flex:1;min-width:0}
+.notif-text{font-size:12.5px;line-height:1.45;color:var(--txt);margin-bottom:3px}
+.notif-meta{font-size:10.5px;color:var(--mu);display:flex;gap:8px;align-items:center}
+.notif-del{background:none;border:none;cursor:pointer;color:var(--mu);font-size:14px;padding:0 2px;flex-shrink:0;line-height:1;transition:color .15s;margin-top:1px}
+.notif-del:hover{color:var(--red)}
+.notif-empty{padding:28px 16px;text-align:center;color:var(--mu);font-size:12.5px}
+.si-badge{display:inline-flex;align-items:center;justify-content:center;background:var(--red);color:#fff;border-radius:10px;font-size:9px;font-weight:800;padding:1px 5px;min-width:15px;margin-left:auto;line-height:14px}
 .skip-link:focus{top:0}
 /* Foco visível em todos elementos interativos */
 :focus-visible{outline:3px solid #005FCC;outline-offset:2px;border-radius:3px}
@@ -538,19 +561,19 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
     <div class="si" role="menuitem" tabindex="0" aria-label="Novo Projeto" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openNew()}"" onclick="openNew()"><span class="si-ic">➕</span><span>Novo Projeto</span></div>
     <div class="sb-sec">Principal</div>
     <div class="si" role="menuitem" tabindex="0" aria-label="Kanban — Quadro de projetos" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();nav('kanban')}" on" onclick="nav('kanban')"><span class="si-ic">🗂️</span><span>Kanban</span></div>
-    <div class="si" role="menuitem" tabindex="0" aria-label="Homologações" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();nav('homologacoes')}"" onclick="nav('homologacoes')"><span class="si-ic">🔖</span><span>Homologações</span></div>
+    <div class="si" role="menuitem" tabindex="0" aria-label="Homologações" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();nav('homologacoes')}"" onclick="nav('homologacoes')"><span class="si-ic">🔖</span><span>Homologações</span><span class="si-badge" id="badgeHomolog" style="display:none"></span></div>
     <div class="si" role="menuitem" tabindex="0" aria-label="Lista de Projetos" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();nav('projetos')}"" onclick="nav('projetos')"><span class="si-ic">📋</span><span>Lista de Projetos</span></div>
     <div class="si" role="menuitem" tabindex="0" aria-label="Cronograma" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();nav('timeline')}"" onclick="nav('timeline')"><span class="si-ic">📅</span><span>Cronograma</span></div>
     <div class="sb-sec">Análise</div>
     <div class="si" role="menuitem" tabindex="0" aria-label="KPIs e Indicadores" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();nav('kpis')}"" onclick="nav('kpis')"><span class="si-ic">📈</span><span>KPIs &amp; Indicadores</span></div>
-    <div class="si" role="menuitem" tabindex="0" aria-label="Relatório de Atrasos" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();nav('atrasos')}"" onclick="nav('atrasos')"><span class="si-ic">⚠️</span><span>Rel. de Atrasos</span></div>
-    <div class="si" role="menuitem" tabindex="0" aria-label="Medição" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();nav('medicao')}"" onclick="nav('medicao')"><span class="si-ic">📐</span><span>Medição</span></div>
+    <div class="si" role="menuitem" tabindex="0" aria-label="Relatório de Atrasos" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();nav('atrasos')}"" onclick="nav('atrasos')"><span class="si-ic">⚠️</span><span>Rel. de Atrasos</span><span class="si-badge" id="badgeAtrasos" style="display:none"></span></div>
+    <div class="si" role="menuitem" tabindex="0" aria-label="Medição" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();nav('medicao')}"" onclick="nav('medicao')"><span class="si-ic">📐</span><span>Medição</span><span class="si-badge" id="badgeMedicao" style="display:none"></span></div>
     <div class="si" role="menuitem" tabindex="0" aria-label="Projetos Cancelados" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();nav('cancelados')}"" onclick="nav('cancelados')"><span class="si-ic">🚫</span><span>Cancelados</span></div>
     <div class="sb-sec">Equipe</div>
     <div class="si" role="menuitem" tabindex="0" aria-label="Carga da Equipe" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();nav('carga')}"" onclick="nav('carga')"><span class="si-ic">👥</span><span>Carga da Equipe</span></div>
     <div class="si" role="menuitem" tabindex="0" aria-label="Histórico de Edições" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();nav('historico')}"" onclick="nav('historico')"><span class="si-ic">📝</span><span>Histórico</span></div>
   </nav>
-  <div class="sb-foot" style="display:flex;align-items:center;justify-content:space-between"><span>v5.0 · Firjan SENAI</span><button class="dark-btn" id="darkBtn" onclick="toggleDark()">🌙</button></div>
+  <div class="sb-foot" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:4px"><span>v5.1 · Firjan SENAI</span><div style="display:flex;gap:4px"><button class="dark-btn" onclick="abrirMigracao()" title="Migrar dados" style="font-size:10px;padding:3px 6px;opacity:.5">🔄</button><button class="dark-btn" id="darkBtn" onclick="toggleDark()">🌙</button></div></div>
 </aside>
 
 <div class="main" role="main" id="main-content" tabindex="-1">
@@ -571,6 +594,22 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
           <div onclick="exportPDFLista();toggleExportMenu()" style="padding:11px 16px;cursor:pointer;font-size:13px;display:flex;align-items:center;gap:9px;transition:background .15s" onmouseover="this.style.background='var(--s2)'" onmouseout="this.style.background=''">📋 <span><strong>PDF — Lista de Projetos</strong><br><small style="color:var(--mu)">Projetos + KPIs + Atrasos + Homologações + Medição</small></span></div>
           <div style="border-top:1px solid var(--bdr);margin:0"></div>
           <div onclick="toggleExportMenu()" style="padding:11px 16px;cursor:pointer;font-size:13px;display:flex;align-items:center;gap:9px;color:var(--mu)" onmouseover="this.style.background='var(--s2)'" onmouseout="this.style.background=''">📄 <span>PDF — Ficha do Projeto<br><small>Abra o projeto e use o botão interno</small></span></div>
+        </div>
+      </div>
+      <div style="position:relative" id="notifWrap">
+        <div class="notif-bell" id="notifBell" onclick="toggleNotifPanel()" title="Notificações">
+          🔔
+          <span class="notif-badge" id="notifBadge" style="display:none">0</span>
+        </div>
+        <div class="notif-panel" id="notifPanel" style="display:none">
+          <div class="notif-panel-head">
+            <span class="notif-panel-title">🔔 Notificações</span>
+            <div class="notif-panel-actions">
+              <button class="notif-panel-action" onclick="marcarTodasLidas()">Marcar todas como lidas</button>
+              <button class="notif-panel-action" style="color:var(--red)" onclick="apagarTodasNotif()">Apagar todas</button>
+            </div>
+          </div>
+          <div class="notif-list" id="notifList"></div>
         </div>
       </div>
       <div class="user-badge" id="userBadge" onclick="fazerLogout()" title="Clique para sair" aria-label="Usuário logado — clique para sair">
@@ -992,7 +1031,7 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
 // ══════════════════════════════════════════════
 //  CONSTANTS
 // ══════════════════════════════════════════════
-const NOMES = ['Daniel David','Cláudio','Thiago','Mateus','Maria Emília','Simone','Ângelo','Fabiana','Maria Julia','Ana Paula','Tatiana','Fatima'];
+const NOMES = ['Tatiana','Thiago','Simone','Mariana','Mateus','Maria Julia','Maria Emilia','Marise','Fatima','Fabiana','Daniel','Claudio','Ana Paula','RPCI'];
 
 const RECURSOS = ['Edição Articulate','Manutenção','Gráficos/Imagens','Web Storyline','Web Rise Básico','Web Rise Intermediário','Web Rise Avançado','Encapsulamento','Questionário','Tradução','Projeto Gráfico','Personagem','Apostila/E-book','Autoria Digital'];
 
@@ -1075,9 +1114,10 @@ function recTags(recs){
   return(recs||[]).map(r=>`<span class="rec-tag">${r}</span>`).join('');
 }
 function avHtml(name){
-  let h=0; for(let c of name)h=(h*31+c.charCodeAt(0))%COLS_AV.length;
-  const ini=name.split(' ').slice(0,2).map(n=>n[0]).join('').toUpperCase();
-  return `<div class="av" style="background:${COLS_AV[h]}" title="${name}">${ini}</div>`;
+  // Usa cor fixa se o nome está no mapa, senão usa hash como fallback
+  const cor = NOME_CORES[name] || (() => { let h=0; for(let c of name)h=(h*31+c.charCodeAt(0))%COLS_AV.length; return COLS_AV[h]; })();
+  const ini = name.split(' ').slice(0,2).map(n=>n[0]).join('').toUpperCase();
+  return `<div class="av" style="background:${cor}" title="${name}">${ini}</div>`;
 }
 function avList(resps){
   return `<div style="display:flex;flex-wrap:wrap;gap:3px">${(resps||[]).map(avHtml).join('')}</div>`;
@@ -3062,8 +3102,8 @@ function buildHomologCard(p){
       ${h.dtInstalacao ? `<span class="hom-resumo-item"><span class="hom-resumo-label">Instalação:</span><span class="hom-resumo-val">${h.dtInstalacao.split('-').reverse().join('/')}</span></span>` : ''}
     </div>` : '';
 
-  const SOLICITANTES = ['','Maria Emília','Simone','Thiago','Mateus','Daniel','Claudio','Fabiana','Marise'];
-  const ENVIADA_POR  = ['','Thiago','Mateus','Daniel','Claudio'];
+  const SOLICITANTES = ['','Tatiana','Thiago','Simone','Mariana','Mateus','Maria Julia','Maria Emilia','Marise','Fatima','Fabiana','Daniel','Claudio','Ana Paula','RPCI'];
+  const ENVIADA_POR  = ['','Tatiana','Thiago','Simone','Mariana','Mateus','Maria Julia','Maria Emilia','Marise','Fatima','Fabiana','Daniel','Claudio','Ana Paula','RPCI'];
   const CONCLUSAO    = ['','Navegação','Avaliação'];
   const NOVO_MANUT   = ['','Novo','Manutenção'];
   const SERVICOS     = ['','Básico','Intermediário','Avançado','Encapsulamento','Manutenção','Autoria Digital','Versionamento'];
@@ -3239,7 +3279,201 @@ function rHomologacoes(){
 
 // ─────────────────────────────────────────────────────────────────────────────
 
-function renderAll(){rDash();rKanban();rList();rTimeline();rKPIs();rAtrasos();rCancelados();rMedicao();rHomologacoes();rCarga();rHistorico();}
+// ══════════════════════════════════════════════════════════════════════════════
+//  MIGRAÇÃO DE DADOS — padroniza nomes antigos para o padrão atual
+// ══════════════════════════════════════════════════════════════════════════════
+
+// Mapa completo: nome antigo (qualquer variação) → nome novo padronizado
+const MIGRACAO_NOMES = {
+  // Daniel
+  'Daniel David':         'Daniel',
+  'Daniel david':         'Daniel',
+  // Claudio
+  'Cláudio':              'Claudio',
+  'Claudio Himmelsbach':  'Claudio',
+  // Maria Emilia
+  'Maria Emília':         'Maria Emilia',
+  'Maria emília':         'Maria Emilia',
+  'Maria emilia':         'Maria Emilia',
+  // Maria Julia
+  'Maria Júlia':          'Maria Julia',
+  'Maria júlia':          'Maria Julia',
+  'Maria julia':          'Maria Julia',
+  // Ângelo (removido da equipe — mapear para vazio ou manter?)
+  'Ângelo':               'RPCI',
+  'Angelo':               'RPCI',
+  // Ana Paula (variações)
+  'Ana paula':            'Ana Paula',
+  // Tatiana
+  'Tatiana Lutz':         'Tatiana',
+  // Thiago
+  'Thiago Oliveira':      'Thiago',
+  // Simone
+  'Simone Castro':        'Simone',
+  // Mateus
+  'Mateus Peixoto':       'Mateus',
+  // Fabiana
+  'Fabiana Ribeiro':      'Fabiana',
+  // Fatima
+  'Fátima':               'Fatima',
+  'Fatima Iino':          'Fatima',
+  // Marise
+  'Marise Lopes':         'Marise',
+  // Mariana
+  'Mariana Rodrigues':    'Mariana',
+};
+
+// Normaliza um único nome usando o mapa
+function migrarNome(nome){
+  if(!nome) return nome;
+  return MIGRACAO_NOMES[nome] || nome; // mantém se não está no mapa
+}
+
+// Aplica migração em um projeto e retorna se houve alteração
+function migrarProjeto(p){
+  let alterado = false;
+
+  // resps
+  if(Array.isArray(p.resps)){
+    const novosResps = p.resps.map(migrarNome);
+    if(JSON.stringify(novosResps) !== JSON.stringify(p.resps)){
+      p.resps = novosResps;
+      alterado = true;
+    }
+  }
+
+  // criadoPor e editadoPor
+  ['criadoPor','editadoPor'].forEach(campo => {
+    if(p[campo]){
+      const novo = migrarNome(p[campo]);
+      if(novo !== p[campo]){ p[campo] = novo; alterado = true; }
+    }
+  });
+
+  // rp
+  if(p.rp){
+    const novo = migrarNome(p.rp);
+    if(novo !== p.rp){ p.rp = novo; alterado = true; }
+  }
+
+  // etapas — responsável por etapa (r) quando for nome
+  if(Array.isArray(p.etapas)){
+    p.etapas.forEach(e => {
+      if(e.r && e.r !== 'eq' && e.r !== 'cl'){
+        const novo = migrarNome(e.r);
+        if(novo !== e.r){ e.r = novo; alterado = true; }
+      }
+    });
+  }
+
+  // histórico de edições
+  if(Array.isArray(p.historico)){
+    p.historico.forEach(h => {
+      if(h.usuario){
+        const novo = migrarNome(h.usuario);
+        if(novo !== h.usuario){ h.usuario = novo; alterado = true; }
+      }
+    });
+  }
+
+  return alterado;
+}
+
+// Abre o modal e gera o preview das alterações
+function abrirMigracao(){
+  const todos = activeDB().concat(cancelDB());
+  const preview = document.getElementById('migracaoPreview');
+  const status  = document.getElementById('migracaoStatus');
+  const btn     = document.getElementById('btnExecutarMigracao');
+  if(!preview) return;
+
+  // Simula a migração para mostrar o que vai mudar
+  let linhas = [];
+  let totalAlterados = 0;
+  let totalCampos = 0;
+
+  todos.forEach(p => {
+    const clone = JSON.parse(JSON.stringify(p));
+    const alterado = migrarProjeto(clone);
+    if(alterado){
+      totalAlterados++;
+      // Detectar diferenças específicas
+      const diffs = [];
+      if(JSON.stringify(clone.resps) !== JSON.stringify(p.resps))
+        diffs.push(`Resp: [${p.resps.join(', ')}] → [${clone.resps.join(', ')}]`);
+      if(clone.criadoPor !== p.criadoPor)
+        diffs.push(`Criado por: "${p.criadoPor}" → "${clone.criadoPor}"`);
+      if(clone.editadoPor !== p.editadoPor)
+        diffs.push(`Editado por: "${p.editadoPor}" → "${clone.editadoPor}"`);
+      if(clone.rp !== p.rp)
+        diffs.push(`RP: "${p.rp}" → "${clone.rp}"`);
+      totalCampos += diffs.length;
+      linhas.push(`<div style="margin-bottom:10px">
+        <div style="font-weight:700;color:var(--txt);margin-bottom:3px">📂 ${p.nome}</div>
+        ${diffs.map(d=>`<div style="color:var(--mu);padding-left:10px">↳ ${d}</div>`).join('')}
+      </div>`);
+    }
+  });
+
+  if(linhas.length === 0){
+    preview.innerHTML = '<div style="color:var(--green);font-weight:600">✅ Nenhuma alteração necessária — todos os nomes já estão no padrão atual!</div>';
+    status.textContent = '';
+    btn.disabled = true;
+    btn.style.opacity = '.5';
+  } else {
+    preview.innerHTML = linhas.join('');
+    status.textContent = `${totalAlterados} projeto(s) serão atualizados em ${totalCampos} campo(s).`;
+    btn.disabled = false;
+    btn.style.opacity = '1';
+  }
+
+  document.getElementById('ovMigracao').style.display = 'flex';
+}
+
+// Executa a migração e salva no Firebase
+async function executarMigracao(){
+  if(!fbProjetos){ showToast('⚠️ Sem conexão com Firebase'); return; }
+
+  const btn    = document.getElementById('btnExecutarMigracao');
+  const status = document.getElementById('migracaoStatus');
+  btn.disabled = true;
+  btn.textContent = '⏳ Migrando...';
+
+  const todos = activeDB().concat(cancelDB());
+  let salvos = 0;
+  let erros  = 0;
+
+  for(const p of todos){
+    const alterado = migrarProjeto(p); // modifica p in-place
+    if(alterado){
+      try {
+        const limpo = JSON.parse(JSON.stringify(p, (k,v) => v === undefined ? null : v));
+        await fbProjetos.child('p' + limpo.id).set(limpo);
+        salvos++;
+        status.textContent = `Salvando... ${salvos} de ${todos.filter((_,i)=>i<todos.indexOf(p)+1).length}`;
+      } catch(e){
+        erros++;
+        console.error('Erro ao migrar projeto', p.id, e);
+      }
+    }
+  }
+
+  // Feedback final
+  if(erros === 0){
+    status.innerHTML = `<span style="color:var(--green);font-weight:600">✅ Migração concluída! ${salvos} projeto(s) atualizado(s).</span>`;
+    btn.textContent = '✅ Concluído';
+    showToast(`✅ Migração concluída — ${salvos} projeto(s) atualizado(s)!`);
+    setTimeout(()=>{ document.getElementById('ovMigracao').style.display='none'; renderAll(); }, 2000);
+  } else {
+    status.innerHTML = `<span style="color:var(--org)">⚠️ ${salvos} atualizados, ${erros} com erro. Verifique o console.</span>`;
+    btn.textContent = 'Tentar novamente';
+    btn.disabled = false;
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+
+function renderAll(){rDash();rKanban();rList();rTimeline();rKPIs();rAtrasos();rCancelados();rMedicao();rHomologacoes();rCarga();rHistorico();limparNotifObsoletas();detectarNotificacoes();}
 
 // ══════════════════════════════════════════════
 //  FIREBASE — PERSISTÊNCIA EM TEMPO REAL
@@ -3423,6 +3657,7 @@ function carregarSDKeFire(cfg){
           document.getElementById('ovLogin').style.display = 'none';
           atualizarUserBadge(nome, user.email);
           showToast('👋 Bem-vindo, ' + nome.split(' ')[0] + '!');
+          setTimeout(()=>{detectarNotificacoes();},1500); // após dados carregarem
           const btn = document.getElementById('loginBtn');
           if(btn){ btn.textContent = 'Entrar →'; btn.disabled = false; }
           escutarFirebase(firebase.database(app));
@@ -3677,9 +3912,11 @@ function rCarga(){
     .sort((a,b) => b[1].projetos.length - a[1].projetos.length)
     .map(([nome, d]) => {
       const pct = Math.round(d.projetos.length / max * 100);
-      const cor = d.atrasados > 0 ? 'var(--red)' : d.projetos.length >= 4 ? 'var(--yel)' : 'var(--blue)';
+      const corStatus = d.atrasados > 0 ? 'var(--red)' : d.projetos.length >= 4 ? 'var(--yel)' : 'var(--blue)';
+      const corPessoal = NOME_CORES[nome] || corStatus;
+      const cor = corStatus; // mantém para uso no contador
       return `<div class="carga-card">
-        <div class="carga-av" style="background:${cor}">${iniciais(nome)}</div>
+        <div class="carga-av" style="background:${corPessoal}">${iniciais(nome)}</div>
         <div class="carga-name">${nome}</div>
         <div style="display:flex;align-items:baseline;gap:7px;margin-bottom:2px">
           <div class="carga-count" style="color:${cor}">${d.projetos.length}</div>
@@ -3746,6 +3983,25 @@ const EMAIL_NOMES = {
   'fcribeiro@firjan.com.br':   'Fabiana',
   'dandasilva@firjan.com.br':  'Daniel',
   'chimmelsbach@firjan.com.br':'Claudio',
+  'anpmoura@firjan.com.br':    'Ana Paula',
+};
+
+// Cores fixas por nome — garante que cada pessoa tenha sempre a mesma cor única
+const NOME_CORES = {
+  'Tatiana':     '#b45309',  // âmbar escuro
+  'Thiago':      '#7C3AED',  // roxo
+  'Simone':      '#4169E1',  // azul royal (pedido especial)
+  'Mariana':     '#0891B2',  // ciano
+  'Mateus':      '#7e22ce',  // violeta
+  'Maria Julia': '#D97706',  // laranja
+  'Maria Emilia':'#EC4899',  // rosa
+  'Marise':      '#0f766e',  // teal
+  'Fatima':      '#E8002D',  // vermelho
+  'Fabiana':     '#1A8A4A',  // verde
+  'Daniel':      '#003DA5',  // azul Firjan
+  'Claudio':     '#6D28D9',  // índigo
+  'Ana Paula':   '#c2410c',  // laranja-tijolo
+  'RPCI':        '#0369a1',  // azul aço
 };
 
 // Retorna sempre o melhor nome disponível para o usuário logado
@@ -3758,6 +4014,283 @@ function nomeUsuarioAtual(){
   }
   return localStorage.getItem('firjan_user') || 'Desconhecido';
 }
+
+// ══════════════════════════════════════════════════════════════════════════════
+//  SISTEMA DE NOTIFICAÇÕES — por usuário, independente, com persistência local
+// ══════════════════════════════════════════════════════════════════════════════
+
+// Chave única por usuário no localStorage
+function _notifKey(){
+  const email = (fbCurrentUser?.email||localStorage.getItem('firjan_user_email')||'anon').toLowerCase();
+  return 'firjan_notif_' + email.replace(/[^a-z0-9]/g,'_');
+}
+
+// Normaliza nome para comparação flexível (ex: "Daniel David" ≈ "Daniel")
+function _nomeMatch(nomeA, nomeB){
+  if(!nomeA||!nomeB) return false;
+  const a = nomeA.toLowerCase().trim();
+  const b = nomeB.toLowerCase().trim();
+  return a === b || a.startsWith(b+' ') || b.startsWith(a+' ') || a.includes(b) || b.includes(a);
+}
+
+// Verifica se o usuário atual está envolvido em um projeto
+function _euEnvolvidoEm(p){
+  const eu = nomeUsuarioAtual();
+  if(!eu || eu === 'Desconhecido') return true; // sem usuário identificado, mostra tudo
+  return (p.resps||[]).some(r => _nomeMatch(r, eu))
+    || _nomeMatch(p.rp||'', eu)
+    || _nomeMatch(p.criadoPor||'', eu)
+    || _nomeMatch(p.editadoPor||'', eu);
+}
+
+// Carrega notificações do localStorage
+function _loadNotifs(){
+  try { return JSON.parse(localStorage.getItem(_notifKey())||'[]'); }
+  catch(e){ return []; }
+}
+
+// Salva notificações no localStorage
+function _saveNotifs(arr){
+  try { localStorage.setItem(_notifKey(), JSON.stringify(arr)); }
+  catch(e){}
+}
+
+// Gera ID único para uma notificação (baseado no conteúdo para evitar duplicatas)
+function _notifId(tipo, projId, extra){
+  return `${tipo}_${projId}_${extra||''}`;
+}
+
+// Detecta notificações relevantes e adiciona novas (não duplica)
+function detectarNotificacoes(){
+  const eu = nomeUsuarioAtual();
+  if(!eu || eu === 'Desconhecido') return;
+
+  const todos = activeDB().concat(cancelDB());
+  const notifs = _loadNotifs();
+  const idsExist = new Set(notifs.map(n=>n.id));
+  const novas = [];
+  const hoje = new Date();
+
+  todos.forEach(p => {
+    if(!_euEnvolvidoEm(p)) return;
+
+    // 1. Projeto atrasado
+    if(calcSit(p)==='atrasado' && !p.cancelado){
+      const id = _notifId('atraso', p.id, p.prazo);
+      if(!idsExist.has(id)){
+        const dias = p.prazo ? Math.round((hoje-new Date(p.prazo))/864e5) : '?';
+        novas.push({
+          id, tipo:'atraso', projId:p.id,
+          texto:`<strong>${p.nome}</strong> está atrasado há ${dias} dia${dias!==1?'s':''}.`,
+          icone:'⚠️', dt: new Date().toISOString(), lida:false
+        });
+      }
+    }
+
+    // 2. Prazo vencendo em até 5 dias
+    if(p.prazo && calcSit(p)!=='concluido' && !p.cancelado){
+      const diasPrazo = Math.round((new Date(p.prazo)-hoje)/864e5);
+      if(diasPrazo >= 0 && diasPrazo <= 5){
+        const id = _notifId('prazo', p.id, p.prazo);
+        if(!idsExist.has(id)){
+          novas.push({
+            id, tipo:'prazo', projId:p.id,
+            texto:`<strong>${p.nome}</strong> vence ${diasPrazo===0?'hoje':`em ${diasPrazo} dia${diasPrazo!==1?'s':''}`}.`,
+            icone:'⏰', dt: new Date().toISOString(), lida:false
+          });
+        }
+      }
+    }
+
+    // 3. Homologação pendente (sem data de instalação)
+    if((p.col===11 || p.homolog?.preenchido) && !p.homolog?.dtInstalacao){
+      const id = _notifId('homolog', p.id, 'pend');
+      if(!idsExist.has(id)){
+        novas.push({
+          id, tipo:'homolog', projId:p.id,
+          texto:`<strong>${p.nome}</strong> aguarda instalação na Homologação.`,
+          icone:'🔖', dt: new Date().toISOString(), lida:false
+        });
+      }
+    }
+
+    // 4. Medição pendente
+    if(p.enviadoMedicao && !p.medicaoFeita){
+      const id = _notifId('medicao', p.id, 'pend');
+      if(!idsExist.has(id)){
+        novas.push({
+          id, tipo:'medicao', projId:p.id,
+          texto:`<strong>${p.nome}</strong> foi enviado para Medição e aguarda confirmação.`,
+          icone:'📐', dt: new Date().toISOString(), lida:false
+        });
+      }
+    }
+
+    // 5. Etapas de cliente atrasadas
+    (p.etapas||[]).forEach(e => {
+      if(e.r==='cl' && !e.done && e.prazo && new Date(e.prazo)<hoje){
+        const dias = Math.round((hoje-new Date(e.prazo))/864e5);
+        const id = _notifId('etapacl', p.id, e.lb);
+        if(!idsExist.has(id)){
+          novas.push({
+            id, tipo:'etapacl', projId:p.id,
+            texto:`Etapa "<strong>${e.lb}</strong>" de <strong>${p.nome}</strong> aguarda cliente há ${dias} dia${dias!==1?'s':''}.`,
+            icone:'🏢', dt: new Date().toISOString(), lida:false
+          });
+        }
+      }
+    });
+  });
+
+  if(novas.length > 0){
+    _saveNotifs([...novas, ...notifs]); // novas primeiro
+  }
+  atualizarUINotif();
+}
+
+// Remove notificações cujo projeto já não tem mais o problema
+function limparNotifObsoletas(){
+  const todos = activeDB().concat(cancelDB());
+  let notifs = _loadNotifs();
+  const antes = notifs.length;
+
+  notifs = notifs.filter(n => {
+    const p = todos.find(x=>x.id===n.projId);
+    if(!p) return false; // projeto deletado
+    if(n.tipo==='atraso'   && calcSit(p)!=='atrasado') return false;
+    if(n.tipo==='prazo'    && (calcSit(p)==='concluido'||p.cancelado)) return false;
+    if(n.tipo==='homolog'  && p.homolog?.dtInstalacao) return false;
+    if(n.tipo==='medicao'  && p.medicaoFeita) return false;
+    if(n.tipo==='etapacl'){
+      const etapa = (p.etapas||[]).find(e=>e.lb===n.id.split('_').slice(2).join('_'));
+      if(!etapa || etapa.done) return false;
+    }
+    return true;
+  });
+
+  if(notifs.length !== antes) _saveNotifs(notifs);
+  atualizarUINotif();
+}
+
+// Atualiza badge, menu badges e painel
+function atualizarUINotif(){
+  const notifs = _loadNotifs();
+  const naoLidas = notifs.filter(n=>!n.lida).length;
+
+  // Badge do sino
+  const badge = document.getElementById('notifBadge');
+  if(badge){
+    badge.style.display = naoLidas>0 ? 'inline-flex' : 'none';
+    badge.textContent = naoLidas > 99 ? '99+' : naoLidas;
+  }
+
+  // Badges do menu lateral
+  const homologPend = notifs.filter(n=>n.tipo==='homolog'&&!n.lida).length;
+  const atrasosPend = notifs.filter(n=>(n.tipo==='atraso'||n.tipo==='prazo')&&!n.lida).length;
+  const medicaoPend = notifs.filter(n=>n.tipo==='medicao'&&!n.lida).length;
+
+  const bH = document.getElementById('badgeHomolog');
+  const bA = document.getElementById('badgeAtrasos');
+  const bM = document.getElementById('badgeMedicao');
+  if(bH){ bH.style.display=homologPend>0?'inline-flex':'none'; bH.textContent=homologPend||''; }
+  if(bA){ bA.style.display=atrasosPend>0?'inline-flex':'none'; bA.textContent=atrasosPend||''; }
+  if(bM){ bM.style.display=medicaoPend>0?'inline-flex':'none'; bM.textContent=medicaoPend||''; }
+
+  // Renderizar painel se aberto
+  if(document.getElementById('notifPanel')?.style.display==='block') renderNotifPanel();
+}
+
+// Renderiza o conteúdo do painel
+function renderNotifPanel(){
+  const notifs = _loadNotifs();
+  const listEl = document.getElementById('notifList');
+  if(!listEl) return;
+
+  if(notifs.length===0){
+    listEl.innerHTML='<div class="notif-empty">🎉 Nenhuma notificação pendente!</div>';
+    return;
+  }
+
+  const tipoLabel={atraso:'Atraso',prazo:'Prazo',homolog:'Homologação',medicao:'Medição',etapacl:'Cliente'};
+  listEl.innerHTML = notifs.map((n,i)=>`
+    <div class="notif-item ${n.lida?'read':'unread'}" id="notifItem_${i}">
+      <div class="notif-icon">${n.icone}</div>
+      <div class="notif-content">
+        <div class="notif-text">${n.texto}</div>
+        <div class="notif-meta">
+          <span>${tipoLabel[n.tipo]||n.tipo}</span>
+          <span>·</span>
+          <span>${_dtRelativa(n.dt)}</span>
+          ${n.lida?'<span>· <em>lida</em></span>':''}
+        </div>
+        ${n.projId?`<div style="margin-top:4px"><button onclick="abrirProjNotif(${n.projId},${i})" style="font-size:11px;color:var(--blue);background:none;border:none;cursor:pointer;padding:0;font-family:'Plus Jakarta Sans',sans-serif">Ver projeto ↗</button></div>`:''}
+      </div>
+      <div style="display:flex;flex-direction:column;gap:4px;align-items:flex-end">
+        ${!n.lida?`<button class="notif-del" onclick="marcarLida(${i})" title="Marcar como lida">✓</button>`:''}
+        <button class="notif-del" onclick="apagarNotif(${i})" title="Apagar">✕</button>
+      </div>
+    </div>`).join('');
+}
+
+function _dtRelativa(iso){
+  if(!iso) return '';
+  const diff = Math.round((new Date()-new Date(iso))/60000);
+  if(diff<1)   return 'agora';
+  if(diff<60)  return diff+'min atrás';
+  if(diff<1440)return Math.round(diff/60)+'h atrás';
+  return Math.round(diff/1440)+'d atrás';
+}
+
+function toggleNotifPanel(){
+  const panel = document.getElementById('notifPanel');
+  if(!panel) return;
+  const aberto = panel.style.display==='block';
+  panel.style.display = aberto?'none':'block';
+  if(!aberto) renderNotifPanel();
+  if(!aberto){
+    const close = e => {
+      if(!document.getElementById('notifWrap')?.contains(e.target)){
+        panel.style.display='none';
+        document.removeEventListener('click',close);
+      }
+    };
+    setTimeout(()=>document.addEventListener('click',close),0);
+  }
+}
+
+function marcarLida(i){
+  const notifs = _loadNotifs();
+  if(notifs[i]) notifs[i].lida = true;
+  _saveNotifs(notifs);
+  atualizarUINotif();
+}
+
+function marcarTodasLidas(){
+  const notifs = _loadNotifs().map(n=>({...n,lida:true}));
+  _saveNotifs(notifs);
+  atualizarUINotif();
+}
+
+function apagarNotif(i){
+  const notifs = _loadNotifs();
+  notifs.splice(i,1);
+  _saveNotifs(notifs);
+  atualizarUINotif();
+}
+
+function apagarTodasNotif(){
+  if(!confirm('Apagar todas as notificações?')) return;
+  _saveNotifs([]);
+  atualizarUINotif();
+}
+
+function abrirProjNotif(projId, notifIdx){
+  marcarLida(notifIdx);
+  document.getElementById('notifPanel').style.display='none';
+  openDet(projId);
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 
 function iniciais(nome){
   if(!nome) return '?';
@@ -3864,5 +4397,31 @@ if(savedUrl){
 }
 
 </script>
+  <!-- MODAL MIGRAÇÃO -->
+  <div class="ov2" id="ovMigracao" role="dialog" aria-modal="true" style="display:none;align-items:center;justify-content:center">
+    <div class="modal" style="max-width:560px;width:100%">
+      <div class="mh">
+        <div class="mht">🔄 Migração de Dados</div>
+        <button class="mcl" onclick="document.getElementById('ovMigracao').style.display='none'">✕</button>
+      </div>
+      <div style="padding:20px 24px">
+        <p style="font-size:13px;color:var(--mu);margin-bottom:16px;line-height:1.6">
+          Esta função padroniza os nomes dos responsáveis em <strong>todos os projetos</strong> do Firebase,
+          atualizando nomes antigos (ex: "Daniel David", "Cláudio", "Maria Emília") para o padrão atual.
+          <strong style="color:var(--red)">Ação irreversível — recomenda-se exportar o XLSX antes.</strong>
+        </p>
+        <div id="migracaoPreview" style="background:var(--s2);border-radius:8px;padding:14px;font-size:12px;max-height:240px;overflow-y:auto;margin-bottom:16px;line-height:1.8"></div>
+        <div id="migracaoStatus" style="font-size:12.5px;color:var(--mu);margin-bottom:16px;min-height:20px"></div>
+        <div style="display:flex;gap:10px;justify-content:flex-end">
+          <button class="btn bg2" onclick="document.getElementById('ovMigracao').style.display='none'">Cancelar</button>
+          <button class="btn" id="btnExecutarMigracao" onclick="executarMigracao()"
+            style="background:var(--blue);color:#fff">
+            ✅ Executar Migração
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
 </body>
 </html>
