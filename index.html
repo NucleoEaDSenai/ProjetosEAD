@@ -1098,22 +1098,22 @@ const COLUNAS = [
 ];
 
 const ETPS_DEF = [
-  {lb:'Reunião Inicial',               r:'eq'},
-  {lb:'Elaboração do PI',              r:'eq'},
-  {lb:'Revisão do PI',                 r:'eq'},
-  {lb:'Revisão Textual do PI',         r:'eq'},
-  {lb:'Entrega do PI ao cliente',      r:'eq'},
-  {lb:'Validação do PI',               r:'cl'},
-  {lb:'Desenho/Roteirização',          r:'eq'},
-  {lb:'Validação DI Referência',       r:'cl'},
-  {lb:'Produção de Recursos Gráficos', r:'eq'},
-  {lb:'Entrega do Review ao cliente',  r:'eq'},
-  {lb:'Solicitação de Ajustes',        r:'cl'},
-  {lb:'Implementação de Ajustes',      r:'eq'},
-  {lb:'Validação Final',               r:'cl'},
-  {lb:'Revisão Textual',               r:'eq'},
-  {lb:'Homologação',                   r:'cl'},
-  {lb:'Instalação no SIRH',            r:'eq'},
+  {lb:'Reunião Inicial',               r:'cl'},  // Cliente
+  {lb:'Elaboração do PI',              r:'eq'},  // Equipe
+  {lb:'Revisão do PI',                 r:'cl'},  // Cliente
+  {lb:'Revisão Textual do PI',         r:'eq'},  // Equipe
+  {lb:'Entrega do PI ao cliente',      r:'eq'},  // Equipe
+  {lb:'Validação do PI',               r:'cl'},  // Cliente
+  {lb:'Desenho/Roteirização',          r:'eq'},  // Equipe
+  {lb:'Validação DI Referência',       r:'eq'},  // Equipe
+  {lb:'Produção de Recursos Gráficos', r:'eq'},  // Equipe
+  {lb:'Entrega do Review ao cliente',  r:'eq'},  // Equipe
+  {lb:'Solicitação de Ajustes',        r:'cl'},  // Cliente
+  {lb:'Implementação de Ajustes',      r:'eq'},  // Equipe
+  {lb:'Validação Final',               r:'cl'},  // Cliente
+  {lb:'Revisão Textual',               r:'eq'},  // Equipe
+  {lb:'Homologação',                   r:'eq'},  // Equipe
+  {lb:'Instalação no SIRH',            r:'eq'},  // Equipe
 ];
 
 const TIMAP = {
@@ -2315,7 +2315,15 @@ function buildRespChips(selected){
   `).join('');
 }
 
-function toggleResp(el,name){el.classList.toggle('sel');}
+function toggleResp(el, name){
+  el.classList.toggle('sel');
+  // Se a tabela de etapas já está aberta, re-sincroniza e re-renderiza
+  // preservando prazos e nomes já digitados
+  if(document.getElementById('etapasForm')?.innerHTML){
+    _efSync();
+    _renderEF();
+  }
+}
 
 function getSelectedResps(){
   return [...document.querySelectorAll('#respChips .resp-chip.sel')].map(el=>el.textContent);
@@ -2327,24 +2335,25 @@ let _efEtapas = [];
 // Gera as <option> do select de responsável por etapa
 // com base nos responsáveis alocados no projeto (lidos dos chips selecionados)
 function _efRespOpts(valorAtual){
-  const resps = getSelectedResps(); // nomes já selecionados nos chips
-  const opts = [];
+  const resps = getSelectedResps();
+  const opts  = [];
 
-  // Opções de equipe: cada responsável alocado
+  // ── Opções da equipe alocada ──
   if(resps.length > 0){
     resps.forEach(nome => {
-      const sel = (valorAtual === nome) ? 'selected' : '';
-      opts.push(`<option value="${nome}" ${sel}>👤 ${nome}</option>`);
+      // Seleciona se: o valor salvo é esse nome, OU o valor é 'eq' e é o primeiro da lista
+      const isSel = (valorAtual === nome)
+        || (valorAtual === 'eq' && nome === resps[0]);
+      opts.push(`<option value="${nome}" ${isSel?'selected':''}>👤 ${nome}</option>`);
     });
   } else {
-    // Fallback se nenhum responsável selecionado ainda
-    const sel = (valorAtual === 'eq' || !valorAtual || valorAtual === '') ? 'selected' : '';
-    opts.push(`<option value="eq" ${sel}>👥 Equipe</option>`);
+    // Nenhum responsável alocado ainda — mantém fallback genérico
+    const isSel = (valorAtual === 'eq' || !valorAtual || valorAtual === '');
+    opts.push(`<option value="eq" ${isSel?'selected':''}>👥 Equipe</option>`);
   }
 
-  // Sempre adiciona Cliente ao final
-  const selCl = (valorAtual === 'cl') ? 'selected' : '';
-  opts.push(`<option value="cl" ${selCl}>🏢 Cliente</option>`);
+  // ── Cliente sempre ao final ──
+  opts.push(`<option value="cl" ${valorAtual==='cl'?'selected':''}>🏢 Cliente</option>`);
 
   return opts.join('');
 }
