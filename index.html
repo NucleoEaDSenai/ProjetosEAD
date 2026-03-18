@@ -872,8 +872,17 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
           <div class="fg-sm"><label class="fl-sm">Ação</label>
             <select class="fi-sm" id="histFiltAcao" onchange="rHistorico()">
               <option value="">Todas</option>
-              <option value="criou">Criação</option>
-              <option value="editou">Edição</option>
+              <option value="criou">✨ Criação</option>
+              <option value="editou">✏️ Edição</option>
+              <option value="concluiu etapa">✅ Etapa concluída</option>
+              <option value="reabriu etapa">↩️ Etapa reaberta</option>
+              <option value="moveu coluna">📌 Moveu coluna</option>
+              <option value="cancelou">🚫 Cancelamento</option>
+              <option value="reativou">🔄 Reativação</option>
+              <option value="enviou medição">📐 Enviou Medição</option>
+              <option value="confirmou medição">🎉 Medição confirmada</option>
+              <option value="desmarcou medição">↩️ Medição desmarcada</option>
+              <option value="homologação salva">🔖 Homologação</option>
             </select>
           </div>
         </div>
@@ -1408,6 +1417,7 @@ function onDrop(e,col){
   if(newCol===13||newCol===14){if(!p.termino)p.termino=td();p.pct=100;}
   // volta de 13/14
   if((oldCol===13||oldCol===14)&&newCol!==13&&newCol!==14){p.termino='';if(p.pct===100)p.pct=90;}
+  registrarHistorico(p, 'moveu coluna', `De "${colLabel(oldCol)}" para "${colLabel(newCol)}"`);
   fbSalvarProjeto(p);
   renderAll();
   showToast(`✅ "${p.nome.length>28?p.nome.slice(0,26)+'…':p.nome}" → ${colLabel(newCol)}`);
@@ -2217,7 +2227,19 @@ function toggleE(pid,idx){
   if(p.pct===100){if(!p.termino)p.termino=td();}
   else{p.termino='';}
   // Avança OU recua a coluna conforme estado atual das etapas
-  avancarColuna(p);
+  // Registrar no histórico
+  const respNome = e.r === 'cl' ? 'Cliente' : e.r === 'eq' ? 'Equipe' : e.r;
+  if(e.done){
+    registrarHistorico(p, 'concluiu etapa', `Etapa "${e.lb}" concluída por ${respNome}`);
+  } else {
+    registrarHistorico(p, 'reabriu etapa', `Etapa "${e.lb}" reaberta`);
+  }
+
+  const colMudou = avancarColuna(p);
+  if(colMudou){
+    const colNome = COLUNAS.find(c=>c.k===p.col)?.l||'';
+    registrarHistorico(p, 'moveu coluna', `Movido para "${colNome}"`);
+  }
   fbSalvarProjeto(p);
   renderAll();
 
@@ -2286,12 +2308,14 @@ function abrirCanc(id){cancId=id;document.getElementById('fCancMotivo').value=''
 function confirmarCanc(){
   const p=DB.find(x=>x.id===cancId);if(!p)return;
   p.cancelado=true; p.cancelEm=td(); p.cancelMotivo=document.getElementById('fCancMotivo').value;
+  registrarHistorico(p, 'cancelou', p.cancelMotivo ? `Motivo: ${p.cancelMotivo}` : 'Projeto cancelado');
   const pc=DB.find(x=>x.id===cancId); if(pc) fbSalvarProjeto(pc);
   cm('ovCanc'); renderAll(); showToast('🚫 Projeto cancelado e movido para a aba Cancelados');
 }
 function reativarP(id){
   const p=DB.find(x=>x.id===id);if(!p)return;
   p.cancelado=false; p.cancelEm=''; p.cancelMotivo='';
+  registrarHistorico(p, 'reativou', 'Projeto reativado');
   fbSalvarProjeto(p); renderAll(); showToast('↩️ Projeto reativado!');
 }
 
@@ -3177,6 +3201,7 @@ function enviarMedicao(id){
   p.enviadoMedicao = td();
   p.medicaoFeita   = false;
   p.medicaoFeitaEm = null;
+  registrarHistorico(p, 'enviou medição', 'Projeto enviado para fila de Medição');
   fbSalvarProjeto(p);
   renderAll();
   showToast('📐 Projeto enviado para Medição!');
@@ -3189,6 +3214,7 @@ function confirmarMedicao(id){
     p.medicaoFeita   = false;
     p.medicaoFeitaEm = null;
     p.col = 13; // volta para Upload BDOC
+    registrarHistorico(p, 'desmarcou medição', 'Medição desmarcada — retornou para Upload BDOC');
     fbSalvarProjeto(p);
     renderAll();
     showToast('↩️ Medição desmarcada — projeto retornou para Upload BDOC.');
@@ -3198,6 +3224,7 @@ function confirmarMedicao(id){
   p.medicaoFeita   = true;
   p.medicaoFeitaEm = td();
   p.col = 14; // move para Projetos Concluídos
+  registrarHistorico(p, 'confirmou medição', 'Medição confirmada — movido para Projetos Concluídos');
   fbSalvarProjeto(p);
   renderAll();
   showToast('🎉 Medição confirmada! Projeto movido para Projetos Concluídos.');
@@ -3277,6 +3304,10 @@ function salvarHomolog(pid){
   h.preenchido    = true; // marca que o usuário já iniciou o preenchimento
 
   p.homolog = h;
+  const dtStr = h.dtInstalacao ? `Instalação: ${h.dtInstalacao.split('-').reverse().join('/')}` :
+                h.dtHomolog    ? `Homologação: ${h.dtHomolog.split('-').reverse().join('/')}` :
+                'Dados atualizados';
+  registrarHistorico(p, 'homologação salva', dtStr);
   fbSalvarProjeto(p);
   showToast('💾 Homologação salva!');
   rHomologacoes();
@@ -3901,10 +3932,39 @@ function rHistorico(){
     el.innerHTML = '<div style="padding:18px;color:var(--mu);font-size:13px">Nenhum registro ainda. Crie ou edite um projeto para começar.</div>';
     return;
   }
-  const acaoCor = {criou:'var(--green)', editou:'var(--blue)', duplicou:'var(--pur)', cancelou:'var(--red)', reativou:'var(--org)'};
+  const acaoCor = {
+    'criou':               'var(--green)',
+    'editou':              'var(--blue)',
+    'duplicou':            'var(--pur)',
+    'cancelou':            'var(--red)',
+    'reativou':            'var(--org)',
+    'concluiu etapa':      '#1A8A4A',
+    'reabriu etapa':       '#9CA3AF',
+    'moveu coluna':        '#003DA5',
+    'enviou medição':      '#7C3AED',
+    'confirmou medição':   '#1A8A4A',
+    'desmarcou medição':   '#9CA3AF',
+    'homologação salva':   '#0891B2',
+  };
+  const acaoIcone = {
+    'criou':               '✨',
+    'editou':              '✏️',
+    'duplicou':            '📋',
+    'cancelou':            '🚫',
+    'reativou':            '🔄',
+    'concluiu etapa':      '✅',
+    'reabriu etapa':       '↩️',
+    'moveu coluna':        '📌',
+    'enviou medição':      '📐',
+    'confirmou medição':   '🎉',
+    'desmarcou medição':   '↩️',
+    'homologação salva':   '🔖',
+  };
   el.innerHTML = rows.map(ev => `
     <div class="hist-row">
-      <div class="hist-av" style="background:${acaoCor[ev.acao]||'var(--mu)'}">${iniciais(ev.usuario)}</div>
+      <div class="hist-av" style="background:${acaoCor[ev.acao]||'var(--mu)'}">
+        ${acaoIcone[ev.acao] ? `<span style="font-size:11px">${acaoIcone[ev.acao]}</span>` : iniciais(ev.usuario)}
+      </div>
       <div class="hist-info">
         <div class="hist-line">
           <strong>${ev.usuario}</strong>
