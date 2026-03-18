@@ -211,6 +211,24 @@ tr:hover td{background:#FAFAF9}
 .kkt{font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;font-weight:700;margin-bottom:13px}
 .leg{display:flex;align-items:center;gap:6px;font-size:11px;margin-bottom:5px}
 .ld{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.kpi-bar-row{margin-bottom:9px}
+.kpi-bar-row-head{display:flex;justify-content:space-between;font-size:11px;margin-bottom:3px;align-items:center}
+.kpi-bar-track{height:7px;background:var(--bdr);border-radius:4px;overflow:hidden}
+.kpi-bar-fill{height:100%;border-radius:4px;transition:width .4s ease}
+.kpi-stat-num{font-family:'Plus Jakarta Sans',sans-serif;font-size:22px;font-weight:800;line-height:1.1;margin-bottom:2px}
+.kpi-stat-lbl{font-size:10px;color:var(--mu);text-transform:uppercase;letter-spacing:.6px;margin-bottom:6px}
+.kpi-stat-sub{font-size:11px;color:var(--mu)}
+.kpi-phase-row{display:flex;align-items:center;gap:8px;margin-bottom:7px;font-size:12px}
+.kpi-phase-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.kpi-phase-name{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:11px}
+.kpi-phase-bar{flex:2;height:6px;background:var(--bdr);border-radius:3px;overflow:hidden}
+.kpi-phase-count{font-weight:700;font-size:11px;width:20px;text-align:right;flex-shrink:0}
+.kpi-month-col{display:flex;flex-direction:column;align-items:center;gap:3px;flex:1}
+.kpi-month-bar-wrap{width:100%;display:flex;align-items:flex-end;justify-content:center;height:60px}
+.kpi-month-bar{width:70%;border-radius:3px 3px 0 0;background:var(--blue);transition:height .3s;min-height:2px}
+.kpi-month-label{font-size:9.5px;color:var(--mu);white-space:nowrap}
+.kpi-month-val{font-size:10px;font-weight:700;color:var(--txt)}
+.kpi-alerta{background:#FEE2E2;border:1px solid #FECACA;border-radius:8px;padding:8px 12px;font-size:11.5px;color:#991B1B;display:flex;align-items:center;gap:6px;margin-bottom:6px}
 /* DETAIL */
 .dl2r{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
 .dl{display:flex;gap:10px;margin-bottom:8px}
@@ -727,11 +745,37 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
 
     <!-- KPIs -->
     <div class="view" id="view-kpis">
-      <div class="st" style="margin-bottom:16px">KPIs &amp; Indicadores de Produção EAD</div>
-      <div class="kg" id="kpiGrid"></div>
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:20px">
+        <div class="st" style="margin-bottom:0">📊 KPIs &amp; Indicadores de Produção EAD</div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <label style="font-size:12px;color:var(--mu);font-weight:600">Período:</label>
+          <select id="kpiFiltPeriodo" class="fi-sm" onchange="rKPIs()" style="width:160px">
+            <option value="0">Todo o histórico</option>
+            <option value="30">Últimos 30 dias</option>
+            <option value="60">Últimos 60 dias</option>
+            <option value="90">Últimos 90 dias</option>
+            <option value="180">Últimos 6 meses</option>
+            <option value="365">Último ano</option>
+          </select>
+        </div>
+      </div>
+      <div id="kpiResumo" style="display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin-bottom:20px"></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:16px">
+        <div class="kk"><div class="kkt">📐 Distribuição por Situação</div><div id="kpiSituacao"></div></div>
+        <div class="kk"><div class="kkt">🏛️ Projetos por Academia</div><div id="kpiAcademia"></div></div>
+        <div class="kk"><div class="kkt">👤 Projetos por RP</div><div id="kpiRP"></div></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
+        <div class="kk"><div class="kkt">🔄 Pipeline por Fase</div><div id="kpiPipeline"></div></div>
+        <div class="kk"><div class="kkt">📋 Conclusões por Mês (últimos 12 meses)</div><div id="kpiThroughput"></div></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
+        <div class="kk"><div class="kkt">⏱️ Tempo Médio por Etapa (dias)</div><div id="etapaBars"></div></div>
+        <div class="kk"><div class="kkt">🛠️ Projetos por Recurso</div><div id="tipoBars"></div></div>
+      </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
-        <div class="kk"><div class="kkt">Etapas — Tempo Médio (dias)</div><div id="etapaBars"></div></div>
-        <div class="kk"><div class="kkt">Projetos por Recurso</div><div id="tipoBars"></div></div>
+        <div class="kk"><div class="kkt">⏳ Espera por Cliente (por etapa)</div><div id="kpiEsperaCl"></div></div>
+        <div class="kk"><div class="kkt">🔴 Distribuição por Prioridade</div><div id="kpiPrioridade"></div></div>
       </div>
     </div>
 
@@ -1514,95 +1558,263 @@ function rTimeline(){
 
 // ── KPIs ──
 function rKPIs(){
-  const act=activeDB();
-  if(act.length===0){
-    document.getElementById('kpiGrid').innerHTML='<div style="color:var(--mu);font-size:13px;padding:20px">Nenhum projeto cadastrado ainda.</div>';
-    document.getElementById('etapaBars').innerHTML='<div style="color:var(--mu);font-size:12px;padding:8px 0">Sem dados ainda</div>';
-    document.getElementById('tipoBars').innerHTML='<div style="color:var(--mu);font-size:12px;padding:8px 0">Sem dados ainda</div>';
-    return;
-  }
-  const total=act.length||1;
-  const conc=act.filter(p=>calcSit(p)==='concluido').length;
-  const avg=Math.round(act.reduce((a,p)=>a+p.pct,0)/total);
-  function dn(val,col,lbl,sub){
-    const r=40,c=2*Math.PI*r,pv=(val/100);
-    return`<div class="kk"><div class="kkt">${lbl}</div><div style="text-align:center">
-      <svg viewBox="0 0 100 100" width="110" height="110">
-        <circle cx="50" cy="50" r="${r}" fill="none" stroke="var(--bdr)" stroke-width="10"/>
-        <circle cx="50" cy="50" r="${r}" fill="none" stroke="${col}" stroke-width="10"
-          stroke-dasharray="${pv*c} ${c}" stroke-linecap="round" transform="rotate(-90 50 50)"/>
-      </svg>
-      <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:20px;font-weight:800;margin-top:-70px">${val}%</div>
-      <div style="font-size:11px;color:var(--mu);margin-top:42px">${sub}</div>
-    </div></div>`;
-  }
-  // distribuição por situação
-  const sits={andamento:0,atrasado:0,concluido:0,aguardando:0};
-  act.forEach(p=>{const s=calcSit(p);if(sits[s]!==undefined)sits[s]++;});
-  const sitCols={andamento:'#D97706',atrasado:'#E8002D',concluido:'#1A8A4A',aguardando:'#9CA3AF'};
-  const sitLbl={andamento:'Em Andamento',atrasado:'Atrasado',concluido:'Concluído',aguardando:'Aguardando'};
-  let off=0,arcs='';
-  Object.entries(sits).forEach(([k,n])=>{
-    const pv=n/total,r=40,c2=2*Math.PI*r;
-    arcs+=`<circle cx="50" cy="50" r="${r}" fill="none" stroke="${sitCols[k]}" stroke-width="10" stroke-dasharray="${pv*c2} ${c2}" stroke-dashoffset="${-off}" stroke-linecap="round" transform="rotate(-90 50 50)"/>`;
-    off+=pv*c2;
-  });
-  const leg=Object.entries(sits).filter(([,n])=>n>0).map(([k,n])=>`<div class="leg"><div class="ld" style="background:${sitCols[k]}"></div>${sitLbl[k]}: <strong>${n}</strong></div>`).join('');
-  document.getElementById('kpiGrid').innerHTML=
-    dn(Math.round(conc/total*100),'var(--green)','Taxa de Conclusão',`${conc} de ${total} concluídos`)+
-    dn(avg,'var(--blue)','Progresso Médio',`média de conclusão`)+
-    `<div class="kk"><div class="kkt">Distribuição por Situação</div><div style="display:flex;align-items:center;gap:16px;padding:6px 0"><svg viewBox="0 0 100 100" width="100" height="100">${arcs}</svg><div>${leg}</div></div></div>`;
+  const diasFiltro = parseInt(document.getElementById('kpiFiltPeriodo')?.value||'0');
+  const corte = diasFiltro > 0 ? new Date(Date.now() - diasFiltro*864e5) : null;
+  const dentroFiltro = p => !corte || (p.criado && new Date(p.criado) >= corte);
 
-  // Calcular tempo médio real de cada etapa a partir de projetos concluídos
-  const etapaMedArr = ETPS_DEF.map((e,i)=>{
-    // Para cada etapa concluída, mede dias entre e.prazo (início previsto) e e.fim (conclusão real)
-    // Etapas sem prazo: conta 1 dia simbólico para aparecer no gráfico
+  const todos  = activeDB().concat(cancelDB());
+  const act    = activeDB().filter(dentroFiltro);
+  const todosF = todos.filter(dentroFiltro);
+
+  const total   = act.length;
+  const conc    = act.filter(p=>calcSit(p)==='concluido').length;
+  const atras   = act.filter(p=>calcSit(p)==='atrasado').length;
+  const andando = act.filter(p=>calcSit(p)==='andamento').length;
+  const aguard  = act.filter(p=>calcSit(p)==='aguardando').length;
+  const homolPend = todos.filter(p=>(p.col===11||p.homolog?.preenchido)&&!p.homolog?.dtInstalacao).length;
+  const medicPend = todos.filter(p=>p.enviadoMedicao&&!p.medicaoFeita).length;
+  const avg     = total>0 ? Math.round(act.reduce((a,p)=>a+p.pct,0)/total) : 0;
+  const txConc  = total>0 ? Math.round(conc/total*100) : 0;
+  const txAtras = total>0 ? Math.round(atras/total*100) : 0;
+
+  // Tempo médio de ciclo (criação → término)
+  const ciclos = todosF.filter(p=>p.termino&&p.criado)
+    .map(p=>Math.round((new Date(p.termino)-new Date(p.criado))/864e5));
+  const tmCiclo = ciclos.length ? Math.round(ciclos.reduce((a,b)=>a+b,0)/ciclos.length) : null;
+
+  // ── 1. Cards resumo executivo ──
+  const resumoEl = document.getElementById('kpiResumo');
+  if(resumoEl) resumoEl.innerHTML = `
+    <div class="kk" style="border-top:3px solid var(--blue)">
+      <div class="kpi-stat-lbl">Total Ativos</div>
+      <div class="kpi-stat-num">${total}</div>
+      <div class="kpi-stat-sub">${andando} em andamento</div>
+    </div>
+    <div class="kk" style="border-top:3px solid var(--green)">
+      <div class="kpi-stat-lbl">Taxa de Conclusão</div>
+      <div class="kpi-stat-num" style="color:var(--green)">${txConc}%</div>
+      <div class="kpi-stat-sub">${conc} concluído${conc!==1?'s':''}</div>
+    </div>
+    <div class="kk" style="border-top:3px solid var(--red)">
+      <div class="kpi-stat-lbl">Taxa de Atraso</div>
+      <div class="kpi-stat-num" style="color:${txAtras>20?'var(--red)':txAtras>10?'var(--org)':'var(--green)'}">${txAtras}%</div>
+      <div class="kpi-stat-sub">${atras} atrasado${atras!==1?'s':''}</div>
+    </div>
+    <div class="kk" style="border-top:3px solid var(--blue)">
+      <div class="kpi-stat-lbl">Progresso Médio</div>
+      <div class="kpi-stat-num">${avg}%</div>
+      <div class="kpi-stat-sub">média geral</div>
+    </div>
+    <div class="kk" style="border-top:3px solid ${homolPend>0?'#F59E0B':'var(--green)'}">
+      <div class="kpi-stat-lbl">Homolog. Pendentes</div>
+      <div class="kpi-stat-num" style="color:${homolPend>0?'#D97706':'var(--green)'}">${homolPend}</div>
+      <div class="kpi-stat-sub">${medicPend} aguard. medição</div>
+    </div>
+    <div class="kk" style="border-top:3px solid var(--mu)">
+      <div class="kpi-stat-lbl">Tempo Médio Ciclo</div>
+      <div class="kpi-stat-num">${tmCiclo!==null?tmCiclo+'d':'—'}</div>
+      <div class="kpi-stat-sub">${ciclos.length} proj. concluídos</div>
+    </div>`;
+
+  // ── 2. Situação + alertas ──
+  const sitEl = document.getElementById('kpiSituacao');
+  if(sitEl){
+    const sits={andamento:andando,atrasado:atras,concluido:conc,aguardando:aguard};
+    const sitCols={andamento:'#D97706',atrasado:'#E8002D',concluido:'#1A8A4A',aguardando:'#9CA3AF'};
+    const sitLbl={andamento:'Em Andamento',atrasado:'Atrasado',concluido:'Concluído',aguardando:'Aguardando'};
+    const r=40,c2=2*Math.PI*r;
+    let off=0,arcs='';
+    const tot2=total||1;
+    Object.entries(sits).forEach(([k,n])=>{
+      const pv=n/tot2;
+      arcs+=`<circle cx="50" cy="50" r="${r}" fill="none" stroke="${sitCols[k]}" stroke-width="10" stroke-dasharray="${pv*c2} ${c2}" stroke-dashoffset="${-off}" stroke-linecap="round" transform="rotate(-90 50 50)"/>`;
+      off+=pv*c2;
+    });
+    const leg=Object.entries(sits).map(([k,n])=>`<div class="leg"><div class="ld" style="background:${sitCols[k]}"></div>${sitLbl[k]}: <strong>${n}</strong></div>`).join('');
+    sitEl.innerHTML = total===0
+      ? '<div style="color:var(--mu);font-size:12px">Sem dados</div>'
+      : `<div style="display:flex;align-items:center;gap:12px;margin-bottom:10px">
+           <svg viewBox="0 0 100 100" width="90" height="90">
+             <circle cx="50" cy="50" r="${r}" fill="none" stroke="var(--bdr)" stroke-width="10"/>${arcs}
+           </svg>
+           <div>${leg}</div>
+         </div>`;
+    // Alertas
+    if(atras>0) sitEl.innerHTML+=`<div class="kpi-alerta">⚠️ ${atras} projeto${atras>1?'s':''} em atraso</div>`;
+    const venc7=act.filter(p=>{ if(calcSit(p)==='concluido'||!p.prazo) return false; const d=Math.round((new Date(p.prazo)-new Date())/864e5); return d>=0&&d<=7; }).length;
+    if(venc7>0) sitEl.innerHTML+=`<div class="kpi-alerta" style="background:#FFF7ED;border-color:#FED7AA;color:#9A3412">⏰ ${venc7} projeto${venc7>1?'s':''} vencem em até 7 dias</div>`;
+  }
+
+  // ── 3. Por Academia ──
+  const acadEl = document.getElementById('kpiAcademia');
+  if(acadEl){
+    const map={};
+    act.forEach(p=>{ const a=p.academia||'Não definida'; map[a]=(map[a]||0)+1; });
+    const arr=Object.entries(map).sort((a,b)=>b[1]-a[1]);
+    const mx=arr.length?arr[0][1]:1;
+    const ACAD_COLS=['#003DA5','#0891B2','#7C3AED','#D97706','#1A8A4A','#E8002D','#EC4899','#F97316','#14B8A6','#6366F1','#84CC16','#be185d'];
+    acadEl.innerHTML=arr.length===0
+      ?'<div style="color:var(--mu);font-size:12px">Sem dados</div>'
+      :arr.map(([nome,n],i)=>`
+        <div class="kpi-bar-row">
+          <div class="kpi-bar-row-head"><span>${nome}</span><strong>${n}</strong></div>
+          <div class="kpi-bar-track"><div class="kpi-bar-fill" style="width:${n/mx*100}%;background:${ACAD_COLS[i%ACAD_COLS.length]}"></div></div>
+        </div>`).join('');
+  }
+
+  // ── 4. Por RP ──
+  const rpEl = document.getElementById('kpiRP');
+  if(rpEl){
+    const map={};
+    act.forEach(p=>{ const r=p.rp||'Não definido'; map[r]=(map[r]||0)+1; });
+    const arr=Object.entries(map).sort((a,b)=>b[1]-a[1]);
+    const mx=arr.length?arr[0][1]:1;
+    rpEl.innerHTML=arr.length===0
+      ?'<div style="color:var(--mu);font-size:12px">Sem dados</div>'
+      :arr.map(([nome,n])=>`
+        <div class="kpi-bar-row">
+          <div class="kpi-bar-row-head"><span>${nome}</span><strong>${n}</strong></div>
+          <div class="kpi-bar-track"><div class="kpi-bar-fill" style="width:${n/mx*100}%;background:${NOME_CORES[nome]||'var(--blue)'}"></div></div>
+        </div>`).join('');
+  }
+
+  // ── 5. Pipeline por fase ──
+  const pipeEl = document.getElementById('kpiPipeline');
+  if(pipeEl){
+    const colCount={};
+    act.forEach(p=>{ colCount[p.col]=(colCount[p.col]||0)+1; });
+    const colArr=COLUNAS.map(c=>({...c,n:colCount[c.k]||0})).filter(c=>c.n>0);
+    const mx=colArr.length?Math.max(...colArr.map(c=>c.n)):1;
+    pipeEl.innerHTML=colArr.length===0
+      ?'<div style="color:var(--mu);font-size:12px">Sem projetos ativos</div>'
+      :colArr.map(c=>`
+        <div class="kpi-phase-row">
+          <div class="kpi-phase-dot" style="background:${c.dot}"></div>
+          <div class="kpi-phase-name" title="${c.l}">${c.l}</div>
+          <div class="kpi-phase-bar"><div style="height:100%;width:${c.n/mx*100}%;background:${c.dot};border-radius:3px"></div></div>
+          <div class="kpi-phase-count">${c.n}</div>
+        </div>`).join('');
+  }
+
+  // ── 6. Throughput mensal (últimos 12 meses) ──
+  const thrEl = document.getElementById('kpiThroughput');
+  if(thrEl){
+    const agora=new Date();
+    const meses=[];
+    for(let i=11;i>=0;i--){
+      const d=new Date(agora.getFullYear(),agora.getMonth()-i,1);
+      meses.push({y:d.getFullYear(),m:d.getMonth(),lbl:d.toLocaleString('pt-BR',{month:'short'}).replace('.',''),n:0});
+    }
+    todos.forEach(p=>{
+      if(!p.termino) return;
+      const d=new Date(p.termino);
+      const mes=meses.find(m=>m.y===d.getFullYear()&&m.m===d.getMonth());
+      if(mes) mes.n++;
+    });
+    const mx=Math.max(...meses.map(m=>m.n),1);
+    const total12=meses.reduce((a,m)=>a+m.n,0);
+    thrEl.innerHTML=`
+      <div style="font-size:11px;color:var(--mu);margin-bottom:10px">${total12} concluído${total12!==1?'s':''} nos últimos 12 meses</div>
+      <div style="display:flex;align-items:flex-end;gap:4px;height:80px">
+        ${meses.map(m=>`
+          <div class="kpi-month-col">
+            <div class="kpi-month-bar-wrap">
+              <div class="kpi-month-bar" style="height:${m.n>0?Math.max(m.n/mx*100,8):2}%;background:${m.n>0?'var(--blue)':'var(--bdr)'}" title="${m.n} concluído${m.n!==1?'s':''}"></div>
+            </div>
+            <div class="kpi-month-val">${m.n||''}</div>
+            <div class="kpi-month-label">${m.lbl}</div>
+          </div>`).join('')}
+      </div>`;
+  }
+
+  // ── 7. Tempo médio por etapa ──
+  const etapaMedArr=ETPS_DEF.map((e,i)=>{
     const amostras=[];
-    activeDB().concat(cancelDB()).forEach(p=>{
+    todos.forEach(p=>{
       const et=(p.etapas||[])[i];
       if(!et||!et.done||!et.fim) return;
       const ref=et.prazo||et.inicio;
-      const dias=ref ? Math.max(1,Math.round((new Date(et.fim)-new Date(ref))/(864e5))) : 1;
+      const dias=ref?Math.max(1,Math.round((new Date(et.fim)-new Date(ref))/(864e5))):1;
       amostras.push(dias);
     });
-    const media=amostras.length
-      ? Math.round(amostras.reduce((a,b)=>a+b,0)/amostras.length)
-      : null;
-    const nomeAbrev=[
-      'Reunião Inicial','Elaboração PI','Revisão PI','Rev. Textual PI',
-      'Entrega PI','Validação PI','Desenho/Rot.','Valid. DI Ref.',
-      'Prod. Gráficos','Entrega Review','Solic. Ajustes','Impl. Ajustes',
-      'Validação Final','Rev. Textual','Homologação','Instalação SIRH'
-    ][i]||e.lb;
-    return{n:nomeAbrev, d:media, r:e.r, amostras:amostras.length};
+    const media=amostras.length?Math.round(amostras.reduce((a,b)=>a+b,0)/amostras.length):null;
+    const nomeAbrev=['Reunião Inicial','Elaboração PI','Revisão PI','Rev. Textual PI','Entrega PI','Validação PI','Desenho/Rot.','Valid. DI Ref.','Prod. Gráficos','Entrega Review','Solic. Ajustes','Impl. Ajustes','Validação Final','Rev. Textual','Homologação','Instalação SIRH'][i]||e.lb;
+    return{n:nomeAbrev,d:media,r:e.r,amostras:amostras.length};
   });
   const comDados=etapaMedArr.filter(e=>e.d!==null);
-  const mx=comDados.length?Math.max(...comDados.map(e=>e.d),1):1;
+  const mx3=comDados.length?Math.max(...comDados.map(e=>e.d),1):1;
   document.getElementById('etapaBars').innerHTML=etapaMedArr.map(e=>`
-    <div style="margin-bottom:8px">
-      <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:2px">
-        <span>${e.n}${e.amostras>0?`<span style="color:var(--mu);font-size:10px;margin-left:5px">(${e.amostras} proj.)</span>`:''}</span>
+    <div class="kpi-bar-row">
+      <div class="kpi-bar-row-head">
+        <span>${e.n}${e.amostras>0?`<span style="color:var(--mu);font-size:10px;margin-left:4px">(${e.amostras})</span>`:''}</span>
         <strong>${e.d!==null?e.d+'d':'—'}</strong>
       </div>
-      <div style="height:5px;background:var(--bdr);border-radius:3px;overflow:hidden">
-        ${e.d!==null?`<div style="height:100%;width:${e.d/mx*100}%;background:${e.r==='cl'?'var(--org)':'var(--blue)'};border-radius:3px"></div>`:''}
+      <div class="kpi-bar-track">
+        ${e.d!==null?`<div class="kpi-bar-fill" style="width:${e.d/mx3*100}%;background:${e.r==='cl'?'var(--org)':'var(--blue)'}"></div>`:''}
       </div>
-      ${e.d===null?'<div style="font-size:10px;color:var(--mu);margin-top:1px">Sem dados ainda</div>':''}
+      ${e.d===null?'<div style="font-size:10px;color:var(--mu)">Sem dados ainda</div>':''}
     </div>`).join('');
 
-  // Contar projetos por recurso
+  // ── 8. Por recurso ──
   const recCount={};
   act.forEach(p=>(p.recursos||[]).forEach(r=>{recCount[r]=(recCount[r]||0)+1;}));
   const tps=Object.entries(recCount).sort((a,b)=>b[1]-a[1]);
-  const mx2=tps.length?Math.max(...tps.map(([,n])=>n),1):1;
+  const mx4=tps.length?Math.max(...tps.map(([,n])=>n),1):1;
   document.getElementById('tipoBars').innerHTML=tps.length===0
-    ?'<div style="color:var(--mu);font-size:12px;padding:8px 0">Nenhum dado ainda</div>'
+    ?'<div style="color:var(--mu);font-size:12px">Sem dados</div>'
     :tps.map(([rec,n],i)=>`
-    <div style="margin-bottom:9px">
-      <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:3px"><span>${rec}</span><strong>${n}</strong></div>
-      <div style="height:6px;background:var(--bdr);border-radius:3px;overflow:hidden"><div style="height:100%;width:${n/mx2*100}%;background:${COLS_AV[i%COLS_AV.length]};border-radius:3px"></div></div>
-    </div>`).join('');
+      <div class="kpi-bar-row">
+        <div class="kpi-bar-row-head"><span>${rec}</span><strong>${n}</strong></div>
+        <div class="kpi-bar-track"><div class="kpi-bar-fill" style="width:${n/mx4*100}%;background:${COLS_AV[i%COLS_AV.length]}"></div></div>
+      </div>`).join('');
+
+  // ── 9. Espera por cliente ──
+  const espEl = document.getElementById('kpiEsperaCl');
+  if(espEl){
+    const etCl={};
+    todos.forEach(p=>{
+      (p.etapas||[]).forEach(e=>{
+        if(e.r==='cl'&&e.done&&e.diasCl!=null){
+          if(!etCl[e.lb]) etCl[e.lb]={total:0,n:0};
+          etCl[e.lb].total+=e.diasCl; etCl[e.lb].n++;
+        }
+      });
+    });
+    const etArr=Object.entries(etCl).map(([lb,v])=>({lb,media:Math.round(v.total/v.n),n:v.n})).sort((a,b)=>b.media-a.media);
+    const mx5=etArr.length?etArr[0].media:1;
+    const mediaGeral=etArr.length?Math.round(etArr.reduce((a,e)=>a+e.media,0)/etArr.length):null;
+    espEl.innerHTML=etArr.length===0
+      ?'<div style="color:var(--mu);font-size:12px">Nenhuma etapa de cliente concluída ainda</div>'
+      :`<div style="font-size:11px;color:var(--mu);margin-bottom:10px">Média geral: <strong style="color:var(--txt)">${mediaGeral}d</strong></div>`
+        +etArr.slice(0,8).map(e=>`
+          <div class="kpi-bar-row">
+            <div class="kpi-bar-row-head">
+              <span>${e.lb}<span style="color:var(--mu);font-size:10px;margin-left:4px">(${e.n}x)</span></span>
+              <strong style="color:${e.media>10?'var(--red)':e.media>5?'var(--org)':'var(--green)'}">${e.media}d</strong>
+            </div>
+            <div class="kpi-bar-track"><div class="kpi-bar-fill" style="width:${e.media/mx5*100}%;background:${e.media>10?'var(--red)':e.media>5?'var(--org)':'var(--green)'}"></div></div>
+          </div>`).join('');
+  }
+
+  // ── 10. Por prioridade ──
+  const prioEl = document.getElementById('kpiPrioridade');
+  if(prioEl){
+    const prioMap={urgente:0,alta:0,media:0,baixa:0,sem:0};
+    act.forEach(p=>{ const k=p.prioridade||'sem'; if(prioMap[k]!==undefined)prioMap[k]++; else prioMap.sem++; });
+    const prioCores={urgente:'#E8002D',alta:'#F97316',media:'#F59E0B',baixa:'#003DA5',sem:'#9CA3AF'};
+    const prioLbl={urgente:'🔴 Urgente',alta:'🟠 Alta',media:'🟡 Média',baixa:'🔵 Baixa',sem:'⚪ Sem prioridade'};
+    const prioArr=Object.entries(prioMap).filter(([,n])=>n>0).sort((a,b)=>b[1]-a[1]);
+    const mx6=prioArr.length?Math.max(...prioArr.map(([,n])=>n)):1;
+    prioEl.innerHTML=prioArr.length===0
+      ?'<div style="color:var(--mu);font-size:12px">Sem dados</div>'
+      :prioArr.map(([k,n])=>`
+        <div class="kpi-bar-row">
+          <div class="kpi-bar-row-head"><span>${prioLbl[k]}</span><strong>${n}</strong></div>
+          <div class="kpi-bar-track"><div class="kpi-bar-fill" style="width:${n/mx6*100}%;background:${prioCores[k]}"></div></div>
+        </div>`).join('');
+  }
 }
+
 
 // ── ATRASOS ──
 function rAtrasos(){
