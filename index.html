@@ -2170,31 +2170,39 @@ let _motivoPid=null, _motivoIdx=null;
 // ══════════════════════════════════════════════
 //  AVANÇO AUTOMÁTICO DE COLUNA
 // ══════════════════════════════════════════════
+// Mapeamento por NOME da etapa (fragmento, case-insensitive) → coluna de destino
+// Funciona independente de quantas etapas existam ou em qual ordem estejam.
+// A coluna escolhida é sempre a do gatilho concluído de maior valor.
 const ETAPA_COL_MAP = [
-  {etapa:0,  col:1},   // Reunião Inicial       → Aguard. Material Base
-  {etapa:4,  col:4},   // Entrega PI ao cliente → Validação PI
-  {etapa:5,  col:6},   // Validação PI          → Desenvolvimento
-  {etapa:7,  col:6},   // Validação DI          → Desenvolvimento
-  {etapa:9,  col:7},   // Entrega Review        → Validação Dev
-  {etapa:11, col:9},   // Impl. Ajustes         → PELD
-  {etapa:12, col:11},  // Validação Final       → Homologação/Instalação
-  {etapa:15, col:13},  // Instalação SIRH       → Upload BDOC
+  {nome:'reunião inicial',        col:1},   // → Aguardando Material Base
+  {nome:'entrega do pi',          col:4},   // → Validação - PI
+  {nome:'validação do pi',        col:6},   // → Desenvolvimento
+  {nome:'validação di',           col:6},   // → Desenvolvimento
+  {nome:'entrega do review',      col:7},   // → Validação - Desenvolvimento
+  {nome:'implementação de ajuste',col:9},   // → PELD
+  {nome:'validação final',        col:11},  // → Homologação/Instalação
+  {nome:'instalação no sirh',     col:13},  // → Upload BDOC
 ];
 
 function calcColIdeal(p){
-  // Descobre qual coluna o projeto deve ocupar com base nas etapas ATUALMENTE concluídas.
-  // Regra: a coluna é determinada pelo maior map.col cujas etapas gatilho estão feitas.
-  // Se nenhuma etapa gatilho estiver feita, volta para col 0 (início).
-  const etapas = p.etapas||[];
+  const etapas = p.etapas || [];
+  if(etapas.length === 0) return p.col;
 
-  // Col base: col 0 se nenhum gatilho ativo, senão menor col antes do primeiro gatilho
+  // Todas concluídas → col 13 (Upload BDOC)
+  if(etapas.every(e => e.done)) return 13;
+
+  // Busca por fragmento de nome (case-insensitive) — não depende de índice
   let melhorCol = 0;
   for(const map of ETAPA_COL_MAP){
-    const et = etapas[map.etapa];
+    // Encontra a etapa cujo nome contém o fragmento do mapa
+    const et = etapas.find(e => e.lb && e.lb.toLowerCase().includes(map.nome));
     if(et && et.done) melhorCol = Math.max(melhorCol, map.col);
   }
-  // Todas concluídas → col 13
-  if(etapas.length > 0 && etapas.every(e => e.done)) melhorCol = 13;
+
+  // Se nenhum gatilho foi ativado mas há etapas concluídas,
+  // mantém a coluna atual do projeto (não volta para 0 sem motivo)
+  if(melhorCol === 0 && etapas.some(e => e.done)) return p.col;
+
   return melhorCol;
 }
 
