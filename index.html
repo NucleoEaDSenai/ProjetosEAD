@@ -825,7 +825,7 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
     <div class="view" id="view-homologacoes">
       <div class="st" style="margin-bottom:6px">🔖 Homologações</div>
       <div style="font-size:12.5px;color:var(--mu);margin-bottom:20px">Projetos na etapa Homologação/Instalação. Preencha os dados e acompanhe o status.</div>
-      <div id="homologStats" style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:22px"></div>
+      <div id="homologStats" style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:22px"></div>
       <div id="homologLista"></div>
     </div>
 
@@ -2188,6 +2188,8 @@ const TEMPLATES = {
       {lb:'Validação Final',             r:'cl'},
       {lb:'Homologação',                 r:'eq'},
       {lb:'Instalação no SIRH',          r:'eq'},
+      {lb:'Medição Feita',               r:'eq'},
+      {lb:'Upload Arquivos Feito',        r:'eq'},
     ],
     gatilhos: [
       {nome:'material base recebido',                      col:2},
@@ -2195,6 +2197,8 @@ const TEMPLATES = {
       {nome:'entrega do review',                           col:7},
       {nome:'validação final',                             col:11},
       {multi:['homologação','instalação no sirh'],         col:12},
+      {nome:'medição feita',                               col:13},
+      {nome:'upload arquivos feito',                       col:14},
     ],
     fimCol: 14,
   },
@@ -2212,6 +2216,8 @@ const TEMPLATES = {
       {lb:'Validação Final',             r:'cl'},
       {lb:'Homologação',                 r:'eq'},
       {lb:'Instalação no SIRH',          r:'eq'},
+      {lb:'Medição Feita',               r:'eq'},
+      {lb:'Upload Arquivos Feito',        r:'eq'},
     ],
     gatilhos: [
       {nome:'reunião inicial',                             col:1},
@@ -2221,6 +2227,8 @@ const TEMPLATES = {
       {nome:'entrega do review',                           col:7},
       {nome:'validação final',                             col:11},
       {multi:['homologação','instalação no sirh'],         col:12},
+      {nome:'medição feita',                               col:13},
+      {nome:'upload arquivos feito',                       col:14},
     ],
     fimCol: 14,
   },
@@ -2228,15 +2236,19 @@ const TEMPLATES = {
   'Autoria Digital': {
     colInicial: 0,
     etapas: [
-      {lb:'Reunião Inicial',  r:'eq'},
-      {lb:'Desenvolvimento',  r:'cl'},
-      {lb:'Homologação',      r:'eq'},
-      {lb:'Instalação no SIRH',r:'eq'},
+      {lb:'Reunião Inicial',       r:'eq'},
+      {lb:'Desenvolvimento',       r:'cl'},
+      {lb:'Homologação',           r:'eq'},
+      {lb:'Instalação no SIRH',    r:'eq'},
+      {lb:'Medição Feita',         r:'eq'},
+      {lb:'Upload Arquivos Feito', r:'eq'},
     ],
     gatilhos: [
       {nome:'reunião inicial',                             col:10},
       {nome:'desenvolvimento',                             col:11},
       {multi:['homologação','instalação no sirh'],         col:12},
+      {nome:'medição feita',                               col:13},
+      {nome:'upload arquivos feito',                       col:14},
     ],
     fimCol: 14,
   },
@@ -2252,6 +2264,8 @@ const TEMPLATES = {
       {lb:'Solicitação de Ajustes',   r:'cl'},
       {lb:'Implementação de Ajustes', r:'eq'},
       {lb:'Validação Final',          r:'cl'},
+      {lb:'Medição Feita',            r:'eq'},
+      {lb:'Upload Arquivos Feito',    r:'eq'},
     ],
     gatilhos: [
       {nome:'reunião inicial',         col:1},
@@ -2259,6 +2273,8 @@ const TEMPLATES = {
       {nome:'realizar cronograma',     col:8},
       {nome:'revisão textual',         col:9},
       {nome:'validação final',         col:12},
+      {nome:'medição feita',           col:13},
+      {nome:'upload arquivos feito',   col:14},
     ],
     fimCol: 14,
   },
@@ -2297,13 +2313,10 @@ function calcColIdeal(p){
 
   const tmpl = getTemplate(p);
 
-  // ── Todas concluídas → coluna final do template ou padrão ──
-  if(etapas.every(e => e.done)){
-    return tmpl ? tmpl.fimCol : 13;
-  }
-
   if(tmpl){
-    // ── Lógica de template específico ──
+    // Todas concluídas → fimCol
+    if(etapas.every(e => e.done)) return tmpl.fimCol;
+
     let melhorCol = tmpl.colInicial;
 
     for(const g of tmpl.gatilhos){
@@ -2319,6 +2332,7 @@ function calcColIdeal(p){
 
   } else {
     // ── Fluxo padrão ──
+    if(etapas.every(e => e.done)) return 13;
     let melhorCol = 0;
     for(const map of ETAPA_COL_MAP_PADRAO){
       if(etapaDone(etapas, map.nome)) melhorCol = Math.max(melhorCol, map.col);
@@ -3502,11 +3516,14 @@ function toggleHomolog(id){
 
 function buildHomologCard(p){
   const h = p.homolog || {};
-  const completo = !!(h.dtInstalacao);
+  const completo   = !!(h.dtInstalacao);
+  const autorizado = !!(h.dtAutorizacao) && !completo;
 
   const statusBdg = completo
     ? `<span class="hom-badge hom-status-ok">✅ Instalado</span>`
-    : `<span class="hom-badge hom-status-pend">⏳ Pendente</span>`;
+    : autorizado
+      ? `<span class="hom-badge" style="background:rgba(8,145,178,.25);color:#0e7490">🔓 Autorizado</span>`
+      : `<span class="hom-badge hom-status-pend">⏳ Pendente</span>`;
 
   const acadBdg = p.academia ? `<span class="hom-badge">${p.academia}</span>` : '';
   const rpBdg   = p.rp       ? `<span class="hom-badge">RP: ${p.rp}</span>`  : '';
@@ -3520,6 +3537,7 @@ function buildHomologCard(p){
       ${h.servico      ? `<span class="hom-resumo-item"><span class="hom-resumo-label">Serviço:</span><span class="hom-resumo-val">${h.servico}</span></span>` : ''}
       ${h.novoManut    ? `<span class="hom-resumo-item"><span class="hom-resumo-label">Tipo:</span><span class="hom-resumo-val">${h.novoManut}</span></span>` : ''}
       ${h.dtHomolog    ? `<span class="hom-resumo-item"><span class="hom-resumo-label">Homolog.:</span><span class="hom-resumo-val">${h.dtHomolog.split('-').reverse().join('/')}</span></span>` : ''}
+      ${h.dtAutorizacao? `<span class="hom-resumo-item"><span class="hom-resumo-label">Autorização:</span><span class="hom-resumo-val" style="color:#0891B2;font-weight:700">${h.dtAutorizacao.split('-').reverse().join('/')}</span></span>` : ''}
       ${h.dtInstalacao ? `<span class="hom-resumo-item"><span class="hom-resumo-label">Instalação:</span><span class="hom-resumo-val">${h.dtInstalacao.split('-').reverse().join('/')}</span></span>` : ''}
     </div>` : '';
 
@@ -3647,8 +3665,9 @@ function rHomologacoes(){
     return a.nome.localeCompare(b.nome);
   });
 
-  const pendentes  = lista.filter(p => !(p.homolog?.dtInstalacao)).length;
-  const instalados = lista.filter(p =>   p.homolog?.dtInstalacao).length;
+  const pendentes   = lista.filter(p => !(p.homolog?.dtAutorizacao) && !(p.homolog?.dtInstalacao)).length;
+  const autorizados = lista.filter(p =>   p.homolog?.dtAutorizacao  && !(p.homolog?.dtInstalacao)).length;
+  const instalados  = lista.filter(p =>   p.homolog?.dtInstalacao).length;
 
   const statsEl = document.getElementById('homologStats');
   if(statsEl){
@@ -3659,11 +3678,15 @@ function rHomologacoes(){
       </div>
       <div class="sc" style="border-left:4px solid var(--yel)">
         <div class="sc-l">Aguardando Instalação</div><div class="sc-v">${pendentes}</div>
-        <div class="sc-s">sem data de instalação</div><div class="sc-i">⏳</div>
+        <div class="sc-s">sem autorização ainda</div><div class="sc-i">⏳</div>
+      </div>
+      <div class="sc" style="border-left:4px solid #0891B2">
+        <div class="sc-l">Autorizados p/ Instalar</div><div class="sc-v">${autorizados}</div>
+        <div class="sc-s">com autorização, aguardando</div><div class="sc-i">✅</div>
       </div>
       <div class="sc" style="border-left:4px solid var(--green)">
         <div class="sc-l">Instalados</div><div class="sc-v">${instalados}</div>
-        <div class="sc-s">com data de instalação</div><div class="sc-i">✅</div>
+        <div class="sc-s">com data de instalação</div><div class="sc-i">🏁</div>
       </div>`;
   }
 
