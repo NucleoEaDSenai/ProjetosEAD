@@ -1123,6 +1123,7 @@ const ETPS_DEF = [
   {lb:'Revisão Textual',               r:'eq'},  // Equipe
   {lb:'Homologação',                   r:'eq'},  // Equipe
   {lb:'Instalação no SIRH',            r:'eq'},  // Equipe
+  {lb:'Upload Arquivos',               r:'eq'},  // Equipe
 ];
 
 const TIMAP = {
@@ -1328,11 +1329,13 @@ function rKanban(){
           </div>
           ${p.criadoPor?`<div class="kcard-autoria"><span>✏️ ${p.criadoPor}</span>${p.editadoPor&&p.editadoPor!==p.criadoPor?`<span>· editado: ${p.editadoPor}</span>`:''}</div>`:''}
           ${(() => {
-            // Template: tem etapa "Medição Feita" → botão aparece na col 12 (Pré-Medição)
-            // Padrão: botão aparece na col 13 quando todas as etapas estão concluídas
+            // Templates têm etapa "Medição Feita" — botão aparece na col 12 (Pré-Medição)
             const temTempl = (p.etapas||[]).some(e => e.lb && e.lb.toLowerCase().includes('medição feita'));
-            const naColCerta = temTempl ? p.col === 12 : (p.col === 13 && (p.etapas||[]).every(e => e.done));
-            if(naColCerta && !p.enviadoMedicao)
+            const colMedicao = temTempl ? 12 : 13;
+            const etapasMedicaoFeitas = temTempl
+              ? (p.etapas||[]).filter(e => !e.lb?.toLowerCase().includes('medição feita') && !e.lb?.toLowerCase().includes('upload arquivos')).every(e => e.done)
+              : (p.etapas||[]).every(e => e.done);
+            if(p.col === colMedicao && etapasMedicaoFeitas && !p.enviadoMedicao)
               return `<button class="btn-medicao" onclick="event.stopPropagation();enviarMedicao(${p.id})">📐 Enviar para Medição</button>`;
             if(p.enviadoMedicao && !p.medicaoFeita)
               return `<span class="badge-medicao-pend">⏳ Aguardando Medição</span>`;
@@ -2194,6 +2197,7 @@ const TEMPLATES = {
       {lb:'Validação Final',             r:'cl'},
       {lb:'Homologação',                 r:'eq'},
       {lb:'Instalação no SIRH',          r:'eq'},
+      {lb:'Upload Arquivos',              r:'eq'},
     ],
     gatilhos: [
       {nome:'material base recebido',                      col:2},
@@ -2201,6 +2205,7 @@ const TEMPLATES = {
       {nome:'entrega do review',                           col:7},
       {nome:'validação final',                             col:11},
       {multi:['homologação','instalação no sirh'],         col:12},
+      {nome:'upload arquivos',                             col:14},
     ],
     fimCol: 14,
   },
@@ -2218,6 +2223,7 @@ const TEMPLATES = {
       {lb:'Validação Final',             r:'cl'},
       {lb:'Homologação',                 r:'eq'},
       {lb:'Instalação no SIRH',          r:'eq'},
+      {lb:'Upload Arquivos',              r:'eq'},
     ],
     gatilhos: [
       {nome:'reunião inicial',                             col:1},
@@ -2227,6 +2233,7 @@ const TEMPLATES = {
       {nome:'entrega do review',                           col:7},
       {nome:'validação final',                             col:11},
       {multi:['homologação','instalação no sirh'],         col:12},
+      {nome:'upload arquivos',                             col:14},
     ],
     fimCol: 14,
   },
@@ -2238,11 +2245,13 @@ const TEMPLATES = {
       {lb:'Desenvolvimento',  r:'cl'},
       {lb:'Homologação',      r:'eq'},
       {lb:'Instalação no SIRH',r:'eq'},
+      {lb:'Upload Arquivos',    r:'eq'},
     ],
     gatilhos: [
       {nome:'reunião inicial',                             col:10},
       {nome:'desenvolvimento',                             col:11},
       {multi:['homologação','instalação no sirh'],         col:12},
+      {nome:'upload arquivos',                             col:14},
     ],
     fimCol: 14,
   },
@@ -2258,6 +2267,7 @@ const TEMPLATES = {
       {lb:'Solicitação de Ajustes',   r:'cl'},
       {lb:'Implementação de Ajustes', r:'eq'},
       {lb:'Validação Final',          r:'cl'},
+      {lb:'Upload Arquivos',          r:'eq'},
     ],
     gatilhos: [
       {nome:'reunião inicial',         col:1},
@@ -2265,6 +2275,7 @@ const TEMPLATES = {
       {nome:'realizar cronograma',     col:8},
       {nome:'revisão textual',         col:9},
       {nome:'validação final',         col:12},
+      {nome:'upload arquivos',         col:14},
     ],
     fimCol: 14,
   },
@@ -2280,6 +2291,7 @@ const ETAPA_COL_MAP_PADRAO = [
   {nome:'implementação de ajuste',  col:9},
   {nome:'validação final',          col:11},
   {nome:'instalação no sirh',       col:13},
+  {nome:'upload arquivos',           col:14},
 ];
 
 // Retorna o template ativo do projeto (baseado no primeiro recurso com template)
@@ -2303,24 +2315,21 @@ function calcColIdeal(p){
 
   const tmpl = getTemplate(p);
 
-  // ── Todas concluídas → coluna final do template ou padrão ──
-  if(etapas.every(e => e.done)){
-    return tmpl ? tmpl.fimCol : 13;
-  }
-
   if(tmpl){
-    // ── Lógica de template específico ──
+    // ── Template específico ──
+    // Percorre todos os gatilhos por nome/multi
     let melhorCol = tmpl.colInicial;
-
     for(const g of tmpl.gatilhos){
       if(g.multi){
-        // Gatilho multi: TODOS os fragmentos precisam estar concluídos
         const todosDone = g.multi.every(frag => etapaDone(etapas, frag));
         if(todosDone) melhorCol = Math.max(melhorCol, g.col);
       } else {
         if(etapaDone(etapas, g.nome)) melhorCol = Math.max(melhorCol, g.col);
       }
     }
+    // Bloqueia acima de col 12 (Pré-Medição) enquanto medição não confirmada.
+    // Após p.medicaoFeita=true, gatilhos de col 13 e 14 ficam liberados.
+    if(!p.medicaoFeita) melhorCol = Math.min(melhorCol, 12);
     return melhorCol;
 
   } else {
@@ -3388,7 +3397,7 @@ function confirmarMedicao(id){
     if(!confirm(`Desmarcar a medição de "${p.nome}"?`)) return;
     p.medicaoFeita   = false;
     p.medicaoFeitaEm = null;
-    p.col = 13; // volta para Upload BDOC
+    p.col = 12; // volta para Pré-Medição
     registrarHistorico(p, 'desmarcou medição', 'Medição desmarcada — retornou para Upload BDOC');
     fbSalvarProjeto(p);
     renderAll();
@@ -3398,11 +3407,11 @@ function confirmarMedicao(id){
   if(!confirm(`Confirmar que a medição de "${p.nome}" foi realizada?`)) return;
   p.medicaoFeita   = true;
   p.medicaoFeitaEm = td();
-  p.col = 14; // move para Projetos Concluídos
-  registrarHistorico(p, 'confirmou medição', 'Medição confirmada — movido para Projetos Concluídos');
+  p.col = 13; // move para Upload BDOC — aguarda Upload Arquivos para concluir
+  registrarHistorico(p, 'confirmou medição', 'Medição confirmada — movido para Upload BDOC');
   fbSalvarProjeto(p);
   renderAll();
-  showToast('🎉 Medição confirmada! Projeto movido para Projetos Concluídos.');
+  showToast('🎉 Medição confirmada! Faça o upload dos arquivos para concluir.');
 }
 
 function rMedicao(){
