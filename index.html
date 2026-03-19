@@ -393,7 +393,6 @@ body.dark .search-box input{background:var(--s2);border-color:var(--bdr);color:v
 body.dark .search-drop{background:var(--surface);border-color:var(--bdr)}
 body.dark .sri:hover{background:var(--s2)}
 body.dark .ov-login .login-box{background:var(--surface)}
-body.dark .tag-inp{background:var(--s2);border-color:var(--bdr);color:var(--txt)}
 body.dark .rec-chip{background:var(--s2);border-color:var(--bdr);color:var(--txt)}
 body.dark .rec-chip.sel{background:rgba(91,155,255,.2);border-color:var(--blue);color:var(--blue)}
 body.dark tr:hover td{background:rgba(255,255,255,.02)}
@@ -412,13 +411,6 @@ body.dark tr:hover td{background:rgba(255,255,255,.02)}
 .sri-meta{font-size:11.5px;color:var(--mu);margin-top:2px}
 .sri-hl{background:#FEF3C7;border-radius:2px;padding:0 2px}
 body.dark .sri-hl{background:rgba(255,202,40,.25)}
-
-/* ═══ TAGS ═══ */
-.tag-badge{display:inline-flex;align-items:center;gap:3px;padding:2px 8px;border-radius:12px;font-size:11px;font-weight:600;border:1.5px solid;margin:2px;cursor:default;white-space:nowrap}
-.tag-rm{cursor:pointer;opacity:.5;margin-left:1px;line-height:1}.tag-rm:hover{opacity:1}
-.tag-inp-row{display:flex;gap:7px;align-items:center;margin-top:7px;flex-wrap:wrap}
-.tag-inp{padding:5px 11px;border:1.5px solid var(--bdr);border-radius:7px;font-family:'Plus Jakarta Sans',sans-serif;font-size:12.5px;outline:none;background:var(--surface)}
-.tag-inp:focus{border-color:var(--blue)}
 
 /* ═══ HISTÓRICO ═══ */
 .hist-row{display:flex;gap:10px;padding:9px 0;border-bottom:1px solid var(--bdr)}
@@ -960,14 +952,7 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
           <div class="rec-wrap" id="recChips"></div>
         </div>
         <div class="fg ff"><label class="fl">Descrição / Objetivo</label><textarea class="fta" id="fd" placeholder="Objetivo, público-alvo, contexto..."></textarea></div>
-        <div class="fg ff">
-          <label class="fl">Tags / Categorias</label>
-          <div id="tagsWrap" style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:4px"></div>
-          <div class="tag-inp-wrap">
-            <input class="tag-inp" id="tagInp" placeholder="Nova tag..." maxlength="30" onkeydown="if(event.key==='Enter'){event.preventDefault();addTag()}">
-            <button class="btn bg2 bsm" onclick="addTag()">+ Adicionar</button>
-          </div>
-        </div>
+
       </div>
     </div>
     <!-- TAB 1 -->
@@ -1440,9 +1425,9 @@ function rList(){
 
   document.getElementById('listTbl').innerHTML=data.map(p=>{
     const{eq,cl}=delInf(p);
-    const _area=p.area?'<br><small style="color:var(--mu)">'+p.area+'</small>':'';const _tags=(p.tags||[]).length?'<div style="margin-top:3px">'+tagsInline(p.tags)+'</div>':'';
+    const _area=p.area?'<br><small style="color:var(--mu)">'+p.area+'</small>':'';
     return`<tr>
-      <td><span style="font-weight:600;cursor:pointer" onclick="openDet(${p.id})">${p.nome}</span>${_area}${_tags}${p.prioridade?'<div style="margin-top:3px">'+prioBadge(p.prioridade)+'</div>':''}</td>
+      <td><span style="font-weight:600;cursor:pointer" onclick="openDet(${p.id})">${p.nome}</span>${_area}${p.prioridade?'<div style="margin-top:3px">'+prioBadge(p.prioridade)+'</div>':''}</td>
       <td>${recTags(p.recursos)}</td>
       <td>${avList(p.resps)}</td>
       <td style="font-size:11.5px"><span style="display:inline-flex;align-items:center;gap:4px"><span style="width:6px;height:6px;border-radius:50%;background:${colDot(p.col)};flex-shrink:0;display:inline-block"></span>${colLabel(p.col)}</span></td>
@@ -2034,8 +2019,7 @@ function sitEtapa(e){
 function openDet(id){
   const p=DB.find(x=>x.id===id);if(!p)return;
   document.getElementById('detTitle').textContent=p.nome;
-  const detTagsEl=document.getElementById('detTagsRow');
-  if(detTagsEl){const t=tagsInline(p.tags);detTagsEl.style.display=t?'flex':'none';detTagsEl.innerHTML=t?`<span style="font-size:11px;color:var(--mu);margin-right:3px">🏷️</span>${t}`:''}
+
   const{eq,cl}=delInf(p);
   const eRows=(p.etapas||[]).map((e,i)=>{
     const isCl=e.r==='cl';
@@ -2812,7 +2796,7 @@ function onDataProjetoChange() {
 // ─────────────────────────────────────────────────────────────────────────────
 
 function openNew(){
-  editId=null; currentTags=[];
+  editId=null;
   document.getElementById('mNewTitle').textContent='Novo Projeto EAD';
   ['fn','fd','fpo'].forEach(id=>document.getElementById(id).value='');
   const prioEl=document.getElementById('fPrio');if(prioEl)prioEl.value='';
@@ -2885,7 +2869,7 @@ function salvar(){
     prioridade:document.getElementById('fPrio')?.value||'',
     rp:document.getElementById('fRP')?.value||'',
     academia:document.getElementById('fAcademia')?.value||'',
-    tags:[...currentTags],
+    tags:editId?(DB.find(x=>x.id===editId)?.tags||[]):[],  // preserva tags existentes
     historico:projAnterior?.historico||[],
     etapas,
   };
@@ -4015,7 +3999,6 @@ function buscarGlobal(q){
   const res = todos.filter(p =>
     p.nome.toLowerCase().includes(ql) ||
     (p.desc||'').toLowerCase().includes(ql) ||
-    (p.tags||[]).some(t => t.toLowerCase().includes(ql)) ||
     (p.resps||[]).some(r => r.toLowerCase().includes(ql)) ||
     (p.recursos||[]).some(r => r.toLowerCase().includes(ql))
   ).slice(0, 8);
@@ -4029,10 +4012,9 @@ function buscarGlobal(q){
     drop.classList.add('on'); return;
   }
   drop.innerHTML = res.map(p => {
-    const tagStr = (p.tags||[]).length ? ' · 🏷️ '+(p.tags||[]).slice(0,3).join(', ') : '';
     return `<div class="sri" onclick="fecharBusca();openDet(${p.id})">
       <div class="sri-name">${hl(p.nome)}</div>
-      <div class="sri-meta">${sitBdg(p)} · ${(p.resps||[]).join(', ')||'—'}${tagStr}</div>
+      <div class="sri-meta">${sitBdg(p)} · ${(p.resps||[]).join(', ')||'—'}</div>
     </div>`;
   }).join('');
   drop.classList.add('on');
@@ -4047,37 +4029,7 @@ function fecharBusca(){
 // ══════════════════════════════════════════════
 //  TAGS PERSONALIZÁVEIS
 // ══════════════════════════════════════════════
-const TAG_PALETTE = [
-  {bg:'#EDE9FE',bd:'#7C3AED',tx:'#5B21B6'},{bg:'#DCFCE7',bd:'#16A34A',tx:'#14532D'},
-  {bg:'#FEF3C7',bd:'#D97706',tx:'#92400E'},{bg:'#DBEAFE',bd:'#2563EB',tx:'#1E3A8A'},
-  {bg:'#FCE7F3',bd:'#DB2777',tx:'#831843'},{bg:'#FEE2E2',bd:'#DC2626',tx:'#7F1D1D'},
-  {bg:'#E0F2FE',bd:'#0284C7',tx:'#0C4A6E'},{bg:'#F0FDF4',bd:'#16A34A',tx:'#166534'},
-];
-let currentTags = [];
-function tagPalette(tag){
-  let h = 0;
-  for(let i = 0; i < tag.length; i++) h = (h * 37 + tag.charCodeAt(i)) >>> 0;
-  return TAG_PALETTE[h % TAG_PALETTE.length];
-}
-function tagBadgeHtml(tag, removable, idx){
-  const p = tagPalette(tag);
-  return `<span class="tag-badge" style="background:${p.bg};border-color:${p.bd};color:${p.tx}">${tag}${removable?`<span class="tag-rm" onclick="removeTag(${idx})">✕</span>`:''}</span>`;
-}
-function renderTagsWrap(){
-  const w = document.getElementById('tagsWrap'); if(!w) return;
-  w.innerHTML = currentTags.map((t,i) => tagBadgeHtml(t, true, i)).join('');
-}
-function addTag(){
-  const inp = document.getElementById('tagInp'); if(!inp) return;
-  const v = inp.value.trim();
-  if(!v || currentTags.includes(v)){ inp.value=''; return; }
-  currentTags.push(v); inp.value = ''; renderTagsWrap();
-}
-function removeTag(i){ currentTags.splice(i,1); renderTagsWrap(); }
-function tagsInline(tags){
-  if(!tags||!tags.length) return '';
-  return tags.map(t => tagBadgeHtml(t, false, 0)).join('');
-}
+function tagsInline(){ return ''; }
 
 // ══════════════════════════════════════════════
 //  HISTÓRICO DE EDIÇÕES
