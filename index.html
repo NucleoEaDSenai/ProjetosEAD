@@ -987,7 +987,7 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
             <option value="8">Revisão Textual/Tradução</option>
             <option value="9">PELD</option>
             <option value="10">Autoria Digital</option>
-            <option value="11">Homologação/<br>Instalação</option>
+            <option value="11">Homologação/Instalação</option>
             <option value="12">Pré-Medição</option>
             <option value="13">Upload BDOC - Files e Scorm</option>
             <option value="14">Projetos Concluídos</option>
@@ -2170,40 +2170,162 @@ let _motivoPid=null, _motivoIdx=null;
 // ══════════════════════════════════════════════
 //  AVANÇO AUTOMÁTICO DE COLUNA
 // ══════════════════════════════════════════════
-// Mapeamento por NOME da etapa (fragmento, case-insensitive) → coluna de destino
-// Funciona independente de quantas etapas existam ou em qual ordem estejam.
-// A coluna escolhida é sempre a do gatilho concluído de maior valor.
-const ETAPA_COL_MAP = [
-  {nome:'reunião inicial',        col:1},   // → Aguardando Material Base
-  {nome:'entrega do pi',          col:4},   // → Validação - PI
-  {nome:'validação do pi',        col:6},   // → Desenvolvimento
-  {nome:'validação di',           col:6},   // → Desenvolvimento
-  {nome:'entrega do review',      col:7},   // → Validação - Desenvolvimento
-  {nome:'implementação de ajuste',col:9},   // → PELD
-  {nome:'validação final',        col:11},  // → Homologação/Instalação
-  {nome:'instalação no sirh',     col:13},  // → Upload BDOC
+// ── TEMPLATES DE ETAPAS POR RECURSO ─────────────────────────────────────────
+// Cada template define: coluna inicial, etapas padrão e gatilhos de movimento.
+// Gatilhos: { nome: fragmento (case-insensitive), col: destino }
+//   'multi': array de fragmentos — TODOS precisam estar concluídos para mover
+// Recurso não listado aqui usa o fluxo padrão (ETPS_DEF).
+
+const TEMPLATES = {
+  'Encapsulamento': {
+    colInicial: 1,
+    etapas: [
+      {lb:'Material Base Recebido',      r:'eq'},
+      {lb:'Realizar Cronograma',         r:'eq'},
+      {lb:'Entrega do Review ao Cliente',r:'eq'},
+      {lb:'Solicitação de Ajustes',      r:'cl'},
+      {lb:'Implementação de Ajustes',    r:'eq'},
+      {lb:'Validação Final',             r:'cl'},
+      {lb:'Homologação',                 r:'eq'},
+      {lb:'Instalação no SIRH',          r:'eq'},
+    ],
+    gatilhos: [
+      {nome:'material base recebido',                      col:2},
+      {nome:'realizar cronograma',                         col:5},
+      {nome:'entrega do review',                           col:7},
+      {nome:'validação final',                             col:11},
+      {multi:['homologação','instalação no sirh'],         col:12},
+    ],
+    fimCol: 14,
+  },
+
+  'Manutenção': {
+    colInicial: 0,
+    etapas: [
+      {lb:'Reunião Inicial',             r:'eq'},
+      {lb:'Material Base Recebido',      r:'eq'},
+      {lb:'Realizar Cronograma',         r:'eq'},
+      {lb:'Desenvolvimento',             r:'eq'},
+      {lb:'Entrega do Review ao Cliente',r:'eq'},
+      {lb:'Solicitação de Ajustes',      r:'cl'},
+      {lb:'Implementação de Ajustes',    r:'eq'},
+      {lb:'Validação Final',             r:'cl'},
+      {lb:'Homologação',                 r:'eq'},
+      {lb:'Instalação no SIRH',          r:'eq'},
+    ],
+    gatilhos: [
+      {nome:'reunião inicial',                             col:1},
+      {nome:'material base recebido',                      col:2},
+      {nome:'realizar cronograma',                         col:5},
+      {nome:'desenvolvimento',                             col:6},
+      {nome:'entrega do review',                           col:7},
+      {nome:'validação final',                             col:11},
+      {multi:['homologação','instalação no sirh'],         col:12},
+    ],
+    fimCol: 14,
+  },
+
+  'Autoria Digital': {
+    colInicial: 0,
+    etapas: [
+      {lb:'Reunião Inicial',  r:'eq'},
+      {lb:'Desenvolvimento',  r:'cl'},
+      {lb:'Homologação',      r:'eq'},
+      {lb:'Instalação no SIRH',r:'eq'},
+    ],
+    gatilhos: [
+      {nome:'reunião inicial',                             col:10},
+      {nome:'desenvolvimento',                             col:11},
+      {multi:['homologação','instalação no sirh'],         col:12},
+    ],
+    fimCol: 14,
+  },
+
+  'Apostila/E-book': {
+    colInicial: 0,
+    etapas: [
+      {lb:'Reunião Inicial',          r:'eq'},
+      {lb:'Material Base Recebido',   r:'eq'},
+      {lb:'Realizar Cronograma',      r:'eq'},
+      {lb:'Revisão Textual',          r:'eq'},
+      {lb:'Desenvolvimento',          r:'eq'},
+      {lb:'Solicitação de Ajustes',   r:'cl'},
+      {lb:'Implementação de Ajustes', r:'eq'},
+      {lb:'Validação Final',          r:'cl'},
+    ],
+    gatilhos: [
+      {nome:'reunião inicial',         col:1},
+      {nome:'material base recebido',  col:2},
+      {nome:'realizar cronograma',     col:8},
+      {nome:'revisão textual',         col:9},
+      {nome:'validação final',         col:12},
+    ],
+    fimCol: 14,
+  },
+};
+
+// Gatilhos do fluxo PADRÃO (recursos sem template específico)
+const ETAPA_COL_MAP_PADRAO = [
+  {nome:'reunião inicial',          col:1},
+  {nome:'entrega do pi ao cliente', col:4},
+  {nome:'validação do pi',          col:6},
+  {nome:'validação di',             col:6},
+  {nome:'entrega do review',        col:7},
+  {nome:'implementação de ajuste',  col:9},
+  {nome:'validação final',          col:11},
+  {nome:'instalação no sirh',       col:13},
 ];
+
+// Retorna o template ativo do projeto (baseado no primeiro recurso com template)
+function getTemplate(p){
+  const recursos = p.recursos || [];
+  for(const r of recursos){
+    if(TEMPLATES[r]) return TEMPLATES[r];
+  }
+  return null;
+}
+
+// Verifica se um fragmento de nome corresponde a alguma etapa concluída
+function etapaDone(etapas, frag){
+  const et = etapas.find(e => e.lb && e.lb.toLowerCase().includes(frag.toLowerCase()));
+  return et && et.done;
+}
 
 function calcColIdeal(p){
   const etapas = p.etapas || [];
   if(etapas.length === 0) return p.col;
 
-  // Todas concluídas → col 13 (Upload BDOC)
-  if(etapas.every(e => e.done)) return 13;
+  const tmpl = getTemplate(p);
 
-  // Busca por fragmento de nome (case-insensitive) — não depende de índice
-  let melhorCol = 0;
-  for(const map of ETAPA_COL_MAP){
-    // Encontra a etapa cujo nome contém o fragmento do mapa
-    const et = etapas.find(e => e.lb && e.lb.toLowerCase().includes(map.nome));
-    if(et && et.done) melhorCol = Math.max(melhorCol, map.col);
+  // ── Todas concluídas → coluna final do template ou padrão ──
+  if(etapas.every(e => e.done)){
+    return tmpl ? tmpl.fimCol : 13;
   }
 
-  // Se nenhum gatilho foi ativado mas há etapas concluídas,
-  // mantém a coluna atual do projeto (não volta para 0 sem motivo)
-  if(melhorCol === 0 && etapas.some(e => e.done)) return p.col;
+  if(tmpl){
+    // ── Lógica de template específico ──
+    let melhorCol = tmpl.colInicial;
 
-  return melhorCol;
+    for(const g of tmpl.gatilhos){
+      if(g.multi){
+        // Gatilho multi: TODOS os fragmentos precisam estar concluídos
+        const todosDone = g.multi.every(frag => etapaDone(etapas, frag));
+        if(todosDone) melhorCol = Math.max(melhorCol, g.col);
+      } else {
+        if(etapaDone(etapas, g.nome)) melhorCol = Math.max(melhorCol, g.col);
+      }
+    }
+    return melhorCol;
+
+  } else {
+    // ── Fluxo padrão ──
+    let melhorCol = 0;
+    for(const map of ETAPA_COL_MAP_PADRAO){
+      if(etapaDone(etapas, map.nome)) melhorCol = Math.max(melhorCol, map.col);
+    }
+    if(melhorCol === 0 && etapas.some(e => e.done)) return p.col;
+    return melhorCol;
+  }
 }
 
 function avancarColuna(p){
@@ -2335,9 +2457,48 @@ function stab(n,el){
 
 function buildRecChips(selected){
   document.getElementById('recChips').innerHTML=RECURSOS.map(r=>`
-    <div class="rec-chip ${(selected||[]).includes(r)?'sel':''}" onclick="this.classList.toggle('sel')">${r}</div>
+    <div class="rec-chip ${(selected||[]).includes(r)?'sel':''}" onclick="toggleRec(this,'${r}')">${r}</div>
   `).join('');
 }
+function toggleRec(el, recurso){
+  el.classList.toggle('sel');
+
+  // Verificar se o recurso selecionado tem template
+  const selecionados = getSelectedRecs();
+  // Encontrar o primeiro recurso com template entre os selecionados
+  let tmplRecurso = null;
+  for(const r of selecionados){
+    if(TEMPLATES[r]){ tmplRecurso = r; break; }
+  }
+
+  // Só aplicar template se ainda não há etapas preenchidas manualmente
+  const temEtapasCustom = _efEtapas.length > 0 &&
+    _efEtapas.some(e => e.lb && !ETPS_DEF.some(d => d.lb === e.lb) &&
+      !Object.values(TEMPLATES).some(t => t.etapas.some(te => te.lb === e.lb)));
+
+  if(tmplRecurso && !temEtapasCustom){
+    const tmpl = TEMPLATES[tmplRecurso];
+    // Aplicar coluna inicial
+    const colEl = document.getElementById('fcol');
+    if(colEl && !colEl._manuallyChanged) colEl.value = tmpl.colInicial;
+    // Aplicar etapas do template
+    buildEF(tmpl.etapas.map(e => ({...e, prazo:null, done:false, fim:null})));
+    setSugestaoStatus(`📋 Template "${tmplRecurso}" aplicado`, 'var(--blue)');
+  } else if(!tmplRecurso && _efEtapas.length > 0){
+    // Nenhum recurso com template — restaurar etapas padrão se ainda estiver no padrão
+    const estaNoTemplate = Object.values(TEMPLATES).some(t =>
+      t.etapas.length === _efEtapas.length &&
+      t.etapas.every((te, i) => _efEtapas[i]?.lb === te.lb)
+    );
+    if(estaNoTemplate){
+      buildEF(ETPS_DEF.map(e => ({...e, prazo:null})));
+      const colEl = document.getElementById('fcol');
+      if(colEl) colEl.value = 0;
+      setSugestaoStatus('', '');
+    }
+  }
+}
+
 function getSelectedRecs(){
   return [...document.querySelectorAll('#recChips .rec-chip.sel')].map(el=>el.textContent.trim());
 }
