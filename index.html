@@ -1328,13 +1328,11 @@ function rKanban(){
           </div>
           ${p.criadoPor?`<div class="kcard-autoria"><span>✏️ ${p.criadoPor}</span>${p.editadoPor&&p.editadoPor!==p.criadoPor?`<span>· editado: ${p.editadoPor}</span>`:''}</div>`:''}
           ${(() => {
-            // Templates têm etapa "Medição Feita" — botão aparece na col 12 (Pré-Medição)
+            // Template: tem etapa "Medição Feita" → botão aparece na col 12 (Pré-Medição)
+            // Padrão: botão aparece na col 13 quando todas as etapas estão concluídas
             const temTempl = (p.etapas||[]).some(e => e.lb && e.lb.toLowerCase().includes('medição feita'));
-            const colMedicao = temTempl ? 12 : 13;
-            const etapasMedicaoFeitas = temTempl
-              ? (p.etapas||[]).filter(e => !e.lb?.toLowerCase().includes('medição feita') && !e.lb?.toLowerCase().includes('upload arquivos')).every(e => e.done)
-              : (p.etapas||[]).every(e => e.done);
-            if(p.col === colMedicao && etapasMedicaoFeitas && !p.enviadoMedicao)
+            const naColCerta = temTempl ? p.col === 12 : (p.col === 13 && (p.etapas||[]).every(e => e.done));
+            if(naColCerta && !p.enviadoMedicao)
               return `<button class="btn-medicao" onclick="event.stopPropagation();enviarMedicao(${p.id})">📐 Enviar para Medição</button>`;
             if(p.enviadoMedicao && !p.medicaoFeita)
               return `<span class="badge-medicao-pend">⏳ Aguardando Medição</span>`;
