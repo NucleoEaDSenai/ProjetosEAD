@@ -902,16 +902,7 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
     <div id="tab0">
       <div class="fg2">
         <div class="fg ff"><label class="fl">Nome do Projeto / Curso *</label><input class="fi" id="fn" placeholder="Ex: Segurança do Trabalho — Módulo 3" aria-required="true" aria-label="Nome do projeto"></div>
-        <div class="fg2" style="grid-template-columns:1fr 1fr 1fr 1fr;gap:10px">
-          <div class="fg">
-            <label class="fl" for="fIdCurso">ID do Projeto</label>
-            <select class="prio-select" id="fIdCursoTipo" style="width:100%;margin-bottom:4px" onchange="toggleIdCursoInput()">
-              <option value="">— Sem ID —</option>
-              <option value="manual">Informar ID</option>
-            </select>
-            <input class="fi" type="text" id="fIdCurso" placeholder="Ex: 12345" maxlength="30"
-              style="width:100%;display:none;box-sizing:border-box">
-          </div>
+        <div class="fg2" style="grid-template-columns:1fr 1fr 1fr;gap:10px">
           <div class="fg">
             <label class="fl" for="fPrio">Prioridade</label>
             <select class="prio-select" id="fPrio" aria-label="Prioridade do projeto" style="width:100%">
@@ -987,8 +978,8 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
             <option value="14">Projetos Concluídos</option>
           </select>
         </div>
-        <div class="fg"><label class="fl">Data de Início Real</label><div style="display:flex;gap:5px"><input class="fi" type="number" id="fi_d" placeholder="DD" min="1" max="31" style="width:58px" ><input class="fi" type="number" id="fi_m" placeholder="MM" min="1" max="12" style="width:58px" ><input class="fi" type="number" id="fi_a" placeholder="AAAA" min="2020" max="2099" style="width:80px" ></div></div>
-        <div class="fg"><label class="fl">Prazo de Entrega</label><div style="display:flex;gap:5px"><input class="fi" type="number" id="fp_d" placeholder="DD" min="1" max="31" style="width:58px" ><input class="fi" type="number" id="fp_m" placeholder="MM" min="1" max="12" style="width:58px" ><input class="fi" type="number" id="fp_a" placeholder="AAAA" min="2020" max="2099" style="width:80px" ></div></div>
+        <div class="fg"><label class="fl">Data de Início Real</label><div style="display:flex;gap:5px"><input class="fi" type="number" id="fi_d" placeholder="DD" min="1" max="31" style="width:58px" onchange="onDataProjetoChange()"><input class="fi" type="number" id="fi_m" placeholder="MM" min="1" max="12" style="width:58px" onchange="onDataProjetoChange()"><input class="fi" type="number" id="fi_a" placeholder="AAAA" min="2020" max="2099" style="width:80px" onchange="onDataProjetoChange()"></div></div>
+        <div class="fg"><label class="fl">Prazo de Entrega</label><div style="display:flex;gap:5px"><input class="fi" type="number" id="fp_d" placeholder="DD" min="1" max="31" style="width:58px" onchange="onDataProjetoChange()"><input class="fi" type="number" id="fp_m" placeholder="MM" min="1" max="12" style="width:58px" onchange="onDataProjetoChange()"><input class="fi" type="number" id="fp_a" placeholder="AAAA" min="2020" max="2099" style="width:80px" onchange="onDataProjetoChange()"></div></div>
         <div class="fg ff"><label class="fl">Observação sobre Prazo</label><textarea class="fta" id="fpo" placeholder="Ex: cliente solicitou extensão..."></textarea></div>
       </div>
     </div>
@@ -998,8 +989,15 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
         <label class="fl">Responsável(is) — selecione um ou mais</label>
         <div class="resp-wrap" id="respChips"></div>
       </div>
-      <div style="margin-bottom:10px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;flex-wrap:wrap;gap:8px">
         <div style="font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:11px;color:var(--mu);text-transform:uppercase;letter-spacing:.5px">Etapas de Produção</div>
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+          <span id="sugestaoStatus" style="font-size:11px;color:var(--mu);font-style:italic"></span>
+          <button type="button" id="btnSugerirPrazos" onclick="sugerirPrazos()"
+            style="font-size:11.5px;padding:5px 12px;background:var(--blue);color:#fff;border:none;border-radius:7px;cursor:pointer;display:flex;align-items:center;gap:5px;font-weight:600">
+            ⚡ Sugerir Prazos
+          </button>
+        </div>
       </div>
       <div id="etapasForm"></div>
     </div>
@@ -2074,7 +2072,7 @@ function openDet(id){
   document.getElementById('detBody').innerHTML=`
     <div class="dl2r">
       <div>
-        ${p.prioridade?dl2('Prioridade',prioBadge(p.prioridade)):''}${p.rp?dl2('RP',`<span style="font-weight:600">${p.rp}</span>`):''}${p.academia?dl2('Academia',`<span style="font-weight:600">${p.academia}</span>`):''}${dl2('Recursos',recTags(p.recursos))}
+        ${p.idCurso?dl2('ID do Projeto',`<span style="font-weight:600;font-family:monospace">${p.idCurso}</span>`):''}${p.prioridade?dl2('Prioridade',prioBadge(p.prioridade)):''}${p.rp?dl2('RP',`<span style="font-weight:600">${p.rp}</span>`):''}${p.academia?dl2('Academia',`<span style="font-weight:600">${p.academia}</span>`):''}${dl2('Recursos',recTags(p.recursos))}
         ${dl2('Coluna',`<span style="display:inline-flex;align-items:center;gap:5px"><span style="width:8px;height:8px;border-radius:50%;background:${colDot(p.col)};display:inline-block"></span>${colLabel(p.col)}</span>`)}
         ${dl2('Situação',sitBdg(p))}
 
@@ -2484,7 +2482,7 @@ function toggleRec(el, recurso){
     if(colEl && !colEl._manuallyChanged) colEl.value = tmpl.colInicial;
     // Aplicar etapas do template
     buildEF(tmpl.etapas.map(e => ({...e, prazo:null, done:false, fim:null})));
-
+    setSugestaoStatus(`📋 Template "${tmplRecurso}" aplicado`, 'var(--blue)');
   } else if(!tmplRecurso && _efEtapas.length > 0){
     // Nenhum recurso com template — restaurar etapas padrão se ainda estiver no padrão
     const estaNoTemplate = Object.values(TEMPLATES).some(t =>
@@ -2495,7 +2493,7 @@ function toggleRec(el, recurso){
       buildEF(ETPS_DEF.map(e => ({...e, prazo:null})));
       const colEl = document.getElementById('fcol');
       if(colEl) colEl.value = 0;
-
+      setSugestaoStatus('', '');
     }
   }
 }
@@ -2634,7 +2632,7 @@ function _efDel(i){
   _efSync();
   _efEtapas.splice(i,1);
   _renderEF();
-
+  setSugestaoStatus('','');
 }
 
 function _efMover(i, dir){
@@ -2681,19 +2679,125 @@ function getEtapasDoForm(projAnterior){
 
 // ── SUGESTÃO AUTOMÁTICA DE PRAZOS POR ETAPA ──────────────────────────────────
 
-function toggleIdCursoInput(){
-  const tipo = document.getElementById('fIdCursoTipo')?.value;
-  const inp  = document.getElementById('fIdCurso');
-  if(!inp) return;
-  inp.style.display = tipo === 'manual' ? 'block' : 'none';
-  if(tipo !== 'manual') inp.value = '';
+const ETPS_PESOS = [3, 10, 5, 4, 2, 6, 10, 6, 12, 2, 5, 8, 6, 5, 8, 8];
+
+function addDiasUteis(dataIso, dias) {
+  const d = new Date(dataIso + 'T12:00:00');
+  let adicionados = 0;
+  while (adicionados < dias) {
+    d.setDate(d.getDate() + 1);
+    const dow = d.getDay();
+    if (dow !== 0 && dow !== 6) adicionados++;
+  }
+  return d.toISOString().split('T')[0];
 }
+
+function diasUteisEntre(inicioIso, fimIso) {
+  const d = new Date(inicioIso + 'T12:00:00');
+  const fim = new Date(fimIso + 'T12:00:00');
+  let count = 0;
+  while (d < fim) {
+    d.setDate(d.getDate() + 1);
+    const dow = d.getDay();
+    if (dow !== 0 && dow !== 6) count++;
+  }
+  return count;
+}
+
+function calcularPrazosEtapas(inicioIso, prazoIso) {
+  const totalDias = diasUteisEntre(inicioIso, prazoIso);
+  if (totalDias <= 0) return null;
+  // Usa pesos fixos para as 16 etapas padrão; se houver mais/menos, distribui igual
+  const n = _efEtapas.length;
+  const pesos = n === ETPS_PESOS.length
+    ? ETPS_PESOS
+    : Array(n).fill(Math.round(100 / n));
+  const totalPeso = pesos.reduce((a, b) => a + b, 0);
+  const prazos = [];
+  let cursor = inicioIso;
+  pesos.forEach(peso => {
+    const diasEtapa = Math.max(1, Math.round((peso / totalPeso) * totalDias));
+    cursor = addDiasUteis(cursor, diasEtapa);
+    if (cursor > prazoIso) cursor = prazoIso;
+    prazos.push(cursor);
+  });
+  return prazos;
+}
+
+function algumPrazoPreenchido() {
+  return _efEtapas.some((_, i) => {
+    const d = document.getElementById('ep_d_' + i)?.value;
+    const m = document.getElementById('ep_m_' + i)?.value;
+    const a = document.getElementById('ep_a_' + i)?.value;
+    return d || m || a;
+  });
+}
+
+function aplicarPrazosNaTabela(prazos) {
+  prazos.forEach((iso, i) => {
+    const el_d = document.getElementById('ep_d_' + i);
+    const el_m = document.getElementById('ep_m_' + i);
+    const el_a = document.getElementById('ep_a_' + i);
+    if (!el_d) return;
+    const [y, mo, dy] = iso.split('-');
+    el_d.value = parseInt(dy);
+    el_m.value = parseInt(mo);
+    el_a.value = parseInt(y);
+    [el_d, el_m, el_a].forEach(el => {
+      el.style.transition = 'background .3s';
+      el.style.background = '#EFF6FF';
+      setTimeout(() => { el.style.background = ''; }, 1200);
+    });
+  });
+}
+
+function setSugestaoStatus(msg, cor) {
+  const el = document.getElementById('sugestaoStatus');
+  if (!el) return;
+  el.textContent = msg;
+  el.style.color = cor || 'var(--mu)';
+}
+
+function sugerirPrazos(silencioso) {
+  const inicio = getDateField('fi');
+  const prazo  = getDateField('fp');
+  if (!inicio || !prazo) {
+    setSugestaoStatus('⚠️ Preencha Início e Prazo de Entrega primeiro.', 'var(--org)');
+    if (!silencioso) showToast('⚠️ Informe Data de Início e Prazo de Entrega na aba Datas & Prazos');
+    return;
+  }
+  if (inicio >= prazo) {
+    setSugestaoStatus('⚠️ Início deve ser anterior ao Prazo.', 'var(--red)');
+    if (!silencioso) showToast('⚠️ A data de início deve ser anterior ao prazo de entrega');
+    return;
+  }
+  if (!silencioso && algumPrazoPreenchido()) {
+    if (!confirm('Alguns prazos de etapa já estão preenchidos.\nDeseja sobrescrever com os prazos sugeridos automaticamente?')) return;
+  }
+  const prazos = calcularPrazosEtapas(inicio, prazo);
+  if (!prazos) { setSugestaoStatus('', ''); return; }
+  aplicarPrazosNaTabela(prazos);
+  const totalDias = diasUteisEntre(inicio, prazo);
+  setSugestaoStatus(`✅ Distribuídos em ${totalDias} dias úteis`, '#1A8A4A');
+  if (!silencioso) showToast('✅ Prazos sugeridos aplicados com sucesso!');
+}
+
+function onDataProjetoChange() {
+  const inicio = getDateField('fi');
+  const prazo  = getDateField('fp');
+  if (!inicio || !prazo || inicio >= prazo) { setSugestaoStatus('', ''); return; }
+  if (algumPrazoPreenchido()) {
+    setSugestaoStatus('📅 Datas alteradas — clique ⚡ para recalcular', 'var(--org)');
+    return;
+  }
+  sugerirPrazos(true);
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 
 function openNew(){
   editId=null;
   document.getElementById('mNewTitle').textContent='Novo Projeto EAD';
-  const _idTipo = document.getElementById('fIdCursoTipo'); if(_idTipo) _idTipo.value='';
-  const _idInp  = document.getElementById('fIdCurso');     if(_idInp){ _idInp.value=''; _idInp.style.display='none'; }
   ['fn','fd','fpo'].forEach(id=>document.getElementById(id).value='');
   const prioEl=document.getElementById('fPrio');if(prioEl)prioEl.value='';
   const rpEl=document.getElementById('fRP');if(rpEl)rpEl.value='';
@@ -2705,6 +2809,7 @@ function openNew(){
   stab(0,document.querySelectorAll('.tab')[0]);
   buildRespChips([]);
   buildEF(ETPS_DEF.map(e=>({...e,prazo:null})));
+  setSugestaoStatus('💡 Preencha Início e Prazo de Entrega para sugestão automática', 'var(--mu)');
   document.getElementById('ovNew').classList.add('on');
   setTimeout(()=>{const f=document.querySelector('#ovNew .fi');if(f)f.focus();},80);
 }
@@ -2716,12 +2821,6 @@ function openEdit(id){
   const _pe=document.getElementById('fPrio');if(_pe)_pe.value=p.prioridade||'';
   const _rp=document.getElementById('fRP');if(_rp)_rp.value=p.rp||'';
   const _ac=document.getElementById('fAcademia');if(_ac)_ac.value=p.academia||'';
-  const _idTipoE = document.getElementById('fIdCursoTipo');
-  const _idInpE  = document.getElementById('fIdCurso');
-  if(_idTipoE && _idInpE){
-    if(p.idCurso){ _idTipoE.value='manual'; _idInpE.value=p.idCurso; _idInpE.style.display='block'; }
-    else { _idTipoE.value=''; _idInpE.value=''; _idInpE.style.display='none'; }
-  }
   buildRecChips(p.recursos||[]);
   document.getElementById('fd').value=p.desc||'';
   document.getElementById('fcol').value=p.col;
@@ -2733,6 +2832,7 @@ function openEdit(id){
   stab(0,document.querySelectorAll('.tab')[0]);
   buildRespChips(p.resps||[]);
   buildEF(p.etapas||ETPS_DEF.map(e=>({...e,prazo:null})));
+  setSugestaoStatus('', '');
   document.getElementById('ovNew').classList.add('on');
 }
 
@@ -2766,9 +2866,6 @@ function salvar(){
     criadoPor:editId?(projAnterior?.criadoPor||usuarioAtual):usuarioAtual,
     editadoPor:editId?usuarioAtual:(projAnterior?.editadoPor||null),
     comentarios:projAnterior?.comentarios||[],
-    idCurso:document.getElementById('fIdCursoTipo')?.value==='manual'
-      ? (document.getElementById('fIdCurso')?.value.trim()||'')
-      : '',
     prioridade:document.getElementById('fPrio')?.value||'',
     rp:document.getElementById('fRP')?.value||'',
     academia:document.getElementById('fAcademia')?.value||'',
@@ -3359,8 +3456,7 @@ function salvarHomolog(pid){
   const h = p.homolog || {};
   const g = id => document.getElementById('hom_'+pid+'_'+id)?.value || '';
 
-  // Pré-preenche idCurso da homologação a partir do ID cadastrado no projeto
-  h.idCurso = g('idCurso') || (p.idCurso && !h.idCurso ? p.idCurso : h.idCurso) || '';
+  h.idCurso       = g('idCurso');
   h.pacoteScorm   = g('pacoteScorm');
   h.solicitante   = g('solicitante');
   h.enviadaPor    = g('enviadaPor');
@@ -3463,7 +3559,7 @@ function buildHomologCard(p){
         </div>
         <div class="hom-field">
           <div class="hom-field-label">ID do Curso</div>
-          <div class="hom-field-val">${_homInput(p.id,'idCurso',h.idCurso||p.idCurso||'','text','Ex: 12345')}</div>
+          <div class="hom-field-val">${_homInput(p.id,'idCurso',h.idCurso,'text','Ex: 12345')}</div>
         </div>
         <div class="hom-field">
           <div class="hom-field-label">Pacote SCORM</div>
