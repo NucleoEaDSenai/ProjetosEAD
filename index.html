@@ -603,7 +603,6 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
           <div style="border-top:1px solid var(--bdr);margin:0"></div>
           <div onclick="exportPDFLista();toggleExportMenu()" style="padding:11px 16px;cursor:pointer;font-size:13px;display:flex;align-items:center;gap:9px;transition:background .15s" onmouseover="this.style.background='var(--s2)'" onmouseout="this.style.background=''">📋 <span><strong>PDF — Lista de Projetos</strong><br><small style="color:var(--mu)">Projetos + KPIs + Atrasos + Homologações + Medição</small></span></div>
           <div style="border-top:1px solid var(--bdr);margin:0"></div>
-          <div onclick="toggleExportMenu()" style="padding:11px 16px;cursor:pointer;font-size:13px;display:flex;align-items:center;gap:9px;color:var(--mu)" onmouseover="this.style.background='var(--s2)'" onmouseout="this.style.background=''">📄 <span>PDF — Ficha do Projeto<br><small>Abra o projeto e use o botão interno</small></span></div>
         </div>
       </div>
       <div style="position:relative" id="notifWrap">
@@ -2129,11 +2128,11 @@ function openDet(id){
 
   document.getElementById('detFt').innerHTML=`
     <button class="btn bg2" onclick="cm('ovDet')">Fechar</button>
-    ${!p.cancelado?`<button class="btn bgray" onclick="abrirCanc(${p.id})">🚫 Cancelar Projeto</button>`:''}
     <button class="btn bg2" onclick="cm('ovDet');duplicarProjeto(${p.id})" title="Criar cópia deste projeto">📋 Duplicar</button>
     <button class="btn bb" onclick="cm('ovDet');openEdit(${p.id})">✏️ Editar</button>
     <button class="btn" style="background:var(--red);color:#fff" onclick="exportPDFFicha(${p.id})">📄 Exportar PDF</button>
-    <button class="btn bd" onclick="cm('ovDet');delP(${p.id})">🗑️ Remover Projeto</button>
+    <button class="btn bd" onclick="cm('ovDet');delP(${p.id})">🗑️ Deletar Projeto</button>
+     ${!p.cancelado?`<button class="btn bgray" onclick="abrirCanc(${p.id})">🚫 Projeto Cancelado</button>`:''}
   `;
   document.getElementById('ovDet').classList.add('on');
   setTimeout(()=>{const m=document.querySelector('#ovDet .modal');if(m)m.focus();},80);
