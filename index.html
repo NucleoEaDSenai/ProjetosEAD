@@ -902,7 +902,16 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
     <div id="tab0">
       <div class="fg2">
         <div class="fg ff"><label class="fl">Nome do Projeto / Curso *</label><input class="fi" id="fn" placeholder="Ex: Segurança do Trabalho — Módulo 3" aria-required="true" aria-label="Nome do projeto"></div>
-        <div class="fg2" style="grid-template-columns:1fr 1fr 1fr;gap:10px">
+        <div class="fg2" style="grid-template-columns:1fr 1fr 1fr 1fr;gap:10px">
+          <div class="fg">
+            <label class="fl" for="fIdCursoTipo">ID do Projeto</label>
+            <select class="prio-select" id="fIdCursoTipo" style="width:100%;margin-bottom:4px" onchange="toggleIdCursoInput()">
+              <option value="">— Sem ID —</option>
+              <option value="manual">Informar ID</option>
+            </select>
+            <input class="fi" type="text" id="fIdCurso" placeholder="Ex: 12345" maxlength="30"
+              style="width:100%;display:none;box-sizing:border-box">
+          </div>
           <div class="fg">
             <label class="fl" for="fPrio">Prioridade</label>
             <select class="prio-select" id="fPrio" aria-label="Prioridade do projeto" style="width:100%">
@@ -2795,6 +2804,14 @@ function onDataProjetoChange() {
 
 // ─────────────────────────────────────────────────────────────────────────────
 
+function toggleIdCursoInput(){
+  const tipo = document.getElementById('fIdCursoTipo')?.value;
+  const inp  = document.getElementById('fIdCurso');
+  if(!inp) return;
+  inp.style.display = tipo === 'manual' ? 'block' : 'none';
+  if(tipo !== 'manual') inp.value = '';
+}
+
 function openNew(){
   editId=null;
   document.getElementById('mNewTitle').textContent='Novo Projeto EAD';
@@ -2802,6 +2819,8 @@ function openNew(){
   const prioEl=document.getElementById('fPrio');if(prioEl)prioEl.value='';
   const rpEl=document.getElementById('fRP');if(rpEl)rpEl.value='';
   const acadEl=document.getElementById('fAcademia');if(acadEl)acadEl.value='';
+  const _idTipo=document.getElementById('fIdCursoTipo');if(_idTipo)_idTipo.value='';
+  const _idInp=document.getElementById('fIdCurso');if(_idInp){_idInp.value='';_idInp.style.display='none';}
   buildRecChips([]);
   iso2dma(td(),'fcr');
   ['fi','fp','fte'].forEach(p=>iso2dma('',p));
@@ -2821,6 +2840,12 @@ function openEdit(id){
   const _pe=document.getElementById('fPrio');if(_pe)_pe.value=p.prioridade||'';
   const _rp=document.getElementById('fRP');if(_rp)_rp.value=p.rp||'';
   const _ac=document.getElementById('fAcademia');if(_ac)_ac.value=p.academia||'';
+  const _idTipoE=document.getElementById('fIdCursoTipo');
+  const _idInpE=document.getElementById('fIdCurso');
+  if(_idTipoE&&_idInpE){
+    if(p.idCurso){_idTipoE.value='manual';_idInpE.value=p.idCurso;_idInpE.style.display='block';}
+    else{_idTipoE.value='';_idInpE.value='';_idInpE.style.display='none';}
+  }
   buildRecChips(p.recursos||[]);
   document.getElementById('fd').value=p.desc||'';
   document.getElementById('fcol').value=p.col;
@@ -2866,6 +2891,9 @@ function salvar(){
     criadoPor:editId?(projAnterior?.criadoPor||usuarioAtual):usuarioAtual,
     editadoPor:editId?usuarioAtual:(projAnterior?.editadoPor||null),
     comentarios:projAnterior?.comentarios||[],
+    idCurso:document.getElementById('fIdCursoTipo')?.value==='manual'
+      ?(document.getElementById('fIdCurso')?.value.trim()||'')
+      :'',
     prioridade:document.getElementById('fPrio')?.value||'',
     rp:document.getElementById('fRP')?.value||'',
     academia:document.getElementById('fAcademia')?.value||'',
@@ -3559,7 +3587,7 @@ function buildHomologCard(p){
         </div>
         <div class="hom-field">
           <div class="hom-field-label">ID do Curso</div>
-          <div class="hom-field-val">${_homInput(p.id,'idCurso',h.idCurso,'text','Ex: 12345')}</div>
+          <div class="hom-field-val">${_homInput(p.id,'idCurso',h.idCurso||p.idCurso||'','text','Ex: 12345')}</div>
         </div>
         <div class="hom-field">
           <div class="hom-field-label">Pacote SCORM</div>
