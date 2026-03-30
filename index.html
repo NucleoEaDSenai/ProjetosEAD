@@ -988,7 +988,7 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
           </select>
         </div>
         <div class="fg"><label class="fl">Data de Início Real</label><div style="display:flex;gap:5px"><input class="fi" type="number" id="fi_d" placeholder="DD" min="1" max="31" style="width:58px" onchange="onDataInicioChange()"><input class="fi" type="number" id="fi_m" placeholder="MM" min="1" max="12" style="width:58px" onchange="onDataInicioChange()"><input class="fi" type="number" id="fi_a" placeholder="AAAA" min="2020" max="2099" style="width:80px" onchange="onDataInicioChange()"></div></div>
-        <div class="fg"><label class="fl">Prazo de Entrega</label><div style="display:flex;gap:5px"><input class="fi" type="number" id="fp_d" placeholder="DD" min="1" max="31" style="width:58px" ><input class="fi" type="number" id="fp_m" placeholder="MM" min="1" max="12" style="width:58px" ><input class="fi" type="number" id="fp_a" placeholder="AAAA" min="2020" max="2099" style="width:80px" ></div></div>
+        <div class="fg"><label class="fl" id="lblPrazo">Prazo de Entrega</label><div style="display:flex;gap:5px"><input class="fi" type="number" id="fp_d" placeholder="DD" min="1" max="31" style="width:58px"><input class="fi" type="number" id="fp_m" placeholder="MM" min="1" max="12" style="width:58px"><input class="fi" type="number" id="fp_a" placeholder="AAAA" min="2020" max="2099" style="width:80px"></div></div>
         <div class="fg ff"><label class="fl">Observação sobre Prazo</label><textarea class="fta" id="fpo" placeholder="Ex: cliente solicitou extensão..."></textarea></div>
       </div>
     </div>
@@ -2467,10 +2467,38 @@ function buildRecChips(selected){
     <div class="rec-chip ${(selected||[]).includes(r)?'sel':''}" onclick="toggleRec(this,'${r}')">${r}</div>
   `).join('');
 }
+// Atualiza visual e estado readonly do campo Prazo conforme recurso selecionado
+function atualizarEstadoPrazo(){
+  const selecionados = getSelectedRecs();
+  const temCron = selecionados.some(r => CRONOGRAMAS[r]);
+  const campos = ['fp_d','fp_m','fp_a'];
+  const lbl = document.getElementById('lblPrazo');
+  campos.forEach(id => {
+    const el = document.getElementById(id);
+    if(!el) return;
+    if(temCron){
+      el.readOnly = true;
+      el.style.background  = 'var(--s2)';
+      el.style.color       = 'var(--mu)';
+      el.style.cursor      = 'default';
+      el.title = 'Calculado automaticamente pelo cronograma';
+    } else {
+      el.readOnly = false;
+      el.style.background  = '';
+      el.style.color       = '';
+      el.style.cursor      = '';
+      el.title = '';
+    }
+  });
+  if(lbl) lbl.textContent = temCron
+    ? 'Prazo de Entrega (automático 🔒)'
+    : 'Prazo de Entrega';
+}
+
 function onDataInicioChange(){
+  atualizarEstadoPrazo();
   const dataInicio = getDateField('fi');
   if(!dataInicio) return;
-  // Re-aplicar cronograma se há recurso com cronograma selecionado
   const selecionados = getSelectedRecs();
   for(const r of selecionados){
     if(CRONOGRAMAS[r]){
@@ -2581,29 +2609,33 @@ function aplicarCronograma(recurso, dataInicio){
   _efSync();
 
   let cursor   = dataInicio;
-  const usados = new Set(); // índices do cron já consumidos
+  const usados = new Set();
 
   _efEtapas.forEach(e => {
     if(!e.lb){ return; }
     const lbLow = e.lb.toLowerCase();
-    // Encontra a primeira entrada do cronograma não usada cujo lb bate
     const idx = cron.findIndex((c, i) =>
       !usados.has(i) && (
         lbLow.includes(c.lb.toLowerCase()) ||
         c.lb.toLowerCase().includes(lbLow)
       )
     );
-    if(idx === -1){ e.prazo = null; return; } // sem correspondência
+    if(idx === -1){ e.prazo = null; return; }
     usados.add(idx);
-    cursor  = addDiasUteis(cursor, cron[idx].dias);
+    cursor = addDiasUteis(cursor, cron[idx].dias);
     e.prazo = cursor;
   });
+
+  // Preencher campo Prazo de Entrega automaticamente com a data da última etapa
+  const ultimoPrazo = [..._efEtapas].reverse().find(e => e.prazo)?.prazo;
+  if(ultimoPrazo) iso2dma(ultimoPrazo, 'fp');
 
   _renderEF();
 }
 
 function toggleRec(el, recurso){
   el.classList.toggle('sel');
+  atualizarEstadoPrazo();
 
   const selecionados = getSelectedRecs();
 
@@ -2858,6 +2890,13 @@ function openNew(){
   buildRecChips([]);
   iso2dma(td(),'fcr');
   ['fi','fp','fte'].forEach(p=>iso2dma('',p));
+  // Garantir campo prazo desbloqueado ao abrir novo projeto
+  ['fp_d','fp_m','fp_a'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el){el.readOnly=false;el.style.background='';el.style.color='';el.style.cursor='';}
+  });
+  const _lbl=document.getElementById('lblPrazo');
+  if(_lbl) _lbl.textContent='Prazo de Entrega';
   document.getElementById('fcol').value='0';
   stab(0,document.querySelectorAll('.tab')[0]);
   buildRespChips([]);
@@ -2880,6 +2919,8 @@ function openEdit(id){
     else{_idTipoE.value='';_idInpE.value='';_idInpE.style.display='none';}
   }
   buildRecChips(p.recursos||[]);
+  // Atualizar estado do campo prazo conforme recursos do projeto
+  setTimeout(atualizarEstadoPrazo, 0);
   document.getElementById('fd').value=p.desc||'';
   document.getElementById('fcol').value=p.col;
   iso2dma(p.criado||td(),'fcr');
