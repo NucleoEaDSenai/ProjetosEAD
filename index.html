@@ -2290,18 +2290,16 @@ const TEMPLATES = {
     colInicial: 1,
     etapas: [
       {lb:'Material Base Recebido',      r:'cl'},
-      {lb:'Realizar Cronograma',         r:'eq'},
       {lb:'Entrega do Review ao Cliente',r:'eq'},
       {lb:'Solicitação de Ajustes',      r:'cl'},
       {lb:'Implementação de Ajustes',    r:'eq'},
       {lb:'Validação Final',             r:'cl'},
       {lb:'Homologação',                 r:'eq'},
       {lb:'Instalação no SIRH',          r:'eq'},
-      {lb:'Upload Arquivos',              r:'eq'},
+      {lb:'Upload Arquivos',             r:'eq'},
     ],
     gatilhos: [
       {nome:'material base recebido',                      col:2},
-      {nome:'realizar cronograma',                         col:5},
       {nome:'entrega do review',                           col:7},
       {nome:'validação final',                             col:11},
       {multi:['homologação','instalação no sirh'],         col:12},
@@ -2361,7 +2359,6 @@ const TEMPLATES = {
     etapas: [
       {lb:'Reunião Inicial',          r:'eq'},
       {lb:'Material Base Recebido',   r:'cl'},
-      {lb:'Realizar Cronograma',      r:'eq'},
       {lb:'Revisão Textual',          r:'eq'},
       {lb:'Desenvolvimento',          r:'eq'},
       {lb:'Solicitação de Ajustes',   r:'cl'},
@@ -2372,7 +2369,6 @@ const TEMPLATES = {
     gatilhos: [
       {nome:'reunião inicial',         col:1},
       {nome:'material base recebido',  col:2},
-      {nome:'realizar cronograma',     col:8},
       {nome:'revisão textual',         col:9},
       {nome:'validação final',         col:12},
       {nome:'upload arquivos',         col:14},
@@ -2622,14 +2618,14 @@ function onDataInicioChange(){
 const CRONOGRAMAS = {
   // ─── Totais: Encaps=24d | Básico=51d | Inter=64d | Avançado=78d ───────────
   'Encapsulamento': [
-    // Material Base Recebido e Realizar Cronograma — sem prazo fixo
+    {lb:'Material Base Recebido',       dias:3},
     {lb:'Entrega do Review ao Cliente', dias:5},
     {lb:'Solicitação de Ajustes',       dias:3},
     {lb:'Implementação de Ajustes',     dias:3},
     {lb:'Validação Final',              dias:1},
     {lb:'Homologação',                  dias:3},
     {lb:'Instalação no SIRH',           dias:2},
-    {lb:'Upload Arquivos',              dias:7},
+    {lb:'Upload Arquivos',              dias:4},
   ],  // total: 24d
   'Web Rise Básico': [
     {lb:'Reunião Inicial',               dias:1},  // +1 para fechar 51d
