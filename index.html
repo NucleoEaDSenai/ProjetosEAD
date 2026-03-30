@@ -2792,7 +2792,6 @@ function _efDel(i){
   _efSync();
   _efEtapas.splice(i,1);
   _renderEF();
-  setSugestaoStatus('','');
 }
 
 function _efMover(i, dir){
@@ -2863,7 +2862,6 @@ function openNew(){
   stab(0,document.querySelectorAll('.tab')[0]);
   buildRespChips([]);
   buildEF(ETPS_DEF.map(e=>({...e,prazo:null})));
-  setSugestaoStatus('💡 Preencha Início e Prazo de Entrega para sugestão automática', 'var(--mu)');
   document.getElementById('ovNew').classList.add('on');
   setTimeout(()=>{const f=document.querySelector('#ovNew .fi');if(f)f.focus();},80);
 }
@@ -2892,7 +2890,6 @@ function openEdit(id){
   stab(0,document.querySelectorAll('.tab')[0]);
   buildRespChips(p.resps||[]);
   buildEF(p.etapas||ETPS_DEF.map(e=>({...e,prazo:null})));
-  setSugestaoStatus('', '');
   document.getElementById('ovNew').classList.add('on');
 }
 
