@@ -1358,7 +1358,7 @@ function rKanban(){
               const homolog  = etapas[idxHom];
               // Aparece somente quando a etapa anterior foi concluída E Homologação ainda não
               if(anterior.done && !homolog.done){
-                return \`<button class="btn-medicao" style="background:linear-gradient(135deg,#003DA5,#0060CC)" onclick="event.stopPropagation();nav('homologacoes')">🔖 Ir para Homologação</button>\`;
+                return `<button class="btn-medicao" style="background:linear-gradient(135deg,#003DA5,#0060CC)" onclick="event.stopPropagation();nav('homologacoes')">🔖 Ir para Homologação</button>`;
               }
             }
 
@@ -1381,11 +1381,11 @@ function rKanban(){
             }
 
             if(gatilhoMedicaoDone && !p.enviadoMedicao)
-              return \`<button class="btn-medicao" onclick="event.stopPropagation();enviarMedicao(${p.id})">📐 Enviar para Medição</button>\`;
+              return `<button class="btn-medicao" onclick="event.stopPropagation();enviarMedicao(${p.id})">📐 Enviar para Medição</button>`;
             if(p.enviadoMedicao && !p.medicaoFeita)
-              return \`<span class="badge-medicao-pend">⏳ Aguardando Medição</span>\`;
+              return `<span class="badge-medicao-pend">⏳ Aguardando Medição</span>`;
             if(p.medicaoFeita)
-              return \`<span class="badge-medicao-ok">✅ Medição Concluída</span>\`;
+              return `<span class="badge-medicao-ok">✅ Medição Concluída</span>`;
             return '';
           })()}
         </div>`;
@@ -4977,12 +4977,24 @@ document.getElementById('topDate').textContent=
   new Date().toLocaleDateString('pt-BR',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
 
 // ── INIT — sessão gerenciada pelo Firebase Authentication ──────────────────
-const savedUrl = localStorage.getItem(CFG_KEY);
-if(savedUrl){
-  // Config salva → carrega SDK → onAuthStateChanged decide o próximo estado
-  carregarSDKeFire(savedUrl);
+const savedUrl     = localStorage.getItem(CFG_KEY);
+const savedApiKey  = localStorage.getItem('firjan_fb_apikey');
+const savedDomain  = localStorage.getItem('firjan_fb_domain');
+const savedProject = localStorage.getItem('firjan_fb_project');
+if(savedUrl && savedApiKey){
+  // Passa objeto completo — garante que apiKey e projectId chegam corretamente
+  carregarSDKeFire({
+    apiKey:      savedApiKey,
+    authDomain:  savedDomain  || '',
+    databaseURL: savedUrl,
+    projectId:   savedProject || '',
+  });
+} else if(savedUrl){
+  // URL salva mas sem apiKey (config legada incompleta) → pedir reconfiguração
+  _loginEstado('semconfig');
+  renderAll();
 } else {
-  // Sem config → mostrar botão de configuração
+  // Sem config → mostrar tela de configuração
   _loginEstado('semconfig');
   renderAll();
 }
