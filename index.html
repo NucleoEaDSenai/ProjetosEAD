@@ -1347,9 +1347,6 @@ function rKanban(){
             const tmplAtivo = getTemplate(p);
             const etapas    = p.etapas || [];
 
-            // ── Apostila/E-book: sem fluxo de medição ──
-            if(tmplAtivo?.semMedicao) return '';
-
             // ── Botão Homologação: aparece quando etapa Homologação está ativa (não concluída) ──
             const etapaHom = etapas.find(e => e.lb && e.lb.toLowerCase().includes('homolog') && !e.lb.toLowerCase().includes('inst'));
             if(etapaHom && !etapaHom.done && etapas.some(e => e.done)){
@@ -2341,10 +2338,10 @@ const TEMPLATES = {
       {lb:'Upload BDOC',                                     r:'eq'},
     ],
     gatilhos: [
-      {nome:'reunião inicial', col:9},   // → PELD (fica aqui até Upload BDOC)
-      {nome:'upload bdoc',     col:13},  // → Upload BDOC - Files e Scorm
+      {nome:'reunião inicial', col:9},   // → PELD (fica aqui durante toda a produção)
+      {nome:'validação final', col:12},  // → Pré-Medição (aciona fluxo de medição)
+      {nome:'upload bdoc',     col:14},  // → Projetos Concluídos (após medição)
     ],
-    semMedicao: true,   // não passa por Pré-Medição
     fimCol: 14,
   },
 };
@@ -2394,12 +2391,7 @@ function calcColIdeal(p){
         if(etapaDone(etapas, g.nome)) melhorCol = Math.max(melhorCol, g.col);
       }
     }
-    // Templates com semMedicao=true vão direto para fimCol ao concluir tudo
-    if(tmpl.semMedicao){
-      if(etapas.every(e => e.done)) return tmpl.fimCol;
-      return melhorCol;
-    }
-    // Demais templates: bloqueia acima de col 12 até medição confirmada
+    // Bloqueia acima de col 12 até medição confirmada
     if(!p.medicaoFeita) melhorCol = Math.min(melhorCol, 12);
     return melhorCol;
 
