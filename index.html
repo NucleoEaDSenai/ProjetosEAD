@@ -988,7 +988,7 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
           </select>
         </div>
         <div class="fg"><label class="fl">Data de Início Real</label><div style="display:flex;gap:5px"><input class="fi" type="number" id="fi_d" placeholder="DD" min="1" max="31" style="width:58px" onchange="onDataInicioChange()"><input class="fi" type="number" id="fi_m" placeholder="MM" min="1" max="12" style="width:58px" onchange="onDataInicioChange()"><input class="fi" type="number" id="fi_a" placeholder="AAAA" min="2020" max="2099" style="width:80px" onchange="onDataInicioChange()"></div></div>
-        <div class="fg"><label class="fl">Prazo de Entrega</label><div style="display:flex;gap:5px"><input class="fi" type="number" id="fp_d" placeholder="DD" min="1" max="31" style="width:58px" onchange="onDataProjetoChange()"><input class="fi" type="number" id="fp_m" placeholder="MM" min="1" max="12" style="width:58px" onchange="onDataProjetoChange()"><input class="fi" type="number" id="fp_a" placeholder="AAAA" min="2020" max="2099" style="width:80px" onchange="onDataProjetoChange()"></div></div>
+        <div class="fg"><label class="fl">Prazo de Entrega</label><div style="display:flex;gap:5px"><input class="fi" type="number" id="fp_d" placeholder="DD" min="1" max="31" style="width:58px" ><input class="fi" type="number" id="fp_m" placeholder="MM" min="1" max="12" style="width:58px" ><input class="fi" type="number" id="fp_a" placeholder="AAAA" min="2020" max="2099" style="width:80px" ></div></div>
         <div class="fg ff"><label class="fl">Observação sobre Prazo</label><textarea class="fta" id="fpo" placeholder="Ex: cliente solicitou extensão..."></textarea></div>
       </div>
     </div>
@@ -1173,6 +1173,9 @@ function td(){return new Date().toISOString().split('T')[0]}
 function dma2iso(d,m,a){
   const dd=parseInt(d),mm=parseInt(m),aa=parseInt(a);
   if(!dd||!mm||!aa||aa<2020||aa>2099) return'';
+  // Validar se o dia é válido para o mês/ano (ex: 31/04 → inválido)
+  const maxDia = new Date(aa, mm, 0).getDate(); // dia 0 do mês seguinte = último dia do mês
+  if(dd < 1 || dd > maxDia) return'';
   return`${aa}-${String(mm).padStart(2,'0')}-${String(dd).padStart(2,'0')}`;
 }
 // Preenche campos d/m/a a partir de 'YYYY-MM-DD'
@@ -2481,6 +2484,7 @@ function onDataInicioChange(){
 // Chave: nome do recurso → array [{lb, dias}] na mesma ordem das etapas
 // Etapas sem entrada no cronograma ficam sem prazo automático
 const CRONOGRAMAS = {
+  // ─── Totais: Encaps=24d | Básico=51d | Inter=64d | Avançado=78d ───────────
   'Encapsulamento': [
     // Material Base Recebido e Realizar Cronograma — sem prazo fixo
     {lb:'Entrega do Review ao Cliente', dias:5},
@@ -2490,20 +2494,19 @@ const CRONOGRAMAS = {
     {lb:'Homologação',                  dias:3},
     {lb:'Instalação no SIRH',           dias:2},
     {lb:'Upload Arquivos',              dias:7},
-  ],
+  ],  // total: 24d
   'Web Rise Básico': [
+    {lb:'Reunião Inicial',               dias:1},  // +1 para fechar 51d
     {lb:'Elaboração do PI',              dias:7},
     {lb:'Revisão do PI',                 dias:3},
     {lb:'Revisão Textual do PI',         dias:1},
     {lb:'Entrega do PI ao cliente',      dias:1},
     {lb:'Validação do PI',               dias:2},
     {lb:'Validação DI Referência',       dias:2},
-    // Validação final do PICV ignorada (1 dia)
     {lb:'Desenho/Roteirização',          dias:5},
-    {lb:'Validação DI Referência',       dias:3},  // segunda ocorrência — DI ref produção
+    {lb:'Validação DI Referência',       dias:3},
     {lb:'Produção de Recursos Gráficos', dias:2},
-    // Validação DM Referência (2d) somada à Entrega do Review
-    {lb:'Entrega do Review ao cliente',  dias:3},  // 2+1
+    {lb:'Entrega do Review ao cliente',  dias:3},  // Val.DM(2)+Entrega(1)
     {lb:'Solicitação de Ajustes',        dias:3},
     {lb:'Implementação de Ajustes',      dias:3},
     {lb:'Validação Final',               dias:1},
@@ -2511,8 +2514,9 @@ const CRONOGRAMAS = {
     {lb:'Homologação',                   dias:3},
     {lb:'Instalação no SIRH',            dias:2},
     {lb:'Upload Arquivos',               dias:7},
-  ],
+  ],  // total: 51d
   'Web Rise Intermediário': [
+    {lb:'Reunião Inicial',               dias:1},  // +1 para fechar 64d
     {lb:'Elaboração do PI',              dias:7},
     {lb:'Revisão do PI',                 dias:3},
     {lb:'Revisão Textual do PI',         dias:1},
@@ -2522,7 +2526,7 @@ const CRONOGRAMAS = {
     {lb:'Desenho/Roteirização',          dias:10},
     {lb:'Validação DI Referência',       dias:3},
     {lb:'Produção de Recursos Gráficos', dias:8},
-    {lb:'Entrega do Review ao cliente',  dias:4},  // 3+1
+    {lb:'Entrega do Review ao cliente',  dias:4},  // Val.DM(3)+Entrega(1)
     {lb:'Solicitação de Ajustes',        dias:3},
     {lb:'Implementação de Ajustes',      dias:3},
     {lb:'Validação Final',               dias:1},
@@ -2530,8 +2534,9 @@ const CRONOGRAMAS = {
     {lb:'Homologação',                   dias:3},
     {lb:'Instalação no SIRH',            dias:2},
     {lb:'Upload Arquivos',               dias:7},
-  ],
+  ],  // total: 64d
   'Web Rise Avançado': [
+    {lb:'Reunião Inicial',               dias:1},  // +1 para fechar 78d
     {lb:'Elaboração do PI',              dias:7},
     {lb:'Revisão do PI',                 dias:3},
     {lb:'Revisão Textual do PI',         dias:1},
@@ -2541,7 +2546,7 @@ const CRONOGRAMAS = {
     {lb:'Desenho/Roteirização',          dias:15},
     {lb:'Validação DI Referência',       dias:3},
     {lb:'Produção de Recursos Gráficos', dias:16},
-    {lb:'Entrega do Review ao cliente',  dias:4},  // 3+1
+    {lb:'Entrega do Review ao cliente',  dias:4},  // Val.DM(3)+Entrega(1)
     {lb:'Solicitação de Ajustes',        dias:3},
     {lb:'Implementação de Ajustes',      dias:3},
     {lb:'Validação Final',               dias:1},
@@ -2549,7 +2554,7 @@ const CRONOGRAMAS = {
     {lb:'Homologação',                   dias:3},
     {lb:'Instalação no SIRH',            dias:2},
     {lb:'Upload Arquivos',               dias:7},
-  ],
+  ],  // total: 78d
 };
 
 // Avança N dias úteis a partir de uma data ISO
