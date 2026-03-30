@@ -1366,13 +1366,12 @@ function rKanban(){
 // Preencher selects de filtro com dados dinâmicos
 function populateFiltSelects(){
   const resps=[...new Set(activeDB().flatMap(p=>p.resps||[]))].sort();
-  // Popular Academia
+  // Popular Academia no Kanban
   const kAcadEl = document.getElementById('kFiltAcad');
   if(kAcadEl){
-    const acads = [...new Set(activeDB().map(p=>p.academia).filter(Boolean))].sort();
-    const curAcad = kAcadEl.value;
-    kAcadEl.innerHTML = '<option value="">Todas</option>' +
-      acads.map(a=>`<option value="${a}" ${a===curAcad?'selected':''}>${a}</option>`).join('');
+    const acads=[...new Set(activeDB().map(p=>p.academia).filter(Boolean))].sort();
+    const cur=kAcadEl.value;
+    kAcadEl.innerHTML='<option value="">Todas</option>'+acads.map(a=>`<option value="${a}"${cur===a?' selected':''}>${a}</option>`).join('');
   }
   ['kFiltResp','lFiltResp'].forEach(id=>{
     const s=document.getElementById(id); if(!s)return;
@@ -1860,6 +1859,7 @@ function rKPIs(){
           </div>`).join('');
   }
 
+  // ── 10. Por prioridade ──
   // ── 11. Taxa de cumprimento de prazo por etapa ──
   const cumpEl = document.getElementById('kpiCumprimento');
   if(cumpEl){
@@ -3482,12 +3482,12 @@ function exportPDFLista(){
   doc.autoTable({
     head:hdrL, body:rowsL, startY:y,
     margin:{left:ML,right:MR},
-    styles:{fontSize:8,cellPadding:2,overflow:'ellipsize'},
+    styles:{fontSize:8,cellPadding:2,overflow:'linebreak'},
     headStyles:{fillColor:[0,61,165],textColor:255,fontStyle:'bold'},
     alternateRowStyles:{fillColor:[245,247,250]},
     columnStyles:{
-      0:{cellWidth:10},1:{cellWidth:52},2:{cellWidth:40},3:{cellWidth:35},
-      4:{cellWidth:22},5:{cellWidth:42},6:{cellWidth:18},7:{cellWidth:18},8:{cellWidth:18},9:{cellWidth:12}
+      0:{cellWidth:8},1:{cellWidth:58},2:{cellWidth:42},3:{cellWidth:35},
+      4:{cellWidth:22},5:{cellWidth:46},6:{cellWidth:18},7:{cellWidth:18},8:{cellWidth:18},9:{cellWidth:8}
     },
     didParseCell(data){
       if(data.section==='body'&&data.column.index===4){
@@ -3552,12 +3552,12 @@ function exportPDFLista(){
   doc.autoTable({
     head:hdrA,body:rowsA,startY:y,
     margin:{left:ML,right:MR},
-    styles:{fontSize:8,cellPadding:2,overflow:'ellipsize'},
+    styles:{fontSize:8,cellPadding:2,overflow:'linebreak'},
     headStyles:{fillColor:[220,38,38],textColor:255,fontStyle:'bold'},
     alternateRowStyles:{fillColor:[255,247,247]},
     columnStyles:{
-      0:{cellWidth:52},1:{cellWidth:22},2:{cellWidth:48},3:{cellWidth:18},
-      4:{cellWidth:22},5:{cellWidth:20,halign:'center'},6:{cellWidth:32},7:{cellWidth:55}
+      0:{cellWidth:55},1:{cellWidth:20},2:{cellWidth:55},3:{cellWidth:16},
+      4:{cellWidth:20},5:{cellWidth:14,halign:'center'},6:{cellWidth:34},7:{cellWidth:59}
     },
     didParseCell(data){
       if(data.section==='body'&&data.column.index===5){
@@ -3592,13 +3592,13 @@ function exportPDFLista(){
   doc.autoTable({
     head:hdrHpdf, body:rowsHpdf, startY:y,
     margin:{left:ML,right:MR},
-    styles:{fontSize:7.5,cellPadding:2,overflow:'ellipsize'},
+    styles:{fontSize:7.5,cellPadding:2,overflow:'linebreak'},
     headStyles:{fillColor:[0,61,165],textColor:255,fontStyle:'bold'},
     alternateRowStyles:{fillColor:[240,244,255]},
     columnStyles:{
-      0:{cellWidth:52},1:{cellWidth:16},2:{cellWidth:16},3:{cellWidth:20},
-      4:{cellWidth:20},5:{cellWidth:18},6:{cellWidth:18},
-      7:{cellWidth:22},8:{cellWidth:22},9:{cellWidth:22},10:{cellWidth:18}
+      0:{cellWidth:68},1:{cellWidth:16},2:{cellWidth:26},3:{cellWidth:22},
+      4:{cellWidth:26},5:{cellWidth:16},6:{cellWidth:16},
+      7:{cellWidth:22},8:{cellWidth:22},9:{cellWidth:22},10:{cellWidth:17}
     },
     didParseCell(data){
       if(data.section==='body'&&data.column.index===10){
@@ -3624,12 +3624,12 @@ function exportPDFLista(){
   doc.autoTable({
     head:hdrMpdf, body:rowsMpdf, startY:y,
     margin:{left:ML,right:MR},
-    styles:{fontSize:8,cellPadding:2,overflow:'ellipsize'},
+    styles:{fontSize:8,cellPadding:2,overflow:'linebreak'},
     headStyles:{fillColor:[124,58,237],textColor:255,fontStyle:'bold'},
     alternateRowStyles:{fillColor:[245,243,255]},
     columnStyles:{
-      0:{cellWidth:60},1:{cellWidth:45},2:{cellWidth:45},
-      3:{cellWidth:42},4:{cellWidth:22},5:{cellWidth:22},6:{cellWidth:22}
+      0:{cellWidth:75},1:{cellWidth:40},2:{cellWidth:45},
+      3:{cellWidth:53},4:{cellWidth:22},5:{cellWidth:18},6:{cellWidth:20}
     },
     didParseCell(data){
       if(data.section==='body'&&data.column.index===5){
