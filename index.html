@@ -1344,30 +1344,48 @@ function rKanban(){
           </div>
           ${p.criadoPor?`<div class="kcard-autoria"><span>✏️ ${p.criadoPor}</span>${p.editadoPor&&p.editadoPor!==p.criadoPor?`<span>· editado: ${p.editadoPor}</span>`:''}</div>`:''}
           ${(() => {
-            const tmplAtivo = getTemplate(p);
-            const etapas    = p.etapas || [];
+            const etapas = p.etapas || [];
 
-            // ── Botão Homologação: aparece quando etapa Homologação está ativa (não concluída) ──
-            const etapaHom = etapas.find(e => e.lb && e.lb.toLowerCase().includes('homolog') && !e.lb.toLowerCase().includes('inst'));
-            if(etapaHom && !etapaHom.done && etapas.some(e => e.done)){
-              return `<button class="btn-medicao" style="background:linear-gradient(135deg,#003DA5,#0060CC)" onclick="event.stopPropagation();nav('homologacoes')">🔖 Ir para Homologação</button>`;
+            // ── BOTÃO HOMOLOGAÇÃO ────────────────────────────────────────────
+            // Regra: encontrar o índice da etapa "Homologação" (excluindo "Instalação")
+            // e verificar se a etapa IMEDIATAMENTE ANTERIOR foi concluída.
+            const idxHom = etapas.findIndex(e =>
+              e.lb && e.lb.toLowerCase().includes('homolog') &&
+              !e.lb.toLowerCase().includes('inst')
+            );
+            if(idxHom > 0){
+              const anterior = etapas[idxHom - 1];
+              const homolog  = etapas[idxHom];
+              // Aparece somente quando a etapa anterior foi concluída E Homologação ainda não
+              if(anterior.done && !homolog.done){
+                return \`<button class="btn-medicao" style="background:linear-gradient(135deg,#003DA5,#0060CC)" onclick="event.stopPropagation();nav('homologacoes')">🔖 Ir para Homologação</button>\`;
+              }
             }
 
-            // ── Botão Medição: aparece na col 12 (Pré-Medição) quando a última etapa
-            // antes de Upload/Medição estiver concluída.
-            // Para templates com Instalação no SIRH: exige instDone.
-            // Para Apostila/E-book (sem Instalação): basta estar na col 12.
-            const temTempl = etapas.some(e => e.lb && e.lb.toLowerCase().includes('medição feita'));
-            const instDone = etapas.some(e => e.lb && e.lb.toLowerCase().includes('instalação') && e.done);
-            const temInstalacao = etapas.some(e => e.lb && e.lb.toLowerCase().includes('instalação'));
-            // Gatilho: col 12 + (instalação concluída OU projeto não tem etapa de instalação)
-            const prontoParaMedicao = p.col === 12 && (!temInstalacao || instDone);
-            if(prontoParaMedicao && !p.enviadoMedicao)
-              return `<button class="btn-medicao" onclick="event.stopPropagation();enviarMedicao(${p.id})">📐 Enviar para Medição</button>`;
+            // ── BOTÃO MEDIÇÃO ────────────────────────────────────────────────
+            // Para Apostila/E-book: gatilho é a conclusão de "Validação final"
+            // Para todos os demais: gatilho é a conclusão de "Instalação no SIRH"
+            const ehApostila = (p.recursos||[]).includes('Produção Apostila/E-book');
+
+            let gatilhoMedicaoDone = false;
+            if(ehApostila){
+              // Apostila: botão aparece ao concluir "Validação final"
+              gatilhoMedicaoDone = etapas.some(e =>
+                e.lb && e.lb.toLowerCase() === 'validação final' && e.done
+              );
+            } else {
+              // Demais: botão aparece ao concluir "Instalação no SIRH"
+              gatilhoMedicaoDone = etapas.some(e =>
+                e.lb && e.lb.toLowerCase().includes('instalação no sirh') && e.done
+              );
+            }
+
+            if(gatilhoMedicaoDone && !p.enviadoMedicao)
+              return \`<button class="btn-medicao" onclick="event.stopPropagation();enviarMedicao(${p.id})">📐 Enviar para Medição</button>\`;
             if(p.enviadoMedicao && !p.medicaoFeita)
-              return `<span class="badge-medicao-pend">⏳ Aguardando Medição</span>`;
+              return \`<span class="badge-medicao-pend">⏳ Aguardando Medição</span>\`;
             if(p.medicaoFeita)
-              return `<span class="badge-medicao-ok">✅ Medição Concluída</span>`;
+              return \`<span class="badge-medicao-ok">✅ Medição Concluída</span>\`;
             return '';
           })()}
         </div>`;
@@ -2342,8 +2360,9 @@ const TEMPLATES = {
       {lb:'Upload BDOC',                                     r:'eq'},
     ],
     gatilhos: [
-      {nome:'reunião inicial', col:9},   // → PELD (fica aqui até Upload BDOC)
-      {nome:'upload bdoc',     col:13},  // → Upload BDOC - Files e Scorm
+      {nome:'reunião inicial', col:9},   // → PELD (fica aqui durante produção)
+      {nome:'validação final', col:12},  // → Pré-Medição (aciona fluxo de medição)
+      {nome:'upload bdoc',     col:14},  // → Projetos Concluídos (após medição)
     ],
     fimCol: 14,
   },
