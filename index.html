@@ -651,6 +651,11 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
               <option value="concluido">✅ Concluído</option>
             </select>
           </div>
+          <div class="fg-sm"><label class="fl-sm">Academia</label>
+            <select class="fi-sm" id="kFiltAcad" onchange="applyKFilts()">
+              <option value="">Todas</option>
+            </select>
+          </div>
           <div class="fg-sm"><label class="fl-sm">Coluna</label>
             <select class="fi-sm" id="kFiltCol" onchange="applyKFilts()">
               <option value="">Todas</option>
@@ -767,13 +772,9 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
       <div style="display:grid;grid-template-columns:1fr;gap:16px;margin-bottom:16px">
         <div class="kk"><div class="kkt">🛠️ Projetos por Recurso</div><div id="tipoBars"></div></div>
       </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
-        <div class="kk"><div class="kkt">⏳ Espera por Cliente (por etapa)</div><div id="kpiEsperaCl"></div></div>
-        <div class="kk"><div class="kkt">🔴 Distribuição por Prioridade</div><div id="kpiPrioridade"></div></div>
-      </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+        <div class="kk"><div class="kkt">⏳ Espera por Cliente (por etapa)</div><div id="kpiEsperaCl"></div></div>
         <div class="kk"><div class="kkt">✅ Taxa de Cumprimento de Prazo por Etapa</div><div id="kpiCumprimento"></div></div>
-        <div class="kk"><div class="kkt">🔮 Previsão de Conclusão</div><div id="kpiPrevisao"></div></div>
       </div>
     </div>
 
@@ -1365,6 +1366,14 @@ function rKanban(){
 // Preencher selects de filtro com dados dinâmicos
 function populateFiltSelects(){
   const resps=[...new Set(activeDB().flatMap(p=>p.resps||[]))].sort();
+  // Popular Academia
+  const kAcadEl = document.getElementById('kFiltAcad');
+  if(kAcadEl){
+    const acads = [...new Set(activeDB().map(p=>p.academia).filter(Boolean))].sort();
+    const curAcad = kAcadEl.value;
+    kAcadEl.innerHTML = '<option value="">Todas</option>' +
+      acads.map(a=>`<option value="${a}" ${a===curAcad?'selected':''}>${a}</option>`).join('');
+  }
   ['kFiltResp','lFiltResp'].forEach(id=>{
     const s=document.getElementById(id); if(!s)return;
     const cur=s.value;
@@ -1381,6 +1390,7 @@ function getKFilts(){
   return{
     resp:document.getElementById('kFiltResp')?.value||'',
     sit:document.getElementById('kFiltSit')?.value||'',
+    acad:document.getElementById('kFiltAcad')?.value||'',
     col:document.getElementById('kFiltCol')?.value||'',
     de:document.getElementById('kFiltDe')?.value||'',
     ate:document.getElementById('kFiltAte')?.value||'',
@@ -1399,6 +1409,7 @@ function applyFilt(data,f){
   let r=data;
   if(f.resp) r=r.filter(p=>(p.resps||[]).includes(f.resp));
   if(f.sit)  r=r.filter(p=>calcSit(p)===f.sit);
+  if(f.acad) r=r.filter(p=>p.academia===f.acad);
   if(f.col!=='') r=r.filter(p=>p.col===parseInt(f.col));
   if(f.de)   r=r.filter(p=>p.criado&&p.criado>=f.de);
   if(f.ate)  r=r.filter(p=>p.criado&&p.criado<=f.ate);
@@ -1407,7 +1418,7 @@ function applyFilt(data,f){
 function applyKFilts(){rKanban();}
 function applyLFilts(){rList();}
 function limparKFilts(){
-  ['kFiltResp','kFiltSit','kFiltCol'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
+  ['kFiltResp','kFiltSit','kFiltAcad','kFiltCol'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
   ['kFiltDe','kFiltAte'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
   rKanban();
 }
@@ -1849,24 +1860,6 @@ function rKPIs(){
           </div>`).join('');
   }
 
-  // ── 10. Por prioridade ──
-  const prioEl = document.getElementById('kpiPrioridade');
-  if(prioEl){
-    const prioMap={urgente:0,alta:0,media:0,baixa:0,sem:0};
-    act.forEach(p=>{ const k=p.prioridade||'sem'; if(prioMap[k]!==undefined)prioMap[k]++; else prioMap.sem++; });
-    const prioCores={urgente:'#E8002D',alta:'#F97316',media:'#F59E0B',baixa:'#003DA5',sem:'#9CA3AF'};
-    const prioLbl={urgente:'🔴 Urgente',alta:'🟠 Alta',media:'🟡 Média',baixa:'🔵 Baixa',sem:'⚪ Sem prioridade'};
-    const prioArr=Object.entries(prioMap).filter(([,n])=>n>0).sort((a,b)=>b[1]-a[1]);
-    const mx6=prioArr.length?Math.max(...prioArr.map(([,n])=>n)):1;
-    prioEl.innerHTML=prioArr.length===0
-      ?'<div style="color:var(--mu);font-size:12px">Sem dados</div>'
-      :prioArr.map(([k,n])=>`
-        <div class="kpi-bar-row">
-          <div class="kpi-bar-row-head"><span>${prioLbl[k]}</span><strong>${n}</strong></div>
-          <div class="kpi-bar-track"><div class="kpi-bar-fill" style="width:${n/mx6*100}%;background:${prioCores[k]}"></div></div>
-        </div>`).join('');
-  }
-
   // ── 11. Taxa de cumprimento de prazo por etapa ──
   const cumpEl = document.getElementById('kpiCumprimento');
   if(cumpEl){
@@ -1897,42 +1890,6 @@ function rKPIs(){
         }).join('');
   }
 
-  // ── 12. Previsão de conclusão ──
-  const prevEl = document.getElementById('kpiPrevisao');
-  if(prevEl){
-    // Para cada projeto ativo, estima conclusão com base no ritmo atual
-    // Ritmo = dias corridos / % concluído → projeta para 100%
-    const projs = act.filter(p=>p.inicio && p.pct>0 && p.pct<100 && calcSit(p)!=='concluido');
-    if(!projs.length){
-      prevEl.innerHTML='<div style="color:var(--mu);font-size:12px">Sem projetos em andamento com dados suficientes</div>';
-    } else {
-      const hoje = new Date();
-      const rows = projs.map(p=>{
-        const iniciado = new Date(p.inicio+'T12:00:00');
-        const diasPassados = Math.max(1, Math.round((hoje-iniciado)/864e5));
-        const ritmo = p.pct / diasPassados; // % por dia
-        const diasRestantes = Math.round((100-p.pct) / ritmo);
-        const prevData = new Date(hoje.getTime() + diasRestantes*864e5);
-        const prevIso = prevData.toISOString().slice(0,10);
-        const atrasado = p.prazo && prevIso > p.prazo;
-        return { nome:p.nome, pct:p.pct, prevIso, atrasado, prazo:p.prazo, id:p.id };
-      }).sort((a,b)=>a.prevIso.localeCompare(b.prevIso)).slice(0,8);
-      prevEl.innerHTML = rows.map(r=>`
-        <div style="margin-bottom:10px;padding:8px 10px;border-radius:7px;background:var(--s2);border:1px solid ${r.atrasado?'var(--red)':'var(--bdr)'}">
-          <div style="display:flex;justify-content:space-between;align-items:center;font-size:11.5px;margin-bottom:4px">
-            <span style="font-weight:600;cursor:pointer;color:var(--blue)" onclick="openDet(${r.id})">${r.nome.length>28?r.nome.slice(0,26)+'…':r.nome}</span>
-            <span style="font-size:10.5px;color:${r.atrasado?'var(--red)':'var(--mu)'};font-weight:${r.atrasado?700:400}">
-              ${r.atrasado?'⚠️ ':'🔮 '}${r.prevIso.split('-').reverse().join('/')}
-            </span>
-          </div>
-          <div style="height:4px;background:var(--bdr);border-radius:3px;overflow:hidden">
-            <div style="height:100%;width:${r.pct}%;background:${r.atrasado?'var(--red)':'var(--blue)'};border-radius:3px"></div>
-          </div>
-          <div style="font-size:10px;color:var(--mu);margin-top:3px">${r.pct}% concluído${r.prazo?` · Prazo: ${r.prazo.split('-').reverse().join('/')}`:''}${r.atrasado?' · <strong style="color:var(--red)">Previsão atrasa</strong>':''}</div>
-        </div>`).
-        join('');
-    }
-  }
 }
 
 
