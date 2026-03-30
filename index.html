@@ -987,7 +987,7 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
             <option value="14">Projetos Concluídos</option>
           </select>
         </div>
-        <div class="fg"><label class="fl">Data de Início Real</label><div style="display:flex;gap:5px"><input class="fi" type="number" id="fi_d" placeholder="DD" min="1" max="31" style="width:58px" onchange="onDataProjetoChange()"><input class="fi" type="number" id="fi_m" placeholder="MM" min="1" max="12" style="width:58px" onchange="onDataProjetoChange()"><input class="fi" type="number" id="fi_a" placeholder="AAAA" min="2020" max="2099" style="width:80px" onchange="onDataProjetoChange()"></div></div>
+        <div class="fg"><label class="fl">Data de Início Real</label><div style="display:flex;gap:5px"><input class="fi" type="number" id="fi_d" placeholder="DD" min="1" max="31" style="width:58px" onchange="onDataInicioChange()"><input class="fi" type="number" id="fi_m" placeholder="MM" min="1" max="12" style="width:58px" onchange="onDataInicioChange()"><input class="fi" type="number" id="fi_a" placeholder="AAAA" min="2020" max="2099" style="width:80px" onchange="onDataInicioChange()"></div></div>
         <div class="fg"><label class="fl">Prazo de Entrega</label><div style="display:flex;gap:5px"><input class="fi" type="number" id="fp_d" placeholder="DD" min="1" max="31" style="width:58px" onchange="onDataProjetoChange()"><input class="fi" type="number" id="fp_m" placeholder="MM" min="1" max="12" style="width:58px" onchange="onDataProjetoChange()"><input class="fi" type="number" id="fp_a" placeholder="AAAA" min="2020" max="2099" style="width:80px" onchange="onDataProjetoChange()"></div></div>
         <div class="fg ff"><label class="fl">Observação sobre Prazo</label><textarea class="fta" id="fpo" placeholder="Ex: cliente solicitou extensão..."></textarea></div>
       </div>
@@ -1001,11 +1001,7 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;flex-wrap:wrap;gap:8px">
         <div style="font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:11px;color:var(--mu);text-transform:uppercase;letter-spacing:.5px">Etapas de Produção</div>
         <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
-          <span id="sugestaoStatus" style="font-size:11px;color:var(--mu);font-style:italic"></span>
-          <button type="button" id="btnSugerirPrazos" onclick="sugerirPrazos()"
-            style="font-size:11.5px;padding:5px 12px;background:var(--blue);color:#fff;border:none;border-radius:7px;cursor:pointer;display:flex;align-items:center;gap:5px;font-weight:600">
-            ⚡ Sugerir Prazos
-          </button>
+
         </div>
       </div>
       <div id="etapasForm"></div>
@@ -2468,32 +2464,179 @@ function buildRecChips(selected){
     <div class="rec-chip ${(selected||[]).includes(r)?'sel':''}" onclick="toggleRec(this,'${r}')">${r}</div>
   `).join('');
 }
+function onDataInicioChange(){
+  const dataInicio = getDateField('fi');
+  if(!dataInicio) return;
+  // Re-aplicar cronograma se há recurso com cronograma selecionado
+  const selecionados = getSelectedRecs();
+  for(const r of selecionados){
+    if(CRONOGRAMAS[r]){
+      aplicarCronograma(r, dataInicio);
+      return;
+    }
+  }
+}
+
+// ── CRONOGRAMAS FIXOS POR RECURSO (dias úteis por etapa) ────────────────────
+// Chave: nome do recurso → array [{lb, dias}] na mesma ordem das etapas
+// Etapas sem entrada no cronograma ficam sem prazo automático
+const CRONOGRAMAS = {
+  'Encapsulamento': [
+    // Material Base Recebido e Realizar Cronograma — sem prazo fixo
+    {lb:'Entrega do Review ao Cliente', dias:5},
+    {lb:'Solicitação de Ajustes',       dias:3},
+    {lb:'Implementação de Ajustes',     dias:3},
+    {lb:'Validação Final',              dias:1},
+    {lb:'Homologação',                  dias:3},
+    {lb:'Instalação no SIRH',           dias:2},
+    {lb:'Upload Arquivos',              dias:7},
+  ],
+  'Web Rise Básico': [
+    {lb:'Elaboração do PI',              dias:7},
+    {lb:'Revisão do PI',                 dias:3},
+    {lb:'Revisão Textual do PI',         dias:1},
+    {lb:'Entrega do PI ao cliente',      dias:1},
+    {lb:'Validação do PI',               dias:2},
+    {lb:'Validação DI Referência',       dias:2},
+    // Validação final do PICV ignorada (1 dia)
+    {lb:'Desenho/Roteirização',          dias:5},
+    {lb:'Validação DI Referência',       dias:3},  // segunda ocorrência — DI ref produção
+    {lb:'Produção de Recursos Gráficos', dias:2},
+    // Validação DM Referência (2d) somada à Entrega do Review
+    {lb:'Entrega do Review ao cliente',  dias:3},  // 2+1
+    {lb:'Solicitação de Ajustes',        dias:3},
+    {lb:'Implementação de Ajustes',      dias:3},
+    {lb:'Validação Final',               dias:1},
+    {lb:'Revisão Textual',               dias:2},
+    {lb:'Homologação',                   dias:3},
+    {lb:'Instalação no SIRH',            dias:2},
+    {lb:'Upload Arquivos',               dias:7},
+  ],
+  'Web Rise Intermediário': [
+    {lb:'Elaboração do PI',              dias:7},
+    {lb:'Revisão do PI',                 dias:3},
+    {lb:'Revisão Textual do PI',         dias:1},
+    {lb:'Entrega do PI ao cliente',      dias:1},
+    {lb:'Validação do PI',               dias:2},
+    {lb:'Validação DI Referência',       dias:2},
+    {lb:'Desenho/Roteirização',          dias:10},
+    {lb:'Validação DI Referência',       dias:3},
+    {lb:'Produção de Recursos Gráficos', dias:8},
+    {lb:'Entrega do Review ao cliente',  dias:4},  // 3+1
+    {lb:'Solicitação de Ajustes',        dias:3},
+    {lb:'Implementação de Ajustes',      dias:3},
+    {lb:'Validação Final',               dias:1},
+    {lb:'Revisão Textual',               dias:3},
+    {lb:'Homologação',                   dias:3},
+    {lb:'Instalação no SIRH',            dias:2},
+    {lb:'Upload Arquivos',               dias:7},
+  ],
+  'Web Rise Avançado': [
+    {lb:'Elaboração do PI',              dias:7},
+    {lb:'Revisão do PI',                 dias:3},
+    {lb:'Revisão Textual do PI',         dias:1},
+    {lb:'Entrega do PI ao cliente',      dias:1},
+    {lb:'Validação do PI',               dias:2},
+    {lb:'Validação DI Referência',       dias:2},
+    {lb:'Desenho/Roteirização',          dias:15},
+    {lb:'Validação DI Referência',       dias:3},
+    {lb:'Produção de Recursos Gráficos', dias:16},
+    {lb:'Entrega do Review ao cliente',  dias:4},  // 3+1
+    {lb:'Solicitação de Ajustes',        dias:3},
+    {lb:'Implementação de Ajustes',      dias:3},
+    {lb:'Validação Final',               dias:1},
+    {lb:'Revisão Textual',               dias:4},
+    {lb:'Homologação',                   dias:3},
+    {lb:'Instalação no SIRH',            dias:2},
+    {lb:'Upload Arquivos',               dias:7},
+  ],
+};
+
+// Avança N dias úteis a partir de uma data ISO
+function addDiasUteis(dataIso, dias){
+  const d = new Date(dataIso + 'T12:00:00');
+  let added = 0;
+  while(added < dias){
+    d.setDate(d.getDate() + 1);
+    const dow = d.getDay();
+    if(dow !== 0 && dow !== 6) added++;
+  }
+  return d.toISOString().slice(0, 10);
+}
+
+// Aplica prazos do cronograma fixo nas etapas já carregadas na tabela.
+// Estratégia: percorre as etapas do projeto em ordem. Para cada etapa,
+// tenta encontrar uma entrada no cronograma cujo lb bate (case-insensitive,
+// contém). A primeira entrada não-usada que bate é consumida.
+// Etapas sem correspondência ficam sem prazo.
+function aplicarCronograma(recurso, dataInicio){
+  const cron = CRONOGRAMAS[recurso];
+  if(!cron || !dataInicio) return;
+
+  _efSync();
+
+  let cursor   = dataInicio;
+  const usados = new Set(); // índices do cron já consumidos
+
+  _efEtapas.forEach(e => {
+    if(!e.lb){ return; }
+    const lbLow = e.lb.toLowerCase();
+    // Encontra a primeira entrada do cronograma não usada cujo lb bate
+    const idx = cron.findIndex((c, i) =>
+      !usados.has(i) && (
+        lbLow.includes(c.lb.toLowerCase()) ||
+        c.lb.toLowerCase().includes(lbLow)
+      )
+    );
+    if(idx === -1){ e.prazo = null; return; } // sem correspondência
+    usados.add(idx);
+    cursor  = addDiasUteis(cursor, cron[idx].dias);
+    e.prazo = cursor;
+  });
+
+  _renderEF();
+}
+
 function toggleRec(el, recurso){
   el.classList.toggle('sel');
 
-  // Verificar se o recurso selecionado tem template
   const selecionados = getSelectedRecs();
-  // Encontrar o primeiro recurso com template entre os selecionados
-  let tmplRecurso = null;
-  for(const r of selecionados){
-    if(TEMPLATES[r]){ tmplRecurso = r; break; }
-  }
 
-  // Só aplicar template se ainda não há etapas preenchidas manualmente
+  // Primeiro recurso com TEMPLATE de etapas
+  let tmplRecurso = null;
+  for(const r of selecionados){ if(TEMPLATES[r]){ tmplRecurso = r; break; } }
+
+  // Primeiro recurso com CRONOGRAMA (pode incluir Web Rise sem template de etapas)
+  let cronRecurso = null;
+  for(const r of selecionados){ if(CRONOGRAMAS[r]){ cronRecurso = r; break; } }
+
+  // Data de início preenchida no formulário
+  const dataInicio = getDateField('fi');
+
+  // Só aplica template/padrão se não há etapas customizadas
   const temEtapasCustom = _efEtapas.length > 0 &&
     _efEtapas.some(e => e.lb && !ETPS_DEF.some(d => d.lb === e.lb) &&
       !Object.values(TEMPLATES).some(t => t.etapas.some(te => te.lb === e.lb)));
 
   if(tmplRecurso && !temEtapasCustom){
+    // Recurso com template de etapas (Encapsulamento, Manutenção, etc.)
     const tmpl = TEMPLATES[tmplRecurso];
-    // Aplicar coluna inicial
     const colEl = document.getElementById('fcol');
     if(colEl && !colEl._manuallyChanged) colEl.value = tmpl.colInicial;
-    // Aplicar etapas do template
     buildEF(tmpl.etapas.map(e => ({...e, prazo:null, done:false, fim:null})));
-    setSugestaoStatus(`📋 Template "${tmplRecurso}" aplicado`, 'var(--blue)');
-  } else if(!tmplRecurso && _efEtapas.length > 0){
-    // Nenhum recurso com template — restaurar etapas padrão se ainda estiver no padrão
+    // Aplicar cronograma se houver data de início
+    if(CRONOGRAMAS[tmplRecurso] && dataInicio){
+      aplicarCronograma(tmplRecurso, dataInicio);
+    }
+  } else if(!tmplRecurso && cronRecurso && !temEtapasCustom){
+    // Recurso sem template mas com cronograma (Web Rise Básico/Inter./Avançado)
+    // Usa ETPS_DEF como base de etapas + aplica cronograma
+    buildEF(ETPS_DEF.map(e => ({...e, prazo:null, done:false, fim:null})));
+    if(dataInicio){
+      aplicarCronograma(cronRecurso, dataInicio);
+    }
+  } else if(!tmplRecurso && !cronRecurso && _efEtapas.length > 0){
+    // Nenhum recurso com template ou cronograma — restaurar padrão se necessário
     const estaNoTemplate = Object.values(TEMPLATES).some(t =>
       t.etapas.length === _efEtapas.length &&
       t.etapas.every((te, i) => _efEtapas[i]?.lb === te.lb)
@@ -2502,8 +2645,11 @@ function toggleRec(el, recurso){
       buildEF(ETPS_DEF.map(e => ({...e, prazo:null})));
       const colEl = document.getElementById('fcol');
       if(colEl) colEl.value = 0;
-      setSugestaoStatus('', '');
     }
+  }
+  // Se já há etapas e há cronograma para o recurso atual, re-aplicar prazos
+  else if(cronRecurso && !temEtapasCustom && dataInicio){
+    aplicarCronograma(cronRecurso, dataInicio);
   }
 }
 
@@ -2687,122 +2833,6 @@ function getEtapasDoForm(projAnterior){
 }
 
 // ── SUGESTÃO AUTOMÁTICA DE PRAZOS POR ETAPA ──────────────────────────────────
-
-const ETPS_PESOS = [3, 10, 5, 4, 2, 6, 10, 6, 12, 2, 5, 8, 6, 5, 8, 8];
-
-function addDiasUteis(dataIso, dias) {
-  const d = new Date(dataIso + 'T12:00:00');
-  let adicionados = 0;
-  while (adicionados < dias) {
-    d.setDate(d.getDate() + 1);
-    const dow = d.getDay();
-    if (dow !== 0 && dow !== 6) adicionados++;
-  }
-  return d.toISOString().split('T')[0];
-}
-
-function diasUteisEntre(inicioIso, fimIso) {
-  const d = new Date(inicioIso + 'T12:00:00');
-  const fim = new Date(fimIso + 'T12:00:00');
-  let count = 0;
-  while (d < fim) {
-    d.setDate(d.getDate() + 1);
-    const dow = d.getDay();
-    if (dow !== 0 && dow !== 6) count++;
-  }
-  return count;
-}
-
-function calcularPrazosEtapas(inicioIso, prazoIso) {
-  const totalDias = diasUteisEntre(inicioIso, prazoIso);
-  if (totalDias <= 0) return null;
-  // Usa pesos fixos para as 16 etapas padrão; se houver mais/menos, distribui igual
-  const n = _efEtapas.length;
-  const pesos = n === ETPS_PESOS.length
-    ? ETPS_PESOS
-    : Array(n).fill(Math.round(100 / n));
-  const totalPeso = pesos.reduce((a, b) => a + b, 0);
-  const prazos = [];
-  let cursor = inicioIso;
-  pesos.forEach(peso => {
-    const diasEtapa = Math.max(1, Math.round((peso / totalPeso) * totalDias));
-    cursor = addDiasUteis(cursor, diasEtapa);
-    if (cursor > prazoIso) cursor = prazoIso;
-    prazos.push(cursor);
-  });
-  return prazos;
-}
-
-function algumPrazoPreenchido() {
-  return _efEtapas.some((_, i) => {
-    const d = document.getElementById('ep_d_' + i)?.value;
-    const m = document.getElementById('ep_m_' + i)?.value;
-    const a = document.getElementById('ep_a_' + i)?.value;
-    return d || m || a;
-  });
-}
-
-function aplicarPrazosNaTabela(prazos) {
-  prazos.forEach((iso, i) => {
-    const el_d = document.getElementById('ep_d_' + i);
-    const el_m = document.getElementById('ep_m_' + i);
-    const el_a = document.getElementById('ep_a_' + i);
-    if (!el_d) return;
-    const [y, mo, dy] = iso.split('-');
-    el_d.value = parseInt(dy);
-    el_m.value = parseInt(mo);
-    el_a.value = parseInt(y);
-    [el_d, el_m, el_a].forEach(el => {
-      el.style.transition = 'background .3s';
-      el.style.background = '#EFF6FF';
-      setTimeout(() => { el.style.background = ''; }, 1200);
-    });
-  });
-}
-
-function setSugestaoStatus(msg, cor) {
-  const el = document.getElementById('sugestaoStatus');
-  if (!el) return;
-  el.textContent = msg;
-  el.style.color = cor || 'var(--mu)';
-}
-
-function sugerirPrazos(silencioso) {
-  const inicio = getDateField('fi');
-  const prazo  = getDateField('fp');
-  if (!inicio || !prazo) {
-    setSugestaoStatus('⚠️ Preencha Início e Prazo de Entrega primeiro.', 'var(--org)');
-    if (!silencioso) showToast('⚠️ Informe Data de Início e Prazo de Entrega na aba Datas & Prazos');
-    return;
-  }
-  if (inicio >= prazo) {
-    setSugestaoStatus('⚠️ Início deve ser anterior ao Prazo.', 'var(--red)');
-    if (!silencioso) showToast('⚠️ A data de início deve ser anterior ao prazo de entrega');
-    return;
-  }
-  if (!silencioso && algumPrazoPreenchido()) {
-    if (!confirm('Alguns prazos de etapa já estão preenchidos.\nDeseja sobrescrever com os prazos sugeridos automaticamente?')) return;
-  }
-  const prazos = calcularPrazosEtapas(inicio, prazo);
-  if (!prazos) { setSugestaoStatus('', ''); return; }
-  aplicarPrazosNaTabela(prazos);
-  const totalDias = diasUteisEntre(inicio, prazo);
-  setSugestaoStatus(`✅ Distribuídos em ${totalDias} dias úteis`, '#1A8A4A');
-  if (!silencioso) showToast('✅ Prazos sugeridos aplicados com sucesso!');
-}
-
-function onDataProjetoChange() {
-  const inicio = getDateField('fi');
-  const prazo  = getDateField('fp');
-  if (!inicio || !prazo || inicio >= prazo) { setSugestaoStatus('', ''); return; }
-  if (algumPrazoPreenchido()) {
-    setSugestaoStatus('📅 Datas alteradas — clique ⚡ para recalcular', 'var(--org)');
-    return;
-  }
-  sugerirPrazos(true);
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
 
 function toggleIdCursoInput(){
   const tipo = document.getElementById('fIdCursoTipo')?.value;
