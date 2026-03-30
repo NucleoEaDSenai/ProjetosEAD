@@ -2511,8 +2511,45 @@ function fecharMotivo(salvar){
   _motivoPid=null; _motivoIdx=null;
   openDet(pid);
 }
+// Aplica cascata: desloca todas as etapas após idx pelo delta de dias úteis
+function cascatarEtapas(etapas, idx, novaData){
+  const prazoAnt = etapas[idx].prazo;
+  if(!prazoAnt || !novaData || prazoAnt === novaData) return;
+
+  // Calcular delta em dias úteis (positivo = avançou, negativo = recuou)
+  let delta = 0;
+  const d1 = new Date(Math.min(new Date(prazoAnt), new Date(novaData))+'');
+  const d2 = new Date(Math.max(new Date(prazoAnt), new Date(novaData))+'');
+  let cursor = new Date(d1.getTime());
+  while(cursor < d2){
+    cursor.setDate(cursor.getDate()+1);
+    if(isDiaUtil(cursor)) delta++;
+  }
+  if(new Date(novaData) < new Date(prazoAnt)) delta = -delta;
+  if(delta === 0) return;
+
+  // Deslocar todas as etapas SEGUINTES que tenham prazo definido
+  for(let j = idx+1; j < etapas.length; j++){
+    if(!etapas[j].prazo) continue;
+    if(delta > 0) etapas[j].prazo = addDiasUteis(etapas[j].prazo, delta);
+    else {
+      // Para recuar, subtrai dias úteis manualmente
+      let cur = etapas[j].prazo;
+      let rem = Math.abs(delta);
+      const d = new Date(cur+'T12:00:00');
+      while(rem > 0){
+        d.setDate(d.getDate()-1);
+        if(isDiaUtil(d)) rem--;
+      }
+      etapas[j].prazo = d.toISOString().slice(0,10);
+    }
+  }
+}
+
 function setEP(pid,idx,v){
   const p=DB.find(x=>x.id===pid);if(!p)return;
+  // Aplicar cascata antes de atualizar o prazo
+  cascatarEtapas(p.etapas, idx, v||null);
   p.etapas[idx].prazo=v||null;
   fbSalvarProjeto(p);
   renderAll(); openDet(pid);
@@ -2788,6 +2825,8 @@ function aplicarCronograma(recurso, dataInicio){
   const ultimoPrazo = [..._efEtapas].reverse().find(e => e.prazo)?.prazo;
   if(ultimoPrazo) iso2dma(ultimoPrazo, 'fp');
 
+  // Atualizar _prazoAntes após aplicar cronograma (nova referência para cascata)
+  _efEtapas = _efEtapas.map(e => ({...e, _prazoAntes: e.prazo||null}));
   _renderEF();
 }
 
@@ -2901,7 +2940,7 @@ function _efRespOpts(valorAtual){
 }
 
 function buildEF(etapas){
-  _efEtapas = etapas.map(e=>({...e})); // cópia mutável
+  _efEtapas = etapas.map(e=>({...e, _prazoAntes: e.prazo||null})); // guarda prazo inicial para cascata
   _renderEF();
 }
 
@@ -2932,11 +2971,11 @@ function _renderEF(){
           <td>
             <div style="display:flex;gap:3px">
               <input class="fi ii" type="number" id="ep_d_${i}" placeholder="DD" min="1" max="31"
-                value="${e.prazo?parseInt(e.prazo.split('-')[2]):''}" style="width:48px;padding:5px 4px;font-size:11.5px">
+                value="${e.prazo?parseInt(e.prazo.split('-')[2]):''}" style="width:48px;padding:5px 4px;font-size:11.5px" onchange="_efCascata(${i})">
               <input class="fi ii" type="number" id="ep_m_${i}" placeholder="MM" min="1" max="12"
-                value="${e.prazo?parseInt(e.prazo.split('-')[1]):''}" style="width:48px;padding:5px 4px;font-size:11.5px">
+                value="${e.prazo?parseInt(e.prazo.split('-')[1]):''}" style="width:48px;padding:5px 4px;font-size:11.5px" onchange="_efCascata(${i})">
               <input class="fi ii" type="number" id="ep_a_${i}" placeholder="AAAA" min="2020" max="2099"
-                value="${e.prazo?parseInt(e.prazo.split('-')[0]):''}" style="width:60px;padding:5px 4px;font-size:11.5px">
+                value="${e.prazo?parseInt(e.prazo.split('-')[0]):''}" style="width:60px;padding:5px 4px;font-size:11.5px" onchange="_efCascata(${i})">
             </div>
           </td>
           <td>
@@ -2963,17 +3002,56 @@ function _renderEF(){
 }
 
 // Lê estado atual dos inputs para _efEtapas antes de operar
+// Cascata de datas no formulário de criação/edição
+function _efCascata(idx){
+  _efSync(); // ler estado atual dos inputs para _efEtapas
+  const prazoAnt = _efEtapas[idx]._prazoAntes; // valor antes da edição
+  const novaData = _efEtapas[idx].prazo;
+  if(!prazoAnt || !novaData || prazoAnt === novaData) return;
+
+  // Delta em dias úteis
+  let delta = 0;
+  const d1 = new Date(Math.min(new Date(prazoAnt), new Date(novaData)));
+  const d2 = new Date(Math.max(new Date(prazoAnt), new Date(novaData)));
+  let cur = new Date(d1.getTime());
+  while(cur < d2){ cur.setDate(cur.getDate()+1); if(isDiaUtil(cur)) delta++; }
+  if(new Date(novaData) < new Date(prazoAnt)) delta = -delta;
+  if(delta === 0) return;
+
+  // Deslocar etapas seguintes
+  for(let j = idx+1; j < _efEtapas.length; j++){
+    if(!_efEtapas[j].prazo) continue;
+    if(delta > 0){
+      _efEtapas[j].prazo = addDiasUteis(_efEtapas[j].prazo, delta);
+    } else {
+      let c = _efEtapas[j].prazo;
+      let rem = Math.abs(delta);
+      const d = new Date(c+'T12:00:00');
+      while(rem > 0){ d.setDate(d.getDate()-1); if(isDiaUtil(d)) rem--; }
+      _efEtapas[j].prazo = d.toISOString().slice(0,10);
+    }
+  }
+  // Guardar novo "antes" para próxima edição
+  _efEtapas[idx]._prazoAntes = novaData;
+  _renderEF();
+}
+
 function _efSync(){
-  _efEtapas = _efEtapas.map((e,i)=>({
-    ...e,
-    lb: document.getElementById('ef_lb_'+i)?.value.trim() || e.lb,
-    r:  document.getElementById('er'+i)?.value || e.r,
-    prazo: dma2iso(
+  _efEtapas = _efEtapas.map((e,i)=>{
+    const novoPrazo = dma2iso(
       document.getElementById('ep_d_'+i)?.value,
       document.getElementById('ep_m_'+i)?.value,
       document.getElementById('ep_a_'+i)?.value
-    ) || e.prazo || null,
-  }));
+    ) || e.prazo || null;
+    return {
+      ...e,
+      lb: document.getElementById('ef_lb_'+i)?.value.trim() || e.lb,
+      r:  document.getElementById('er'+i)?.value || e.r,
+      prazo: novoPrazo,
+      // Preservar _prazoAntes — só é atualizado pela cascata após edição
+      _prazoAntes: e._prazoAntes !== undefined ? e._prazoAntes : novoPrazo,
+    };
+  });
 }
 
 function _efDel(i){
