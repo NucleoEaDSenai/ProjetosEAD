@@ -1344,13 +1344,24 @@ function rKanban(){
           </div>
           ${p.criadoPor?`<div class="kcard-autoria"><span>✏️ ${p.criadoPor}</span>${p.editadoPor&&p.editadoPor!==p.criadoPor?`<span>· editado: ${p.editadoPor}</span>`:''}</div>`:''}
           ${(() => {
-            // Templates têm etapa "Medição Feita" — botão aparece na col 12 (Pré-Medição)
-            const temTempl = (p.etapas||[]).some(e => e.lb && e.lb.toLowerCase().includes('medição feita'));
-            const colMedicao = temTempl ? 12 : 13;
-            const etapasMedicaoFeitas = temTempl
-              ? (p.etapas||[]).filter(e => !e.lb?.toLowerCase().includes('medição feita') && !e.lb?.toLowerCase().includes('upload arquivos')).every(e => e.done)
-              : (p.etapas||[]).every(e => e.done);
-            if(p.col === colMedicao && etapasMedicaoFeitas && !p.enviadoMedicao)
+            const tmplAtivo = getTemplate(p);
+            const etapas    = p.etapas || [];
+
+            // ── Apostila/E-book: sem fluxo de medição ──
+            if(tmplAtivo?.semMedicao) return '';
+
+            // ── Botão Homologação: aparece quando etapa Homologação está ativa (não concluída) ──
+            const etapaHom = etapas.find(e => e.lb && e.lb.toLowerCase().includes('homolog') && !e.lb.toLowerCase().includes('inst'));
+            if(etapaHom && !etapaHom.done && etapas.some(e => e.done)){
+              return `<button class="btn-medicao" style="background:linear-gradient(135deg,#003DA5,#0060CC)" onclick="event.stopPropagation();nav('homologacoes')">🔖 Ir para Homologação</button>`;
+            }
+
+            // ── Botão Medição: aparece após Instalação no SIRH concluída ──
+            const temTempl = etapas.some(e => e.lb && e.lb.toLowerCase().includes('medição feita'));
+            const colMedicao = temTempl ? 12 : p.col;
+            const instDone = etapas.some(e => e.lb && e.lb.toLowerCase().includes('instalação') && e.done);
+            const naColMedicao = temTempl ? p.col === 12 : (p.col === 11 || p.col === 12 || p.col === 13);
+            if(instDone && naColMedicao && !p.enviadoMedicao)
               return `<button class="btn-medicao" onclick="event.stopPropagation();enviarMedicao(${p.id})">📐 Enviar para Medição</button>`;
             if(p.enviadoMedicao && !p.medicaoFeita)
               return `<span class="badge-medicao-pend">⏳ Aguardando Medição</span>`;
@@ -2330,11 +2341,10 @@ const TEMPLATES = {
       {lb:'Upload BDOC',                                     r:'eq'},
     ],
     gatilhos: [
-      {nome:'reunião inicial',      col:1},
-      {nome:'diagramação',          col:9},
-      {nome:'validação final',     col:12},
-      {nome:'upload bdoc',         col:14},
+      {nome:'reunião inicial', col:9},   // → PELD (fica aqui até Upload BDOC)
+      {nome:'upload bdoc',     col:13},  // → Upload BDOC - Files e Scorm
     ],
+    semMedicao: true,   // não passa por Pré-Medição
     fimCol: 14,
   },
 };
@@ -2375,7 +2385,6 @@ function calcColIdeal(p){
 
   if(tmpl){
     // ── Template específico ──
-    // Percorre todos os gatilhos por nome/multi
     let melhorCol = tmpl.colInicial;
     for(const g of tmpl.gatilhos){
       if(g.multi){
@@ -2385,8 +2394,12 @@ function calcColIdeal(p){
         if(etapaDone(etapas, g.nome)) melhorCol = Math.max(melhorCol, g.col);
       }
     }
-    // Bloqueia acima de col 12 (Pré-Medição) enquanto medição não confirmada.
-    // Após p.medicaoFeita=true, gatilhos de col 13 e 14 ficam liberados.
+    // Templates com semMedicao=true vão direto para fimCol ao concluir tudo
+    if(tmpl.semMedicao){
+      if(etapas.every(e => e.done)) return tmpl.fimCol;
+      return melhorCol;
+    }
+    // Demais templates: bloqueia acima de col 12 até medição confirmada
     if(!p.medicaoFeita) melhorCol = Math.min(melhorCol, 12);
     return melhorCol;
 
