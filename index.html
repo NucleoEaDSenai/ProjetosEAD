@@ -2431,6 +2431,7 @@ const TEMPLATES = {
     colInicial: 0,
     etapas: [
       {lb:'Reunião Inicial',               r:'eq'},
+      {lb:'Material Base Recebido',        r:'cl'},
       {lb:'Elaboração do PI',              r:'eq'},
       {lb:'Revisão do PI',                 r:'eq'},
       {lb:'Revisão Textual do PI',         r:'eq'},
@@ -2450,16 +2451,17 @@ const TEMPLATES = {
       {lb:'Upload Arquivos',               r:'eq'},
     ],
     gatilhos: [
-      {nome:'reunião inicial',                       col:1,  exato:false},
-      {nome:'entrega do pi ao cliente',              col:4,  exato:true},
-      {nome:'validação do pi',                       col:6,  exato:true},
-      {nome:'validação di referência',               col:6,  exato:false},
-      {nome:'entrega do review ao cliente',          col:7,  exato:true},
+      {nome:'reunião inicial',                       col:1,  exato:true},  // → Aguardando Material Base
+      {nome:'material base recebido',                col:3,  exato:true},  // → Projeto Instrucional (PI)
+      {nome:'entrega do pi ao cliente',              col:4,  exato:true},  // → Validação - PI
+      {nome:'validação do pi',                       col:6,  exato:true},  // → Desenvolvimento
+      {nome:'validação di referência',               col:6,  exato:false}, // → Desenvolvimento
+      {nome:'entrega do review ao cliente',          col:7,  exato:true},  // → Validação - Desenvolvimento
       // Implementação de Ajustes NÃO move — permanece em col 7
-      {nome:'validação final',                       col:8,  exato:true},
-      {nome:'revisão textual',                       col:11, exato:true},
-      {multi:['homologação','instalação no sirh'],   col:12},
-      {nome:'upload arquivos',                       col:14, exato:false},
+      {nome:'validação final',                       col:8,  exato:true},  // → Revisão Textual/Tradução
+      {nome:'revisão textual',                       col:11, exato:true},  // → Homologação/Instalação
+      {multi:['homologação','instalação no sirh'],   col:12},              // → Pré-Medição
+      {nome:'upload arquivos',                       col:14, exato:false}, // → Projetos Concluídos
     ],
     fimCol: 14,
   },
@@ -2468,6 +2470,7 @@ const TEMPLATES = {
     colInicial: 0,
     etapas: [
       {lb:'Reunião Inicial',               r:'eq'},
+      {lb:'Material Base Recebido',        r:'cl'},
       {lb:'Elaboração do PI',              r:'eq'},
       {lb:'Revisão do PI',                 r:'eq'},
       {lb:'Revisão Textual do PI',         r:'eq'},
@@ -2487,16 +2490,17 @@ const TEMPLATES = {
       {lb:'Upload Arquivos',               r:'eq'},
     ],
     gatilhos: [
-      {nome:'reunião inicial',                       col:1,  exato:false},
-      {nome:'entrega do pi ao cliente',              col:4,  exato:true},
-      {nome:'validação do pi',                       col:6,  exato:true},
-      {nome:'validação di referência',               col:6,  exato:false},
-      {nome:'entrega do review ao cliente',          col:7,  exato:true},
+      {nome:'reunião inicial',                       col:1,  exato:true},  // → Aguardando Material Base
+      {nome:'material base recebido',                col:3,  exato:true},  // → Projeto Instrucional (PI)
+      {nome:'entrega do pi ao cliente',              col:4,  exato:true},  // → Validação - PI
+      {nome:'validação do pi',                       col:6,  exato:true},  // → Desenvolvimento
+      {nome:'validação di referência',               col:6,  exato:false}, // → Desenvolvimento
+      {nome:'entrega do review ao cliente',          col:7,  exato:true},  // → Validação - Desenvolvimento
       // Implementação de Ajustes NÃO move — permanece em col 7
-      {nome:'validação final',                       col:8,  exato:true},
-      {nome:'revisão textual',                       col:11, exato:true},
-      {multi:['homologação','instalação no sirh'],   col:12},
-      {nome:'upload arquivos',                       col:14, exato:false},
+      {nome:'validação final',                       col:8,  exato:true},  // → Revisão Textual/Tradução
+      {nome:'revisão textual',                       col:11, exato:true},  // → Homologação/Instalação
+      {multi:['homologação','instalação no sirh'],   col:12},              // → Pré-Medição
+      {nome:'upload arquivos',                       col:14, exato:false}, // → Projetos Concluídos
     ],
     fimCol: 14,
   },
@@ -2505,6 +2509,7 @@ const TEMPLATES = {
     colInicial: 0,
     etapas: [
       {lb:'Reunião Inicial',               r:'eq'},
+      {lb:'Material Base Recebido',        r:'cl'},
       {lb:'Elaboração do PI',              r:'eq'},
       {lb:'Revisão do PI',                 r:'eq'},
       {lb:'Revisão Textual do PI',         r:'eq'},
@@ -2524,16 +2529,17 @@ const TEMPLATES = {
       {lb:'Upload Arquivos',               r:'eq'},
     ],
     gatilhos: [
-      {nome:'reunião inicial',                       col:1,  exato:false},
-      {nome:'entrega do pi ao cliente',              col:4,  exato:true},
-      {nome:'validação do pi',                       col:6,  exato:true},
-      {nome:'validação di referência',               col:6,  exato:false},
-      {nome:'entrega do review ao cliente',          col:7,  exato:true},
+      {nome:'reunião inicial',                       col:1,  exato:true},  // → Aguardando Material Base
+      {nome:'material base recebido',                col:3,  exato:true},  // → Projeto Instrucional (PI)
+      {nome:'entrega do pi ao cliente',              col:4,  exato:true},  // → Validação - PI
+      {nome:'validação do pi',                       col:6,  exato:true},  // → Desenvolvimento
+      {nome:'validação di referência',               col:6,  exato:false}, // → Desenvolvimento
+      {nome:'entrega do review ao cliente',          col:7,  exato:true},  // → Validação - Desenvolvimento
       // Implementação de Ajustes NÃO move — permanece em col 7
-      {nome:'validação final',                       col:8,  exato:true},
-      {nome:'revisão textual',                       col:11, exato:true},
-      {multi:['homologação','instalação no sirh'],   col:12},
-      {nome:'upload arquivos',                       col:14, exato:false},
+      {nome:'validação final',                       col:8,  exato:true},  // → Revisão Textual/Tradução
+      {nome:'revisão textual',                       col:11, exato:true},  // → Homologação/Instalação
+      {multi:['homologação','instalação no sirh'],   col:12},              // → Pré-Medição
+      {nome:'upload arquivos',                       col:14, exato:false}, // → Projetos Concluídos
     ],
     fimCol: 14,
   },
@@ -2859,7 +2865,8 @@ const CRONOGRAMAS = {
     {lb:'Upload Arquivos',              dias:4},
   ],  // total: 24d
   'Web Rise Básico': [
-    {lb:'Reunião Inicial',               dias:1},  // +1 para fechar 51d
+    {lb:'Reunião Inicial',               dias:1},
+    {lb:'Material Base Recebido',        dias:3},
     {lb:'Elaboração do PI',              dias:7},
     {lb:'Revisão do PI',                 dias:3},
     {lb:'Revisão Textual do PI',         dias:1},
@@ -2876,10 +2883,11 @@ const CRONOGRAMAS = {
     {lb:'Revisão Textual',               dias:2},
     {lb:'Homologação',                   dias:3},
     {lb:'Instalação no SIRH',            dias:2},
-    {lb:'Upload Arquivos',               dias:7},
+    {lb:'Upload Arquivos',               dias:4},
   ],  // total: 51d
   'Web Rise Intermediário': [
-    {lb:'Reunião Inicial',               dias:1},  // +1 para fechar 64d
+    {lb:'Reunião Inicial',               dias:1},
+    {lb:'Material Base Recebido',        dias:3},
     {lb:'Elaboração do PI',              dias:7},
     {lb:'Revisão do PI',                 dias:3},
     {lb:'Revisão Textual do PI',         dias:1},
@@ -2896,10 +2904,11 @@ const CRONOGRAMAS = {
     {lb:'Revisão Textual',               dias:3},
     {lb:'Homologação',                   dias:3},
     {lb:'Instalação no SIRH',            dias:2},
-    {lb:'Upload Arquivos',               dias:7},
+    {lb:'Upload Arquivos',               dias:4},
   ],  // total: 64d
   'Web Rise Avançado': [
-    {lb:'Reunião Inicial',               dias:1},  // +1 para fechar 78d
+    {lb:'Reunião Inicial',               dias:1},
+    {lb:'Material Base Recebido',        dias:3},
     {lb:'Elaboração do PI',              dias:7},
     {lb:'Revisão do PI',                 dias:3},
     {lb:'Revisão Textual do PI',         dias:1},
@@ -2916,7 +2925,7 @@ const CRONOGRAMAS = {
     {lb:'Revisão Textual',               dias:4},
     {lb:'Homologação',                   dias:3},
     {lb:'Instalação no SIRH',            dias:2},
-    {lb:'Upload Arquivos',               dias:7},
+    {lb:'Upload Arquivos',               dias:4},
   ],  // total: 78d
   'Produção Apostila/E-book': [
     {lb:'Reunião inicial',                                  dias:5},
