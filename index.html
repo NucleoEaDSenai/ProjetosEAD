@@ -991,7 +991,6 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
           <select class="fs" id="fcol">
             <option value="0">Aguardando Reunião Inicial</option>
             <option value="1">Aguardando Material Base</option>
-            <option value="2">Fazer Cronograma</option>
             <option value="3">Projeto Instrucional (PI)</option>
             <option value="4">Validação - PI</option>
             <option value="5">Fila de Espera - Produção</option>
@@ -1114,6 +1113,8 @@ const COLUNAS = [
   {k:13, l:'Upload BDOC - Files e Scorm',      dot:'#1A8A4A'},
   {k:14, l:'Projetos Concluídos',                 dot:'#7C3AED'},
 ];
+// Colunas ocultas no Kanban (existem no sistema mas não são exibidas)
+const COLUNAS_OCULTAS = new Set([2]); // Fazer Cronograma — cronograma é automático
 
 const ETPS_DEF = [
   {lb:'Reunião Inicial',               r:'cl'},  // Cliente
@@ -1317,7 +1318,7 @@ function rDash(){
 function rKanban(){
   populateFiltSelects();
   const flt=applyFilt(activeDB(),getKFilts());
-  document.getElementById('kanbanBoard').innerHTML=COLUNAS.map(col=>{
+  document.getElementById('kanbanBoard').innerHTML=COLUNAS.filter(col=>!COLUNAS_OCULTAS.has(col.k)).map(col=>{
     const cards=flt.filter(p=>p.col===col.k);
     return`<div class="kc" data-col="${col.k}"
       ondragover="onDragOver(event,this)" ondragleave="onDragLeave(this)" ondrop="onDrop(event,this)">
@@ -1423,7 +1424,7 @@ function populateFiltSelects(){
   ['kFiltCol','lFiltCol'].forEach(id=>{
     const s=document.getElementById(id); if(!s)return;
     const cur=s.value;
-    s.innerHTML='<option value="">Todas</option>'+COLUNAS.map(col=>`<option value="${col.k}"${cur!==''&&cur==col.k?' selected':''}>${col.l}</option>`).join('');
+    s.innerHTML='<option value="">Todas</option>'+COLUNAS.filter(col=>!COLUNAS_OCULTAS.has(col.k)).map(col=>`<option value="${col.k}"${cur!==''&&cur==col.k?' selected':''}>${col.l}</option>`).join('');
   });
 }
 
