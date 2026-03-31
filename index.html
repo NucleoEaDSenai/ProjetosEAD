@@ -93,7 +93,7 @@ tr:hover td{background:#FAFAF9}
 .tco{background:#dcfce7;color:#15803d}
 .tca{background:#fff7ed;color:#c2410c}
 /* KANBAN */
-.kb{display:flex;gap:11px;overflow-x:auto;padding-bottom:12px;align-items:flex-start;cursor:grab;user-select:none;scroll-behavior:smooth}
+.kb{display:flex;gap:11px;overflow-x:auto;padding-bottom:12px;align-items:stretch;cursor:grab;user-select:none;scroll-behavior:smooth;max-height:calc(100vh - 210px)}
 .kb.is-dragging{cursor:grabbing}
 .kb.is-dragging .kcard{pointer-events:none}
 /* Indicadores de scroll lateral */
@@ -101,8 +101,8 @@ tr:hover td{background:#FAFAF9}
 .kb-fade-left,.kb-fade-right{position:absolute;top:0;bottom:12px;width:40px;pointer-events:none;z-index:5;transition:opacity .2s}
 .kb-fade-left{left:0;background:linear-gradient(to right,var(--bg) 30%,transparent)}
 .kb-fade-right{right:0;background:linear-gradient(to left,var(--bg) 30%,transparent)}
-.kc{background:var(--s2);border-radius:var(--r);padding:11px;border:1px solid var(--bdr);min-height:300px;min-width:185px;flex:0 0 185px}
-.kc-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.kc{background:var(--s2);border-radius:var(--r);padding:11px;border:1px solid var(--bdr);min-height:300px;min-width:185px;flex:0 0 185px;overflow-y:auto;display:flex;flex-direction:column}
+.kc-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;position:sticky;top:0;z-index:2;background:var(--s2);padding-bottom:6px;margin-top:-2px;padding-top:2px}
 .kc-t{font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:8px;text-transform:uppercase;letter-spacing:.5px;display:flex;align-items:center;gap:5px;line-height:1.3}
 .kc-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
 .kc-n{background:var(--bdr);color:var(--mu);font-size:10px;font-weight:700;padding:1px 6px;border-radius:12px;flex-shrink:0}
@@ -389,7 +389,7 @@ body.dark .sb{background:#080A10}
 body.dark .tp{background:var(--surface);border-bottom:1px solid var(--bdr)}
 body.dark .kk,.dark .sc,.dark .fbox,.dark .modal,.dark .tw table,.dark .gw{background:var(--surface);border-color:var(--bdr)}
 body.dark .kcard{background:var(--surface);border-color:var(--bdr)}
-body.dark .kcol,.dark .kcol-hd,.dark .kc,.dark .kc-hd{background:var(--s2);border-color:var(--bdr)}
+body.dark .kcol,.dark .kcol-hd,.dark .kc,.dark .kc-hd{background:var(--s2);border-color:var(--bdr)} body.dark .kc-hd{background:var(--s2)}
 body.dark .fi,.dark .fs,.dark .fta,.dark .fi-sm,.dark .iis,.dark .ii{background:var(--s2);color:var(--txt);border-color:var(--bdr)}
 body.dark .tw th,.dark .et th{background:var(--s2);color:var(--txt);border-color:var(--bdr)}
 body.dark .tw td,.dark .et td{border-color:var(--bdr);color:var(--txt)}
@@ -1325,7 +1325,7 @@ function rKanban(){
         <div class="kc-t"><span class="kc-dot" style="background:${col.dot}"></span>${col.l}</div>
         <span class="kc-n">${cards.length}</span>
       </div>
-      ${cards.map(p=>{
+      <div style="flex:1;min-height:60px">${cards.map(p=>{
         const sit=calcSit(p);
         const{eq,cl}=delInf(p);
         return`<div class="kcard" draggable="true" data-id="${p.id}"
@@ -1400,7 +1400,7 @@ function rKanban(){
             return '';
           })()}
         </div>`;
-      }).join('')}
+      }).join('')}</div>
     </div>`;
   }).join('');
   setTimeout(_kbUpdateFades, 80);
