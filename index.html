@@ -2840,7 +2840,13 @@ function atualizarEstadoPrazo(){
 function onDataInicioChange(){
   atualizarEstadoPrazo();
   const dataInicio = getDateField('fi');
-  if(!dataInicio) return;
+  if(!dataInicio){
+    // Data de início apagada → limpar prazo automático se houver cronograma ativo
+    const selecionados = getSelectedRecs();
+    const temCron = selecionados.some(r => CRONOGRAMAS[r]);
+    if(temCron) iso2dma('', 'fp');
+    return;
+  }
   const selecionados = getSelectedRecs();
   for(const r of selecionados){
     if(CRONOGRAMAS[r]){
