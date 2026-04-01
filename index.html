@@ -2187,7 +2187,7 @@ function rAtrasos(){
     }).join('');
 
     return `<div class="atraso-proj">
-      <div class="atraso-proj-hd${pi===0?' open':''}" onclick="toggleAtrasoProj(this)">
+      <div class="atraso-proj-hd" onclick="toggleAtrasoProj(this)">
         <div class="atraso-proj-info">
           <div class="atraso-proj-nome" onclick="event.stopPropagation();openDet(${pg.projId})">${pg.proj}</div>
           <div class="atraso-proj-meta">
@@ -2202,7 +2202,7 @@ function rAtrasos(){
           <span class="atraso-proj-arrow">▼</span>
         </div>
       </div>
-      <div class="atraso-etapas${pi===0?' open':''}">
+      <div class="atraso-etapas">
         <div class="atraso-etapa-hdr">
           <span>Etapa · Responsável · Prazo</span>
           <span>Status</span><span>Dias</span><span>Motivo</span>
