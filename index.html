@@ -90,6 +90,22 @@ tr:hover td{background:#FAFAF9}
 .tvi{background:#fef3c7;color:#b45309}
 .ttr{background:#e0f2fe;color:#0369a1}
 .tav{background:#f3e8ff;color:#7e22ce}
+.atraso-proj{background:#fff;border:1px solid var(--bdr);border-radius:10px;margin-bottom:10px;overflow:hidden;box-shadow:var(--sh)}
+.atraso-proj-hd{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;cursor:pointer;gap:12px;user-select:none;transition:background .15s}
+.atraso-proj-hd:hover{background:var(--s2)}
+.atraso-proj-hd.open{background:#EFF6FF;border-bottom:1px solid #BFDBFE}
+.atraso-proj-info{display:flex;align-items:center;gap:10px;flex:1;min-width:0}
+.atraso-proj-nome{font-weight:700;font-size:13px;color:var(--blue);cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:360px}
+.atraso-proj-meta{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.atraso-proj-right{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.atraso-proj-arrow{font-size:12px;color:var(--mu);transition:transform .2s}
+.atraso-proj-hd.open .atraso-proj-arrow{transform:rotate(180deg)}
+.atraso-etapas{display:none;padding:0}
+.atraso-etapas.open{display:block}
+.atraso-etapa-row{display:grid;grid-template-columns:1fr auto auto auto auto auto;gap:8px;align-items:center;padding:10px 16px;border-bottom:1px solid var(--bdr);font-size:12.5px}
+.atraso-etapa-row:last-child{border-bottom:none}
+.atraso-etapa-row:nth-child(even){background:var(--s2)}
+.atraso-etapa-hdr{display:grid;grid-template-columns:1fr auto auto auto auto auto;gap:8px;padding:6px 16px;background:var(--s2);font-size:11px;font-weight:700;color:var(--mu);text-transform:uppercase;letter-spacing:.4px;border-bottom:1px solid var(--bdr)}
 .tco{background:#dcfce7;color:#15803d}
 .tca{background:#fff7ed;color:#c2410c}
 /* KANBAN */
@@ -820,14 +836,7 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
           <button class="btn-lim" onclick="limparAFilts()">✕ Limpar</button>
         </div>
       </div>
-      <div class="tw"><table>
-        <thead><tr>
-          <th>Projeto</th><th>Sit.</th><th>Etapa</th><th>Resp.</th>
-          <th>Prazo Etapa</th><th>Ant. Concluída em</th>
-          <th>Dias Atraso</th><th>Status Etapa</th><th>Motivo</th>
-        </tr></thead>
-        <tbody id="atrasosDetail"></tbody>
-      </table></div>
+      <div id="atrasosDetail"></div>
     </div>
 
     <!-- CANCELADOS -->
@@ -2130,33 +2139,84 @@ function rAtrasos(){
     return m[row.sitProjeto]||row.sitProjeto;
   }
 
-  document.getElementById('atrasosDetail').innerHTML = rows.length === 0
-    ? '<tr><td colspan="9" style="text-align:center;padding:24px;color:var(--green)">✅ Nenhum atraso encontrado com os filtros selecionados</td></tr>'
-    : rows.map(r => {
-        const respBdg = r.r==='cl'
-          ? '<span class="db dcl" style="font-size:11px">🏢 Cliente</span>'
-          : `<span class="db deq" style="font-size:11px">👤 ${r.r==='eq'?'Equipe':r.r}</span>`;
-        const statusBdg = r.statusEtapa==='concluida_atraso'
-          ? `<span class="sit sit-done" style="font-size:11px">✓ Concluída</span>`
-          : `<span class="sit sit-ov" style="font-size:11px">⚠️ Em aberto</span>`;
-        const motivoCell = r.motivo
-          ? `<span style="color:var(--red);font-size:11.5px" title="${r.motivo}">⚠️ ${r.motivo.length>35?r.motivo.slice(0,33)+'…':r.motivo}</span>`
-          : r.statusEtapa==='concluida_atraso'
-            ? '<span style="color:var(--mu);font-size:11px;font-style:italic">—</span>'
-            : '';
-        const diasColor = r.diasAtraso > 10 ? 'var(--red)' : r.diasAtraso > 5 ? 'var(--yel)' : 'var(--org)';
-        return `<tr>
-          <td><strong style="cursor:pointer;color:var(--blue)" onclick="openDet(${r.projId})">${r.proj}</strong><br><small style="color:var(--mu)">${r.resp}</small></td>
-          <td>${sitProjBdg(r)}</td>
-          <td style="font-size:12px">${r.etapa}</td>
-          <td>${respBdg}</td>
-          <td style="white-space:nowrap">${fd(r.prazo)}</td>
-          <td style="white-space:nowrap;color:var(--green)">${r.antFim ? fd(r.antFim) : '<span style="color:var(--mu);font-size:11px">primeira etapa</span>'}</td>
-          <td><strong style="color:${diasColor};font-size:14px">${r.diasAtraso} dias</strong></td>
-          <td>${statusBdg}</td>
-          <td style="min-width:140px">${motivoCell}</td>
-        </tr>`;
-      }).join('');
+  if(rows.length === 0){
+    document.getElementById('atrasosDetail').innerHTML =
+      '<div style="text-align:center;padding:40px;color:var(--green);font-size:14px">✅ Nenhum atraso encontrado com os filtros selecionados</div>';
+    return;
+  }
+
+  // Agrupar rows por projeto
+  const porProjeto = {};
+  rows.forEach(r => {
+    if(!porProjeto[r.projId]) porProjeto[r.projId] = { proj:r.proj, resp:r.resp, sitProjeto:r.sitProjeto, cancelado:r.cancelado, projId:r.projId, etapas:[] };
+    porProjeto[r.projId].etapas.push(r);
+  });
+
+  // Ordenar projetos pelo maior atraso dentre suas etapas
+  const projArr = Object.values(porProjeto)
+    .sort((a,b) => Math.max(...b.etapas.map(e=>e.diasAtraso)) - Math.max(...a.etapas.map(e=>e.diasAtraso)));
+
+  document.getElementById('atrasosDetail').innerHTML = projArr.map((pg, pi) => {
+    const maxDias = Math.max(...pg.etapas.map(e=>e.diasAtraso));
+    const nAberto = pg.etapas.filter(e=>e.statusEtapa==='aberta_atraso').length;
+    const nConc   = pg.etapas.filter(e=>e.statusEtapa==='concluida_atraso').length;
+    const corMax  = maxDias > 10 ? 'var(--red)' : maxDias > 5 ? 'var(--yel)' : 'var(--org)';
+
+    const etapasHtml = pg.etapas.map((r,ei) => {
+      const respBdg = r.r==='cl'
+        ? '<span class="db dcl" style="font-size:11px">🏢 Cliente</span>'
+        : `<span class="db deq" style="font-size:11px">👤 ${r.r==='eq'?'Equipe':r.r}</span>`;
+      const statusBdg = r.statusEtapa==='concluida_atraso'
+        ? '<span class="sit sit-done" style="font-size:11px">✓ Concluída</span>'
+        : '<span class="sit sit-ov" style="font-size:11px">⚠️ Em aberto</span>';
+      const motivoCell = r.motivo
+        ? `<span style="color:var(--red);font-size:11.5px" title="${r.motivo}">⚠️ ${r.motivo.length>40?r.motivo.slice(0,38)+'…':r.motivo}</span>`
+        : r.statusEtapa==='concluida_atraso'
+          ? '<span style="color:var(--mu);font-size:11px;font-style:italic">sem motivo</span>'
+          : '<span style="color:var(--mu);font-size:11px">—</span>';
+      const diasColor = r.diasAtraso > 10 ? 'var(--red)' : r.diasAtraso > 5 ? 'var(--yel)' : 'var(--org)';
+      return `<div class="atraso-etapa-row">
+        <div style="min-width:0">
+          <div style="font-weight:600;font-size:12.5px">${r.etapa}</div>
+          <div style="font-size:11px;color:var(--mu);margin-top:2px">${respBdg} · Prazo: ${fd(r.prazo)} · ${r.antFim ? 'Ant: '+fd(r.antFim) : '<span style="color:var(--mu)">primeira etapa</span>'}</div>
+        </div>
+        <div style="white-space:nowrap">${statusBdg}</div>
+        <div><strong style="color:${diasColor};font-size:13px;white-space:nowrap">${r.diasAtraso}d</strong></div>
+        <div style="min-width:120px">${motivoCell}</div>
+      </div>`;
+    }).join('');
+
+    return `<div class="atraso-proj">
+      <div class="atraso-proj-hd${pi===0?' open':''}" onclick="toggleAtrasoProj(this)">
+        <div class="atraso-proj-info">
+          <div class="atraso-proj-nome" onclick="event.stopPropagation();openDet(${pg.projId})">${pg.proj}</div>
+          <div class="atraso-proj-meta">
+            ${sitProjBdg(pg)}
+            <span style="font-size:11px;color:var(--mu)">${pg.resp}</span>
+          </div>
+        </div>
+        <div class="atraso-proj-right">
+          ${nAberto>0?`<span class="sit sit-ov" style="font-size:11px">${nAberto} em aberto</span>`:''}
+          ${nConc>0?`<span class="sit sit-done" style="font-size:11px">${nConc} concluída${nConc>1?'s':''} c/ atraso</span>`:''}
+          <span style="font-weight:700;color:${corMax};font-size:13px;white-space:nowrap">máx ${maxDias}d</span>
+          <span class="atraso-proj-arrow">▼</span>
+        </div>
+      </div>
+      <div class="atraso-etapas${pi===0?' open':''}">
+        <div class="atraso-etapa-hdr">
+          <span>Etapa · Responsável · Prazo</span>
+          <span>Status</span><span>Dias</span><span>Motivo</span>
+        </div>
+        ${etapasHtml}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function toggleAtrasoProj(hd){
+  hd.classList.toggle('open');
+  const body = hd.nextElementSibling;
+  body.classList.toggle('open');
 }
 
 function limparAFilts(){
