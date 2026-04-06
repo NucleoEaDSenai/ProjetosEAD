@@ -2307,9 +2307,12 @@ function openDet(id){
       </td>
       <td>
         <div style="display:flex;gap:3px;align-items:center">
-          <span id="ep_prazo_txt_${id}_${i}" style="font-size:11.5px;color:var(--txt)">${e.prazo?fd(e.prazo):'—'}</span>
-          <button type="button" title="Editar prazo" onclick="_editarPrazoEtapa(${id},${i},this)"
-            style="padding:2px 6px;font-size:10px;background:var(--s2);border:1px solid var(--bdr);border-radius:4px;cursor:pointer;color:var(--mu)">✏️</button>
+          ${ETAPAS_SEM_PRAZO_AUTO.has(e.lb)
+            ? '<i style="color:#CBD5E1;font-size:11px">sem data definida</i>'
+            : `<span id="ep_prazo_txt_${id}_${i}" style="font-size:11.5px;color:var(--txt)">${e.prazo?fd(e.prazo):'—'}</span>
+               <button type="button" title="Editar prazo" onclick="_editarPrazoEtapa(${id},${i},this)"
+                 style="padding:2px 6px;font-size:10px;background:var(--s2);border:1px solid var(--bdr);border-radius:4px;cursor:pointer;color:var(--mu)">✏️</button>`
+          }
           <div id="ep_prazo_inp_${id}_${i}" style="display:none;gap:3px;align-items:center">
             <input class="ii" type="number" id="ep_d_${id}_${i}" placeholder="DD" min="1" max="31"
               value="${e.prazo?parseInt(e.prazo.split('-')[2]):''}"
@@ -2519,38 +2522,41 @@ const TEMPLATES = {
   'Web Rise Básico': {
     colInicial: 0,
     etapas: [
-      {lb:'Reunião Inicial',               r:'eq'},
-      {lb:'Material Base Recebido',        r:'cl'},
-      {lb:'Elaboração do PI',              r:'eq'},
-      {lb:'Revisão do PI',                 r:'eq'},
-      {lb:'Revisão Textual do PI',         r:'eq'},
-      {lb:'Entrega do PI ao cliente',      r:'eq'},
-      {lb:'Validação do PI',               r:'cl'},
-      {lb:'Validação DI Referência',       r:'cl'},
-      {lb:'Desenho/Roteirização',          r:'eq'},
-      {lb:'Validação DI Referência',       r:'cl'},
-      {lb:'Produção de Recursos Gráficos', r:'eq'},
-      {lb:'Entrega do Review ao cliente',  r:'eq'},
-      {lb:'Solicitação de Ajustes',        r:'cl'},
-      {lb:'Implementação de Ajustes',      r:'eq'},
-      {lb:'Validação Final',               r:'cl'},
-      {lb:'Revisão Textual',               r:'eq'},
-      {lb:'Homologação',                   r:'eq'},
-      {lb:'Instalação no SIRH',            r:'eq'},
-      {lb:'Upload Arquivos',               r:'eq'},
+      {lb:'Reunião Inicial',                        r:'eq'},
+      {lb:'Material Base Recebido',                 r:'cl'},
+      {lb:'Análise do material base',               r:'eq'},
+      {lb:'Elaboração do PICV',                     r:'eq'},
+      {lb:'Validação PICV DI/DM Referência',        r:'cl'},
+      {lb:'Validação LD',                           r:'cl'},
+      {lb:'Revisão textual do PICV',                r:'eq'},
+      {lb:'Entrega do PICV ao cliente',             r:'eq'},
+      {lb:'Solicitação de ajustes no PICV',         r:'cl'},
+      {lb:'Implementação de ajustes',               r:'eq'},
+      {lb:'Validação final do PICV',                r:'cl'},
+      {lb:'Desenho/roteirização do onepage',        r:'eq'},
+      {lb:'Validação DI Referência',                r:'cl'},
+      {lb:'Produção de recursos gráficos',          r:'eq'},
+      {lb:'Validação DM Referência',                r:'cl'},
+      {lb:'Validação LD',                           r:'cl'},
+      {lb:'Entrega do review ao cliente',           r:'eq'},
+      {lb:'Solicitação de ajustes',                 r:'cl'},
+      {lb:'Implementação de ajustes',               r:'eq'},
+      {lb:'Validação final do review',              r:'cl'},
+      {lb:'Revisão textual do review',              r:'eq'},
+      {lb:'Homologação',                            r:'eq'},
+      {lb:'Instalação no SIRH',                     r:'eq'},
+      {lb:'Upload Arquivos Bdoc',                   r:'eq'},
     ],
     gatilhos: [
       {nome:'reunião inicial',                       col:1,  exato:true},  // → Aguardando Material Base
       {nome:'material base recebido',                col:3,  exato:true},  // → Projeto Instrucional (PI)
-      {nome:'entrega do pi ao cliente',              col:4,  exato:true},  // → Validação - PI
-      {nome:'validação do pi',                       col:6,  exato:true},  // → Desenvolvimento
-      {nome:'validação di referência',               col:6,  exato:false}, // → Desenvolvimento
+      {nome:'entrega do picv ao cliente',            col:4,  exato:true},  // → Validação - PI
+      {nome:'validação final do picv',               col:6,  exato:true},  // → Desenvolvimento
       {nome:'entrega do review ao cliente',          col:7,  exato:true},  // → Validação - Desenvolvimento
-      // Implementação de Ajustes NÃO move — permanece em col 7
-      {nome:'validação final',                       col:8,  exato:true},  // → Revisão Textual/Tradução
-      {nome:'revisão textual',                       col:11, exato:true},  // → Homologação/Instalação
+      {nome:'validação final do review',             col:8,  exato:true},  // → Revisão Textual/Tradução
+      {nome:'revisão textual do review',             col:11, exato:true},  // → Homologação/Instalação
       {multi:['homologação','instalação no sirh'],   col:12},              // → Pré-Medição
-      {nome:'upload arquivos',                       col:14, exato:false}, // → Projetos Concluídos
+      {nome:'upload arquivos bdoc',                  col:14, exato:true},  // → Projetos Concluídos
     ],
     fimCol: 14,
   },
@@ -2558,38 +2564,41 @@ const TEMPLATES = {
   'Web Rise Intermediário': {
     colInicial: 0,
     etapas: [
-      {lb:'Reunião Inicial',               r:'eq'},
-      {lb:'Material Base Recebido',        r:'cl'},
-      {lb:'Elaboração do PI',              r:'eq'},
-      {lb:'Revisão do PI',                 r:'eq'},
-      {lb:'Revisão Textual do PI',         r:'eq'},
-      {lb:'Entrega do PI ao cliente',      r:'eq'},
-      {lb:'Validação do PI',               r:'cl'},
-      {lb:'Validação DI Referência',       r:'cl'},
-      {lb:'Desenho/Roteirização',          r:'eq'},
-      {lb:'Validação DI Referência',       r:'cl'},
-      {lb:'Produção de Recursos Gráficos', r:'eq'},
-      {lb:'Entrega do Review ao cliente',  r:'eq'},
-      {lb:'Solicitação de Ajustes',        r:'cl'},
-      {lb:'Implementação de Ajustes',      r:'eq'},
-      {lb:'Validação Final',               r:'cl'},
-      {lb:'Revisão Textual',               r:'eq'},
-      {lb:'Homologação',                   r:'eq'},
-      {lb:'Instalação no SIRH',            r:'eq'},
-      {lb:'Upload Arquivos',               r:'eq'},
+      {lb:'Reunião Inicial',                        r:'eq'},
+      {lb:'Material Base Recebido',                 r:'cl'},
+      {lb:'Análise do material base',               r:'eq'},
+      {lb:'Elaboração do PICV',                     r:'eq'},
+      {lb:'Validação PICV DI/DM Referência',        r:'cl'},
+      {lb:'Validação LD',                           r:'cl'},
+      {lb:'Revisão textual do PICV',                r:'eq'},
+      {lb:'Entrega do PICV ao cliente',             r:'eq'},
+      {lb:'Solicitação de ajustes no PICV',         r:'cl'},
+      {lb:'Implementação de ajustes',               r:'eq'},
+      {lb:'Validação final do PICV',                r:'cl'},
+      {lb:'Desenho/roteirização do onepage',        r:'eq'},
+      {lb:'Validação DI Referência',                r:'cl'},
+      {lb:'Produção de recursos gráficos',          r:'eq'},
+      {lb:'Validação DM Referência',                r:'cl'},
+      {lb:'Validação LD',                           r:'cl'},
+      {lb:'Entrega do review ao cliente',           r:'eq'},
+      {lb:'Solicitação de ajustes',                 r:'cl'},
+      {lb:'Implementação de ajustes',               r:'eq'},
+      {lb:'Validação final do review',              r:'cl'},
+      {lb:'Revisão textual do review',              r:'eq'},
+      {lb:'Homologação',                            r:'eq'},
+      {lb:'Instalação no SIRH',                     r:'eq'},
+      {lb:'Upload Arquivos Bdoc',                   r:'eq'},
     ],
     gatilhos: [
       {nome:'reunião inicial',                       col:1,  exato:true},  // → Aguardando Material Base
       {nome:'material base recebido',                col:3,  exato:true},  // → Projeto Instrucional (PI)
-      {nome:'entrega do pi ao cliente',              col:4,  exato:true},  // → Validação - PI
-      {nome:'validação do pi',                       col:6,  exato:true},  // → Desenvolvimento
-      {nome:'validação di referência',               col:6,  exato:false}, // → Desenvolvimento
+      {nome:'entrega do picv ao cliente',            col:4,  exato:true},  // → Validação - PI
+      {nome:'validação final do picv',               col:6,  exato:true},  // → Desenvolvimento
       {nome:'entrega do review ao cliente',          col:7,  exato:true},  // → Validação - Desenvolvimento
-      // Implementação de Ajustes NÃO move — permanece em col 7
-      {nome:'validação final',                       col:8,  exato:true},  // → Revisão Textual/Tradução
-      {nome:'revisão textual',                       col:11, exato:true},  // → Homologação/Instalação
+      {nome:'validação final do review',             col:8,  exato:true},  // → Revisão Textual/Tradução
+      {nome:'revisão textual do review',             col:11, exato:true},  // → Homologação/Instalação
       {multi:['homologação','instalação no sirh'],   col:12},              // → Pré-Medição
-      {nome:'upload arquivos',                       col:14, exato:false}, // → Projetos Concluídos
+      {nome:'upload arquivos bdoc',                  col:14, exato:true},  // → Projetos Concluídos
     ],
     fimCol: 14,
   },
@@ -2597,38 +2606,41 @@ const TEMPLATES = {
   'Web Rise Avançado': {
     colInicial: 0,
     etapas: [
-      {lb:'Reunião Inicial',               r:'eq'},
-      {lb:'Material Base Recebido',        r:'cl'},
-      {lb:'Elaboração do PI',              r:'eq'},
-      {lb:'Revisão do PI',                 r:'eq'},
-      {lb:'Revisão Textual do PI',         r:'eq'},
-      {lb:'Entrega do PI ao cliente',      r:'eq'},
-      {lb:'Validação do PI',               r:'cl'},
-      {lb:'Validação DI Referência',       r:'cl'},
-      {lb:'Desenho/Roteirização',          r:'eq'},
-      {lb:'Validação DI Referência',       r:'cl'},
-      {lb:'Produção de Recursos Gráficos', r:'eq'},
-      {lb:'Entrega do Review ao cliente',  r:'eq'},
-      {lb:'Solicitação de Ajustes',        r:'cl'},
-      {lb:'Implementação de Ajustes',      r:'eq'},
-      {lb:'Validação Final',               r:'cl'},
-      {lb:'Revisão Textual',               r:'eq'},
-      {lb:'Homologação',                   r:'eq'},
-      {lb:'Instalação no SIRH',            r:'eq'},
-      {lb:'Upload Arquivos',               r:'eq'},
+      {lb:'Reunião Inicial',                        r:'eq'},
+      {lb:'Material Base Recebido',                 r:'cl'},
+      {lb:'Análise do material base',               r:'eq'},
+      {lb:'Elaboração do PICV',                     r:'eq'},
+      {lb:'Validação PICV DI/DM Referência',        r:'cl'},
+      {lb:'Validação LD',                           r:'cl'},
+      {lb:'Revisão textual do PICV',                r:'eq'},
+      {lb:'Entrega do PICV ao cliente',             r:'eq'},
+      {lb:'Solicitação de ajustes no PICV',         r:'cl'},
+      {lb:'Implementação de ajustes',               r:'eq'},
+      {lb:'Validação final do PICV',                r:'cl'},
+      {lb:'Desenho/roteirização do onepage',        r:'eq'},
+      {lb:'Validação DI Referência',                r:'cl'},
+      {lb:'Produção de recursos gráficos',          r:'eq'},
+      {lb:'Validação DM Referência',                r:'cl'},
+      {lb:'Validação LD',                           r:'cl'},
+      {lb:'Entrega do review ao cliente',           r:'eq'},
+      {lb:'Solicitação de ajustes',                 r:'cl'},
+      {lb:'Implementação de ajustes',               r:'eq'},
+      {lb:'Validação final do review',              r:'cl'},
+      {lb:'Revisão textual do review',              r:'eq'},
+      {lb:'Homologação',                            r:'eq'},
+      {lb:'Instalação no SIRH',                     r:'eq'},
+      {lb:'Upload Arquivos Bdoc',                   r:'eq'},
     ],
     gatilhos: [
       {nome:'reunião inicial',                       col:1,  exato:true},  // → Aguardando Material Base
       {nome:'material base recebido',                col:3,  exato:true},  // → Projeto Instrucional (PI)
-      {nome:'entrega do pi ao cliente',              col:4,  exato:true},  // → Validação - PI
-      {nome:'validação do pi',                       col:6,  exato:true},  // → Desenvolvimento
-      {nome:'validação di referência',               col:6,  exato:false}, // → Desenvolvimento
+      {nome:'entrega do picv ao cliente',            col:4,  exato:true},  // → Validação - PI
+      {nome:'validação final do picv',               col:6,  exato:true},  // → Desenvolvimento
       {nome:'entrega do review ao cliente',          col:7,  exato:true},  // → Validação - Desenvolvimento
-      // Implementação de Ajustes NÃO move — permanece em col 7
-      {nome:'validação final',                       col:8,  exato:true},  // → Revisão Textual/Tradução
-      {nome:'revisão textual',                       col:11, exato:true},  // → Homologação/Instalação
+      {nome:'validação final do review',             col:8,  exato:true},  // → Revisão Textual/Tradução
+      {nome:'revisão textual do review',             col:11, exato:true},  // → Homologação/Instalação
       {multi:['homologação','instalação no sirh'],   col:12},              // → Pré-Medição
-      {nome:'upload arquivos',                       col:14, exato:false}, // → Projetos Concluídos
+      {nome:'upload arquivos bdoc',                  col:14, exato:true},  // → Projetos Concluídos
     ],
     fimCol: 14,
   },
@@ -2961,8 +2973,8 @@ function onDataInicioChange(){
 const CRONOGRAMAS = {
   // ─── Totais: Encaps=24d | Básico=51d | Inter=64d | Avançado=78d ───────────
   'Encapsulamento': [
-    {lb:'Material Base Recebido',       dias:3},
-    {lb:'Entrega do Review ao Cliente', dias:5},
+    // Reunião Inicial e Material Base Recebido: sem prazo automático (dependem do cliente)
+    {lb:'Entrega do Review ao Cliente', dias:8},  // +3d do Material Base Recebido
     {lb:'Solicitação de Ajustes',       dias:3},
     {lb:'Implementação de Ajustes',     dias:3},
     {lb:'Validação Final',              dias:1},
@@ -2971,68 +2983,77 @@ const CRONOGRAMAS = {
     {lb:'Upload Arquivos',              dias:4},
   ],  // total: 24d
   'Web Rise Básico': [
-    {lb:'Reunião Inicial',               dias:1},
-    {lb:'Material Base Recebido',        dias:3},
-    {lb:'Elaboração do PI',              dias:7},
-    {lb:'Revisão do PI',                 dias:3},
-    {lb:'Revisão Textual do PI',         dias:1},
-    {lb:'Entrega do PI ao cliente',      dias:1},
-    {lb:'Validação do PI',               dias:2},
-    {lb:'Validação DI Referência',       dias:2},
-    {lb:'Desenho/Roteirização',          dias:5},
-    {lb:'Validação DI Referência',       dias:3},
-    {lb:'Produção de Recursos Gráficos', dias:2},
-    {lb:'Entrega do Review ao cliente',  dias:3},  // Val.DM(2)+Entrega(1)
-    {lb:'Solicitação de Ajustes',        dias:3},
-    {lb:'Implementação de Ajustes',      dias:3},
-    {lb:'Validação Final',               dias:1},
-    {lb:'Revisão Textual',               dias:2},
-    {lb:'Homologação',                   dias:3},
-    {lb:'Instalação no SIRH',            dias:2},
-    {lb:'Upload Arquivos',               dias:4},
-  ],  // total: 51d
+    // Reunião Inicial e Material Base Recebido: sem prazo automático
+    {lb:'Elaboração do PICV',                  dias:7},
+    {lb:'Validação PICV DI/DM Referência',     dias:3},
+    {lb:'Validação LD',                        dias:2},
+    {lb:'Revisão textual do PICV',             dias:1},
+    {lb:'Entrega do PICV ao cliente',          dias:1},
+    {lb:'Solicitação de ajustes no PICV',      dias:2},
+    {lb:'Implementação de ajustes',            dias:2},
+    {lb:'Validação final do PICV',             dias:1},
+    {lb:'Desenho/roteirização do onepage',     dias:5},
+    {lb:'Validação DI Referência',             dias:3},
+    {lb:'Produção de recursos gráficos',       dias:2},
+    {lb:'Validação DM Referência',             dias:2},
+    {lb:'Validação LD',                        dias:2},
+    {lb:'Entrega do review ao cliente',        dias:1},
+    {lb:'Solicitação de ajustes',              dias:3},
+    {lb:'Implementação de ajustes',            dias:3},
+    {lb:'Validação final do review',           dias:1},
+    {lb:'Revisão textual do review',           dias:2},
+    {lb:'Homologação',                         dias:3},
+    {lb:'Instalação no SIRH',                  dias:2},
+    {lb:'Upload Arquivos Bdoc',                dias:7},
+  ],  // total: 55d
   'Web Rise Intermediário': [
-    {lb:'Reunião Inicial',               dias:1},
-    {lb:'Material Base Recebido',        dias:3},
-    {lb:'Elaboração do PI',              dias:7},
-    {lb:'Revisão do PI',                 dias:3},
-    {lb:'Revisão Textual do PI',         dias:1},
-    {lb:'Entrega do PI ao cliente',      dias:1},
-    {lb:'Validação do PI',               dias:2},
-    {lb:'Validação DI Referência',       dias:2},
-    {lb:'Desenho/Roteirização',          dias:10},
-    {lb:'Validação DI Referência',       dias:3},
-    {lb:'Produção de Recursos Gráficos', dias:8},
-    {lb:'Entrega do Review ao cliente',  dias:4},  // Val.DM(3)+Entrega(1)
-    {lb:'Solicitação de Ajustes',        dias:3},
-    {lb:'Implementação de Ajustes',      dias:3},
-    {lb:'Validação Final',               dias:1},
-    {lb:'Revisão Textual',               dias:3},
-    {lb:'Homologação',                   dias:3},
-    {lb:'Instalação no SIRH',            dias:2},
-    {lb:'Upload Arquivos',               dias:4},
-  ],  // total: 64d
+    // Reunião Inicial e Material Base Recebido: sem prazo automático
+    {lb:'Elaboração do PICV',                  dias:7},
+    {lb:'Validação PICV DI/DM Referência',     dias:3},
+    {lb:'Validação LD',                        dias:2},
+    {lb:'Revisão textual do PICV',             dias:1},
+    {lb:'Entrega do PICV ao cliente',          dias:1},
+    {lb:'Solicitação de ajustes no PICV',      dias:2},
+    {lb:'Implementação de ajustes',            dias:2},
+    {lb:'Validação final do PICV',             dias:1},
+    {lb:'Desenho/roteirização do onepage',     dias:10},
+    {lb:'Validação DI Referência',             dias:3},
+    {lb:'Produção de recursos gráficos',       dias:8},
+    {lb:'Validação DM Referência',             dias:3},
+    {lb:'Validação LD',                        dias:2},
+    {lb:'Entrega do review ao cliente',        dias:1},
+    {lb:'Solicitação de ajustes',              dias:3},
+    {lb:'Implementação de ajustes',            dias:3},
+    {lb:'Validação final do review',           dias:1},
+    {lb:'Revisão textual do review',           dias:3},
+    {lb:'Homologação',                         dias:3},
+    {lb:'Instalação no SIRH',                  dias:2},
+    {lb:'Upload Arquivos Bdoc',                dias:7},
+  ],  // total: 68d
   'Web Rise Avançado': [
-    {lb:'Reunião Inicial',               dias:1},
-    {lb:'Material Base Recebido',        dias:3},
-    {lb:'Elaboração do PI',              dias:7},
-    {lb:'Revisão do PI',                 dias:3},
-    {lb:'Revisão Textual do PI',         dias:1},
-    {lb:'Entrega do PI ao cliente',      dias:1},
-    {lb:'Validação do PI',               dias:2},
-    {lb:'Validação DI Referência',       dias:2},
-    {lb:'Desenho/Roteirização',          dias:15},
-    {lb:'Validação DI Referência',       dias:3},
-    {lb:'Produção de Recursos Gráficos', dias:16},
-    {lb:'Entrega do Review ao cliente',  dias:4},  // Val.DM(3)+Entrega(1)
-    {lb:'Solicitação de Ajustes',        dias:3},
-    {lb:'Implementação de Ajustes',      dias:3},
-    {lb:'Validação Final',               dias:1},
-    {lb:'Revisão Textual',               dias:4},
-    {lb:'Homologação',                   dias:3},
-    {lb:'Instalação no SIRH',            dias:2},
-    {lb:'Upload Arquivos',               dias:4},
-  ],  // total: 78d
+    // Reunião Inicial e Material Base Recebido: sem prazo automático
+    {lb:'Elaboração do PICV',                  dias:7},
+    {lb:'Validação PICV DI/DM Referência',     dias:3},
+    {lb:'Validação LD',                        dias:2},
+    {lb:'Revisão textual do PICV',             dias:1},
+    {lb:'Entrega do PICV ao cliente',          dias:1},
+    {lb:'Solicitação de ajustes no PICV',      dias:2},
+    {lb:'Implementação de ajustes',            dias:2},
+    {lb:'Validação final do PICV',             dias:1},
+    {lb:'Desenho/roteirização do onepage',     dias:15},
+    {lb:'Validação DI Referência',             dias:3},
+    {lb:'Produção de recursos gráficos',       dias:16},
+    {lb:'Validação DM Referência',             dias:3},
+    {lb:'Validação LD',                        dias:2},
+    {lb:'Entrega do review ao cliente',        dias:1},
+    {lb:'Solicitação de ajustes',              dias:3},
+    {lb:'Implementação de ajustes',            dias:3},
+    {lb:'Validação final do review',           dias:1},
+    {lb:'Revisão textual do review',           dias:4},
+    {lb:'Homologação',                         dias:3},
+    {lb:'Instalação no SIRH',                  dias:2},
+    {lb:'Upload Arquivos Bdoc',                dias:7},
+  ],  // total: 82d
   'Produção Apostila/E-book': [
     {lb:'Reunião inicial',                                  dias:5},
     {lb:'Revisão textual',                                  dias:5},
@@ -3050,13 +3071,16 @@ const CRONOGRAMAS = {
     {lb:'Upload BDOC',                                     dias:1},
   ],  // total: 52d
   'Autoria Digital': [
-    {lb:'Reunião Inicial',     dias:1},
-    {lb:'Desenvolvimento',     dias:1},
+    // Reunião Inicial: sem prazo automático (depende do cliente)
+    {lb:'Desenvolvimento',     dias:2},  // +1d da Reunião Inicial
     {lb:'Homologação',         dias:2},
     {lb:'Instalação no SIRH',  dias:1},
     {lb:'Upload Arquivos',     dias:1},
   ],  // total: 6d
 };
+
+// Etapas que ficam sem prazo automático (dependem do cliente)
+const ETAPAS_SEM_PRAZO_AUTO = new Set(['Reunião Inicial','Material Base Recebido','Reunião inicial','Material base recebido']);
 
 // Avança N dias úteis a partir de uma data ISO
 // Feriados nacionais fixos (MM-DD) e móveis calculados por ano
@@ -3316,12 +3340,15 @@ function _renderEF(){
           </td>
           <td>
             <div style="display:flex;gap:3px">
-              <input class="fi ii" type="number" id="ep_d_${i}" placeholder="DD" min="1" max="31"
-                value="${e.prazo?parseInt(e.prazo.split('-')[2]):''}" style="width:48px;padding:5px 4px;font-size:11.5px" onchange="_efCascata(${i})">
-              <input class="fi ii" type="number" id="ep_m_${i}" placeholder="MM" min="1" max="12"
-                value="${e.prazo?parseInt(e.prazo.split('-')[1]):''}" style="width:48px;padding:5px 4px;font-size:11.5px" onchange="_efCascata(${i})">
-              <input class="fi ii" type="number" id="ep_a_${i}" placeholder="AAAA" min="2020" max="2099"
-                value="${e.prazo?parseInt(e.prazo.split('-')[0]):''}" style="width:60px;padding:5px 4px;font-size:11.5px" onchange="_efCascata(${i})">
+              ${ETAPAS_SEM_PRAZO_AUTO.has(e.lb)
+                ? `<span style="font-size:11px;color:#CBD5E1;font-style:italic">sem data definida</span>`
+                : `<input class="fi ii" type="number" id="ep_d_${i}" placeholder="DD" min="1" max="31"
+                    value="${e.prazo?parseInt(e.prazo.split('-')[2]):''}" style="width:48px;padding:5px 4px;font-size:11.5px" onchange="_efCascata(${i})">
+                  <input class="fi ii" type="number" id="ep_m_${i}" placeholder="MM" min="1" max="12"
+                    value="${e.prazo?parseInt(e.prazo.split('-')[1]):''}" style="width:48px;padding:5px 4px;font-size:11.5px" onchange="_efCascata(${i})">
+                  <input class="fi ii" type="number" id="ep_a_${i}" placeholder="AAAA" min="2020" max="2099"
+                    value="${e.prazo?parseInt(e.prazo.split('-')[0]):''}" style="width:60px;padding:5px 4px;font-size:11.5px" onchange="_efCascata(${i})">`
+              }
             </div>
           </td>
           <td>
