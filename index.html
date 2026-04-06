@@ -1093,6 +1093,14 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
     <input class="setup-inp" id="setupProjectId"  placeholder="projectId  (nome-do-projeto)" autocomplete="off">
     <div class="setup-err" id="setupErr"></div>
     <button class="setup-btn" onclick="conectarFirebase()">🔗 Conectar e Salvar</button>
+    <div style="margin-top:20px;padding-top:16px;border-top:1px solid #eee">
+      <div style="font-size:12px;color:#6B7280;margin-bottom:8px">🔧 Ferramentas de manutenção</div>
+      <button onclick="migrarEtapasWebRise()"
+        style="width:100%;padding:10px;background:#F0FDF4;color:#166534;border:1px solid #BBF7D0;border-radius:8px;cursor:pointer;font-size:13px;font-weight:600;font-family:'Plus Jakarta Sans',sans-serif">
+        🔄 Migrar etapas Web Rise para novo padrão
+      </button>
+      <div id="migracaoStatus" style="font-size:11.5px;color:#6B7280;margin-top:6px;min-height:16px"></div>
+    </div>
   </div>
 </div>
 <div class="toast" id="toast"></div>
@@ -2309,9 +2317,7 @@ function openDet(id){
         <div style="display:flex;gap:3px;align-items:center">
           ${ETAPAS_SEM_PRAZO_AUTO.has(e.lb)
             ? '<i style="color:#CBD5E1;font-size:11px">sem data definida</i>'
-            : `<span id="ep_prazo_txt_${id}_${i}" style="font-size:11.5px;color:var(--txt)">${e.prazo?fd(e.prazo):'—'}</span>
-               <button type="button" title="Editar prazo" onclick="_editarPrazoEtapa(${id},${i},this)"
-                 style="padding:2px 6px;font-size:10px;background:var(--s2);border:1px solid var(--bdr);border-radius:4px;cursor:pointer;color:var(--mu)">✏️</button>`
+            : `<span id="ep_prazo_txt_${id}_${i}" style="font-size:11.5px;color:var(--txt)">${e.prazo?fd(e.prazo):'—'}</span>`
           }
           <div id="ep_prazo_inp_${id}_${i}" style="display:none;gap:3px;align-items:center">
             <input class="ii" type="number" id="ep_d_${id}_${i}" placeholder="DD" min="1" max="31"
@@ -3226,7 +3232,8 @@ function toggleRec(el, recurso){
     // Recurso com template de etapas (Encapsulamento, Manutenção, etc.)
     const tmpl = TEMPLATES[tmplRecurso];
     const colEl = document.getElementById('fcol');
-    if(colEl && !colEl._manuallyChanged) colEl.value = tmpl.colInicial;
+    // Só aplica coluna inicial em projetos NOVOS — edição mantém a coluna atual
+    if(colEl && !colEl._manuallyChanged && editId === null) colEl.value = tmpl.colInicial;
     buildEF(tmpl.etapas.map(e => ({...e, prazo:null, done:false, fim:null})));
     // Aplicar cronograma se houver data de início
     if(CRONOGRAMAS[tmplRecurso] && dataInicio){
@@ -3247,8 +3254,9 @@ function toggleRec(el, recurso){
     );
     if(estaNoTemplate){
       buildEF(ETPS_DEF.map(e => ({...e, prazo:null})));
+      // Só volta para col 0 em projetos novos
       const colEl = document.getElementById('fcol');
-      if(colEl) colEl.value = 0;
+      if(colEl && editId === null) colEl.value = 0;
     }
   }
   // Se já há etapas e há cronograma para o recurso atual, re-aplicar prazos
@@ -5338,6 +5346,123 @@ document.addEventListener('keydown', function(e){
 initDark();
 document.getElementById('topDate').textContent=
   new Date().toLocaleDateString('pt-BR',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+
+// ── MIGRAÇÃO DE ETAPAS Web Rise ─────────────────────────────────────────────
+function migrarEtapasWebRise(){
+  const RECURSOS_WEB_RISE = ['Web Rise Básico','Web Rise Intermediário','Web Rise Avançado'];
+
+  // Mapa de renomeação: nome antigo → nome novo
+  // null = remover a etapa (ex: 'Revisão do PI' foi removida)
+  const RENOMEAR = {
+    'Elaboração do PI':              'Elaboração do PICV',
+    'Revisão do PI':                 null,  // removida
+    'Revisão Textual do PI':         'Revisão textual do PICV',
+    'Entrega do PI ao cliente':      'Entrega do PICV ao cliente',
+    'Validação do PI':               'Validação PICV DI/DM Referência',
+    'Desenho/Roteirização':          'Desenho/roteirização do onepage',
+    'Produção de Recursos Gráficos': 'Produção de recursos gráficos',
+    'Entrega do Review ao cliente':  'Entrega do review ao cliente',
+    'Solicitação de Ajustes':        'Solicitação de ajustes',
+    'Implementação de Ajustes':      'Implementação de ajustes',
+    'Validação Final':               'Validação final do review',
+    'Revisão Textual':               'Revisão textual do review',
+    'Upload Arquivos':               'Upload Arquivos Bdoc',
+  };
+
+  // Etapas novas a inserir (em posição específica relativa a outras etapas)
+  // Formato: { apos: 'nome da etapa anterior', inserir: {lb, r} }
+  const INSERIR = [
+    { apos: 'Material Base Recebido',     lb:'Análise do material base',         r:'eq' },
+    { apos: 'Validação PICV DI/DM Referência', lb:'Validação LD',               r:'cl' },
+    { apos: 'Validação final do PICV',    lb:'Validação final do PICV',          r:'cl', skip:true }, // já existe após renomeação
+    { apos: 'Validação DI Referência',    lb:'Validação DM Referência',          r:'cl' },
+    { apos: 'Validação DM Referência',    lb:'Validação LD',                     r:'cl' },
+    { apos: 'Solicitação de ajustes no PICV', lb:'Implementação de ajustes',    r:'eq', skip:true }, // já existe
+    { apos: 'Implementação de ajustes (PICV)', lb:'Validação final do PICV',    r:'cl' },
+  ];
+
+  // Sequência final esperada (para reordenar se necessário)
+  const SEQUENCIA_FINAL = [
+    {lb:'Reunião Inicial',                     r:'eq'},
+    {lb:'Material Base Recebido',              r:'cl'},
+    {lb:'Análise do material base',            r:'eq'},
+    {lb:'Elaboração do PICV',                  r:'eq'},
+    {lb:'Validação PICV DI/DM Referência',     r:'cl'},
+    {lb:'Validação LD',                        r:'cl'},
+    {lb:'Revisão textual do PICV',             r:'eq'},
+    {lb:'Entrega do PICV ao cliente',          r:'eq'},
+    {lb:'Solicitação de ajustes no PICV',      r:'cl'},
+    {lb:'Implementação de ajustes',            r:'eq'},
+    {lb:'Validação final do PICV',             r:'cl'},
+    {lb:'Desenho/roteirização do onepage',     r:'eq'},
+    {lb:'Validação DI Referência',             r:'cl'},
+    {lb:'Produção de recursos gráficos',       r:'eq'},
+    {lb:'Validação DM Referência',             r:'cl'},
+    {lb:'Validação LD',                        r:'cl'},
+    {lb:'Entrega do review ao cliente',        r:'eq'},
+    {lb:'Solicitação de ajustes',              r:'cl'},
+    {lb:'Implementação de ajustes',            r:'eq'},
+    {lb:'Validação final do review',           r:'cl'},
+    {lb:'Revisão textual do review',           r:'eq'},
+    {lb:'Homologação',                         r:'eq'},
+    {lb:'Instalação no SIRH',                  r:'eq'},
+    {lb:'Upload Arquivos Bdoc',                r:'eq'},
+  ];
+
+  if(!confirm('Migrar etapas de todos os projetos Web Rise para o novo padrão?\n\nEsta ação não pode ser desfeita. Recomenda-se exportar o XLSX antes.')) return;
+
+  const statusEl = document.getElementById('migracaoStatus');
+  statusEl.textContent = '⏳ Migrando...';
+
+  const todosDB = activeDB().concat(cancelDB());
+  const projWebRise = todosDB.filter(p =>
+    (p.recursos||[]).some(r => RECURSOS_WEB_RISE.includes(r))
+  );
+
+  if(projWebRise.length === 0){
+    statusEl.textContent = '⚠️ Nenhum projeto Web Rise encontrado.';
+    return;
+  }
+
+  let migrados = 0;
+  let erros = 0;
+
+  projWebRise.forEach(p => {
+    try {
+      const etapasAntigas = p.etapas || [];
+
+      // Construir mapa de dados existentes (prazo, done, fim, etc.) por nome antigo
+      const dadosEtapa = {};
+      etapasAntigas.forEach(e => { dadosEtapa[e.lb] = {...e}; });
+
+      // Montar novas etapas preservando dados (prazo, done, fim, motivo)
+      const novasEtapas = SEQUENCIA_FINAL.map(tmpl => {
+        // Verificar se já existe com o novo nome
+        if(dadosEtapa[tmpl.lb]){
+          return {...dadosEtapa[tmpl.lb], lb: tmpl.lb, r: tmpl.r};
+        }
+        // Verificar se existe com nome antigo (buscar no mapa de renomeação)
+        const nomeAntigo = Object.entries(RENOMEAR).find(([,novo]) => novo === tmpl.lb)?.[0];
+        if(nomeAntigo && dadosEtapa[nomeAntigo]){
+          return {...dadosEtapa[nomeAntigo], lb: tmpl.lb, r: tmpl.r};
+        }
+        // Etapa nova — sem dados históricos
+        return {lb: tmpl.lb, r: tmpl.r, prazo: null, done: false, fim: null};
+      });
+
+      p.etapas = novasEtapas;
+      fbSalvarProjeto(p);
+      migrados++;
+    } catch(e) {
+      console.error('Erro ao migrar projeto', p.nome, e);
+      erros++;
+    }
+  });
+
+  statusEl.textContent = `✅ ${migrados} projeto(s) migrado(s)${erros > 0 ? ` · ⚠️ ${erros} erro(s)` : ''}`;
+  showToast(`✅ Migração concluída: ${migrados} projeto(s) Web Rise atualizados`);
+  setTimeout(() => renderAll(), 500);
+}
 
 // ── INIT — sessão gerenciada pelo Firebase Authentication ──────────────────
 const savedUrl     = localStorage.getItem(CFG_KEY);
