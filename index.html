@@ -444,14 +444,24 @@ body.dark .sri-hl{background:rgba(255,202,40,.25)}
 .hist-detail{font-size:11.5px;color:var(--mu);margin-top:2px}
 
 /* ═══ CARGA DA EQUIPE ═══ */
-.carga-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:14px}
-.carga-card{background:var(--surface);border:1px solid var(--bdr);border-radius:12px;padding:16px}
-.carga-av{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;color:#fff;margin-bottom:10px}
-.carga-name{font-weight:700;font-size:13.5px;margin-bottom:3px}
-.carga-count{font-size:26px;font-weight:800;font-family:'Plus Jakarta Sans',sans-serif;line-height:1.1}
-.carga-bar-bg{height:4px;background:var(--bdr);border-radius:2px;margin:8px 0 10px;overflow:hidden}
+.carga-grid{display:flex;flex-direction:column;gap:10px}
+.carga-card{background:var(--surface);border:1px solid var(--bdr);border-radius:12px;overflow:hidden;transition:box-shadow .15s}
+.carga-card:hover{box-shadow:0 2px 12px rgba(0,0,0,.08)}
+.carga-hd{display:flex;align-items:center;gap:12px;padding:14px 16px;cursor:pointer;user-select:none}
+.carga-hd:hover{background:var(--s2)}
+.carga-av{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;color:#fff;flex-shrink:0}
+.carga-info{flex:1;min-width:0}
+.carga-name{font-weight:700;font-size:13.5px}
+.carga-meta{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:3px}
+.carga-count{font-size:22px;font-weight:800;font-family:'Plus Jakarta Sans',sans-serif;line-height:1;flex-shrink:0}
+.carga-bar-bg{height:4px;background:var(--bdr);border-radius:2px;overflow:hidden;width:80px;flex-shrink:0}
 .carga-bar-fill{height:100%;border-radius:2px;transition:width .4s}
-.carga-proj{font-size:11.5px;color:var(--blue);cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding:2px 0}
+.carga-arrow{font-size:11px;color:var(--mu);transition:transform .2s;flex-shrink:0}
+.carga-arrow.open{transform:rotate(180deg)}
+.carga-body{display:none;padding:0 16px 14px;border-top:1px solid var(--bdr)}
+.carga-body.open{display:block}
+.carga-proj{font-size:11.5px;color:var(--blue);cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding:3px 0;border-bottom:1px solid var(--bdr)}
+.carga-proj:last-child{border-bottom:none}
 .carga-proj:hover{text-decoration:underline}
 body.dark .carga-card{background:var(--surface);border-color:var(--bdr)}
 
@@ -607,13 +617,7 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
     <div class="si" role="menuitem" tabindex="0" aria-label="Histórico de Edições" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();nav('historico')}"" onclick="nav('historico')"><span class="si-ic">📝</span><span>Histórico</span></div>
   </nav>
   <div class="sb-foot" style="display:flex;align-items:center;justify-content:space-between"><span>v2.0 · Firjan SENAI</span><button class="dark-btn" id="darkBtn" onclick="toggleDark()">🌙</button></div>
-  <div style="padding:8px 12px;border-top:1px solid rgba(255,255,255,.07)">
-    <button onclick="migrarEtapasWebRise()"
-      style="width:100%;padding:7px 10px;background:#14532d;color:#bbf7d0;border:1px solid #166534;border-radius:7px;cursor:pointer;font-size:11px;font-weight:600;font-family:'Plus Jakarta Sans',sans-serif;display:flex;align-items:center;gap:6px;justify-content:center">
-      🔄 Migrar etapas Web Rise
-    </button>
-    <div id="migracaoStatus2" style="font-size:10.5px;color:rgba(255,255,255,.4);margin-top:4px;text-align:center;min-height:14px"></div>
-  </div>
+
 </aside>
 
 <div class="main" role="main" id="main-content" tabindex="-1">
@@ -1100,14 +1104,7 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
     <input class="setup-inp" id="setupProjectId"  placeholder="projectId  (nome-do-projeto)" autocomplete="off">
     <div class="setup-err" id="setupErr"></div>
     <button class="setup-btn" onclick="conectarFirebase()">🔗 Conectar e Salvar</button>
-    <div style="margin-top:20px;padding-top:16px;border-top:1px solid #eee">
-      <div style="font-size:12px;color:#6B7280;margin-bottom:8px">🔧 Ferramentas de manutenção</div>
-      <button onclick="migrarEtapasWebRise()"
-        style="width:100%;padding:10px;background:#F0FDF4;color:#166534;border:1px solid #BBF7D0;border-radius:8px;cursor:pointer;font-size:13px;font-weight:600;font-family:'Plus Jakarta Sans',sans-serif">
-        🔄 Migrar etapas Web Rise para novo padrão
-      </button>
-      <div id="migracaoStatus" style="font-size:11.5px;color:#6B7280;margin-top:6px;min-height:16px"></div>
-    </div>
+
   </div>
 </div>
 <div class="toast" id="toast"></div>
@@ -4859,6 +4856,14 @@ function rHistorico(){
 // ══════════════════════════════════════════════
 //  CARGA DA EQUIPE
 // ══════════════════════════════════════════════
+function toggleCarga(uid){
+  const body  = document.getElementById(uid+'_body');
+  const arrow = document.getElementById(uid+'_arrow');
+  if(!body) return;
+  const open = body.classList.toggle('open');
+  if(arrow) arrow.classList.toggle('open', open);
+}
+
 function rCarga(){
   const el = document.getElementById('cargaGrid'); if(!el) return;
   const ativos = activeDB().filter(p => calcSit(p) !== 'concluido');
@@ -4877,24 +4882,29 @@ function rCarga(){
   const max = Math.max(...Object.values(membros).map(m => m.projetos.length), 1);
   el.innerHTML = Object.entries(membros)
     .sort((a,b) => b[1].projetos.length - a[1].projetos.length)
-    .map(([nome, d]) => {
+    .map(([nome, d], idx) => {
       const pct = Math.round(d.projetos.length / max * 100);
       const corStatus = d.atrasados > 0 ? 'var(--red)' : d.projetos.length >= 4 ? 'var(--yel)' : 'var(--blue)';
       const corPessoal = NOME_CORES[nome] || corStatus;
-      const cor = corStatus; // mantém para uso no contador
+      const uid = 'carga_' + nome.replace(/\W/g,'_');
       return `<div class="carga-card">
-        <div class="carga-av" style="background:${corPessoal}">${iniciais(nome)}</div>
-        <div class="carga-name">${nome}</div>
-        <div style="display:flex;align-items:baseline;gap:7px;margin-bottom:2px">
-          <div class="carga-count" style="color:${cor}">${d.projetos.length}</div>
-          <div style="font-size:12px;color:var(--mu)">projeto(s) ativo(s)</div>
+        <div class="carga-hd" onclick="toggleCarga('${uid}')">
+          <div class="carga-av" style="background:${corPessoal}">${iniciais(nome)}</div>
+          <div class="carga-info">
+            <div class="carga-name">${nome}</div>
+            <div class="carga-meta">
+              ${d.atrasados > 0 ? `<span style="font-size:11px;color:var(--red);font-weight:600">⚠️ ${d.atrasados} atrasado(s)</span>` : ''}
+              ${d.cl > 0 ? `<span style="font-size:11px;color:var(--org)">⏳ ${d.cl} ag. cliente</span>` : ''}
+            </div>
+          </div>
+          <div class="carga-bar-bg"><div class="carga-bar-fill" style="width:${pct}%;background:${corStatus}"></div></div>
+          <div class="carga-count" style="color:${corStatus}">${d.projetos.length}</div>
+          <span style="font-size:11px;color:var(--mu);flex-shrink:0">proj.</span>
+          <span class="carga-arrow" id="${uid}_arrow">▼</span>
         </div>
-        ${d.atrasados > 0 ? `<div style="font-size:11.5px;color:var(--red);font-weight:600;margin-bottom:2px">⚠️ ${d.atrasados} atrasado(s)</div>` : ''}
-        ${d.cl > 0 ? `<div style="font-size:11.5px;color:var(--org);margin-bottom:2px">⏳ ${d.cl} aguardando cliente</div>` : ''}
-        <div class="carga-bar-bg"><div class="carga-bar-fill" style="width:${pct}%;background:${cor}"></div></div>
-        <div style="display:flex;flex-direction:column;gap:1px;margin-top:6px">
+        <div class="carga-body" id="${uid}_body">
           ${d.projetos.map(p => `<div class="carga-proj" onclick="openDet(${p.id})" title="${p.nome}">
-            ${calcSit(p)==='atrasado'?'⚠️ ':calcSit(p)==='aguardando'?'⏳ ':'▸ '}${p.nome.length>30?p.nome.slice(0,28)+'…':p.nome}
+            ${calcSit(p)==='atrasado'?'⚠️ ':calcSit(p)==='aguardando'?'⏳ ':'▸ '}${p.nome.length>55?p.nome.slice(0,53)+'…':p.nome}
           </div>`).join('')}
         </div>
       </div>`;
