@@ -607,6 +607,13 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
     <div class="si" role="menuitem" tabindex="0" aria-label="Histórico de Edições" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();nav('historico')}"" onclick="nav('historico')"><span class="si-ic">📝</span><span>Histórico</span></div>
   </nav>
   <div class="sb-foot" style="display:flex;align-items:center;justify-content:space-between"><span>v2.0 · Firjan SENAI</span><button class="dark-btn" id="darkBtn" onclick="toggleDark()">🌙</button></div>
+  <div style="padding:8px 12px;border-top:1px solid rgba(255,255,255,.07)">
+    <button onclick="migrarEtapasWebRise()"
+      style="width:100%;padding:7px 10px;background:#14532d;color:#bbf7d0;border:1px solid #166534;border-radius:7px;cursor:pointer;font-size:11px;font-weight:600;font-family:'Plus Jakarta Sans',sans-serif;display:flex;align-items:center;gap:6px;justify-content:center">
+      🔄 Migrar etapas Web Rise
+    </button>
+    <div id="migracaoStatus2" style="font-size:10.5px;color:rgba(255,255,255,.4);margin-top:4px;text-align:center;min-height:14px"></div>
+  </div>
 </aside>
 
 <div class="main" role="main" id="main-content" tabindex="-1">
@@ -5411,8 +5418,10 @@ function migrarEtapasWebRise(){
 
   if(!confirm('Migrar etapas de todos os projetos Web Rise para o novo padrão?\n\nEsta ação não pode ser desfeita. Recomenda-se exportar o XLSX antes.')) return;
 
-  const statusEl = document.getElementById('migracaoStatus');
-  statusEl.textContent = '⏳ Migrando...';
+  const statusEl = document.getElementById('migracaoStatus') || document.getElementById('migracaoStatus2');
+  const statusEl2 = document.getElementById('migracaoStatus2');
+  if(statusEl) statusEl.textContent = '⏳ Migrando...';
+  if(statusEl2) statusEl2.textContent = '⏳ Migrando...';
 
   const todosDB = activeDB().concat(cancelDB());
   const projWebRise = todosDB.filter(p =>
@@ -5459,7 +5468,9 @@ function migrarEtapasWebRise(){
     }
   });
 
-  statusEl.textContent = `✅ ${migrados} projeto(s) migrado(s)${erros > 0 ? ` · ⚠️ ${erros} erro(s)` : ''}`;
+  const msg = `✅ ${migrados} projeto(s)${erros > 0 ? ` · ⚠️ ${erros} erro(s)` : ''}`;
+  if(statusEl) statusEl.textContent = msg;
+  if(statusEl2) statusEl2.textContent = msg;
   showToast(`✅ Migração concluída: ${migrados} projeto(s) Web Rise atualizados`);
   setTimeout(() => renderAll(), 500);
 }
