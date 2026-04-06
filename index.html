@@ -5003,6 +5003,14 @@ function _notifKey(){
   const email = (fbCurrentUser?.email||localStorage.getItem('firjan_user_email')||'anon').toLowerCase();
   return 'firjan_notif_' + email.replace(/[^a-z0-9]/g,'_');
 }
+// Chave para IDs de notificações que o usuário já descartou (não reaparecem)
+function _notifDescKey(){ return _notifKey()+'_desc'; }
+function _loadDescartados(){
+  try{ return new Set(JSON.parse(localStorage.getItem(_notifDescKey())||'[]')); }catch(e){ return new Set(); }
+}
+function _saveDescartados(set){
+  try{ localStorage.setItem(_notifDescKey(), JSON.stringify([...set])); }catch(e){}
+}
 
 // Normaliza nome para comparação flexível (ex: "Daniel David" ≈ "Daniel")
 function _nomeMatch(nomeA, nomeB){
@@ -5047,6 +5055,7 @@ function detectarNotificacoes(){
   const todos = activeDB().concat(cancelDB());
   const notifs = _loadNotifs();
   const idsExist = new Set(notifs.map(n=>n.id));
+  const descartados = _loadDescartados(); // IDs que o usuário já dispensou
   const novas = [];
   const hoje = new Date();
 
@@ -5056,7 +5065,7 @@ function detectarNotificacoes(){
     // 1. Projeto atrasado
     if(calcSit(p)==='atrasado' && !p.cancelado){
       const id = _notifId('atraso', p.id, p.prazo);
-      if(!idsExist.has(id)){
+      if(!idsExist.has(id) && !descartados.has(id)){
         const dias = p.prazo ? Math.round((hoje-new Date(p.prazo))/864e5) : '?';
         novas.push({
           id, tipo:'atraso', projId:p.id,
@@ -5071,7 +5080,7 @@ function detectarNotificacoes(){
       const diasPrazo = Math.round((new Date(p.prazo)-hoje)/864e5);
       if(diasPrazo >= 0 && diasPrazo <= 5){
         const id = _notifId('prazo', p.id, p.prazo);
-        if(!idsExist.has(id)){
+        if(!idsExist.has(id) && !descartados.has(id)){
           novas.push({
             id, tipo:'prazo', projId:p.id,
             texto:`<strong>${p.nome}</strong> vence ${diasPrazo===0?'hoje':`em ${diasPrazo} dia${diasPrazo!==1?'s':''}`}.`,
@@ -5084,7 +5093,7 @@ function detectarNotificacoes(){
     // 3. Homologação pendente (sem data de instalação)
     if((p.col===11 || p.homolog?.preenchido) && !p.homolog?.dtInstalacao){
       const id = _notifId('homolog', p.id, 'pend');
-      if(!idsExist.has(id)){
+      if(!idsExist.has(id) && !descartados.has(id)){
         novas.push({
           id, tipo:'homolog', projId:p.id,
           texto:`<strong>${p.nome}</strong> aguarda instalação na Homologação.`,
@@ -5096,7 +5105,7 @@ function detectarNotificacoes(){
     // 4. Medição pendente
     if(p.enviadoMedicao && !p.medicaoFeita){
       const id = _notifId('medicao', p.id, 'pend');
-      if(!idsExist.has(id)){
+      if(!idsExist.has(id) && !descartados.has(id)){
         novas.push({
           id, tipo:'medicao', projId:p.id,
           texto:`<strong>${p.nome}</strong> foi enviado para Medição e aguarda confirmação.`,
@@ -5105,20 +5114,22 @@ function detectarNotificacoes(){
       }
     }
 
-    // 5. Etapas de cliente atrasadas
-    (p.etapas||[]).forEach(e => {
-      if(e.r==='cl' && !e.done && e.prazo && new Date(e.prazo)<hoje){
-        const dias = Math.round((hoje-new Date(e.prazo))/864e5);
-        const id = _notifId('etapacl', p.id, e.lb);
-        if(!idsExist.has(id)){
-          novas.push({
-            id, tipo:'etapacl', projId:p.id,
-            texto:`Etapa "<strong>${e.lb}</strong>" de <strong>${p.nome}</strong> aguarda cliente há ${dias} dia${dias!==1?'s':''}.`,
-            icone:'🏢', dt: new Date().toISOString(), lida:false
-          });
-        }
+    // 5. Etapas de cliente atrasadas — agrupadas por projeto (1 notificação)
+    const etapasClAtrasadas = (p.etapas||[]).filter(e =>
+      e.r==='cl' && !e.done && e.prazo && new Date(e.prazo)<hoje
+    );
+    if(etapasClAtrasadas.length > 0){
+      const id = _notifId('etapacl', p.id, 'proj');
+      if(!idsExist.has(id) && !descartados.has(id)){
+        const nomes = etapasClAtrasadas.map(e=>e.lb).join(', ');
+        const maxDias = Math.max(...etapasClAtrasadas.map(e=>Math.round((hoje-new Date(e.prazo))/864e5)));
+        novas.push({
+          id, tipo:'etapacl', projId:p.id,
+          texto:`<strong>${p.nome}</strong>: ${etapasClAtrasadas.length} etapa(s) aguardando cliente (${maxDias}d) — ${nomes.length>60?nomes.slice(0,58)+'…':nomes}.`,
+          icone:'🏢', dt: new Date().toISOString(), lida:false
+        });
       }
-    });
+    }
   });
 
   if(novas.length > 0){
@@ -5202,11 +5213,11 @@ function renderNotifPanel(){
           <span>${_dtRelativa(n.dt)}</span>
           ${n.lida?'<span>· <em>lida</em></span>':''}
         </div>
-        ${n.projId?`<div style="margin-top:4px"><button onclick="abrirProjNotif(${n.projId},${i})" style="font-size:11px;color:var(--blue);background:none;border:none;cursor:pointer;padding:0;font-family:'Plus Jakarta Sans',sans-serif">Ver projeto ↗</button></div>`:''}
+        ${n.projId?`<div style="margin-top:4px"><button onclick="abrirProjNotif(${n.projId},'${n.id}')" style="font-size:11px;color:var(--blue);background:none;border:none;cursor:pointer;padding:0;font-family:'Plus Jakarta Sans',sans-serif">Ver projeto ↗</button></div>`:''}
       </div>
       <div style="display:flex;flex-direction:column;gap:4px;align-items:flex-end">
-        ${!n.lida?`<button class="notif-del" onclick="marcarLida(${i})" title="Marcar como lida">✓</button>`:''}
-        <button class="notif-del" onclick="apagarNotif(${i})" title="Apagar">✕</button>
+        ${!n.lida?`<button class="notif-del" onclick="marcarLida('${n.id}')" title="Marcar como lida">✓</button>`:''}
+        <button class="notif-del" onclick="apagarNotif('${n.id}')" title="Apagar">✕</button>
       </div>
     </div>`).join('');
 }
@@ -5237,9 +5248,10 @@ function toggleNotifPanel(){
   }
 }
 
-function marcarLida(i){
+function marcarLida(notifId){
   const notifs = _loadNotifs();
-  if(notifs[i]) notifs[i].lida = true;
+  const n = notifs.find(x => x.id === notifId);
+  if(n) n.lida = true;
   _saveNotifs(notifs);
   atualizarUINotif();
 }
@@ -5250,9 +5262,14 @@ function marcarTodasLidas(){
   atualizarUINotif();
 }
 
-function apagarNotif(i){
-  const notifs = _loadNotifs();
-  notifs.splice(i,1);
+function apagarNotif(notifId){
+  let notifs = _loadNotifs();
+  // Adicionar aos descartados para não reaparecer no refresh
+  const desc = _loadDescartados();
+  desc.add(notifId);
+  _saveDescartados(desc);
+  // Remover da lista ativa
+  notifs = notifs.filter(n => n.id !== notifId);
   _saveNotifs(notifs);
   atualizarUINotif();
 }
@@ -5263,8 +5280,8 @@ function apagarTodasNotif(){
   atualizarUINotif();
 }
 
-function abrirProjNotif(projId, notifIdx){
-  marcarLida(notifIdx);
+function abrirProjNotif(projId, notifId){
+  marcarLida(notifId);
   document.getElementById('notifPanel').style.display='none';
   openDet(projId);
 }
