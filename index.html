@@ -1616,6 +1616,18 @@ function rList(){
   populateFiltSelects();
   let data=applyFilt(activeDB(),getLFilts());
 
+  // Ordenar: prioridade → situação → data de criação
+  const _ordPrioList={urgente:0,alta:1,media:2,baixa:3};
+  const _ordSitList={atrasado:0,andamento:1,aguardando:2,concluido:3,cancelado:4};
+  data=[...data].sort((a,b)=>{
+    const pA=_ordPrioList[a.prioridade]??4, pB=_ordPrioList[b.prioridade]??4;
+    if(pA!==pB) return pA-pB;
+    const sA=_ordSitList[a.cancelado?'cancelado':calcSit(a)]??5;
+    const sB=_ordSitList[b.cancelado?'cancelado':calcSit(b)]??5;
+    if(sA!==sB) return sA-sB;
+    return new Date(a.criado||0)-new Date(b.criado||0);
+  });
+
   document.getElementById('listTbl').innerHTML=data.map(p=>{
     const{eq,cl}=delInf(p);
     const _area=p.area?'<br><small style="color:var(--mu)">'+p.area+'</small>':'';
@@ -5253,12 +5265,20 @@ function marcarLida(notifId){
   const n = notifs.find(x => x.id === notifId);
   if(n) n.lida = true;
   _saveNotifs(notifs);
+  // Salvar nos descartados para não reaparecer no refresh
+  const desc = _loadDescartados();
+  desc.add(notifId);
+  _saveDescartados(desc);
   atualizarUINotif();
 }
 
 function marcarTodasLidas(){
-  const notifs = _loadNotifs().map(n=>({...n,lida:true}));
-  _saveNotifs(notifs);
+  const notifs = _loadNotifs();
+  // Salvar todos os ids nos descartados
+  const desc = _loadDescartados();
+  notifs.forEach(n => desc.add(n.id));
+  _saveDescartados(desc);
+  _saveNotifs(notifs.map(n=>({...n,lida:true})));
   atualizarUINotif();
 }
 
@@ -5276,6 +5296,11 @@ function apagarNotif(notifId){
 
 function apagarTodasNotif(){
   if(!confirm('Apagar todas as notificações?')) return;
+  // Salvar todos os ids nos descartados antes de limpar
+  const notifs = _loadNotifs();
+  const desc = _loadDescartados();
+  notifs.forEach(n => desc.add(n.id));
+  _saveDescartados(desc);
   _saveNotifs([]);
   atualizarUINotif();
 }
