@@ -4476,11 +4476,79 @@ function setStatus(state, msg){
 // ── NORMALIZAR campos do projeto ──
 // Mapa de nomes antigos → novos (migração automática ao carregar do Firebase)
 const _NOMES_MIGRAR = {
-  'Maria Julia':       'Julia',
-  'Fabiana':           'Liderança Fabiana',
-  'Marise':            'Liderança Marise',
+  'Maria Julia':  'Julia',
+  'Fabiana':      'Liderança Fabiana',
+  'Marise':       'Liderança Marise',
 };
 function _migrarNome(nome){ return _NOMES_MIGRAR[nome] || nome; }
+
+// ── Migração silenciosa de etapas Web Rise ────────────────────────────────────
+const _RECURSOS_WEB_RISE = ['Web Rise Básico','Web Rise Intermediário','Web Rise Avançado'];
+
+const _ETAPAS_RENOMEAR = {
+  'Elaboração do PI':              'Elaboração do PICV',
+  'Revisão Textual do PI':         'Revisão textual do PICV',
+  'Entrega do PI ao cliente':      'Entrega do PICV ao cliente',
+  'Validação do PI':               'Validação PICV DI/DM Referência',
+  'Desenho/Roteirização':          'Desenho/roteirização do onepage',
+  'Produção de Recursos Gráficos': 'Produção de recursos gráficos',
+  'Entrega do Review ao cliente':  'Entrega do review ao cliente',
+  'Solicitação de Ajustes':        'Solicitação de ajustes',
+  'Implementação de Ajustes':      'Implementação de ajustes',
+  'Validação Final':               'Validação final do review',
+  'Revisão Textual':               'Revisão textual do review',
+  'Upload Arquivos':               'Upload Arquivos Bdoc',
+};
+
+// Etapas que indicam projeto já migrado
+const _ETAPAS_NOVAS = new Set([
+  'Validação LD','Validação DM Referência','Validação final do PICV',
+  'Solicitação de ajustes no PICV','Análise do material base',
+]);
+
+// Sequência final correta das etapas Web Rise
+const _SEQUENCIA_WEB_RISE = [
+  {lb:'Reunião Inicial',                     r:'eq'},
+  {lb:'Material Base Recebido',              r:'cl'},
+  {lb:'Análise do material base',            r:'eq'},
+  {lb:'Elaboração do PICV',                  r:'eq'},
+  {lb:'Validação PICV DI/DM Referência',     r:'cl'},
+  {lb:'Validação LD',                        r:'cl'},
+  {lb:'Revisão textual do PICV',             r:'eq'},
+  {lb:'Entrega do PICV ao cliente',          r:'eq'},
+  {lb:'Solicitação de ajustes no PICV',      r:'cl'},
+  {lb:'Implementação de ajustes',            r:'eq'},
+  {lb:'Validação final do PICV',             r:'cl'},
+  {lb:'Desenho/roteirização do onepage',     r:'eq'},
+  {lb:'Validação DI Referência',             r:'cl'},
+  {lb:'Produção de recursos gráficos',       r:'eq'},
+  {lb:'Validação DM Referência',             r:'cl'},
+  {lb:'Validação LD',                        r:'cl'},
+  {lb:'Entrega do review ao cliente',        r:'eq'},
+  {lb:'Solicitação de ajustes',              r:'cl'},
+  {lb:'Implementação de ajustes',            r:'eq'},
+  {lb:'Validação final do review',           r:'cl'},
+  {lb:'Revisão textual do review',           r:'eq'},
+  {lb:'Homologação',                         r:'eq'},
+  {lb:'Instalação no SIRH',                  r:'eq'},
+  {lb:'Upload Arquivos Bdoc',                r:'eq'},
+];
+
+function _migrarEtapasWebRise(etapas){
+  // Mapear dados existentes por nome antigo e novo
+  const dados = {};
+  etapas.forEach(e => {
+    dados[e.lb] = e;
+    const novo = _ETAPAS_RENOMEAR[e.lb];
+    if(novo && !dados[novo]) dados[novo] = e;
+  });
+  // Montar sequência final preservando todos os dados históricos
+  return _SEQUENCIA_WEB_RISE.map(tmpl => {
+    const existente = dados[tmpl.lb];
+    if(existente) return {...existente, lb: tmpl.lb, r: tmpl.r};
+    return {lb: tmpl.lb, r: tmpl.r, prazo: null, done: false, fim: null};
+  });
+}
 
 function normalizar(p){
   if(!p) return p;
@@ -4492,8 +4560,16 @@ function normalizar(p){
   p.enviadoMedicao = p.enviadoMedicao || null;
   p.medicaoFeita   = !!p.medicaoFeita;
   p.medicaoFeitaEm = p.medicaoFeitaEm || null;
-  // Dados de homologação (preenchidos na página Homologações)
-  p.homolog = p.homolog || {};
+  p.homolog        = p.homolog || {};
+
+  // Migração de etapas Web Rise: roda se ainda tem etapas antigas ou faltam novas
+  const ehWebRise = (p.recursos||[]).some(r => _RECURSOS_WEB_RISE.includes(r));
+  if(ehWebRise && p.etapas.length > 0){
+    const temAntiga = p.etapas.some(e => _ETAPAS_RENOMEAR[e.lb]);
+    const faltaNova = !p.etapas.some(e => _ETAPAS_NOVAS.has(e.lb));
+    if(temAntiga || faltaNova) p.etapas = _migrarEtapasWebRise(p.etapas);
+  }
+
   return p;
 }
 
