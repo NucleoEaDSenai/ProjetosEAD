@@ -4568,9 +4568,40 @@ function normalizar(p){
     const temAntiga = p.etapas.some(e => _ETAPAS_RENOMEAR[e.lb]);
     const faltaNova = !p.etapas.some(e => _ETAPAS_NOVAS.has(e.lb));
     if(temAntiga || faltaNova) p.etapas = _migrarEtapasWebRise(p.etapas);
+
+    // Preencher prazos em cascata nas etapas sem prazo (se há data de início)
+    const recursoWR = (p.recursos||[]).find(r => _RECURSOS_WEB_RISE.includes(r));
+    const temEtapasSemPrazo = p.etapas.some(e =>
+      !e.prazo && !ETAPAS_SEM_PRAZO_AUTO.has(e.lb)
+    );
+    if(recursoWR && p.inicio && CRONOGRAMAS[recursoWR] && temEtapasSemPrazo){
+      p.etapas = _cronogramaEtapasSilencioso(p.etapas, CRONOGRAMAS[recursoWR], p.inicio);
+    }
   }
 
   return p;
+}
+
+// Aplica cronograma diretamente no array de etapas — sem depender do formulário.
+// Preserva prazos já existentes; preenche apenas os que estão null.
+function _cronogramaEtapasSilencioso(etapas, cron, dataInicio){
+  let cursor = dataInicio;
+  const usados = new Set();
+  return etapas.map(e => {
+    if(!e.lb || ETAPAS_SEM_PRAZO_AUTO.has(e.lb)) return e;
+    const lbLow = e.lb.toLowerCase();
+    const idx = cron.findIndex((c, i) =>
+      !usados.has(i) && (
+        lbLow.includes(c.lb.toLowerCase()) ||
+        c.lb.toLowerCase().includes(lbLow)
+      )
+    );
+    if(idx === -1) return e;
+    usados.add(idx);
+    cursor = addDiasUteis(cursor, cron[idx].dias);
+    // Só preenche prazo se ainda não tem — preserva datas já definidas
+    return e.prazo ? {...e} : {...e, prazo: cursor};
+  });
 }
 
 // ── SALVAR UM PROJETO ESPECÍFICO no Firebase ──
