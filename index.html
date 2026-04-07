@@ -4474,11 +4474,19 @@ function setStatus(state, msg){
 }
 
 // ── NORMALIZAR campos do projeto ──
+// Mapa de nomes antigos → novos (migração automática ao carregar do Firebase)
+const _NOMES_MIGRAR = {
+  'Maria Julia':       'Julia',
+  'Fabiana':           'Liderança Fabiana',
+  'Marise':            'Liderança Marise',
+};
+function _migrarNome(nome){ return _NOMES_MIGRAR[nome] || nome; }
+
 function normalizar(p){
   if(!p) return p;
-  p.resps          = p.resps    || [];
+  p.resps          = (p.resps || []).map(_migrarNome);
   p.recursos       = p.recursos || [];
-  p.etapas         = p.etapas   || [];
+  p.etapas         = (p.etapas || []).map(e => ({...e, r: _migrarNome(e.r||'')}));
   p.col            = typeof p.col === 'string' ? parseInt(p.col) : (p.col || 0);
   p.cancelado      = !!p.cancelado;
   p.enviadoMedicao = p.enviadoMedicao || null;
