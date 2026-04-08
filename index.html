@@ -2826,7 +2826,11 @@ function fecharMotivo(salvar){
   if(salvar){
     const p=DB.find(x=>x.id===_motivoPid);
     if(p&&p.etapas[_motivoIdx]){
-      p.etapas[_motivoIdx].atrasoMotivo=document.getElementById('motivoTxt').value.trim()||null;
+      const motivoAnt = p.etapas[_motivoIdx].atrasoMotivo||'';
+      const motivoNov = document.getElementById('motivoTxt').value.trim()||null;
+      p.etapas[_motivoIdx].atrasoMotivo = motivoNov;
+      if(motivoNov && motivoNov !== motivoAnt)
+        registrarHistorico(p, 'registrou motivo', `Atraso em "${p.etapas[_motivoIdx].lb}": ${motivoNov}`);
       fbSalvarProjeto(p);
     }
   }
@@ -2871,9 +2875,12 @@ function cascatarEtapas(etapas, idx, novaData){
 
 function setEP(pid,idx,v){
   const p=DB.find(x=>x.id===pid);if(!p)return;
+  const prazoAnt = p.etapas[idx].prazo;
   // Aplicar cascata antes de atualizar o prazo
   cascatarEtapas(p.etapas, idx, v||null);
   p.etapas[idx].prazo=v||null;
+  if(prazoAnt !== p.etapas[idx].prazo)
+    registrarHistorico(p, 'alterou prazo', `"${p.etapas[idx].lb}": "${fd(prazoAnt)||'—'}" → "${fd(p.etapas[idx].prazo)||'—'}"`);
   fbSalvarProjeto(p);
   renderAll(); openDet(pid);
 }
@@ -2889,6 +2896,8 @@ function _editarPrazoEtapa(pid, idx, btn){
 }
 
 function setEPdma(pid,idx){
+  const p=DB.find(x=>x.id===pid); if(!p||!p.etapas[idx]) return;
+  const prazoAnt = p.etapas[idx].prazo; // guardar antes de alterar
   const d=document.getElementById(`ep_d_${pid}_${idx}`)?.value;
   const m=document.getElementById(`ep_m_${pid}_${idx}`)?.value;
   const a=document.getElementById(`ep_a_${pid}_${idx}`)?.value;
@@ -2913,7 +2922,15 @@ function detRespOpts(resps, valorAtual){
   return opts.join('');
 }
 
-function setER(pid,idx,v){const p=DB.find(x=>x.id===pid);if(!p)return;p.etapas[idx].r=v;fbSalvarProjeto(p);renderAll();openDet(pid);}
+function setER(pid,idx,v){
+  const p=DB.find(x=>x.id===pid);if(!p)return;
+  const rAnt = p.etapas[idx].r;
+  p.etapas[idx].r=v;
+  const fmt = r => r==='cl'?'Cliente':r==='eq'?'Equipe':r;
+  if(rAnt !== v)
+    registrarHistorico(p, 'alterou responsável', `"${p.etapas[idx].lb}": "${fmt(rAnt)}" → "${fmt(v)}"`);
+  fbSalvarProjeto(p);renderAll();openDet(pid);
+}
 
 // ── CANCELAR ──
 function abrirCanc(id){cancId=id;document.getElementById('fCancMotivo').value='';cm('ovDet');document.getElementById('ovCanc').classList.add('on');}
@@ -3623,8 +3640,50 @@ function salvar(){
   };
 
   if(editId){DB=DB.map(p=>p.id===editId?proj:p);}else{DB.push(proj);}
-  // Registrar histórico
-  registrarHistorico(proj, editId?'editou':'criou', editId?'Projeto editado':'Projeto criado');
+  // Registrar histórico detalhado
+  if(editId && projAnterior){
+    const diffs = [];
+    // Mudança de nome
+    if(projAnterior.nome !== proj.nome)
+      diffs.push(`Nome: "${projAnterior.nome}" → "${proj.nome}"`);
+    // Mudança de prioridade
+    if((projAnterior.prioridade||'') !== (proj.prioridade||''))
+      diffs.push(`Prioridade: "${projAnterior.prioridade||'sem'}" → "${proj.prioridade||'sem'}"`);
+    // Mudança de responsáveis
+    const respsAnt = (projAnterior.resps||[]).slice().sort().join(', ');
+    const respsNov = (proj.resps||[]).slice().sort().join(', ');
+    if(respsAnt !== respsNov)
+      diffs.push(`Responsáveis: ${respsNov}`);
+    // Mudança de data de início (cronograma)
+    if((projAnterior.inicio||'') !== (proj.inicio||''))
+      diffs.push(`Início: "${fd(projAnterior.inicio)||'—'}" → "${fd(proj.inicio)||'—'}"`);
+    // Mudança de prazo de entrega
+    if((projAnterior.prazo||'') !== (proj.prazo||''))
+      diffs.push(`Prazo entrega: "${fd(projAnterior.prazo)||'—'}" → "${fd(proj.prazo)||'—'}"`);
+    // Mudança de coluna (via edição, não drag)
+    if((projAnterior.col||0) !== (proj.col||0))
+      diffs.push(`Coluna: "${colLabel(projAnterior.col)}" → "${colLabel(proj.col)}"`);
+    // Mudança de recurso
+    const recAnt = (projAnterior.recursos||[]).slice().sort().join(', ');
+    const recNov = (proj.recursos||[]).slice().sort().join(', ');
+    if(recAnt !== recNov)
+      diffs.push(`Recursos: ${recNov||'—'}`);
+    // Mudanças de prazo por etapa
+    const etpAnt = projAnterior.etapas||[];
+    const etpNov = proj.etapas||[];
+    etpNov.forEach((en, i) => {
+      const ea = etpAnt.find(x => x.lb === en.lb);
+      if(!ea) return;
+      if((ea.prazo||'') !== (en.prazo||'') && !ETAPAS_SEM_PRAZO_AUTO.has(en.lb))
+        diffs.push(`Prazo "${en.lb}": "${fd(ea.prazo)||'—'}" → "${fd(en.prazo)||'—'}"`);
+      if((ea.r||'') !== (en.r||''))
+        diffs.push(`Resp. "${en.lb}": "${ea.r==='cl'?'Cliente':ea.r==='eq'?'Equipe':ea.r}" → "${en.r==='cl'?'Cliente':en.r==='eq'?'Equipe':en.r}"`);
+    });
+    const desc = diffs.length > 0 ? diffs.join(' · ') : 'Projeto editado';
+    registrarHistorico(proj, 'editou', desc);
+  } else {
+    registrarHistorico(proj, 'criou', 'Projeto criado');
+  }
   fbSalvarProjeto(proj);
   fbSalvarNxt();
   cm('ovNew');
@@ -4948,6 +5007,9 @@ function rHistorico(){
     'confirmou medição':   '#1A8A4A',
     'desmarcou medição':   '#9CA3AF',
     'homologação salva':   '#0891B2',
+    'alterou prazo':       '#F59E0B',
+    'alterou responsável': '#8B5CF6',
+    'registrou motivo':    '#EF4444',
   };
   const acaoIcone = {
     'criou':               '✨',
@@ -4962,6 +5024,9 @@ function rHistorico(){
     'confirmou medição':   '🎉',
     'desmarcou medição':   '↩️',
     'homologação salva':   '🔖',
+    'alterou prazo':       '📅',
+    'alterou responsável': '👤',
+    'registrou motivo':    '⚠️',
   };
   el.innerHTML = rows.map(ev => `
     <div class="hist-row">
