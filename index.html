@@ -4957,7 +4957,7 @@ function tagsInline(){ return ''; }
 //  HISTÓRICO DE EDIÇÕES
 // ══════════════════════════════════════════════
 function dtAgora(){
-  return new Date().toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'});
+  return new Date().toISOString(); // ISO para ordenação correta
 }
 function registrarHistorico(proj, acao, desc){
   if(!proj.historico) proj.historico = [];
@@ -4988,7 +4988,18 @@ function rHistorico(){
       rows.push({...h, projId: p.id, projNome: p.nome});
     });
   });
-  rows.sort((a,b) => b.dt.localeCompare(a.dt));
+  rows.sort((a,b) => {
+    // Normalizar para ISO para comparação correta (suporta legado pt-BR e ISO)
+    const toMs = dt => {
+      if(!dt) return 0;
+      if(dt.includes('T') || (dt.includes('-') && !dt.includes('/'))) return new Date(dt).getTime();
+      // Formato legado: DD/MM/YYYY, HH:MM
+      const [datePart, timePart=''] = dt.split(', ');
+      const [d,m,y] = datePart.split('/');
+      return new Date(`${y}-${m}-${d}T${timePart||'00:00'}:00`).getTime();
+    };
+    return toMs(b.dt) - toMs(a.dt);
+  });
 
   if(!rows.length){
     el.innerHTML = '<div style="padding:18px;color:var(--mu);font-size:13px">Nenhum registro ainda. Crie ou edite um projeto para começar.</div>';
@@ -5038,7 +5049,7 @@ function rHistorico(){
           <strong>${ev.usuario}</strong>
           <span style="color:${acaoCor[ev.acao]||'var(--mu)'};font-weight:600;margin:0 5px">${ev.acao}</span>
           <span style="color:var(--blue);cursor:pointer;text-decoration:underline" onclick="openDet(${ev.projId})">${ev.projNome}</span>
-          <span style="color:var(--mu);font-size:11px;margin-left:6px">${ev.dt}</span>
+          <span style="color:var(--mu);font-size:11px;margin-left:6px">${_fmtDt(ev.dt)}</span>
         </div>
         ${ev.desc ? `<div class="hist-detail">${ev.desc}</div>` : ''}
       </div>
@@ -5424,6 +5435,16 @@ function renderNotifPanel(){
         <button class="notif-del" onclick="apagarNotif('${n.id}')" title="Apagar">✕</button>
       </div>
     </div>`).join('');
+}
+
+function _fmtDt(dt){
+  if(!dt) return '';
+  // Suporta ISO (novo) e formato pt-BR legado (DD/MM/YYYY, HH:MM)
+  if(dt.includes('T') || dt.includes('-')){
+    const d = new Date(dt);
+    return d.toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'});
+  }
+  return dt; // já está no formato pt-BR legado
 }
 
 function _dtRelativa(iso){
