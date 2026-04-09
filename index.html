@@ -1807,6 +1807,8 @@ function rKPIs(){
   const total   = act.length;
   const conc    = act.filter(p=>calcSit(p)==='concluido').length;
   const atras   = act.filter(p=>calcSit(p)==='atrasado').length;
+  const atrasEq = act.filter(p=>atrasadoPorEquipe(p)).length;
+  const atrasCl = act.filter(p=>atrasadoPorCliente(p)).length;
   const andando = act.filter(p=>calcSit(p)==='andamento').length;
   const aguard  = act.filter(p=>calcSit(p)==='aguardando').length;
   const homolPend = todos.filter(p=>(p.col===11||p.homolog?.preenchido)&&!p.homolog?.dtInstalacao).length;
@@ -1857,9 +1859,9 @@ function rKPIs(){
   // ── 2. Situação + alertas ──
   const sitEl = document.getElementById('kpiSituacao');
   if(sitEl){
-    const sits={andamento:andando,atrasado:atras,concluido:conc,aguardando:aguard};
-    const sitCols={andamento:'#D97706',atrasado:'#E8002D',concluido:'#1A8A4A',aguardando:'#9CA3AF'};
-    const sitLbl={andamento:'Em Andamento',atrasado:'Atrasado',concluido:'Concluído',aguardando:'Aguardando'};
+    const sits={andamento:andando,atrasadoEq:atrasEq,atrasadoCl:atrasCl,concluido:conc,aguardando:aguard};
+    const sitCols={andamento:'#D97706',atrasadoEq:'#E8002D',atrasadoCl:'#F97316',concluido:'#1A8A4A',aguardando:'#9CA3AF'};
+    const sitLbl={andamento:'Em Andamento',atrasadoEq:'Atrasado — Equipe',atrasadoCl:'Atrasado — Cliente',concluido:'Concluído',aguardando:'Aguardando'};
     const r=40,c2=2*Math.PI*r;
     let off=0,arcs='';
     const tot2=total||1;
@@ -1878,7 +1880,8 @@ function rKPIs(){
            <div>${leg}</div>
          </div>`;
     // Alertas
-    if(atras>0) sitEl.innerHTML+=`<div class="kpi-alerta">⚠️ ${atras} projeto${atras>1?'s':''} em atraso</div>`;
+    if(atrasEq>0) sitEl.innerHTML+=`<div class="kpi-alerta">⚠️ ${atrasEq} projeto${atrasEq>1?'s':''} atrasado${atrasEq>1?'s':''} — Equipe</div>`;
+    if(atrasCl>0) sitEl.innerHTML+=`<div class="kpi-alerta" style="background:#FFF7ED;border-color:#FED7AA;color:#9A3412">⏳ ${atrasCl} projeto${atrasCl>1?'s':''} atrasado${atrasCl>1?'s':''} — Cliente</div>`;
     const venc7=act.filter(p=>{ if(calcSit(p)==='concluido'||!p.prazo) return false; const d=Math.round((new Date(p.prazo)-new Date())/864e5); return d>=0&&d<=7; }).length;
     if(venc7>0) sitEl.innerHTML+=`<div class="kpi-alerta" style="background:#FFF7ED;border-color:#FED7AA;color:#9A3412">⏰ ${venc7} projeto${venc7>1?'s':''} vencem em até 7 dias</div>`;
   }
@@ -2118,9 +2121,14 @@ function rAtrasos(){
 
     const etapas = p.etapas || [];
 
+    // Identificar a próxima etapa não concluída do projeto
+    const proximaIdx = etapas.findIndex(e => !e.done);
+
     etapas.forEach((e, i) => {
       // Etapas sem prazo E sem fim real não entram no relatório
       if(!e.prazo && !e.fim) return;
+      // Para etapas em aberto: mostrar apenas a próxima etapa não concluída
+      if(!e.done && i !== proximaIdx) return;
 
       // Data em que a etapa anterior foi concluída (referência de início real)
       let antFim = null;
@@ -3743,7 +3751,8 @@ function isoToBR(iso){ if(!iso) return '—'; const[y,m,d]=iso.split('-'); retur
 function sitLabel(p){
   if(p.cancelado) return 'Cancelado';
   const s=calcSit(p);
-  return {andamento:'Em Andamento',atrasado:'Atrasado',concluido:'Concluído',aguardando:'Aguardando'}[s]||s;
+  if(s==='atrasado') return atrasadoPorCliente(p) ? 'Atrasado — Cliente' : 'Atrasado — Equipe';
+  return {andamento:'Em Andamento',concluido:'Concluído',aguardando:'Aguardando'}[s]||s;
 }
 
 // ── XLSX ──────────────────────────────────────────────────────────────────────
@@ -3795,13 +3804,16 @@ function exportXLSX(){
   const hdrA = ['Projeto','Situação Projeto','Etapa','Responsável','Prazo Etapa','Dias de Atraso','Status Etapa','Motivo'];
   const rowsA = [];
   todos.forEach(p=>{
-    (p.etapas||[]).forEach(e=>{
+    const proximaIdxX = (p.etapas||[]).findIndex(e => !e.done);
+    (p.etapas||[]).forEach((e, ei)=>{
       if(!e.prazo && !e.fim) return;
       let diasAt=0, statusEt='';
       if(e.done && e.fim && e.prazo && e.fim > e.prazo){
         diasAt=Math.round((new Date(e.fim)-new Date(e.prazo))/864e5);
         statusEt='Concluída com atraso';
       } else if(!e.done && e.prazo && new Date(e.prazo)<new Date()){
+        // Apenas a próxima etapa não concluída
+        if(ei !== proximaIdxX) return;
         diasAt=Math.round((new Date()-new Date(e.prazo))/864e5);
         statusEt='Em aberto — atrasada';
       } else return;
@@ -3886,6 +3898,7 @@ function exportPDFFicha(id){
   const sit = sitLabel(p);
   const sitColors = {
     'Em Andamento':[217,119,6], 'Atrasado':[220,38,38],
+    'Atrasado — Equipe':[220,38,38], 'Atrasado — Cliente':[249,115,22],
     'Concluído':[26,138,74], 'Aguardando':[107,114,128], 'Cancelado':[107,114,128]
   };
   const [sr,sg,sb] = sitColors[sit]||[100,100,100];
@@ -3937,7 +3950,7 @@ function exportPDFFicha(id){
   const etRows = (p.etapas||[]).map((e,i)=>{
     let diasAt='';
     if(e.done&&e.fim&&e.prazo&&e.fim>e.prazo) diasAt=Math.round((new Date(e.fim)-new Date(e.prazo))/864e5)+'d';
-    else if(!e.done&&e.prazo&&new Date(e.prazo)<new Date()) diasAt=Math.round((new Date()-new Date(e.prazo))/864e5)+'d ⚠';
+    else if(!e.done&&e.prazo&&new Date(e.prazo)<new Date()) diasAt=Math.round((new Date()-new Date(e.prazo))/864e5)+'d';
     return [i+1, e.lb, e.r==='cl'?'Cliente':(e.r==='eq'?'Equipe':e.r), isoToBR(e.prazo), isoToBR(e.fim), e.done?'✓':'', diasAt, e.atrasoMotivo||''];
   });
   doc.autoTable({
@@ -4057,13 +4070,15 @@ function exportPDFLista(){
   const hdrA=[['Projeto','Situação Proj.','Etapa','Resp.','Prazo Etapa','Dias Atraso','Status','Motivo']];
   const rowsA=[];
   todos.forEach(p=>{
-    (p.etapas||[]).forEach(e=>{
+    const proximaIdxPdf = (p.etapas||[]).findIndex(e => !e.done);
+    (p.etapas||[]).forEach((e,ei)=>{
       if(!e.prazo&&!e.fim) return;
       let diasAt=0,statusEt='';
       if(e.done&&e.fim&&e.prazo&&e.fim>e.prazo){
         diasAt=Math.round((new Date(e.fim)-new Date(e.prazo))/864e5);
         statusEt='Concluída c/ atraso';
       } else if(!e.done&&e.prazo&&new Date(e.prazo)<new Date()){
+        if(ei !== proximaIdxPdf) return;
         diasAt=Math.round((new Date()-new Date(e.prazo))/864e5);
         statusEt='Em aberto — atrasada';
       } else return;
