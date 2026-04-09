@@ -4574,9 +4574,10 @@ function setStatus(state, msg){
 // ── NORMALIZAR campos do projeto ──
 // Mapa de nomes antigos → novos (migração automática ao carregar do Firebase)
 const _NOMES_MIGRAR = {
-  'Maria Julia':  'Julia',
-  'Fabiana':      'Liderança Fabiana',
-  'Marise':       'Liderança Marise',
+  'Maria Julia':   'Julia',
+  'Fabiana':       'Liderança Fabiana',
+  'Marise':        'Liderança Marise',
+  'Maria Emilia':  'Liderança Maria Emilia',
 };
 function _migrarNome(nome){ return _NOMES_MIGRAR[nome] || nome; }
 
