@@ -5096,10 +5096,11 @@ function rCarga(){
   const membros = {};
   ativos.forEach(p => {
     (p.resps||[]).forEach(r => {
-      if(!membros[r]) membros[r] = {projetos:[], atrasados:0, cl:0};
+      if(!membros[r]) membros[r] = {projetos:[], atrasados:0, cl:0, andamento:0};
       membros[r].projetos.push(p);
       if(atrasadoPorEquipe(p)) membros[r].atrasados++;
-      if(atrasadoPorCliente(p)) membros[r].cl++;
+      else if(atrasadoPorCliente(p)) membros[r].cl++;
+      else membros[r].andamento++;
     });
   });
   if(!Object.keys(membros).length){
@@ -5119,6 +5120,7 @@ function rCarga(){
           <div class="carga-info">
             <div class="carga-name">${nome}</div>
             <div class="carga-meta">
+              ${d.andamento > 0 ? `<span style="font-size:11px;color:var(--blue)">🔄 ${d.andamento} em andamento</span>` : ''}
               ${d.atrasados > 0 ? `<span style="font-size:11px;color:var(--red);font-weight:600">⚠️ ${d.atrasados} atraso(s) equipe</span>` : ''}
               ${d.cl > 0 ? `<span style="font-size:11px;color:var(--org)">⏳ ${d.cl} atraso(s) cliente</span>` : ''}
             </div>
