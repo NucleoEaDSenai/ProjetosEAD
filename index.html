@@ -2454,7 +2454,7 @@ function openDet(id){
       ${cl>0?`<span class="db dcl" style="font-size:12px;padding:4px 11px">⏳ Aguard. Cliente: ${cl} dias</span>`:''}
       ${!eq&&!cl?`<span class="db dok" style="font-size:12px;padding:4px 11px">✅ Em dia</span>`:''}
     </div>
-    ${p.desc?`<div style="background:var(--s2);border-radius:8px;padding:11px;font-size:12.5px;color:var(--mu);margin-bottom:14px;white-space:pre-wrap;word-break:break-word">${p.desc.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}</div>`:''}
+    ${p.desc?`<div style="background:var(--s2);border-radius:8px;padding:11px;font-size:12.5px;color:var(--mu);margin-bottom:14px;white-space:pre-wrap;word-break:break-word">${linkify(p.desc)}</div>`:''}
     <hr class="dv">
     <div style="font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:13px;margin-bottom:9px">
       Etapas de Produção
@@ -2476,7 +2476,7 @@ function openDet(id){
                 <span class="coment-autor">${cm.autor}</span>
                 <span class="coment-dt">${cm.dt}</span>
               </div>
-              <div class="coment-txt">${cm.txt.replace(/\n/g,'<br>')}</div>
+              <div class="coment-txt">${linkify(cm.txt).replace(/\n/g,'<br>')}</div>
             </div>`).join('')
         }
       </div>
@@ -2500,6 +2500,16 @@ function openDet(id){
 }
 
 function dl2(l,v){return`<div class="dl"><div class="dll">${l}</div><div class="dlv">${v}</div></div>`}
+
+// Converte URLs em links clicáveis (abre em nova aba)
+function linkify(txt){
+  if(!txt) return '';
+  const escaped = txt.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  return escaped.replace(
+    /(https?:\/\/[^\s<>"]+)/g,
+    '<a href="$1" target="_blank" rel="noopener noreferrer" style="color:var(--blue);text-decoration:underline;word-break:break-all">$1</a>'
+  );
+}
 
 function adicionarComent(pid){
   const ta=document.getElementById('comentTa');
@@ -3787,7 +3797,7 @@ function exportXLSX(){
   const wb = XLSX.utils.book_new();
 
   // ── Aba 1: Projetos (dados básicos) ──
-  const hdrP = ['ID','Nome','Recursos','Tags','Situação','Coluna','Responsáveis','Prioridade','RP','Academia','Criado','Início','Prazo','Término','% Concluído','Atraso Eq (d)','Aguard. Cliente (d)','Observação Prazo'];
+  const hdrP = ['ID','Nome','Recursos','Tags','Situação','Coluna','Responsáveis','Prioridade','RP','Academia','Criado','Início','Prazo','Término','% Concluído','Atraso Eq (d)','Atraso Cliente (d)','Observação Prazo'];
   const rowsP = todos.map(p=>{
     const{eq,cl}=delInf(p);
     return [p.id, p.nome, (p.recursos||[]).join('; '), (p.tags||[]).join('; '),
@@ -4053,7 +4063,8 @@ function exportPDFLista(){
     didParseCell(data){
       if(data.section==='body'&&data.column.index===4){
         const cores={
-          'Atrasado':[220,38,38],'Em Andamento':[217,119,6],
+          'Atrasado':[220,38,38],'Atrasado — Equipe':[220,38,38],'Atrasado — Cliente':[249,115,22],
+          'Em Andamento':[37,99,235],
           'Concluído':[26,138,74],'Aguardando':[107,114,128],'Cancelado':[107,114,128]
         };
         const c=cores[data.cell.raw];
@@ -4074,11 +4085,15 @@ function exportPDFLista(){
   const total=act.length||1;
   const conc=act.filter(p=>calcSit(p)==='concluido').length;
   const atras=act.filter(p=>calcSit(p)==='atrasado').length;
+  const atrasEqPdf=act.filter(p=>atrasadoPorEquipe(p)).length;
+  const atrasCLPdf=act.filter(p=>atrasadoPorCliente(p)).length;
   const avg=Math.round(act.reduce((a,p)=>a+p.pct,0)/total);
   const kpiData=[
     ['Total de Projetos Ativos',String(act.length)],
     ['Concluídos',conc+' ('+Math.round(conc/total*100)+'%)'],
-    ['Atrasados',atras+' ('+Math.round(atras/total*100)+'%)'],
+    ['Atrasados — Equipe',atrasEqPdf+' ('+Math.round(atrasEqPdf/total*100)+'%)'],
+    ['Atrasados — Cliente',atrasCLPdf+' ('+Math.round(atrasCLPdf/total*100)+'%)'],
+    ['Total Atrasados',atras+' ('+Math.round(atras/total*100)+'%)'],
     ['Progresso Médio',avg+'%'],
   ];
   doc.autoTable({
@@ -4218,10 +4233,10 @@ function exportPDFLista(){
 
 // ── CSV (mantido como fallback interno) ──
 function exportCSV(){
-  const hdr='ID,Nome,Recursos,Tags,Situação,Coluna,Responsáveis,Criado,Início,Prazo,Término,% Concluído,Atraso Eq(d),Aguard.Cl(d)';
+  const hdr='ID,Nome,Recursos,Tags,Situação,Coluna,Responsáveis,RP,Academia,Prioridade,Criado,Início,Prazo,Término,% Concluído,Atraso Eq(d),Atraso Cl(d)';
   const rows=activeDB().concat(cancelDB()).map(p=>{
     const{eq,cl}=delInf(p);
-    return[p.id,`"${p.nome}"`,`"${(p.recursos||[]).join('; ')}"`,`"${(p.tags||[]).join('; ')}"`,calcSit(p),colLabel(p.col),`"${(p.resps||[]).join('; ')}"`,p.criado,p.inicio||'',p.prazo||'',p.termino||'',p.pct,eq,cl].join(',');
+    return[p.id,`"${p.nome}"`,`"${(p.recursos||[]).join('; ')}"`,`"${(p.tags||[]).join('; ')}"`,sitLabel(p),colLabel(p.col),`"${(p.resps||[]).join('; ')}"`,p.rp||'',p.academia||'',p.prioridade||'',p.criado,p.inicio||'',p.prazo||'',p.termino||'',p.pct,eq,cl].join(',');
   });
   const a=document.createElement('a');
   a.href='data:text/csv;charset=utf-8,'+encodeURIComponent('\uFEFF'+[hdr,...rows].join('\n'));
