@@ -1298,14 +1298,15 @@ function sitBdg(p){
 }
 
 function delInf(p){
-  let eq=0,cl=0;
-  (p.etapas||[]).forEach(e=>{
-    if(!e.done&&e.prazo&&new Date(e.prazo)<new Date()){
-      const d=dd(e.prazo,td());
-      if(e.r!=='cl')eq+=d; else cl+=d;
-    }
-  });
-  if(!eq&&calcSit(p)==='atrasado') eq=dd(p.prazo,td());
+  // Usar apenas a próxima etapa não concluída para calcular o atraso
+  const proxima = (p.etapas||[]).find(e => !e.done);
+  let eq=0, cl=0;
+  if(proxima && proxima.prazo && new Date(proxima.prazo)<new Date()){
+    const d = dd(proxima.prazo, td());
+    if(proxima.r === 'cl') cl = d; else eq = d;
+  }
+  // Fallback: sem etapas mapeadas mas projeto atrasado — usa prazo do projeto
+  if(!eq && !cl && calcSit(p)==='atrasado') eq = dd(p.prazo, td());
   return{eq,cl};
 }
 
