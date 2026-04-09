@@ -1329,12 +1329,12 @@ function rDash(){
   const el=document.getElementById('statsGrid');
   if(!el) return;
   el.innerHTML=`
-    <div class="sc cb"><div class="sc-l">Total Ativos</div><div class="sc-v">${total}</div><div class="sc-s">projetos</div><div class="sc-i">🗂️</div></div>
-    <div class="sc cr"><div class="sc-l">Em Andamento</div><div class="sc-v">${and}</div><div class="sc-s">em curso</div><div class="sc-i">🔄</div></div>
-    <div class="sc cg"><div class="sc-l">Concluídos</div><div class="sc-v">${conc}</div><div class="sc-s">finalizados</div><div class="sc-i">✅</div></div>
-    <div class="sc cy"><div class="sc-l">Atrasados</div><div class="sc-v">${atq}</div><div class="sc-s">requerem atenção</div><div class="sc-i">⚠️</div></div>
-    <div class="sc cp"><div class="sc-l">Aguard. Cliente</div><div class="sc-v">${waitCl}</div><div class="sc-s">validação pendente</div><div class="sc-i">⏳</div></div>
-    <div class="sc cgr"><div class="sc-l">Cancelados</div><div class="sc-v">${canc}</div><div class="sc-s"><a href="#" onclick="nav('cancelados');return false" style="color:var(--mu)">ver relatório</a></div><div class="sc-i">🚫</div></div>
+    <div class="sc cb"><div class="sc-l">Total de Cards</div><div class="sc-v">${total}</div><div class="sc-s">total de projetos</div><div class="sc-i">🗂️</div></div>
+    <div class="sc cr"><div class="sc-l">Projetos Em Andamento</div><div class="sc-v">${and}</div><div class="sc-s">em execução</div><div class="sc-i">🔄</div></div>
+    <div class="sc cg"><div class="sc-l">Concluídos</div><div class="sc-v">${conc}</div><div class="sc-s">projetos entregues</div><div class="sc-i">✅</div></div>
+    <div class="sc cy"><div class="sc-l">Projetos Atrasados</div><div class="sc-v">${atq}</div><div class="sc-s">verificar atrasos</div><div class="sc-i">⚠️</div></div>
+    <div class="sc cp"><div class="sc-l">Aguardando Cliente</div><div class="sc-v">${waitCl}</div><div class="sc-s">validação pendente</div><div class="sc-i">⏳</div></div>
+    <div class="sc cgr"><div class="sc-l">Projetos Cancelados</div><div class="sc-v">${canc}</div><div class="sc-s"><a href="#" onclick="nav('cancelados');return false" style="color:var(--mu)">ver relatório</a></div><div class="sc-i">🚫</div></div>
   `;
 }
 
