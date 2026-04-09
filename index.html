@@ -1860,7 +1860,7 @@ function rKPIs(){
   const sitEl = document.getElementById('kpiSituacao');
   if(sitEl){
     const sits={andamento:andando,atrasadoEq:atrasEq,atrasadoCl:atrasCl,concluido:conc,aguardando:aguard};
-    const sitCols={andamento:'#D97706',atrasadoEq:'#E8002D',atrasadoCl:'#F97316',concluido:'#1A8A4A',aguardando:'#9CA3AF'};
+    const sitCols={andamento:'#2563EB',atrasadoEq:'#E8002D',atrasadoCl:'#F59E0B',concluido:'#16A34A',aguardando:'#94A3B8'};
     const sitLbl={andamento:'Em Andamento',atrasadoEq:'Atrasado — Equipe',atrasadoCl:'Atrasado — Cliente',concluido:'Concluído',aguardando:'Aguardando'};
     const r=40,c2=2*Math.PI*r;
     let off=0,arcs='';
@@ -1988,19 +1988,44 @@ function rKPIs(){
         </div>`).join('');
   }
 
-  // ── 7. Tempo médio por etapa ──
-  const etapaMedArr=ETPS_DEF.map((e,i)=>{
-    const amostras=[];
-    todos.forEach(p=>{
-      const et=(p.etapas||[])[i];
-      if(!et||!et.done||!et.fim) return;
-      const ref=et.prazo||et.inicio;
-      const dias=ref?Math.max(1,Math.round((new Date(et.fim)-new Date(ref))/(864e5))):1;
+  // ── 7. Tempo médio por etapa — busca por nome (suporta etapas novas e antigas) ──
+  // Lista de etapas para medir (nome de exibição, nomes de busca, responsável)
+  const ETAPAS_MEDIR = [
+    {n:'Reunião Inicial',           busca:['Reunião Inicial'],                                   r:'eq'},
+    {n:'Mat. Base Recebido',        busca:['Material Base Recebido'],                             r:'cl'},
+    {n:'Análise Mat. Base',         busca:['Análise do material base'],                           r:'eq'},
+    {n:'Elaboração PICV/PI',        busca:['Elaboração do PICV','Elaboração do PI'],               r:'eq'},
+    {n:'Valid. PICV DI/DM',         busca:['Validação PICV DI/DM Referência','Validação do PI'],  r:'cl'},
+    {n:'Validação LD',              busca:['Validação LD'],                                       r:'cl'},
+    {n:'Rev. Textual PICV/PI',      busca:['Revisão textual do PICV','Revisão Textual do PI'],    r:'eq'},
+    {n:'Entrega PICV/PI cliente',   busca:['Entrega do PICV ao cliente','Entrega do PI ao cliente'],r:'eq'},
+    {n:'Solic. Ajustes PICV',       busca:['Solicitação de ajustes no PICV'],                     r:'cl'},
+    {n:'Impl. Ajustes (PI)',        busca:['Implementação de ajustes','Implementação de Ajustes'], r:'eq'},
+    {n:'Valid. Final PICV',         busca:['Validação final do PICV'],                            r:'cl'},
+    {n:'Desenho/Rot. Onepage',      busca:['Desenho/roteirização do onepage','Desenho/Roteirização'],r:'eq'},
+    {n:'Valid. DI Referência',      busca:['Validação DI Referência'],                            r:'cl'},
+    {n:'Prod. Recursos Gráficos',   busca:['Produção de recursos gráficos','Produção de Recursos Gráficos'],r:'eq'},
+    {n:'Valid. DM Referência',      busca:['Validação DM Referência'],                            r:'cl'},
+    {n:'Entrega Review cliente',    busca:['Entrega do review ao cliente','Entrega do Review ao cliente'],r:'eq'},
+    {n:'Solic. Ajustes Review',     busca:['Solicitação de ajustes','Solicitação de Ajustes'],     r:'cl'},
+    {n:'Impl. Ajustes (Review)',    busca:['Implementação de ajustes','Implementação de Ajustes'], r:'eq'},
+    {n:'Valid. Final Review',       busca:['Validação final do review','Validação Final'],         r:'cl'},
+    {n:'Rev. Textual Review',       busca:['Revisão textual do review','Revisão Textual'],         r:'eq'},
+    {n:'Homologação',               busca:['Homologação'],                                        r:'eq'},
+    {n:'Instalação SIRH',           busca:['Instalação no SIRH'],                                 r:'eq'},
+    {n:'Upload Arquivos Bdoc',      busca:['Upload Arquivos Bdoc','Upload Arquivos'],              r:'eq'},
+  ];
+  const etapaMedArr = ETAPAS_MEDIR.map(def => {
+    const amostras = [];
+    todos.forEach(p => {
+      const et = (p.etapas||[]).find(e => def.busca.includes(e.lb));
+      if(!et || !et.done || !et.fim) return;
+      const ref = et.prazo || et.inicio;
+      const dias = ref ? Math.max(1, Math.round((new Date(et.fim)-new Date(ref))/864e5)) : 1;
       amostras.push(dias);
     });
-    const media=amostras.length?Math.round(amostras.reduce((a,b)=>a+b,0)/amostras.length):null;
-    const nomeAbrev=['Reunião Inicial','Elaboração PI','Revisão PI','Rev. Textual PI','Entrega PI','Validação PI','Desenho/Rot.','Valid. DI Ref.','Prod. Gráficos','Entrega Review','Solic. Ajustes','Impl. Ajustes','Validação Final','Rev. Textual','Homologação','Instalação SIRH'][i]||e.lb;
-    return{n:nomeAbrev,d:media,r:e.r,amostras:amostras.length};
+    const media = amostras.length ? Math.round(amostras.reduce((a,b)=>a+b,0)/amostras.length) : null;
+    return {n:def.n, d:media, r:def.r, amostras:amostras.length};
   });
   const comDados=etapaMedArr.filter(e=>e.d!==null);
   const mx3=comDados.length?Math.max(...comDados.map(e=>e.d),1):1;
@@ -3967,7 +3992,7 @@ function exportPDFFicha(id){
     didParseCell(data){
       if(data.section==='body'&&data.column.index===5&&data.cell.raw==='✓')
         data.cell.styles.textColor=[26,138,74];
-      if(data.section==='body'&&data.column.index===6&&String(data.cell.raw).includes('⚠'))
+      if(data.section==='body'&&data.column.index===6&&data.cell.raw&&String(data.cell.raw).replace('d','').length>0&&parseInt(String(data.cell.raw))>0)
         data.cell.styles.textColor=[220,38,38];
     }
   });
