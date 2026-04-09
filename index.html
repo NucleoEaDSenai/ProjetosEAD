@@ -1324,14 +1324,14 @@ function rDash(){
   const and=act.filter(p=>calcSit(p)==='andamento').length;
   const atq=act.filter(p=>calcSit(p)==='atrasado').length;
   const canc=cancelDB().length;
-  const waitCl=act.filter(p=>(p.etapas||[]).some(e=>e.r==='cl'&&!e.done&&e.prazo&&new Date(e.prazo)<new Date())).length;
+  const waitCl=act.filter(p=>(p.etapas||[]).some(e=>e.r==='cl'&&!e.done)).length;
   const total=act.length;
   const el=document.getElementById('statsGrid');
   if(!el) return;
   el.innerHTML=`
-    <div class="sc cb"><div class="sc-l">Total de Cards</div><div class="sc-v">${total}</div><div class="sc-s">total de projetos</div><div class="sc-i">🗂️</div></div>
+    <div class="sc cb"><div class="sc-l">Total de Cards Criados</div><div class="sc-v">${total}</div><div class="sc-s">total de projetos</div><div class="sc-i">🗂️</div></div>
     <div class="sc cr"><div class="sc-l">Projetos Em Andamento</div><div class="sc-v">${and}</div><div class="sc-s">em execução</div><div class="sc-i">🔄</div></div>
-    <div class="sc cg"><div class="sc-l">Concluídos</div><div class="sc-v">${conc}</div><div class="sc-s">projetos entregues</div><div class="sc-i">✅</div></div>
+    <div class="sc cg"><div class="sc-l">Projetos Concluídos</div><div class="sc-v">${conc}</div><div class="sc-s">projetos entregues</div><div class="sc-i">✅</div></div>
     <div class="sc cy"><div class="sc-l">Projetos Atrasados</div><div class="sc-v">${atq}</div><div class="sc-s">verificar atrasos</div><div class="sc-i">⚠️</div></div>
     <div class="sc cp"><div class="sc-l">Aguardando Cliente</div><div class="sc-v">${waitCl}</div><div class="sc-s">validação pendente</div><div class="sc-i">⏳</div></div>
     <div class="sc cgr"><div class="sc-l">Projetos Cancelados</div><div class="sc-v">${canc}</div><div class="sc-s"><a href="#" onclick="nav('cancelados');return false" style="color:var(--mu)">ver relatório</a></div><div class="sc-i">🚫</div></div>
@@ -5077,7 +5077,7 @@ function rCarga(){
       if(!membros[r]) membros[r] = {projetos:[], atrasados:0, cl:0};
       membros[r].projetos.push(p);
       if(calcSit(p) === 'atrasado') membros[r].atrasados++;
-      if((p.etapas||[]).some(e => e.r==='cl' && !e.done && e.prazo && new Date(e.prazo)<new Date())) membros[r].cl++;
+      if((p.etapas||[]).some(e => e.r==='cl' && !e.done)) membros[r].cl++;
     });
   });
   if(!Object.keys(membros).length){
