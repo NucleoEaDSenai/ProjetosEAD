@@ -1254,6 +1254,27 @@ function colLabel(k){return COLUNAS[k]?.l||'—'}
 function colDot(k){return COLUNAS[k]?.dot||'#ccc'}
 
 // Situação automática baseada em datas e etapas
+// Retorna o responsável da próxima etapa não concluída do projeto
+// 'cl' = cliente, 'eq' = equipe, nome específico = pessoa
+// null = todas concluídas ou sem etapas
+function proximaEtapaResp(p){
+  const etapa = (p.etapas||[]).find(e => !e.done);
+  if(!etapa) return null;
+  return etapa.r || 'eq';
+}
+
+// Retorna true se o projeto está atrasado e a etapa atual é do cliente
+function atrasadoPorCliente(p){
+  if(calcSit(p) !== 'atrasado') return false;
+  return proximaEtapaResp(p) === 'cl';
+}
+
+// Retorna true se o projeto está atrasado e a etapa atual é da equipe
+function atrasadoPorEquipe(p){
+  if(calcSit(p) !== 'atrasado') return false;
+  return proximaEtapaResp(p) !== 'cl';
+}
+
 function calcSit(p){
   if(p.cancelado) return 'cancelado';
   if(p.pct===100 || p.col===13 || p.col===14) return 'concluido';
@@ -1322,9 +1343,10 @@ function rDash(){
   const act=activeDB();
   const conc=act.filter(p=>calcSit(p)==='concluido').length;
   const and=act.filter(p=>calcSit(p)==='andamento').length;
-  const atq=act.filter(p=>calcSit(p)==='atrasado').length;
+  const atq=act.filter(p=>atrasadoPorEquipe(p)).length;
+  const atqCl=act.filter(p=>atrasadoPorCliente(p)).length;
   const canc=cancelDB().length;
-  const waitCl=act.filter(p=>(p.etapas||[]).some(e=>e.r==='cl'&&!e.done)).length;
+  const waitCl=atqCl;
   const total=act.length;
   const el=document.getElementById('statsGrid');
   if(!el) return;
@@ -1332,8 +1354,8 @@ function rDash(){
     <div class="sc cb"><div class="sc-l">Total de Cards Criados</div><div class="sc-v">${total}</div><div class="sc-s">total de projetos</div><div class="sc-i">🗂️</div></div>
     <div class="sc cr"><div class="sc-l">Projetos Em Andamento</div><div class="sc-v">${and}</div><div class="sc-s">em execução</div><div class="sc-i">🔄</div></div>
     <div class="sc cg"><div class="sc-l">Projetos Concluídos</div><div class="sc-v">${conc}</div><div class="sc-s">projetos entregues</div><div class="sc-i">✅</div></div>
-    <div class="sc cy"><div class="sc-l">Projetos Atrasados</div><div class="sc-v">${atq}</div><div class="sc-s">verificar atrasos</div><div class="sc-i">⚠️</div></div>
-    <div class="sc cp"><div class="sc-l">Aguardando Cliente</div><div class="sc-v">${waitCl}</div><div class="sc-s">validação pendente</div><div class="sc-i">⏳</div></div>
+    <div class="sc cy"><div class="sc-l">Atrasados — Equipe</div><div class="sc-v">${atq}</div><div class="sc-s">próxima etapa da equipe</div><div class="sc-i">⚠️</div></div>
+    <div class="sc cp"><div class="sc-l">Atrasados — Cliente</div><div class="sc-v">${waitCl}</div><div class="sc-s">próxima etapa do cliente</div><div class="sc-i">⏳</div></div>
     <div class="sc cgr"><div class="sc-l">Projetos Cancelados</div><div class="sc-v">${canc}</div><div class="sc-s"><a href="#" onclick="nav('cancelados');return false" style="color:var(--mu)">ver relatório</a></div><div class="sc-i">🚫</div></div>
   `;
 }
@@ -5076,8 +5098,8 @@ function rCarga(){
     (p.resps||[]).forEach(r => {
       if(!membros[r]) membros[r] = {projetos:[], atrasados:0, cl:0};
       membros[r].projetos.push(p);
-      if(calcSit(p) === 'atrasado') membros[r].atrasados++;
-      if((p.etapas||[]).some(e => e.r==='cl' && !e.done)) membros[r].cl++;
+      if(atrasadoPorEquipe(p)) membros[r].atrasados++;
+      if(atrasadoPorCliente(p)) membros[r].cl++;
     });
   });
   if(!Object.keys(membros).length){
@@ -5097,8 +5119,8 @@ function rCarga(){
           <div class="carga-info">
             <div class="carga-name">${nome}</div>
             <div class="carga-meta">
-              ${d.atrasados > 0 ? `<span style="font-size:11px;color:var(--red);font-weight:600">⚠️ ${d.atrasados} atrasado(s)</span>` : ''}
-              ${d.cl > 0 ? `<span style="font-size:11px;color:var(--org)">⏳ ${d.cl} ag. cliente</span>` : ''}
+              ${d.atrasados > 0 ? `<span style="font-size:11px;color:var(--red);font-weight:600">⚠️ ${d.atrasados} atraso(s) equipe</span>` : ''}
+              ${d.cl > 0 ? `<span style="font-size:11px;color:var(--org)">⏳ ${d.cl} atraso(s) cliente</span>` : ''}
             </div>
           </div>
           <div class="carga-bar-bg"><div class="carga-bar-fill" style="width:${pct}%;background:${corStatus}"></div></div>
