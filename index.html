@@ -2090,6 +2090,7 @@ function rKPIs(){
     todos.forEach(p=>{
       (p.etapas||[]).forEach(e=>{
         if(!e.prazo || !e.done) return; // só etapas concluídas com prazo
+        if(ETAPAS_SEM_PRAZO_AUTO.has(e.lb)) return; // excluir etapas sem prazo automático
         if(!etMap[e.lb]) etMap[e.lb] = {noPrazo:0, comAtraso:0};
         if(e.fim && new Date(e.fim) <= new Date(e.prazo)) etMap[e.lb].noPrazo++;
         else etMap[e.lb].comAtraso++;
@@ -2152,6 +2153,8 @@ function rAtrasos(){
     etapas.forEach((e, i) => {
       // Etapas sem prazo E sem fim real não entram no relatório
       if(!e.prazo && !e.fim) return;
+      // Etapas sem prazo automático nunca entram no relatório de atrasos
+      if(ETAPAS_SEM_PRAZO_AUTO.has(e.lb)) return;
       // Para etapas em aberto: mostrar apenas a próxima etapa não concluída
       if(!e.done && i !== proximaIdx) return;
 
@@ -2357,6 +2360,8 @@ function rCancelados(){
 // ── DETAIL ──
 function sitEtapa(e){
   if(e.done) return`<span class="sit sit-done">✓ Concluída</span>`;
+  // Etapas sem prazo automático: nunca mostrar atraso
+  if(ETAPAS_SEM_PRAZO_AUTO.has(e.lb)) return`<span class="sit sit-pend">Pendente</span>`;
   if(!e.prazo) return`<span class="sit sit-pend">Pendente</span>`;
   const ov=new Date(e.prazo)<new Date();
   if(e.r==='cl'){
@@ -2375,10 +2380,10 @@ function openDet(id){
   const{eq,cl}=delInf(p);
   const eRows=(p.etapas||[]).map((e,i)=>{
     const isCl=e.r==='cl';
-    const rowCls=e.done?'done-row':(!e.done&&e.prazo&&new Date(e.prazo)<new Date()?'ov-row':'');
+    const rowCls=e.done?'done-row':(!e.done&&e.prazo&&new Date(e.prazo)<new Date()&&!ETAPAS_SEM_PRAZO_AUTO.has(e.lb)?'ov-row':'');
     return`<tr class="${rowCls}">
       <td><div style="display:flex;align-items:center;gap:6px">
-        <div class="chk ${e.done?'done':isCl&&!e.done?'cwait':''}" onclick="toggleE(${id},${i})">${e.done?'✓':isCl?'⏳':''}</div>
+        <div class="chk ${e.done?'done':isCl&&!e.done&&!ETAPAS_SEM_PRAZO_AUTO.has(e.lb)?'cwait':''}" onclick="toggleE(${id},${i})">${e.done?'✓':isCl&&!ETAPAS_SEM_PRAZO_AUTO.has(e.lb)?'⏳':''}</div>
         <span>${e.lb}</span>
       </div></td>
       <td>
@@ -2413,13 +2418,13 @@ function openDet(id){
       <td style="white-space:nowrap;color:var(--green)">${fd(e.fim)||'—'}</td>
       <td>${sitEtapa(e)}</td>
       <td style="min-width:160px;font-size:11.5px;vertical-align:middle">
-        ${e.done && e.r!=='cl' && e.prazo && e.fim && new Date(e.prazo)<new Date(e.fim)
+        ${e.done && e.r!=='cl' && e.prazo && e.fim && new Date(e.prazo)<new Date(e.fim) && !ETAPAS_SEM_PRAZO_AUTO.has(e.lb)
           ? e.atrasoMotivo
             ? `<span style="color:var(--red)" title="${e.atrasoMotivo}">⚠️ ${e.atrasoMotivo.length>38?e.atrasoMotivo.slice(0,36)+'…':e.atrasoMotivo}</span>`
             : '<span style="color:var(--mu);font-style:italic">sem motivo registrado</span>'
           : ''
         }
-        ${e.r==='cl' && !e.done && e.prazo
+        ${e.r==='cl' && !e.done && e.prazo && !ETAPAS_SEM_PRAZO_AUTO.has(e.lb)
           ? `<span class="cl-dias">⏳ ${Math.max(0,Math.round((new Date()-new Date(e.prazo))/(864e5)))} dias em espera</span>`
           : e.r==='cl' && e.done && e.diasCl!=null
             ? `<span class="cl-dias" style="background:#DCFCE7;border-color:#16A34A;color:#14532D">✓ ${e.diasCl} dias aguardado</span>`
@@ -2850,7 +2855,7 @@ function toggleE(pid,idx){
 
   // Etapa do cliente concluída: registrar quantos dias ficou em espera
   if(e.done && e.r==='cl' && e.prazo){
-    e.diasCl=Math.max(0,Math.round((new Date()-new Date(e.prazo))/(864e5)));
+    if(!ETAPAS_SEM_PRAZO_AUTO.has(e.lb)) e.diasCl=Math.max(0,Math.round((new Date()-new Date(e.prazo))/(864e5)));
   }
 
   // Recalcular % automaticamente
@@ -2875,7 +2880,7 @@ function toggleE(pid,idx){
   renderAll();
 
   // Etapa da equipe concluída com atraso → abrir modal de motivo
-  if(e.done && e.r!=='cl' && e.prazo && new Date(e.prazo)<new Date()){
+  if(e.done && e.r!=='cl' && e.prazo && new Date(e.prazo)<new Date() && !ETAPAS_SEM_PRAZO_AUTO.has(e.lb)){
     _motivoPid=pid; _motivoIdx=idx;
     const d=Math.round((new Date()-new Date(e.prazo))/(864e5));
     document.getElementById('motivoDesc').textContent=
@@ -3820,10 +3825,12 @@ function exportXLSX(){
   todos.forEach(p=>{
     (p.etapas||[]).forEach((e,i)=>{
       let diasAt = 0;
-      if(e.done && e.fim && e.prazo && e.fim > e.prazo)
-        diasAt = Math.round((new Date(e.fim)-new Date(e.prazo))/864e5);
-      else if(!e.done && e.prazo && new Date(e.prazo)<new Date())
-        diasAt = Math.round((new Date()-new Date(e.prazo))/864e5);
+      if(!ETAPAS_SEM_PRAZO_AUTO.has(e.lb)){
+        if(e.done && e.fim && e.prazo && e.fim > e.prazo)
+          diasAt = Math.round((new Date(e.fim)-new Date(e.prazo))/864e5);
+        else if(!e.done && e.prazo && new Date(e.prazo)<new Date())
+          diasAt = Math.round((new Date()-new Date(e.prazo))/864e5);
+      }
       rowsE.push([
         p.nome, sitLabel(p), e.lb, i+1,
         e.r==='cl'?'🏢 Cliente':`👤 ${e.r==='eq'?'Equipe':e.r}`,
@@ -3986,8 +3993,10 @@ function exportPDFFicha(id){
   const etHdr = [['#','Etapa','Resp.','Prazo','Conclusão','✓','Atraso','Motivo']];
   const etRows = (p.etapas||[]).map((e,i)=>{
     let diasAt='';
-    if(e.done&&e.fim&&e.prazo&&e.fim>e.prazo) diasAt=Math.round((new Date(e.fim)-new Date(e.prazo))/864e5)+'d';
-    else if(!e.done&&e.prazo&&new Date(e.prazo)<new Date()) diasAt=Math.round((new Date()-new Date(e.prazo))/864e5)+'d';
+    if(!ETAPAS_SEM_PRAZO_AUTO.has(e.lb)){
+      if(e.done&&e.fim&&e.prazo&&e.fim>e.prazo) diasAt=Math.round((new Date(e.fim)-new Date(e.prazo))/864e5)+'d';
+      else if(!e.done&&e.prazo&&new Date(e.prazo)<new Date()) diasAt=Math.round((new Date()-new Date(e.prazo))/864e5)+'d';
+    }
     return [i+1, e.lb, e.r==='cl'?'Cliente':(e.r==='eq'?'Equipe':e.r), isoToBR(e.prazo), isoToBR(e.fim), e.done?'✓':'', diasAt, e.atrasoMotivo||''];
   });
   doc.autoTable({
