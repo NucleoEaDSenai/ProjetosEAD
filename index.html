@@ -5129,6 +5129,18 @@ function rHistorico(){
     'alterou responsável': '👤',
     'registrou motivo':    '⚠️',
   };
+  // Traduz usernames/emails antigos para nomes amigáveis na exibição
+  const _resolverNome = u => {
+    if(!u) return u;
+    const _el = u.toLowerCase();
+    if(EMAIL_NOMES[_el]) return EMAIL_NOMES[_el];
+    // username sem domínio (ex: ssnmart68)
+    const _comDominio = _el + '@firjan.com.br';
+    if(EMAIL_NOMES[_comDominio]) return EMAIL_NOMES[_comDominio];
+    return u;
+  };
+  rows = rows.map(r => ({...r, usuario: _resolverNome(r.usuario)}));
+
   el.innerHTML = rows.map(ev => `
     <div class="hist-row">
       <div class="hist-av" style="background:${acaoCor[ev.acao]||'var(--mu)'}">
