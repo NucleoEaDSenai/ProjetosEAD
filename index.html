@@ -917,6 +917,9 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
           </div>
         </div>
       </div>
+      <div style="margin-bottom:12px">
+        <button class="btn bg2 bsm" onclick="migrarNomesHistorico()" title="Corrige entradas antigas que mostram username em vez do nome">🔧 Corrigir nomes antigos no histórico</button>
+      </div>
       <div class="kk"><div id="histList" style="max-height:600px;overflow-y:auto;padding:4px 0"></div></div>
     </div>
 
@@ -4788,6 +4791,13 @@ function escutarFirebase(db){
     if(primeiraVez){
       DB = projetosRemotos;
       primeiraVez = false;
+      // Corrige automaticamente nomes antigos (username) salvos no localStorage
+      (function(){
+        const _emailLS = (localStorage.getItem('firjan_user_email')||'').toLowerCase();
+        if(_emailLS && EMAIL_NOMES[_emailLS]){
+          localStorage.setItem('firjan_user', EMAIL_NOMES[_emailLS]);
+        }
+      })();
       // Só navegar se há sessão válida (evita flash de conteúdo antes do login)
       const _u = localStorage.getItem('firjan_user');
       const _t = parseInt(localStorage.getItem('firjan_login_ts')||'0');
