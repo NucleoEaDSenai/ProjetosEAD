@@ -1258,7 +1258,7 @@ function colDot(k){return COLUNAS[k]?.dot||'#ccc'}
 // 'cl' = cliente, 'eq' = equipe, nome específico = pessoa
 // null = todas concluídas ou sem etapas
 function proximaEtapaResp(p){
-  const etapa = (p.etapas||[]).find(e => !e.done);
+  const etapa = (p.etapas||[]).find(e => !e.done && !ETAPAS_SEM_PRAZO_AUTO.has(e.lb));
   if(!etapa) return null;
   return etapa.r || 'eq';
 }
@@ -1298,8 +1298,8 @@ function sitBdg(p){
 }
 
 function delInf(p){
-  // Usar apenas a próxima etapa não concluída para calcular o atraso
-  const proxima = (p.etapas||[]).find(e => !e.done);
+  // Próxima etapa que conta para atraso: não concluída e fora das etapas sem prazo automático
+  const proxima = (p.etapas||[]).find(e => !e.done && !ETAPAS_SEM_PRAZO_AUTO.has(e.lb));
   let eq=0, cl=0;
   if(proxima && proxima.prazo && new Date(proxima.prazo)<new Date()){
     const d = dd(proxima.prazo, td());
@@ -2147,7 +2147,7 @@ function rAtrasos(){
     const etapas = p.etapas || [];
 
     // Identificar a próxima etapa não concluída do projeto
-    const proximaIdx = etapas.findIndex(e => !e.done);
+    const proximaIdx = etapas.findIndex(e => !e.done && !ETAPAS_SEM_PRAZO_AUTO.has(e.lb));
 
     etapas.forEach((e, i) => {
       // Etapas sem prazo E sem fim real não entram no relatório
@@ -3751,11 +3751,13 @@ function salvar(){
   } else {
     registrarHistorico(proj, 'criou', 'Projeto criado');
   }
+  const _editadoId = editId; // guardar antes de renderAll limpar editId
   fbSalvarProjeto(proj);
   fbSalvarNxt();
   cm('ovNew');
   renderAll(); // atualiza UI imediatamente sem esperar Firebase
-  showToast(editId?'✅ Projeto atualizado!':'✅ Projeto criado!');
+  showToast(_editadoId?'✅ Projeto atualizado!':'✅ Projeto criado!');
+  if(_editadoId) setTimeout(()=>openDet(_editadoId), 80);
 }
 
 function delP(id){
@@ -3839,7 +3841,7 @@ function exportXLSX(){
   const hdrA = ['Projeto','Situação Projeto','Etapa','Responsável','Prazo Etapa','Dias de Atraso','Status Etapa','Motivo'];
   const rowsA = [];
   todos.forEach(p=>{
-    const proximaIdxX = (p.etapas||[]).findIndex(e => !e.done);
+    const proximaIdxX = (p.etapas||[]).findIndex(e => !e.done && !ETAPAS_SEM_PRAZO_AUTO.has(e.lb));
     (p.etapas||[]).forEach((e, ei)=>{
       if(!e.prazo && !e.fim) return;
       let diasAt=0, statusEt='';
@@ -4110,7 +4112,7 @@ function exportPDFLista(){
   const hdrA=[['Projeto','Situação Proj.','Etapa','Resp.','Prazo Etapa','Dias Atraso','Status','Motivo']];
   const rowsA=[];
   todos.forEach(p=>{
-    const proximaIdxPdf = (p.etapas||[]).findIndex(e => !e.done);
+    const proximaIdxPdf = (p.etapas||[]).findIndex(e => !e.done && !ETAPAS_SEM_PRAZO_AUTO.has(e.lb));
     (p.etapas||[]).forEach((e,ei)=>{
       if(!e.prazo&&!e.fim) return;
       let diasAt=0,statusEt='';
