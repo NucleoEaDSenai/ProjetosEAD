@@ -681,6 +681,8 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
           <div style="border-top:1px solid var(--bdr);margin:0"></div>
           <div onclick="exportPDFLista();toggleExportMenu()" style="padding:11px 16px;cursor:pointer;font-size:13px;display:flex;align-items:center;gap:9px;transition:background .15s" onmouseover="this.style.background='var(--s2)'" onmouseout="this.style.background=''">📋 <span><strong>PDF — Lista de Projetos</strong><br><small style="color:var(--mu)">Projetos + KPIs + Atrasos + Homologações + Medição</small></span></div>
           <div style="border-top:1px solid var(--bdr);margin:0"></div>
+          <div onclick="exportPDFHomologacoes();toggleExportMenu()" style="padding:11px 16px;cursor:pointer;font-size:13px;display:flex;align-items:center;gap:9px;transition:background .15s" onmouseover="this.style.background='var(--s2)'" onmouseout="this.style.background=''">🔖 <span><strong>PDF — Relatório de Homologações</strong><br><small style="color:var(--mu)">Todos os dados por grupo e status</small></span></div>
+          <div style="border-top:1px solid var(--bdr);margin:0"></div>
         </div>
       </div>
       <div style="position:relative" id="notifWrap">
@@ -4328,6 +4330,252 @@ function exportPDFLista(){
 
   doc.save(`relatorio-projetos-ead-${td()}.pdf`);
   showToast('📋 PDF completo exportado!');
+}
+
+function exportPDFHomologacoes(){
+  if(typeof jspdf === 'undefined'){ showToast('⚠️ Biblioteca PDF não carregada ainda.'); return; }
+  const { jsPDF } = jspdf;
+  const doc = new jsPDF({ orientation:'landscape', unit:'mm', format:'a4' });
+  const PW=297, PH=210, ML=14, MR=14, TW=PW-ML-MR;
+
+  const AZUL    = [0,61,165];
+  const AZUL2   = [37,99,235];
+  const VERDE   = [21,128,61];
+  const LARANJA = [194,65,12];
+  const AMBAR   = [146,64,14];
+  const CINZA   = [100,116,139];
+  const CINZACL = [241,245,249];
+  const BRANCO  = [255,255,255];
+
+  const isoFmt = d => d ? d.split('-').reverse().join('/') : '—';
+  const hoje = new Date();
+  const dataGer = hoje.toLocaleDateString('pt-BR') + ' ' + hoje.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+
+  // ── Dados ──
+  const todos = activeDB().concat(cancelDB());
+  const lista = todos
+    .filter(p => p.col === 11 || p.homolog?.preenchido)
+    .sort((a,b) => a.nome.localeCompare(b.nome,'pt-BR'));
+
+  const grpPendente   = lista.filter(p => !(p.homolog?.dtHomolog) && !(p.homolog?.dtAutorizacao) && !(p.homolog?.dtInstalacao));
+  const grpHomologado = lista.filter(p =>  !!(p.homolog?.dtHomolog) && !(p.homolog?.dtAutorizacao) && !(p.homolog?.dtInstalacao));
+  const grpAutorizado = lista.filter(p =>  !!(p.homolog?.dtAutorizacao) && !(p.homolog?.dtInstalacao));
+  const grpInstalado  = lista.filter(p =>  !!(p.homolog?.dtInstalacao));
+
+  // ════════════════════════════════════════
+  //  CAPA
+  // ════════════════════════════════════════
+  // Fundo degradê topo
+  doc.setFillColor(...AZUL);
+  doc.rect(0, 0, PW, 70, 'F');
+
+  // Faixa decorativa lateral
+  doc.setFillColor(37,99,235);
+  doc.rect(0, 0, 6, PH, 'F');
+
+  // Badge FIRJAN SENAI
+  doc.setFillColor(8,145,178);
+  doc.roundedRect(ML+2, 10, 44, 8, 2, 2, 'F');
+  doc.setTextColor(...BRANCO);
+  doc.setFont('helvetica','bold'); doc.setFontSize(7.5);
+  doc.text('FIRJAN SENAI', ML+24, 15.2, {align:'center'});
+
+  // Título principal
+  doc.setFont('helvetica','bold'); doc.setFontSize(24);
+  doc.setTextColor(...BRANCO);
+  doc.text('Relatório de Homologações', ML+2, 36);
+
+  // Subtítulo
+  doc.setFont('helvetica','normal'); doc.setFontSize(10);
+  doc.setTextColor(186,230,253);
+  doc.text('Sistema de Gestão de Projetos EAD — Educação a Distância', ML+2, 44);
+
+  // Data geração
+  doc.setFontSize(8.5); doc.setTextColor(148,163,184);
+  doc.text('Gerado em ' + dataGer, PW-MR, 44, {align:'right'});
+
+  // ── Cards de estatísticas ──
+  const cards = [
+    { label:'Total', val: lista.length,           cor: AZUL,    icone:'TOTAL' },
+    { label:'Pendentes', val: grpPendente.length,  cor: AMBAR,   icone:'PEND'  },
+    { label:'Homologados', val: grpHomologado.length, cor: LARANJA, icone:'HOM' },
+    { label:'Autorizados', val: grpAutorizado.length, cor: AZUL2,   icone:'AUT' },
+    { label:'Instalados', val: grpInstalado.length,   cor: VERDE,   icone:'INST' },
+  ];
+  const cw = 48, ch = 28, gap = 4;
+  const totalW = cards.length * cw + (cards.length-1)*gap;
+  let cx = (PW - totalW) / 2;
+  const cy = 76;
+
+  cards.forEach(card => {
+    // Sombra suave
+    doc.setFillColor(200,210,225);
+    doc.roundedRect(cx+1, cy+1, cw, ch, 3, 3, 'F');
+    // Card
+    doc.setFillColor(...BRANCO);
+    doc.roundedRect(cx, cy, cw, ch, 3, 3, 'F');
+    // Borda colorida topo
+    doc.setFillColor(...card.cor);
+    doc.roundedRect(cx, cy, cw, 2.5, 1, 1, 'F');
+    // Número
+    doc.setFont('helvetica','bold'); doc.setFontSize(22);
+    doc.setTextColor(...card.cor);
+    doc.text(String(card.val), cx + cw/2, cy + 17, {align:'center'});
+    // Label
+    doc.setFont('helvetica','normal'); doc.setFontSize(7.5);
+    doc.setTextColor(...CINZA);
+    doc.text(card.label, cx + cw/2, cy + 23, {align:'center'});
+    cx += cw + gap;
+  });
+
+  // Linha separadora
+  doc.setDrawColor(226,232,240);
+  doc.setLineWidth(0.4);
+  doc.line(ML, cy+ch+8, PW-MR, cy+ch+8);
+
+  // Nota de rodapé da capa
+  doc.setFont('helvetica','italic'); doc.setFontSize(7.5);
+  doc.setTextColor(...CINZA);
+  doc.text('Este relatório contém informações confidenciais de uso interno exclusivo da Firjan SENAI.', PW/2, cy+ch+15, {align:'center'});
+
+  // ════════════════════════════════════════
+  //  Função auxiliar: cabeçalho de página
+  // ════════════════════════════════════════
+  function cabecalhoPag(titulo, corFundo){
+    doc.setFillColor(...corFundo);
+    doc.rect(0, 0, PW, 18, 'F');
+    doc.setFillColor(37,99,235);
+    doc.rect(0, 0, 6, PH, 'F');
+    doc.setTextColor(...BRANCO);
+    doc.setFont('helvetica','bold'); doc.setFontSize(11);
+    doc.text('Firjan SENAI  ·  Relatório de Homologações', ML+2, 8);
+    doc.setFont('helvetica','normal'); doc.setFontSize(8.5);
+    doc.text(titulo, ML+2, 14.5);
+    doc.setFontSize(7.5);
+    doc.text('Gerado em '+dataGer, PW-MR, 14.5, {align:'right'});
+  }
+
+  // ════════════════════════════════════════
+  //  Função: renderizar grupo numa página
+  // ════════════════════════════════════════
+  function renderGrupo(grp, titulo, corFundo, corHead, corAlt, corStatus, statusLabel){
+    if(grp.length === 0) return;
+
+    doc.addPage();
+    cabecalhoPag(titulo, corFundo);
+
+    // Pílula de contagem
+    doc.setFillColor(...corHead);
+    doc.roundedRect(PW-MR-22, 4, 22, 8, 3, 3, 'F');
+    doc.setFont('helvetica','bold'); doc.setFontSize(8);
+    doc.setTextColor(...BRANCO);
+    doc.text(grp.length + (grp.length===1?' projeto':' projetos'), PW-MR-11, 9, {align:'center'});
+
+    const rows = grp.map(p => {
+      const h = p.homolog || {};
+      return [
+        p.nome,
+        p.rp || '—',
+        p.academia || '—',
+        h.solicitante || '—',
+        h.enviadaPor || '—',
+        h.servico || '—',
+        h.novoManut || '—',
+        h.conclusao || '—',
+        h.idCurso || '—',
+        h.notaCorte || '—',
+        isoFmt(h.dtHomolog),
+        isoFmt(h.dtAutorizacao),
+        isoFmt(h.dtInstalacao),
+      ];
+    });
+
+    doc.autoTable({
+      head: [[
+        'Projeto','RP','Academia','Solicitante','Enviada Por',
+        'Serviço','Tipo','Conclusão','ID Curso','Nota',
+        'Homologação','Autorização','Instalação'
+      ]],
+      body: rows,
+      startY: 23,
+      margin: { left: ML, right: MR },
+      styles: {
+        fontSize: 7.5,
+        cellPadding: { top:2.5, bottom:2.5, left:2.5, right:2.5 },
+        overflow: 'linebreak',
+        lineColor: [226,232,240],
+        lineWidth: 0.2,
+      },
+      headStyles: {
+        fillColor: corHead,
+        textColor: BRANCO,
+        fontStyle: 'bold',
+        fontSize: 7.5,
+        cellPadding: 3,
+      },
+      alternateRowStyles: { fillColor: corAlt },
+      columnStyles: {
+        0: { cellWidth: 58, fontStyle:'bold' },
+        1: { cellWidth: 13, halign:'center' },
+        2: { cellWidth: 22 },
+        3: { cellWidth: 22 },
+        4: { cellWidth: 22 },
+        5: { cellWidth: 22 },
+        6: { cellWidth: 14, halign:'center' },
+        7: { cellWidth: 16, halign:'center' },
+        8: { cellWidth: 14, halign:'center' },
+        9: { cellWidth: 10, halign:'center' },
+        10:{ cellWidth: 20, halign:'center' },
+        11:{ cellWidth: 20, halign:'center' },
+        12:{ cellWidth: 20, halign:'center' },
+      },
+      didParseCell(data){
+        if(data.section === 'body'){
+          // Datas preenchidas em negrito colorido
+          if([10,11,12].includes(data.column.index) && data.cell.raw !== '—'){
+            data.cell.styles.textColor = corHead;
+            data.cell.styles.fontStyle = 'bold';
+          }
+          // Datas ausentes em cinza
+          if([10,11,12].includes(data.column.index) && data.cell.raw === '—'){
+            data.cell.styles.textColor = [156,163,175];
+          }
+        }
+      },
+      willDrawCell(data){
+        // Linha de separação mais visível entre projetos
+        if(data.section === 'body' && data.row.index % 2 === 0){
+          doc.setDrawColor(...corAlt);
+        }
+      }
+    });
+  }
+
+  // ════════════════════════════════════════
+  //  Renderizar os 4 grupos
+  // ════════════════════════════════════════
+  renderGrupo(grpPendente,   '⏳  Pendentes — sem data de Homologação',   AZUL,    [146,64,14],  [255,251,235], [217,119,6],  'Pendente');
+  renderGrupo(grpHomologado, '🔖  Homologados — aguardando Autorização',  AZUL,    [194,65,12],  [255,247,237], [234,88,12],  'Homologado');
+  renderGrupo(grpAutorizado, '🔓  Autorizados — aguardando Instalação',   AZUL,    [29,78,216],  [239,246,255], [37,99,235],  'Autorizado');
+  renderGrupo(grpInstalado,  '✅  Instalados no SIRH',                    AZUL,    [21,128,61],  [240,253,244], [34,197,94],  'Instalado');
+
+  // ── Rodapé em todas as páginas ──
+  const pages = doc.internal.getNumberOfPages();
+  for(let i = 1; i <= pages; i++){
+    doc.setPage(i);
+    doc.setFillColor(248,250,252);
+    doc.rect(0, PH-8, PW, 8, 'F');
+    doc.setDrawColor(226,232,240);
+    doc.setLineWidth(0.3);
+    doc.line(0, PH-8, PW, PH-8);
+    doc.setFont('helvetica','normal'); doc.setFontSize(7);
+    doc.setTextColor(...CINZA);
+    doc.text('© '+new Date().getFullYear()+' Firjan SENAI — Relatório de Homologações — Uso interno exclusivo', ML+4, PH-3);
+    doc.text('Pág. '+i+'/'+pages, PW-MR, PH-3, {align:'right'});
+  }
+
+  doc.save('homologacoes-firjan-'+td()+'.pdf');
+  showToast('🔖 PDF de Homologações exportado!');
 }
 
 // ── CSV (mantido como fallback interno) ──
