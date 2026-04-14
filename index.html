@@ -4538,7 +4538,7 @@ function exportPDFHomologacoes(){
 
     doc.autoTable({
       head: [[
-        'Projeto','RP','Academia','Solicitante','Enviada Por',
+        'Projeto','RP','Academia','Solicitante','Homologado Por',
         'Servico','Tipo','Conclusao','ID Curso','Nota','Pag.',
         'Homologacao','Autorizacao','Instalacao'
       ]],
@@ -4877,7 +4877,7 @@ function buildHomologCard(p){
           <div class="hom-field-val">${_homSel(p.id,'solicitante',SOLICITANTES,h.solicitante||'')}</div>
         </div>
         <div class="hom-field">
-          <div class="hom-field-label">Enviada Por</div>
+          <div class="hom-field-label">Homologado Por</div>
           <div class="hom-field-val">${_homSel(p.id,'enviadaPor',ENVIADA_POR,h.enviadaPor||'')}</div>
         </div>
         <div class="hom-field">
