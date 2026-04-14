@@ -387,9 +387,12 @@ tr.canc-row td{opacity:.55}
 .hom-foot{padding:10px 14px;display:flex;justify-content:flex-end;gap:8px;background:var(--s2);border-top:1px solid var(--bdr)}
 .hom-status-ok{background:#DCFCE7;color:#15803D}
 .hom-status-pend{background:#FEF9C3;color:#854D0E}
+.hom-status-homolog{background:#FFF7ED;color:#C2410C}
+.hom-status-autorizado{background:#EFF6FF;color:#1D4ED8}
 .hom-empty{text-align:center;padding:48px 20px;color:var(--mu);font-size:13px}
 .hom-group-title{display:flex;align-items:center;gap:8px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;padding:8px 14px;border-radius:8px;margin-bottom:10px;margin-top:4px}
 .hom-group-title.pendente{background:#FEF9C3;color:#854D0E}
+.hom-group-title.homologado{background:#FFF7ED;color:#C2410C}
 .hom-group-title.autorizado{background:#EFF6FF;color:#1D4ED8}
 .hom-group-title.instalado{background:#DCFCE7;color:#15803D}
 .hom-card-head{cursor:pointer;user-select:none}
@@ -400,6 +403,8 @@ tr.canc-row td{opacity:.55}
 .hom-body.open{max-height:2000px;opacity:1}
 .hom-sec-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--mu);padding:10px 14px 4px;background:var(--s2);border-bottom:1px solid var(--bdr);grid-column:span 4}
 .hom-instalado .hom-card-head{background:linear-gradient(135deg,#14532D,#15803d)}
+.hom-homologado .hom-card-head{background:linear-gradient(135deg,#9A3412,#C2410C)}
+.hom-autorizado .hom-card-head{background:linear-gradient(135deg,#1D4ED8,#2563EB)}
 .hom-resumo{display:flex;flex-wrap:wrap;gap:10px;padding:10px 14px;background:var(--s2);border-top:1px solid var(--bdr)}
 .hom-resumo-item{font-size:11.5px;display:flex;gap:4px;align-items:center}
 .hom-resumo-label{color:var(--mu);font-weight:600}
@@ -4459,7 +4464,16 @@ function salvarHomolog(pid){
   registrarHistorico(p, 'homologação salva', dtStr);
   fbSalvarProjeto(p);
   showToast('💾 Homologação salva!');
+  // Capturar quais cards estão abertos antes de re-renderizar
+  const abertosAntes = [...document.querySelectorAll('.hom-body.open')].map(el => el.id.replace('hom_body_',''));
   rHomologacoes();
+  // Restaurar estado aberto após re-render
+  abertosAntes.forEach(id => {
+    const body = document.getElementById('hom_body_'+id);
+    const chev = document.getElementById('hom_chev_'+id);
+    if(body){ body.classList.add('open'); }
+    if(chev){ chev.classList.add('open'); }
+  });
 }
 
 function _homSel(pid, fld, opts, val){
@@ -4482,14 +4496,22 @@ function toggleHomolog(id){
 
 function buildHomologCard(p){
   const h = p.homolog || {};
-  const completo   = !!(h.dtInstalacao);
-  const autorizado = !!(h.dtAutorizacao) && !completo;
+  const completo    = !!(h.dtInstalacao);
+  const autorizado  = !!(h.dtAutorizacao) && !completo;
+  const homologado  = !!(h.dtHomolog) && !autorizado && !completo;
+
+  const cardCls = completo   ? 'hom-instalado'
+                : autorizado ? 'hom-autorizado'
+                : homologado ? 'hom-homologado'
+                : '';
 
   const statusBdg = completo
     ? `<span class="hom-badge hom-status-ok">✅ Instalado</span>`
     : autorizado
-      ? `<span class="hom-badge hom-status-pend">🔓 Autorizado</span>`
-      : `<span class="hom-badge hom-status-pend">⏳ Pendente</span>`;
+      ? `<span class="hom-badge hom-status-autorizado">🔓 Autorizado</span>`
+      : homologado
+        ? `<span class="hom-badge hom-status-homolog">🔖 Homologado</span>`
+        : `<span class="hom-badge hom-status-pend">⏳ Pendente</span>`;
 
   const acadBdg = p.academia ? `<span class="hom-badge">${p.academia}</span>` : '';
   const rpBdg   = p.rp       ? `<span class="hom-badge">RP: ${p.rp}</span>`  : '';
@@ -4514,7 +4536,7 @@ function buildHomologCard(p){
   const SERVICOS     = ['','Básico','Intermediário','Avançado','Encapsulamento','Manutenção','Autoria Digital','Versionamento'];
 
   return `
-  <div class="hom-card ${completo?'hom-instalado':''}" id="homcard_${p.id}">
+  <div class="hom-card ${cardCls}" id="homcard_${p.id}">
 
     <div class="hom-card-head" onclick="toggleHomolog(${p.id})" title="Clique para expandir / recolher">
       <div class="hom-card-title">
@@ -4652,23 +4674,29 @@ function rHomologacoes(){
   listaTotal.sort((a,b) => a.nome.localeCompare(b.nome, 'pt-BR'));
 
   // Estatísticas sempre do total (sem filtro)
-  const pendentes  = listaTotal.filter(p => !(p.homolog?.dtInstalacao) && !(p.homolog?.dtAutorizacao)).length;
-  const autorizados = listaTotal.filter(p => !!(p.homolog?.dtAutorizacao) && !(p.homolog?.dtInstalacao)).length;
-  const instalados = listaTotal.filter(p =>  !!(p.homolog?.dtInstalacao)).length;
+  const cntPendente   = listaTotal.filter(p => !(p.homolog?.dtHomolog) && !(p.homolog?.dtAutorizacao) && !(p.homolog?.dtInstalacao)).length;
+  const cntHomologado = listaTotal.filter(p =>  !!(p.homolog?.dtHomolog) && !(p.homolog?.dtAutorizacao) && !(p.homolog?.dtInstalacao)).length;
+  const cntAutorizado = listaTotal.filter(p =>  !!(p.homolog?.dtAutorizacao) && !(p.homolog?.dtInstalacao)).length;
+  const cntInstalado  = listaTotal.filter(p =>  !!(p.homolog?.dtInstalacao)).length;
 
   const statsEl = document.getElementById('homologStats');
   if(statsEl){
+    statsEl.style.gridTemplateColumns = 'repeat(4,1fr)';
     statsEl.innerHTML = `
       <div class="sc" style="border-left:4px solid var(--yel)">
-        <div class="sc-l">⏳ Pendentes</div><div class="sc-v">${pendentes}</div>
-        <div class="sc-s">sem autorização</div><div class="sc-i">⏳</div>
+        <div class="sc-l">⏳ Pendentes</div><div class="sc-v">${cntPendente}</div>
+        <div class="sc-s">sem data de homologação</div><div class="sc-i">⏳</div>
+      </div>
+      <div class="sc" style="border-left:4px solid var(--org)">
+        <div class="sc-l">🔖 Homologados</div><div class="sc-v">${cntHomologado}</div>
+        <div class="sc-s">aguardando autorização</div><div class="sc-i">🔖</div>
       </div>
       <div class="sc" style="border-left:4px solid var(--blue)">
-        <div class="sc-l">🔓 Autorizados</div><div class="sc-v">${autorizados}</div>
-        <div class="sc-s">aguardando instalação</div><div class="sc-i">🔓</div>
+        <div class="sc-l">🔓 Autorizados</div><div class="sc-v">${cntAutorizado}</div>
+        <div class="sc-s">aguardando instalação SIRH</div><div class="sc-i">🔓</div>
       </div>
       <div class="sc" style="border-left:4px solid var(--green)">
-        <div class="sc-l">✅ Instalados</div><div class="sc-v">${instalados}</div>
+        <div class="sc-l">✅ Instalados</div><div class="sc-v">${cntInstalado}</div>
         <div class="sc-s">com data de instalação</div><div class="sc-i">✅</div>
       </div>`;
   }
@@ -4714,25 +4742,35 @@ function rHomologacoes(){
     return;
   }
 
-  // Separar em 3 grupos
-  const grpPendente   = lista.filter(p => !(p.homolog?.dtAutorizacao) && !(p.homolog?.dtInstalacao));
+  // Separar em 4 grupos
+  const grpPendente   = lista.filter(p => !(p.homolog?.dtHomolog) && !(p.homolog?.dtAutorizacao) && !(p.homolog?.dtInstalacao));
+  const grpHomologado = lista.filter(p =>  !!(p.homolog?.dtHomolog) && !(p.homolog?.dtAutorizacao) && !(p.homolog?.dtInstalacao));
   const grpAutorizado = lista.filter(p =>  !!(p.homolog?.dtAutorizacao) && !(p.homolog?.dtInstalacao));
   const grpInstalado  = lista.filter(p =>  !!(p.homolog?.dtInstalacao));
 
   let html = '';
+  let temAnterior = false;
 
   if(grpPendente.length > 0){
-    html += `<div class="hom-group-title pendente">⏳ Pendentes <span style="font-size:12px;font-weight:800">${grpPendente.length}</span></div>`;
+    html += `<div class="hom-group-title pendente" style="margin-top:${temAnterior?'28px':'4px'}">⏳ Pendentes <span style="font-size:12px;font-weight:800">${grpPendente.length}</span></div>`;
     html += grpPendente.map(p => buildHomologCard(p)).join('');
+    temAnterior = true;
+  }
+
+  if(grpHomologado.length > 0){
+    html += `<div class="hom-group-title homologado" style="margin-top:${temAnterior?'28px':'4px'}">🔖 Homologados <span style="font-size:12px;font-weight:800">${grpHomologado.length}</span></div>`;
+    html += grpHomologado.map(p => buildHomologCard(p)).join('');
+    temAnterior = true;
   }
 
   if(grpAutorizado.length > 0){
-    html += `<div class="hom-group-title autorizado" style="margin-top:${grpPendente.length?'28px':'4px'}">🔓 Autorizados <span style="font-size:12px;font-weight:800">${grpAutorizado.length}</span></div>`;
+    html += `<div class="hom-group-title autorizado" style="margin-top:${temAnterior?'28px':'4px'}">🔓 Autorizados <span style="font-size:12px;font-weight:800">${grpAutorizado.length}</span></div>`;
     html += grpAutorizado.map(p => buildHomologCard(p)).join('');
+    temAnterior = true;
   }
 
   if(grpInstalado.length > 0){
-    html += `<div class="hom-group-title instalado" style="margin-top:${(grpPendente.length||grpAutorizado.length)?'28px':'4px'}">✅ Instalados <span style="font-size:12px;font-weight:800">${grpInstalado.length}</span></div>`;
+    html += `<div class="hom-group-title instalado" style="margin-top:${temAnterior?'28px':'4px'}">✅ Instalados <span style="font-size:12px;font-weight:800">${grpInstalado.length}</span></div>`;
     html += grpInstalado.map(p => buildHomologCard(p)).join('');
   }
 
