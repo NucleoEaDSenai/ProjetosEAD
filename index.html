@@ -4007,7 +4007,7 @@ function exportXLSX(){
   XLSX.utils.book_append_sheet(wb, wsA, 'Atrasos');
 
   // ── Aba 4: Homologações ──
-  const hdrH = ['Projeto','Situação','RP','Academia','ID Curso','Pacote SCORM','Solicitante','Enviada Por','RT','Conclusão','Nota de Corte','Novo/Manutenção','Serviço','Dt. Homologação','Dt. Autorização','Dt. Instalação SIRH','Status'];
+  const hdrH = ['Projeto','Situação','RP','Academia','ID Curso','Pacote SCORM','Solicitou a Homologação','Homologado Por','RT','Conclusão','Nota de Corte','Novo/Manutenção','Serviço','Dt. Homologação','Dt. Autorização','Dt. Instalação SIRH','Status'];
   const todosTodos = activeDB().concat(cancelDB());
   const rowsH = todosTodos
     .filter(p => p.col === 11 || p.homolog?.preenchido)
