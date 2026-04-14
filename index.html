@@ -4016,7 +4016,7 @@ function exportXLSX(){
       return [
         p.nome, sitLabel(p), p.rp||'', p.academia||'',
         h.idCurso||'', h.pacoteScorm||'', h.solicitante||'', h.enviadaPor||'',
-        h.rt||'', h.conclusao||'', h.notaCorte||'', h.novoManut||'', h.servico||'',
+        h.rt||'', h.conclusao||'', h.notaCorte||'', h.nPaginas||'', h.novoManut||'', h.servico||'',
         isoToBR(h.dtHomolog), isoToBR(h.dtAutorizacao), isoToBR(h.dtInstalacao),
         h.dtInstalacao ? 'Instalado' : 'Pendente'
       ];
@@ -4529,6 +4529,7 @@ function exportPDFHomologacoes(){
         h.conclusao || '—',
         h.idCurso || '—',
         h.notaCorte || '—',
+        h.nPaginas  || '—',
         isoFmt(h.dtHomolog),
         isoFmt(h.dtAutorizacao),
         isoFmt(h.dtInstalacao),
@@ -4538,7 +4539,7 @@ function exportPDFHomologacoes(){
     doc.autoTable({
       head: [[
         'Projeto','RP','Academia','Solicitante','Enviada Por',
-        'Servico','Tipo','Conclusao','ID Curso','Nota',
+        'Servico','Tipo','Conclusao','ID Curso','Nota','Pag.',
         'Homologacao','Autorizacao','Instalacao'
       ]],
       body: rows,
@@ -4570,19 +4571,21 @@ function exportPDFHomologacoes(){
         7: { cellWidth: 16, halign:'center' },
         8: { cellWidth: 14, halign:'center' },
         9: { cellWidth: 10, halign:'center' },
-        10:{ cellWidth: 20, halign:'center' },
-        11:{ cellWidth: 20, halign:'center' },
-        12:{ cellWidth: 20, halign:'center' },
+        10:{ cellWidth: 14, halign:'center' },
+        11:{ cellWidth: 10, halign:'center' },
+        12:{ cellWidth: 18, halign:'center' },
+        13:{ cellWidth: 18, halign:'center' },
+        14:{ cellWidth: 18, halign:'center' },
       },
       didParseCell(data){
         if(data.section === 'body'){
           // Datas preenchidas em negrito colorido
-          if([10,11,12].includes(data.column.index) && data.cell.raw !== '—'){
+          if([12,13,14].includes(data.column.index) && data.cell.raw !== '—'){
             data.cell.styles.textColor = corHead;
             data.cell.styles.fontStyle = 'bold';
           }
           // Datas ausentes em cinza
-          if([10,11,12].includes(data.column.index) && data.cell.raw === '—'){
+          if([12,13,14].includes(data.column.index) && data.cell.raw === '—'){
             data.cell.styles.textColor = [156,163,175];
           }
         }
@@ -4743,6 +4746,7 @@ function salvarHomolog(pid){
   h.academia      = g('academia');
   h.conclusao     = g('conclusao');
   h.notaCorte     = g('notaCorte');
+  h.nPaginas      = g('nPaginas');
   h.novoManut     = g('novoManut');
   h.dtHomolog     = g('dtHomolog');
   h.dtAutorizacao = g('dtAutorizacao');
@@ -4862,8 +4866,8 @@ function buildHomologCard(p){
           <div class="hom-field-val">${_homInput(p.id,'pacoteScorm',h.pacoteScorm,'text','Ex: curso_v1.zip')}</div>
         </div>
         <div class="hom-field">
-          <div class="hom-field-label">Nota de Corte</div>
-          <div class="hom-field-val">${_homInput(p.id,'notaCorte',h.notaCorte,'text','Ex: 70')}</div>
+          <div class="hom-field-label">Nº de Páginas</div>
+          <div class="hom-field-val">${_homInput(p.id,'nPaginas',h.nPaginas||'','number','Ex: 42')}</div>
         </div>
 
         <div class="hom-sec-title">👥 Responsáveis</div>
@@ -4892,6 +4896,10 @@ function buildHomologCard(p){
           <div class="hom-field-val">${_homSel(p.id,'conclusao',CONCLUSAO,h.conclusao||'')}</div>
         </div>
         <div class="hom-field">
+          <div class="hom-field-label">Nota de Corte</div>
+          <div class="hom-field-val">${_homInput(p.id,'notaCorte',h.notaCorte,'text','Ex: 70')}</div>
+        </div>
+        <div class="hom-field">
           <div class="hom-field-label">Novo ou Manutenção</div>
           <div class="hom-field-val">${_homSel(p.id,'novoManut',NOVO_MANUT,h.novoManut||'')}</div>
         </div>
@@ -4899,7 +4907,6 @@ function buildHomologCard(p){
           <div class="hom-field-label">Serviço</div>
           <div class="hom-field-val">${_homSel(p.id,'servico',SERVICOS,h.servico||'')}</div>
         </div>
-        <div class="hom-field"></div>
 
         <div class="hom-sec-title">📅 Datas</div>
 
