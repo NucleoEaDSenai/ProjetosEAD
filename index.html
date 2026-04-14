@@ -2090,17 +2090,40 @@ function rKPIs(){
   });
   const comDados=etapaMedArr.filter(e=>e.d!==null);
   const mx3=comDados.length?Math.max(...comDados.map(e=>e.d),1):1;
-  document.getElementById('etapaBars').innerHTML=etapaMedArr.map(e=>`
-    <div class="kpi-bar-row">
+  const mn3=comDados.length?Math.min(...comDados.map(e=>e.d),mx3):0;
+  // Cor relativa por responsável: eq=tons azul→roxo, cl=tons amarelo→laranja→vermelho
+  const _etCor=(e)=>{
+    if(e.d===null) return 'var(--bdr)';
+    const t=mx3===mn3?0.5:(e.d-mn3)/(mx3-mn3); // 0=rápido, 1=lento
+    if(e.r==='cl'){
+      // Cliente: verde claro → âmbar → laranja → vermelho
+      const h=Math.round(120-t*120); // 120(verde)→0(vermelho)
+      const s=Math.round(65+t*20);
+      const l=Math.round(42-t*8);
+      return `hsl(${h},${s}%,${l}%)`;
+    } else {
+      // Equipe: azul claro → azul SENAI → azul escuro → índigo
+      const h=Math.round(215+t*30); // 215→245
+      const s=Math.round(70+t*20);
+      const l=Math.round(52-t*22);
+      return `hsl(${h},${s}%,${l}%)`;
+    }
+  };
+  document.getElementById('etapaBars').innerHTML=etapaMedArr.map(e=>{
+    const cor=_etCor(e);
+    const lblResp=e.r==='cl'
+      ?`<span style="font-size:9px;padding:1px 5px;border-radius:3px;background:#FEF3C7;color:#92400E;font-weight:700;margin-left:4px">CL</span>`
+      :`<span style="font-size:9px;padding:1px 5px;border-radius:3px;background:#EFF6FF;color:#1D4ED8;font-weight:700;margin-left:4px">EQ</span>`;
+    return `<div class="kpi-bar-row">
       <div class="kpi-bar-row-head">
-        <span>${e.n}${e.amostras>0?`<span style="color:var(--mu);font-size:10px;margin-left:4px">(${e.amostras})</span>`:''}</span>
-        <strong>${e.d!==null?e.d+'d':'—'}</strong>
+        <span>${e.n}${lblResp}${e.amostras>0?`<span style="color:var(--mu);font-size:10px;margin-left:4px">(${e.amostras})</span>`:''}</span>
+        <strong style="color:${e.d!==null?cor:'var(--mu)'}">${e.d!==null?e.d+'d':'—'}</strong>
       </div>
       <div class="kpi-bar-track">
-        ${e.d!==null?`<div class="kpi-bar-fill" style="width:${e.d/mx3*100}%;background:${e.r==='cl'?'var(--org)':'var(--blue)'}"></div>`:''}
+        ${e.d!==null?`<div class="kpi-bar-fill" style="width:${e.d/mx3*100}%;background:${cor}"></div>`:''}
       </div>
       ${e.d===null?'<div style="font-size:10px;color:var(--mu)">Sem dados ainda</div>':''}
-    </div>`).join('');
+    </div>`;}).join('');
 
   // ── 8. Por recurso ──
   const recCount={};
@@ -2130,17 +2153,27 @@ function rKPIs(){
     const etArr=Object.entries(etCl).map(([lb,v])=>({lb,media:Math.round(v.total/v.n),n:v.n})).sort((a,b)=>b.media-a.media);
     const mx5=etArr.length?etArr[0].media:1;
     const mediaGeral=etArr.length?Math.round(etArr.reduce((a,e)=>a+e.media,0)/etArr.length):null;
+    // Escala de cor relativa: melhor (menor) = verde, pior (maior) = vermelho
+    const _espCor=(val,mn,mx)=>{
+      if(mx===mn) return '#E8002D';
+      const t=(val-mn)/(mx-mn); // 0=melhor, 1=pior
+      if(t<0.33) return `hsl(${Math.round(120-t*3*40)},72%,38%)`; // verde → amarelo-verde
+      if(t<0.66) return `hsl(${Math.round(40-(t-0.33)*3*20)},85%,44%)`; // amarelo → laranja
+      return `hsl(${Math.round(20-(t-0.66)*3*20)},90%,42%)`; // laranja → vermelho
+    };
+    const _espMn=etArr.length?etArr[etArr.length-1].media:0;
     espEl.innerHTML=etArr.length===0
       ?'<div style="color:var(--mu);font-size:12px">Nenhuma etapa de cliente concluída ainda</div>'
       :`<div style="font-size:11px;color:var(--mu);margin-bottom:10px">Média geral: <strong style="color:var(--txt)">${mediaGeral}d</strong></div>`
-        +etArr.slice(0,8).map(e=>`
-          <div class="kpi-bar-row">
+        +etArr.slice(0,8).map(e=>{
+          const cor=_espCor(e.media,_espMn,mx5);
+          return `<div class="kpi-bar-row">
             <div class="kpi-bar-row-head">
               <span>${e.lb}<span style="color:var(--mu);font-size:10px;margin-left:4px">(${e.n}x)</span></span>
-              <strong style="color:${e.media>10?'var(--red)':e.media>5?'var(--org)':'var(--green)'}">${e.media}d</strong>
+              <strong style="color:${cor}">${e.media}d</strong>
             </div>
-            <div class="kpi-bar-track"><div class="kpi-bar-fill" style="width:${e.media/mx5*100}%;background:${e.media>10?'var(--red)':e.media>5?'var(--org)':'var(--green)'}"></div></div>
-          </div>`).join('');
+            <div class="kpi-bar-track"><div class="kpi-bar-fill" style="width:${e.media/mx5*100}%;background:${cor}"></div></div>
+          </div>`;}).join('');
   }
 
   // ── 10. Por prioridade ──
@@ -2163,16 +2196,27 @@ function rKPIs(){
       .sort((a,b)=>a.tx-b.tx); // pior primeiro
     cumpEl.innerHTML = etArr.length===0
       ? '<div style="color:var(--mu);font-size:12px">Dados insuficientes (mínimo 2 conclusões por etapa)</div>'
-      : etArr.slice(0,10).map(e=>{
-          const cor = e.tx>=80?'var(--green)':e.tx>=50?'var(--org)':'var(--red)';
-          return `<div class="kpi-bar-row">
-            <div class="kpi-bar-row-head">
-              <span>${e.lb}<span style="color:var(--mu);font-size:10px;margin-left:4px">(${e.total}x)</span></span>
-              <strong style="color:${cor}">${e.tx}%</strong>
-            </div>
-            <div class="kpi-bar-track"><div class="kpi-bar-fill" style="width:${e.tx}%;background:${cor}"></div></div>
-          </div>`;
-        }).join('');
+      : (()=>{
+          // Cor relativa: melhor (maior %) = verde, pior (menor %) = vermelho
+          const _txMn=etArr.length?etArr[0].tx:0;
+          const _txMx=etArr.length?etArr[etArr.length-1].tx:100;
+          const _cumpCor=(tx)=>{
+            const rng=_txMx-_txMn||1;
+            const t=(_txMx-tx)/rng; // 0=melhor, 1=pior
+            if(t<0.33) return `hsl(${Math.round(120-t*3*40)},72%,38%)`;
+            if(t<0.66) return `hsl(${Math.round(40-(t-0.33)*3*20)},85%,44%)`;
+            return `hsl(${Math.round(20-(t-0.66)*3*20)},90%,42%)`;
+          };
+          return etArr.slice(0,10).map(e=>{
+            const cor=_cumpCor(e.tx);
+            return `<div class="kpi-bar-row">
+              <div class="kpi-bar-row-head">
+                <span>${e.lb}<span style="color:var(--mu);font-size:10px;margin-left:4px">(${e.total}x)</span></span>
+                <strong style="color:${cor}">${e.tx}%</strong>
+              </div>
+              <div class="kpi-bar-track"><div class="kpi-bar-fill" style="width:${e.tx}%;background:${cor}"></div></div>
+            </div>`;}).join('');
+        })();
   }
 
 }
