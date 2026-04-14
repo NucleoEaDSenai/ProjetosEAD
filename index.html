@@ -402,6 +402,7 @@ tr.canc-row td{opacity:.55}
 .hom-body{overflow:hidden;transition:max-height .3s ease,opacity .25s ease;max-height:0;opacity:0}
 .hom-body.open{max-height:2000px;opacity:1}
 .hom-sec-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--mu);padding:10px 14px 4px;background:var(--s2);border-bottom:1px solid var(--bdr);grid-column:span 4}
+.hom-pendente .hom-card-head{background:linear-gradient(135deg,#991B1B,#DC2626)}
 .hom-instalado .hom-card-head{background:linear-gradient(135deg,#14532D,#15803d)}
 .hom-homologado .hom-card-head{background:linear-gradient(135deg,#B45309,#F59E0B)}
 .hom-autorizado .hom-card-head{background:linear-gradient(135deg,#1D4ED8,#2563EB)}
@@ -4751,7 +4752,7 @@ function buildHomologCard(p){
   const cardCls = completo   ? 'hom-instalado'
                 : autorizado ? 'hom-autorizado'
                 : homologado ? 'hom-homologado'
-                : '';
+                : 'hom-pendente';
 
   const statusBdg = completo
     ? `<span class="hom-badge hom-status-ok">✅ Instalado</span>`
