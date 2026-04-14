@@ -309,6 +309,14 @@ tr.canc-row td{opacity:.55}
 .setup-btn:hover{background:#c4001f}
 .setup-err{color:var(--red);font-size:12px;margin-top:8px;min-height:18px}
 @media(max-width:960px){.sb{width:50px}.main{margin-left:50px}.sb-title,.sb-sub,.sb-sec,.sb-badge,.si span{display:none}.si{justify-content:center;padding:11px}}
+.sb.collapsed{width:50px!important}
+.sb.collapsed .sb-title,.sb.collapsed .sb-sub,.sb.collapsed .sb-sec,.sb.collapsed .sb-badge,.sb.collapsed .si span,.sb.collapsed .sb-foot span{display:none}
+.sb.collapsed .si{justify-content:center;padding:11px}
+.sb.collapsed .sb-logo{padding:14px 0;display:flex;justify-content:center;align-items:center}
+.main.sb-collapsed{margin-left:50px}
+#sbToggleBtn{background:none;border:none;color:rgba(255,255,255,.4);cursor:pointer;font-size:15px;padding:2px 4px;border-radius:4px;transition:color .15s;flex-shrink:0}
+#sbToggleBtn:hover{color:#fff;background:rgba(255,255,255,.1)}
+.sb.collapsed #sbToggleBtn{margin:0 auto;display:block}
 /* MODAL MOTIVO ATRASO */
 .ov-motivo{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:1800;display:none;align-items:center;justify-content:center;backdrop-filter:blur(3px)}
 .ov-motivo.on{display:flex}
@@ -616,7 +624,7 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
     <div class="si" role="menuitem" tabindex="0" aria-label="Carga da Equipe" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();nav('carga')}"" onclick="nav('carga')"><span class="si-ic">👥</span><span>Carga da Equipe</span></div>
     <div class="si" role="menuitem" tabindex="0" aria-label="Histórico de Edições" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();nav('historico')}"" onclick="nav('historico')"><span class="si-ic">📝</span><span>Histórico</span></div>
   </nav>
-  <div class="sb-foot" style="display:flex;align-items:center;justify-content:space-between"><span>v2.0 · Firjan SENAI</span><button class="dark-btn" id="darkBtn" onclick="toggleDark()">🌙</button></div>
+  <div class="sb-foot" style="display:flex;align-items:center;justify-content:space-between"><span>v2.0 · Firjan SENAI</span><div style="display:flex;gap:6px;align-items:center"><button class="dark-btn" id="darkBtn" onclick="toggleDark()">🌙</button><button id="sbToggleBtn" onclick="toggleSidebar()" title="Recolher menu">◀</button></div></div>
 
 </aside>
 
@@ -2418,17 +2426,24 @@ function openDet(id){
       <td style="white-space:nowrap;color:var(--green)">${fd(e.fim)||'—'}</td>
       <td>${sitEtapa(e)}</td>
       <td style="min-width:160px;font-size:11.5px;vertical-align:middle">
-        ${e.done && e.r!=='cl' && e.prazo && e.fim && new Date(e.prazo)<new Date(e.fim) && !ETAPAS_SEM_PRAZO_AUTO.has(e.lb)
-          ? e.atrasoMotivo
-            ? `<span style="color:var(--red)" title="${e.atrasoMotivo}">⚠️ ${e.atrasoMotivo.length>38?e.atrasoMotivo.slice(0,36)+'…':e.atrasoMotivo}</span>`
-            : '<span style="color:var(--mu);font-style:italic">sem motivo registrado</span>'
-          : ''
-        }
-        ${e.r==='cl' && !e.done && e.prazo && !ETAPAS_SEM_PRAZO_AUTO.has(e.lb)
-          ? `<span class="cl-dias">⏳ ${Math.max(0,Math.round((new Date()-new Date(e.prazo))/(864e5)))} dias em espera</span>`
-          : e.r==='cl' && e.done && e.diasCl!=null
-            ? `<span class="cl-dias" style="background:#DCFCE7;border-color:#16A34A;color:#14532D">✓ ${e.diasCl} dias aguardado</span>`
-            : ''
+        ${ETAPAS_SEM_PRAZO_AUTO.has(e.lb)
+          ? `<input class="fi ii" type="text" placeholder="Observação…"
+               value="${(e.obs||''   ).replace(/"/g,'&quot;')}"
+               style="width:100%;font-size:11.5px;padding:4px 7px"
+               onchange="setEObs(${id},${i},this.value)"
+               title="Observação livre para esta etapa">`
+          : `${e.done && e.r!=='cl' && e.prazo && e.fim && new Date(e.prazo)<new Date(e.fim)
+              ? e.atrasoMotivo
+                ? `<span style="color:var(--red)" title="${e.atrasoMotivo}">⚠️ ${e.atrasoMotivo.length>38?e.atrasoMotivo.slice(0,36)+'…':e.atrasoMotivo}</span>`
+                : '<span style="color:var(--mu);font-style:italic">sem motivo registrado</span>'
+              : ''
+            }
+            ${e.r==='cl' && !e.done && e.prazo
+              ? `<span class="cl-dias">⏳ ${Math.max(0,Math.round((new Date()-new Date(e.prazo))/(864e5)))} dias em espera</span>`
+              : e.r==='cl' && e.done && e.diasCl!=null
+                ? `<span class="cl-dias" style="background:#DCFCE7;border-color:#16A34A;color:#14532D">✓ ${e.diasCl} dias aguardado</span>`
+                : ''
+            }`
         }
       </td>
     </tr>`;
@@ -2984,6 +2999,12 @@ function detRespOpts(resps, valorAtual){
   const selCl = (valorAtual === 'cl') ? 'selected' : '';
   opts.push(`<option value="cl" ${selCl}>🏢 Cliente</option>`);
   return opts.join('');
+}
+
+function setEObs(pid,idx,v){
+  const p=DB.find(x=>x.id===pid);if(!p)return;
+  p.etapas[idx].obs=(v||'').trim();
+  fbSalvarProjeto(p);
 }
 
 function setER(pid,idx,v){
@@ -3770,6 +3791,27 @@ function cm(id){document.getElementById(id).classList.remove('on')}
 // ── EXPORTAÇÃO ─────────────────────────────────────────────────────────────
 
 // Dropdown toggle
+function toggleSidebar(){
+  const sb = document.querySelector('.sb');
+  const main = document.querySelector('.main');
+  const btn = document.getElementById('sbToggleBtn');
+  const collapsed = sb.classList.toggle('collapsed');
+  main.classList.toggle('sb-collapsed', collapsed);
+  btn.textContent = collapsed ? '▶' : '◀';
+  btn.title = collapsed ? 'Expandir menu' : 'Recolher menu';
+  localStorage.setItem('firjan_sb_collapsed', collapsed ? '1' : '0');
+}
+
+// Restaurar estado do menu ao carregar
+(function(){
+  if(localStorage.getItem('firjan_sb_collapsed')==='1'){
+    const sb=document.querySelector('.sb');
+    const main=document.querySelector('.main');
+    const btn=document.getElementById('sbToggleBtn');
+    if(sb&&main){sb.classList.add('collapsed');main.classList.add('sb-collapsed');if(btn){btn.textContent='▶';btn.title='Expandir menu';}}
+  }
+})();
+
 function toggleExportMenu(){
   const m = document.getElementById('exportMenu');
   const btn = document.getElementById('btnExport');
