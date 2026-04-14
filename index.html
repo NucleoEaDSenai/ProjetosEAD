@@ -386,13 +386,13 @@ tr.canc-row td{opacity:.55}
 .hom-field-val select:focus,.hom-field-val input:focus{border-color:var(--blue)}
 .hom-foot{padding:10px 14px;display:flex;justify-content:flex-end;gap:8px;background:var(--s2);border-top:1px solid var(--bdr)}
 .hom-status-ok{background:#DCFCE7;color:#15803D}
-.hom-status-pend{background:#FEE2E2;color:#991B1B}
-.hom-status-homolog{background:#FEF9C3;color:#854D0E}
+.hom-status-pend{background:#FEE2E2;color:#B91C1C}
+.hom-status-homolog{background:#FEF08A;color:#92400E}
 .hom-status-autorizado{background:#EFF6FF;color:#1D4ED8}
 .hom-empty{text-align:center;padding:48px 20px;color:var(--mu);font-size:13px}
 .hom-group-title{display:flex;align-items:center;gap:8px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;padding:8px 14px;border-radius:8px;margin-bottom:10px;margin-top:4px}
-.hom-group-title.pendente{background:#FEE2E2;color:#991B1B}
-.hom-group-title.homologado{background:#FEF9C3;color:#854D0E}
+.hom-group-title.pendente{background:#FEE2E2;color:#B91C1C}
+.hom-group-title.homologado{background:#FEF08A;color:#92400E}
 .hom-group-title.autorizado{background:#EFF6FF;color:#1D4ED8}
 .hom-group-title.instalado{background:#DCFCE7;color:#15803D}
 .hom-card-head{cursor:pointer;user-select:none}
@@ -403,7 +403,7 @@ tr.canc-row td{opacity:.55}
 .hom-body.open{max-height:2000px;opacity:1}
 .hom-sec-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--mu);padding:10px 14px 4px;background:var(--s2);border-bottom:1px solid var(--bdr);grid-column:span 4}
 .hom-instalado .hom-card-head{background:linear-gradient(135deg,#14532D,#15803d)}
-.hom-homologado .hom-card-head{background:linear-gradient(135deg,#92400E,#D97706)}
+.hom-homologado .hom-card-head{background:linear-gradient(135deg,#B45309,#F59E0B)}
 .hom-autorizado .hom-card-head{background:linear-gradient(135deg,#1D4ED8,#2563EB)}
 .hom-resumo{display:flex;flex-wrap:wrap;gap:10px;padding:10px 14px;background:var(--s2);border-top:1px solid var(--bdr)}
 .hom-resumo-item{font-size:11.5px;display:flex;gap:4px;align-items:center}
@@ -4397,8 +4397,8 @@ function exportPDFHomologacoes(){
   // ── Cards de estatísticas ──
   const cards = [
     { label:'Total', val: lista.length,           cor: AZUL,    icone:'TOTAL' },
-    { label:'Pendentes', val: grpPendente.length,  cor: [185,28,28],  icone:'PEND'  },
-    { label:'Homologados', val: grpHomologado.length, cor: [146,64,14], icone:'HOM' },
+    { label:'Pendentes', val: grpPendente.length,  cor: [185,28,28],  icone:'PEND'  }, // vermelho
+    { label:'Homologados', val: grpHomologado.length, cor: [161,98,7],  icone:'HOM' }, // ambar
     { label:'Autorizados', val: grpAutorizado.length, cor: AZUL2,   icone:'AUT' },
     { label:'Instalados', val: grpInstalado.length,   cor: VERDE,   icone:'INST' },
   ];
@@ -4555,7 +4555,7 @@ function exportPDFHomologacoes(){
   //  Renderizar os 4 grupos
   // ════════════════════════════════════════
   renderGrupo(grpPendente,   'PENDENTES — sem data de Homologacao',   [185,28,28],  [185,28,28],  [255,241,241], [220,38,38],  'Pendente');
-  renderGrupo(grpHomologado, 'HOMOLOGADOS — aguardando Autorizacao',  [146,64,14],  [146,64,14],  [255,251,235], [217,119,6],  'Homologado');
+  renderGrupo(grpHomologado, 'HOMOLOGADOS — aguardando Autorizacao',  [161,98,7],   [161,98,7],   [254,252,232], [234,179,8],  'Homologado');
   renderGrupo(grpAutorizado, 'AUTORIZADOS — aguardando Instalacao SIRH',   [0,61,165],  [0,61,165],  [239,246,255], [37,99,235],  'Autorizado');
   renderGrupo(grpInstalado,  'INSTALADOS NO SIRH',                    [21,128,61],  [21,128,61],  [240,253,244], [34,197,94],  'Instalado');
 
@@ -4931,11 +4931,11 @@ function rHomologacoes(){
   if(statsEl){
     statsEl.style.gridTemplateColumns = 'repeat(4,1fr)';
     statsEl.innerHTML = `
-      <div class="sc" style="border-left:4px solid var(--yel)">
+      <div class="sc" style="border-left:4px solid var(--red)">
         <div class="sc-l">⏳ Pendentes</div><div class="sc-v">${cntPendente}</div>
         <div class="sc-s">sem data de homologação</div><div class="sc-i">⏳</div>
       </div>
-      <div class="sc" style="border-left:4px solid var(--org)">
+      <div class="sc" style="border-left:4px solid var(--yel)">
         <div class="sc-l">🔖 Homologados</div><div class="sc-v">${cntHomologado}</div>
         <div class="sc-s">aguardando autorização</div><div class="sc-i">🔖</div>
       </div>
