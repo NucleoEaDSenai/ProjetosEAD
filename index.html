@@ -4538,7 +4538,7 @@ function exportPDFHomologacoes(){
 
     doc.autoTable({
       head: [[
-        'Projeto','RP','Academia','Solicitante','Homologado Por',
+        'Projeto','RP','Academia','Solicitou a Homologação','Homologado Por',
         'Servico','Tipo','Conclusao','ID Curso','Nota','Pag.',
         'Homologacao','Autorizacao','Instalacao'
       ]],
@@ -4873,7 +4873,7 @@ function buildHomologCard(p){
         <div class="hom-sec-title">👥 Responsáveis</div>
 
         <div class="hom-field">
-          <div class="hom-field-label">Solicitante</div>
+          <div class="hom-field-label">Solicitou a Homologação</div>
           <div class="hom-field-val">${_homSel(p.id,'solicitante',SOLICITANTES,h.solicitante||'')}</div>
         </div>
         <div class="hom-field">
@@ -4958,9 +4958,9 @@ function _popularFiltrosHomolog(lista){
   const val1 = sel1.value;
   const val2 = sel2.value;
 
-  sel1.innerHTML = '<option value="">👤 Solicitante — Todos</option>'
+  sel1.innerHTML = '<option value="">👤 Solicitou a Homologação — Todos</option>'
     + solicitantes.map(s=>`<option value="${s}" ${val1===s?'selected':''}>${s}</option>`).join('');
-  sel2.innerHTML = '<option value="">📤 Enviada Por — Todos</option>'
+  sel2.innerHTML = '<option value="">📤 Homologado Por — Todos</option>'
     + enviadosPor.map(s=>`<option value="${s}" ${val2===s?'selected':''}>${s}</option>`).join('');
 }
 
