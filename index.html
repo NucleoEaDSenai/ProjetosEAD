@@ -3514,6 +3514,7 @@ function getSelectedResps(){
 
 // Estado temporário das etapas no formulário (array mutável durante edição)
 let _efEtapas = [];
+let _efCascataAtiva = true; // flag: cascateamento automático de datas
 
 // Gera as <option> do select de responsável por etapa
 // com base nos responsáveis alocados no projeto (lidos dos chips selecionados)
@@ -3543,13 +3544,33 @@ function _efRespOpts(valorAtual){
 
 function buildEF(etapas){
   _efEtapas = etapas.map(e=>({...e, _prazoAntes: e.prazo||null})); // guarda prazo inicial para cascata
+  _efCascataAtiva = true; // sempre começa com cascata ativa
   _renderEF();
 }
 
 function _renderEF(){
   const wrap = document.getElementById('etapasForm');
   if(!wrap) return;
+  // Label e estilo do botão conforme estado atual
+  const _btnCascLabel = _efCascataAtiva
+    ? '🔗 Cascata: ON'
+    : '✂️ Cascata: OFF';
+  const _btnCascStyle = _efCascataAtiva
+    ? 'background:#DCFCE7;color:#15803D;border:1.5px solid #86EFAC;'
+    : 'background:#FEE2E2;color:#991B1B;border:1.5px solid #FCA5A5;';
+
   wrap.innerHTML = `
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+      <span style="font-size:11px;color:var(--mu)">
+        ${_efCascataAtiva
+          ? '🔗 Cascata <strong>ativa</strong> — ao editar uma data, as demais se ajustam automaticamente'
+          : '✂️ Cascata <strong>desativada</strong> — edite cada data manualmente sem afetar as demais'}
+      </span>
+      <button type="button" onclick="_efToggleCascata()"
+        style="padding:5px 13px;border-radius:7px;cursor:pointer;font-size:12px;font-weight:700;font-family:'Plus Jakarta Sans',sans-serif;transition:all .15s;${_btnCascStyle}">
+        ${_btnCascLabel}
+      </button>
+    </div>
     <table class="et">
       <thead><tr>
         <th style="width:28px">#</th>
@@ -3608,10 +3629,24 @@ function _renderEF(){
 
 // Lê estado atual dos inputs para _efEtapas antes de operar
 // Cascata de datas no formulário de criação/edição
+function _efToggleCascata(){
+  _efSync(); // salvar estado atual antes de re-renderizar
+  _efCascataAtiva = !_efCascataAtiva;
+  _renderEF();
+  showToast(_efCascataAtiva ? '🔗 Cascata ativada' : '✂️ Cascata desativada — edição manual livre');
+}
+
 function _efCascata(idx){
   _efSync(); // ler estado atual dos inputs para _efEtapas
-  const prazoAnt = _efEtapas[idx]._prazoAntes; // valor antes da edição
+  const prazoAnt = _efEtapas[idx]._prazoAntes; // valor ANTES da edição (lido antes de sobrescrever)
   const novaData = _efEtapas[idx].prazo;
+
+  if(!_efCascataAtiva){
+    // Cascata desligada: apenas atualiza _prazoAntes desta etapa e sai
+    _efEtapas[idx]._prazoAntes = novaData;
+    return;
+  }
+
   if(!prazoAnt || !novaData || prazoAnt === novaData) return;
 
   // Delta em dias úteis
