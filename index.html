@@ -1338,7 +1338,7 @@ function atrasadoPorEquipe(p){
 
 function calcSit(p){
   if(p.cancelado) return 'cancelado';
-  if(p.pct===100 || p.col===13 || p.col===14) return 'concluido';
+  if(p.pct===100 || p.col===14) return 'concluido';
   // atraso: prazo passou e não concluído
   if(p.prazo && new Date(p.prazo)<new Date() && p.pct<100) return 'atrasado';
   // em andamento: tem data de início ou etapas em curso
