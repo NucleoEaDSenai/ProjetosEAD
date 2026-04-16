@@ -3447,6 +3447,15 @@ function toggleRec(el, recurso){
   // Data de início preenchida no formulário
   const dataInicio = getDateField('fi');
 
+  // Se etapas estão travadas (cascata OFF ou edição manual), nunca sobrescrever
+  if(_efEtapasLockadas){
+    // Ainda aplica cronograma de datas se cascata estiver ON e houver data de início
+    if(_efCascataAtiva && (cronRecurso || tmplRecurso) && dataInicio){
+      aplicarCronograma(cronRecurso||tmplRecurso, dataInicio);
+    }
+    return;
+  }
+
   // Só aplica template/padrão se não há etapas customizadas
   const temEtapasCustom = _efEtapas.length > 0 &&
     _efEtapas.some(e => e.lb && !ETPS_DEF.some(d => d.lb === e.lb) &&
@@ -3514,7 +3523,8 @@ function getSelectedResps(){
 
 // Estado temporário das etapas no formulário (array mutável durante edição)
 let _efEtapas = [];
-let _efCascataAtiva = true; // flag: cascateamento automático de datas
+let _efCascataAtiva = true;   // flag: cascateamento automático de datas
+let _efEtapasLockadas = false; // flag: etapas bloqueadas contra regravação pelo template
 
 // Gera as <option> do select de responsável por etapa
 // com base nos responsáveis alocados no projeto (lidos dos chips selecionados)
@@ -3545,6 +3555,7 @@ function _efRespOpts(valorAtual){
 function buildEF(etapas){
   _efEtapas = etapas.map(e=>({...e, _prazoAntes: e.prazo||null})); // guarda prazo inicial para cascata
   _efCascataAtiva = true; // sempre começa com cascata ativa
+  // _efEtapasLockadas é gerenciado por openNew/openEdit/toggleCascata — não resetar aqui
   _renderEF();
 }
 
@@ -3558,13 +3569,17 @@ function _renderEF(){
   const _btnCascStyle = _efCascataAtiva
     ? 'background:#DCFCE7;color:#15803D;border:1.5px solid #86EFAC;'
     : 'background:#FEE2E2;color:#991B1B;border:1.5px solid #FCA5A5;';
+  const _lockBadge = _efEtapasLockadas
+    ? '<span style="font-size:10px;background:#FEF9C3;color:#92400E;border:1px solid #FCD34D;border-radius:4px;padding:1px 6px;margin-left:6px">🔒 etapas travadas</span>'
+    : '';
 
   wrap.innerHTML = `
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
       <span style="font-size:11px;color:var(--mu)">
         ${_efCascataAtiva
           ? '🔗 Cronograma Automático <strong>ativado</strong> — ao editar uma data, as demais se ajustam automaticamente'
-          : '✂️ Cronograma Automático<strong>desativado</strong> — edite cada data manualmente sem afetar as demais'}
+          : '✂️ Cronograma Automático <strong>desativado</strong> — edite cada data manualmente sem afetar as demais'}
+        ${_lockBadge}
       </span>
       <button type="button" onclick="_efToggleCascata()"
         style="padding:5px 13px;border-radius:7px;cursor:pointer;font-size:12px;font-weight:700;font-family:'Plus Jakarta Sans',sans-serif;transition:all .15s;${_btnCascStyle}">
@@ -3632,8 +3647,13 @@ function _renderEF(){
 function _efToggleCascata(){
   _efSync(); // salvar estado atual antes de re-renderizar
   _efCascataAtiva = !_efCascataAtiva;
+  // Quando desliga cascata → trava etapas contra regravação pelo template
+  // Quando religa → mantém travado (usuário escolheu edição manual)
+  if(!_efCascataAtiva) _efEtapasLockadas = true;
   _renderEF();
-  showToast(_efCascataAtiva ? '🔗 Cascata ativada' : '✂️ Cascata desativada — edição manual livre');
+  showToast(_efCascataAtiva
+    ? '🔗 Cascata ativada — datas se ajustam automaticamente'
+    : '✂️ Cascata desativada — etapas travadas contra o template');
 }
 
 function _efCascata(idx){
@@ -3785,6 +3805,7 @@ function openNew(){
   document.getElementById('fcol').value='0';
   stab(0,document.querySelectorAll('.tab')[0]);
   buildRespChips([]);
+  _efEtapasLockadas = false;
   buildEF(ETPS_DEF.map(e=>({...e,prazo:null})));
   document.getElementById('ovNew').classList.add('on');
   setTimeout(()=>{const f=document.querySelector('#ovNew .fi');if(f)f.focus();},80);
@@ -3815,6 +3836,7 @@ function openEdit(id){
   document.getElementById('fpo').value=p.prazObs||'';
   stab(0,document.querySelectorAll('.tab')[0]);
   buildRespChips(p.resps||[]);
+  _efEtapasLockadas = false;
   buildEF(p.etapas||ETPS_DEF.map(e=>({...e,prazo:null})));
   document.getElementById('ovNew').classList.add('on');
 }
