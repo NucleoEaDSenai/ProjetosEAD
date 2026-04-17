@@ -1043,20 +1043,20 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
             <label class="fl" for="fAcademia">Academia</label>
             <select class="prio-select" id="fAcademia" aria-label="Academia do projeto" style="width:100%">
               <option value="">— Sem Academia —</option>
-              <option value="SMS">SMS</option>
-              <option value="FSGC">FSGC</option>
-              <option value="GPTDI">GPTDI</option>
-              <option value="CCT-OM">CCT-OM</option>
+              <option value="CEEI">CEEI</option>
               <option value="CL">CL</option>
               <option value="COA/T&D">COA/T&D</option>
+              <option value="EXP">EXP</option>
+              <option value="FSGC">FSGC</option>
               <option value="GL">GL</option>
+              <option value="GPTDI">GPTDI</option>
               <option value="ITD">ITD</option>
               <option value="Local">Local</option>
+              <option value="NTTE">NTTE</option>
               <option value="POÇOS">POÇOS</option>
               <option value="PPRG">PPRG</option>
+              <option value="SMS">SMS</option>
               <option value="SUB-NAV">SUB-NAV</option>
-              <option value="NTTE">NTTE</option>
-              <option value="EXP">EXP</option>
             </select>
           </div>
         </div>
@@ -1533,7 +1533,7 @@ function populateFiltSelects(){
   // Popular Academia no Kanban
   const kAcadEl = document.getElementById('kFiltAcad');
   if(kAcadEl){
-    const ACADS_FIXAS=['SMS','FSGC','GPTDI','CCT-OM','CCT-FSGC','CL','COA/T&D','GL','ITD','Local','POÇOS','PPRG','SUB-NAV','NTTE'];
+    const ACADS_FIXAS=["CCT-FSGC", "CEEI", "CL", "COA/T&D", "EXP", "FSGC", "GL", "GPTDI", "ITD", "Local", "NTTE", "PO\u00c7OS", "PPRG", "SMS", "SUB-NAV"];
     const acadsProj=[...new Set(activeDB().map(p=>p.academia).filter(Boolean))];
     const acads=[...new Set([...ACADS_FIXAS,...acadsProj])].sort();
     const cur=kAcadEl.value;
