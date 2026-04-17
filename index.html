@@ -3171,9 +3171,9 @@ function atualizarEstadoPrazo(){
 
 function onDataInicioChange(){
   atualizarEstadoPrazo();
+  if(_efEtapasLockadas) return; // modo manual: não recalcular ao mudar data início
   const dataInicio = getDateField('fi');
   if(!dataInicio){
-    // Data de início apagada → limpar prazo automático se houver cronograma ativo
     const selecionados = getSelectedRecs();
     const temCron = selecionados.some(r => CRONOGRAMAS[r]);
     if(temCron) iso2dma('', 'fp');
@@ -3390,42 +3390,80 @@ function aplicarCronograma(recurso, dataInicio){
   const cron = CRONOGRAMAS[recurso];
   if(!cron || !dataInicio) return;
 
-  // ── Alerta de prazo inviável ──
-  const totalCronDias = cron.reduce((s,c)=>s+c.dias, 0);
-  const prazoAtual = getDateField('fp');
-  if(prazoAtual && prazoAtual > dataInicio){
-    const duDisponiveis = diasUteisTotais(dataInicio, prazoAtual);
-    if(duDisponiveis < totalCronDias){
-      const falta = totalCronDias - duDisponiveis;
-      showToast(`⚠️ Prazo curto: faltam ${falta} dias úteis para completar o cronograma de ${recurso} (${totalCronDias}du necessários)`);
-    }
-  }
+  // ── Modo desligado: nunca tocar nas datas ──
+  if(_efEtapasLockadas) return;
 
   _efSync();
 
-  let cursor   = dataInicio;
-  const usados = new Set();
-
-  _efEtapas.forEach(e => {
-    if(!e.lb){ return; }
+  // ── Verificar se as etapas batem com o template ──
+  const etapasTemNomeTemplate = _efEtapas.filter(e => e.lb).every(e => {
     const lbLow = e.lb.toLowerCase();
-    const idx = cron.findIndex((c, i) =>
-      !usados.has(i) && (
-        lbLow.includes(c.lb.toLowerCase()) ||
-        c.lb.toLowerCase().includes(lbLow)
-      )
-    );
-    if(idx === -1){ e.prazo = null; return; }
-    usados.add(idx);
-    cursor = addDiasUteis(cursor, cron[idx].dias);
-    e.prazo = cursor;
+    return cron.some(c =>
+      lbLow.includes(c.lb.toLowerCase()) || c.lb.toLowerCase().includes(lbLow)
+    ) || ETAPAS_SEM_PRAZO_AUTO.has(e.lb);
   });
 
-  // Preencher campo Prazo de Entrega automaticamente com a data da última etapa
+  const totalCronDias = cron.reduce((s, c) => s + c.dias, 0);
+
+  if(etapasTemNomeTemplate){
+    // ── Modo normal: casar etapas por nome ──
+    const prazoAtual = getDateField('fp');
+    if(prazoAtual && prazoAtual > dataInicio){
+      const duDisponiveis = diasUteisTotais(dataInicio, prazoAtual);
+      if(duDisponiveis < totalCronDias){
+        const falta = totalCronDias - duDisponiveis;
+        showToast(`⚠️ Prazo curto: faltam ${falta} dias úteis (${recurso} precisa de ${totalCronDias}du)`);
+      }
+    }
+    let cursor = dataInicio;
+    const usados = new Set();
+    _efEtapas.forEach(e => {
+      if(!e.lb) return;
+      const lbLow = e.lb.toLowerCase();
+      const idx = cron.findIndex((c, i) =>
+        !usados.has(i) && (
+          lbLow.includes(c.lb.toLowerCase()) ||
+          c.lb.toLowerCase().includes(lbLow)
+        )
+      );
+      if(idx === -1){ e.prazo = null; return; }
+      usados.add(idx);
+      cursor = addDiasUteis(cursor, cron[idx].dias);
+      e.prazo = cursor;
+    });
+  } else {
+    // ── Modo personalizado: distribuir proporcionalmente dentro do range do template ──
+    // Data máxima = dataInicio + totalCronDias úteis
+    const dataMax = addDiasUteis(dataInicio, totalCronDias);
+
+    // Etapas que podem receber prazo (excluindo sem prazo auto)
+    const etapasComPrazo = _efEtapas.filter(e => e.lb && !ETAPAS_SEM_PRAZO_AUTO.has(e.lb));
+    const n = etapasComPrazo.length;
+
+    if(n > 0){
+      // Distribuir uniformemente: cada etapa recebe (totalCronDias / n) dias úteis
+      const diasPorEtapa = Math.max(1, Math.floor(totalCronDias / n));
+      let cursor = dataInicio;
+      let etapasUsadas = 0;
+      _efEtapas.forEach(e => {
+        if(!e.lb || ETAPAS_SEM_PRAZO_AUTO.has(e.lb)){ e.prazo = null; return; }
+        etapasUsadas++;
+        // Última etapa vai exatamente até dataMax para não ultrapassar
+        if(etapasUsadas === n){
+          e.prazo = dataMax;
+        } else {
+          cursor = addDiasUteis(cursor, diasPorEtapa);
+          e.prazo = cursor;
+        }
+      });
+    }
+  }
+
+  // Preencher campo Prazo de Entrega com a data da última etapa
   const ultimoPrazo = [..._efEtapas].reverse().find(e => e.prazo)?.prazo;
   if(ultimoPrazo) iso2dma(ultimoPrazo, 'fp');
 
-  // Atualizar _prazoAntes após aplicar cronograma (nova referência para cascata)
+  // Atualizar _prazoAntes
   _efEtapas = _efEtapas.map(e => ({...e, _prazoAntes: e.prazo||null}));
   _renderEF();
 }
@@ -3447,14 +3485,8 @@ function toggleRec(el, recurso){
   // Data de início preenchida no formulário
   const dataInicio = getDateField('fi');
 
-  // Se etapas estão travadas (cascata OFF ou edição manual), nunca sobrescrever
-  if(_efEtapasLockadas){
-    // Ainda aplica cronograma de datas se cascata estiver ON e houver data de início
-    if(_efCascataAtiva && (cronRecurso || tmplRecurso) && dataInicio){
-      aplicarCronograma(cronRecurso||tmplRecurso, dataInicio);
-    }
-    return;
-  }
+  // Se etapas estão travadas (modo manual), nunca sobrescrever nomes/estrutura
+  if(_efEtapasLockadas) return;
 
   // Só aplica template/padrão se não há etapas customizadas
   const temEtapasCustom = _efEtapas.length > 0 &&
@@ -3645,15 +3677,27 @@ function _renderEF(){
 // Lê estado atual dos inputs para _efEtapas antes de operar
 // Cascata de datas no formulário de criação/edição
 function _efToggleCascata(){
-  _efSync(); // salvar estado atual antes de re-renderizar
+  _efSync();
   _efCascataAtiva = !_efCascataAtiva;
-  // Quando desliga cascata → trava etapas contra regravação pelo template
-  // Quando religa → mantém travado (usuário escolheu edição manual)
-  if(!_efCascataAtiva) _efEtapasLockadas = true;
-  _renderEF();
-  showToast(_efCascataAtiva
-    ? '🔗 Cascata ativada — datas se ajustam automaticamente'
-    : '✂️ Cascata desativada — etapas travadas contra o template');
+
+  if(!_efCascataAtiva){
+    // Desligou → travar etapas contra qualquer regravação
+    _efEtapasLockadas = true;
+    _renderEF();
+    showToast('✂️ Cronograma desativado — edite datas e etapas livremente');
+  } else {
+    // Religou → destrava e reaaplica cronograma proporcional (respeita etapas personalizadas)
+    _efEtapasLockadas = false;
+    _renderEF();
+    const dataInicio = getDateField('fi');
+    if(dataInicio){
+      const selecionados = getSelectedRecs();
+      for(const r of selecionados){
+        if(CRONOGRAMAS[r]){ aplicarCronograma(r, dataInicio); break; }
+      }
+    }
+    showToast('🔗 Cronograma ativado — datas ajustadas proporcionalmente');
+  }
 }
 
 function _efCascata(idx){
@@ -3744,6 +3788,7 @@ function _efAdd(){
 
 // Reaplica cronograma automaticamente se houver recurso + data início preenchidos
 function _efReaplicarCronograma(){
+  if(_efEtapasLockadas) return; // modo manual: nunca reaplicar
   const dataInicio = getDateField('fi');
   if(!dataInicio) return;
   const selecionados = getSelectedRecs();
@@ -4715,6 +4760,12 @@ function enviarMedicao(id){
 
 function confirmarMedicao(id){
   const p = DB.find(x=>x.id===id); if(!p) return;
+  // Apenas usuários com "Liderança" no nome podem confirmar/desmarcar medição
+  const usuConfirm = nomeUsuarioAtual();
+  if(!usuConfirm.toLowerCase().includes('liderança')){
+    showToast('🚫 Apenas a Liderança pode confirmar a Medição');
+    return;
+  }
   if(p.medicaoFeita){
     if(!confirm(`Desmarcar a medição de "${p.nome}"?`)) return;
     p.medicaoFeita   = false;
