@@ -3156,12 +3156,14 @@ function buildRecChips(selected){
 function atualizarEstadoPrazo(){
   const selecionados = getSelectedRecs();
   const temCron = selecionados.some(r => CRONOGRAMAS[r]);
+  // Se cronograma desligado (modo manual), prazo sempre editável
+  const bloquear = temCron && !_efEtapasLockadas;
   const campos = ['fp_d','fp_m','fp_a'];
   const lbl = document.getElementById('lblPrazo');
   campos.forEach(id => {
     const el = document.getElementById(id);
     if(!el) return;
-    if(temCron){
+    if(bloquear){
       el.readOnly = true;
       el.style.background  = 'var(--s2)';
       el.style.color       = 'var(--mu)';
@@ -3175,9 +3177,11 @@ function atualizarEstadoPrazo(){
       el.title = '';
     }
   });
-  if(lbl) lbl.textContent = temCron
+  if(lbl) lbl.textContent = bloquear
     ? 'Prazo de Entrega (automático 🔒)'
-    : 'Prazo de Entrega';
+    : temCron
+      ? 'Prazo de Entrega (cronograma desligado ✏️)'
+      : 'Prazo de Entrega';
 }
 
 function onDataInicioChange(){
@@ -3692,14 +3696,16 @@ function _efToggleCascata(){
   _efCascataAtiva = !_efCascataAtiva;
 
   if(!_efCascataAtiva){
-    // Desligou → travar etapas contra qualquer regravação
+    // Desligou → travar etapas contra qualquer regravação e liberar prazo
     _efEtapasLockadas = true;
     _renderEF();
-    showToast('✂️ Cronograma desativado — edite datas e etapas livremente');
+    atualizarEstadoPrazo(); // desbloqueia campo prazo
+    showToast('✂️ Cronograma desativado — edite datas, etapas e prazo livremente');
   } else {
-    // Religou → destrava e reaaplica cronograma proporcional (respeita etapas personalizadas)
+    // Religou → destrava e reaplica cronograma proporcional (respeita etapas personalizadas)
     _efEtapasLockadas = false;
     _renderEF();
+    atualizarEstadoPrazo(); // bloqueia campo prazo novamente
     const dataInicio = getDateField('fi');
     if(dataInicio){
       const selecionados = getSelectedRecs();
