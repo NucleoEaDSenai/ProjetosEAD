@@ -2295,12 +2295,12 @@ function rAtrasos(){
           return;
         }
       } else if(!e.done && new Date(e.prazo) < new Date()){
-        // Etapa em aberto atrasada: atraso = hoje - prazo
-        // Mas se há uma etapa anterior, conta a partir dela
-        const base = antFim && new Date(antFim) > new Date(e.prazo)
-          ? antFim   // etapa anterior concluída depois do prazo desta = wait real
-          : e.prazo;
-        diasAtraso = Math.round((new Date() - new Date(base)) / 864e5);
+        // Etapa em aberto atrasada: atraso = hoje - prazo (só conta se prazo < hoje sem hora)
+        const _ah=new Date();_ah.setHours(0,0,0,0);
+        const _ap=new Date(e.prazo+'T00:00:00');
+        if(!(_ap<_ah)) return; // prazo é hoje → não é atraso
+        const base = antFim && new Date(antFim) > _ap ? antFim : e.prazo;
+        diasAtraso = Math.round((_ah - new Date(base+'T00:00:00')) / 864e5);
         statusEtapa = 'aberta_atraso';
         totalAberto++;
         if(e.r!=='cl') totalEq++; else totalCl++;
@@ -2469,9 +2469,11 @@ function sitEtapa(e){
   // Etapas sem prazo automático: nunca mostrar atraso
   if(ETAPAS_SEM_PRAZO_AUTO.has(e.lb)) return`<span class="sit sit-pend">Pendente</span>`;
   if(!e.prazo) return`<span class="sit sit-pend">Pendente</span>`;
-  const ov=new Date(e.prazo)<new Date();
+  const _hoje0=new Date(); _hoje0.setHours(0,0,0,0);
+  const _prazo0=new Date(e.prazo+'T00:00:00');
+  const ov=_prazo0<_hoje0;
   if(e.r==='cl'){
-    const diasEspera=Math.max(0,Math.round((new Date()-new Date(e.prazo))/(864e5)));
+    const diasEspera=Math.max(0,Math.round((_hoje0-_prazo0)/(864e5)));
     if(ov) return`<span class="sit sit-ov">⏳ Aguard. cliente <strong>${diasEspera} dias</strong></span>`;
     return`<span class="sit sit-and">⏳ Aguardando cliente</span>`;
   }
@@ -2486,7 +2488,8 @@ function openDet(id){
   const{eq,cl}=delInf(p);
   const eRows=(p.etapas||[]).map((e,i)=>{
     const isCl=e.r==='cl';
-    const rowCls=e.done?'done-row':(!e.done&&e.prazo&&new Date(e.prazo)<new Date()&&!ETAPAS_SEM_PRAZO_AUTO.has(e.lb)?'ov-row':'');
+    const _rh=new Date();_rh.setHours(0,0,0,0);const _rp=new Date(e.prazo+'T00:00:00');
+    const rowCls=e.done?'done-row':(!e.done&&e.prazo&&_rp<_rh&&!ETAPAS_SEM_PRAZO_AUTO.has(e.lb)?'ov-row':'');
     return`<tr class="${rowCls}">
       <td><div style="display:flex;align-items:center;gap:6px">
         <div class="chk ${e.done?'done':isCl&&!e.done&&!ETAPAS_SEM_PRAZO_AUTO.has(e.lb)?'cwait':''}" onclick="toggleE(${id},${i})">${e.done?'✓':isCl&&!ETAPAS_SEM_PRAZO_AUTO.has(e.lb)?'⏳':''}</div>
@@ -3003,9 +3006,11 @@ function toggleE(pid,idx){
   renderAll();
 
   // Etapa da equipe concluída com atraso → abrir modal de motivo
-  if(e.done && e.r!=='cl' && e.prazo && new Date(e.prazo)<new Date() && !ETAPAS_SEM_PRAZO_AUTO.has(e.lb)){
+  const _mh=new Date();_mh.setHours(0,0,0,0);
+  const _mp=e.prazo?new Date(e.prazo+'T00:00:00'):null;
+  if(e.done && e.r!=='cl' && _mp && _mp<_mh && !ETAPAS_SEM_PRAZO_AUTO.has(e.lb)){
     _motivoPid=pid; _motivoIdx=idx;
-    const d=Math.round((new Date()-new Date(e.prazo))/(864e5));
+    const d=Math.round((_mh-_mp)/(864e5));
     document.getElementById('motivoDesc').textContent=
       '"'+e.lb+'" foi concluída com '+d+' dia(s) de atraso. Registre o motivo para o histórico.';
     document.getElementById('motivoTxt').value=e.atrasoMotivo||'';
