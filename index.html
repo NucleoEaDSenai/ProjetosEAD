@@ -1057,6 +1057,7 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
           <label class="fl">Tipos de Recurso — selecione um ou mais</label>
           <div class="rec-wrap" id="recChips"></div>
         </div>
+        <div class="fg ff"><label class="fl">Link BDOC</label><input class="fi" type="url" id="fLinkBdoc" placeholder="https://..." style="width:100%"></div>
         <div class="fg ff"><label class="fl">Descrição / Objetivo</label><textarea class="fta" id="fd" placeholder="Objetivo, público-alvo, contexto..."></textarea></div>
 
       </div>
@@ -2534,6 +2535,7 @@ function openDet(id){
       <div>
         ${dl2('Responsável(is)',avList(p.resps)+'<div style="font-size:11.5px;margin-top:3px">'+(p.resps||[]).join(', ')+'</div>')}
         ${dl2('Progresso',progH(p,'110px'))}
+        ${p.linkBdoc?dl2('Link BDOC',`<a href="${p.linkBdoc}" target="_blank" rel="noopener noreferrer" style="color:var(--blue);text-decoration:underline;word-break:break-all;font-size:12.5px">🔗 ${p.linkBdoc}</a>`):''}
         ${p.prazObs?dl2('Obs. Prazo',`<em style="color:var(--mu)">${p.prazObs}</em>`):''}
       </div>
     </div>
@@ -3826,7 +3828,7 @@ function toggleIdCursoInput(){
 function openNew(){
   editId=null;
   document.getElementById('mNewTitle').textContent='Novo Projeto EAD';
-  ['fn','fd','fpo'].forEach(id=>document.getElementById(id).value='');
+  ['fn','fd','fpo','fLinkBdoc'].forEach(id=>document.getElementById(id).value='');
   const prioEl=document.getElementById('fPrio');if(prioEl)prioEl.value='';
   const rpEl=document.getElementById('fRP');if(rpEl)rpEl.value='';
   const acadEl=document.getElementById('fAcademia');if(acadEl)acadEl.value='';
@@ -3874,6 +3876,7 @@ function openEdit(id){
   iso2dma(p.prazo||'','fp');
   iso2dma(p.termino||'','fte');
   document.getElementById('fpo').value=p.prazObs||'';
+  const _lbEl=document.getElementById('fLinkBdoc');if(_lbEl)_lbEl.value=p.linkBdoc||'';
   stab(0,document.querySelectorAll('.tab')[0]);
   buildRespChips(p.resps||[]);
   _efEtapasLockadas = false;
@@ -3905,6 +3908,7 @@ function salvar(){
     criado:getDateField('fcr')||td(),
     inicio, prazo, termino:getDateField('fte'),
     pct, prazObs:document.getElementById('fpo').value,
+    linkBdoc:document.getElementById('fLinkBdoc')?.value.trim()||'',
     cancelado:editId?(projAnterior?.cancelado||false):false,
     cancelEm:editId?(projAnterior?.cancelEm||''):'',
     cancelMotivo:editId?(projAnterior?.cancelMotivo||''):'',
@@ -3917,7 +3921,8 @@ function salvar(){
     prioridade:document.getElementById('fPrio')?.value||'',
     rp:document.getElementById('fRP')?.value||'',
     academia:document.getElementById('fAcademia')?.value||'',
-    tags:editId?(DB.find(x=>x.id===editId)?.tags||[]):[],  // preserva tags existentes
+    tags:editId?(DB.find(x=>x.id===editId)?.tags||[]):[],
+    linkBdoc:document.getElementById('fLinkBdoc')?.value.trim()||projAnterior?.linkBdoc||'',  // preserva tags existentes
     historico:projAnterior?.historico||[],
     etapas,
   };
@@ -4725,10 +4730,10 @@ function exportPDFHomologacoes(){
 
 // ── CSV (mantido como fallback interno) ──
 function exportCSV(){
-  const hdr='ID,Nome,Recursos,Tags,Situação,Coluna,Responsáveis,RP,Academia,Prioridade,Criado,Início,Prazo,Término,% Concluído,Atraso Eq(d),Atraso Cl(d)';
+  const hdr='ID,Nome,Recursos,Tags,Situação,Coluna,Responsáveis,RP,Academia,Prioridade,Criado,Início,Prazo,Término,% Concluído,Atraso Eq(d),Atraso Cl(d),Link BDOC';
   const rows=activeDB().concat(cancelDB()).map(p=>{
     const{eq,cl}=delInf(p);
-    return[p.id,`"${p.nome}"`,`"${(p.recursos||[]).join('; ')}"`,`"${(p.tags||[]).join('; ')}"`,sitLabel(p),colLabel(p.col),`"${(p.resps||[]).join('; ')}"`,p.rp||'',p.academia||'',p.prioridade||'',p.criado,p.inicio||'',p.prazo||'',p.termino||'',p.pct,eq,cl].join(',');
+    return[p.id,`"${p.nome}"`,`"${(p.recursos||[]).join('; ')}"`,`"${(p.tags||[]).join('; ')}"`,sitLabel(p),colLabel(p.col),`"${(p.resps||[]).join('; ')}"`,p.rp||'',p.academia||'',p.prioridade||'',p.criado,p.inicio||'',p.prazo||'',p.termino||'',p.pct,eq,cl,`"${p.linkBdoc||''}"`].join(',');
   });
   const a=document.createElement('a');
   a.href='data:text/csv;charset=utf-8,'+encodeURIComponent('\uFEFF'+[hdr,...rows].join('\n'));
