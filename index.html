@@ -1352,9 +1352,16 @@ function sitBdg(p){
   return map[s]||`<span class="bdg b-ag">${s}</span>`;
 }
 
+
+// Verifica se uma etapa é isenta de atraso para Produção Apostila/E-book
+function _isApostilaIsentaAtraso(p, e){
+  if(!(p.recursos||[]).includes('Produção Apostila/E-book')) return false;
+  const lb = (e.lb||'').toLowerCase();
+  return lb.includes('validação final') || lb.includes('upload');
+}
 function delInf(p){
-  // Próxima etapa que conta para atraso: não concluída e fora das etapas sem prazo automático
-  const proxima = (p.etapas||[]).find(e => !e.done && !ETAPAS_SEM_PRAZO_AUTO.has(e.lb));
+  // Próxima etapa que conta para atraso: não concluída, fora das etapas sem prazo automático e não isenta
+  const proxima = (p.etapas||[]).find(e => !e.done && !ETAPAS_SEM_PRAZO_AUTO.has(e.lb) && !_isApostilaIsentaAtraso(p, e));
   let eq=0, cl=0;
   if(proxima && proxima.prazo && new Date(proxima.prazo)<new Date()){
     const d = dd(proxima.prazo, td());
@@ -2257,6 +2264,8 @@ function rAtrasos(){
       if(!e.prazo && !e.fim) return;
       // Etapas sem prazo automático nunca entram no relatório de atrasos
       if(ETAPAS_SEM_PRAZO_AUTO.has(e.lb)) return;
+      // Apostila/E-book: Validação Final e Upload isentas de atraso
+      if(_isApostilaIsentaAtraso(p, e)) return;
       // Etapas concluídas não aparecem mais no relatório
       if(e.done) return;
       // Para etapas em aberto: mostrar apenas a próxima etapa não concluída
@@ -2425,10 +2434,12 @@ function rCancelados(){
 }
 
 // ── DETAIL ──
-function sitEtapa(e){
+function sitEtapa(e, p){
   if(e.done) return`<span class="sit sit-done">✓ Concluída</span>`;
   // Etapas sem prazo automático: nunca mostrar atraso
   if(ETAPAS_SEM_PRAZO_AUTO.has(e.lb)) return`<span class="sit sit-pend">Pendente</span>`;
+  // Apostila/E-book: Validação Final e Upload nunca mostram atraso
+  if(p && _isApostilaIsentaAtraso(p, e)) return`<span class="sit sit-pend">Pendente</span>`;
   if(!e.prazo) return`<span class="sit sit-pend">Pendente</span>`;
   const _hoje0=new Date(); _hoje0.setHours(0,0,0,0);
   const _prazo0=new Date(e.prazo+'T00:00:00');
@@ -2450,7 +2461,8 @@ function openDet(id){
   const eRows=(p.etapas||[]).map((e,i)=>{
     const isCl=e.r==='cl';
     const _rh=new Date();_rh.setHours(0,0,0,0);const _rp=new Date(e.prazo+'T00:00:00');
-    const rowCls=e.done?'done-row':(!e.done&&e.prazo&&_rp<_rh&&!ETAPAS_SEM_PRAZO_AUTO.has(e.lb)?'ov-row':'');
+    const _isentaAtraso = ETAPAS_SEM_PRAZO_AUTO.has(e.lb) || _isApostilaIsentaAtraso(p, e);
+    const rowCls=e.done?'done-row':(!e.done&&e.prazo&&_rp<_rh&&!_isentaAtraso?'ov-row':'');
     return`<tr class="${rowCls}">
       <td><div style="display:flex;align-items:center;gap:6px">
         <div class="chk ${e.done?'done':isCl&&!e.done&&!ETAPAS_SEM_PRAZO_AUTO.has(e.lb)?'cwait':''}" onclick="toggleE(${id},${i})">${e.done?'✓':isCl&&!ETAPAS_SEM_PRAZO_AUTO.has(e.lb)?'⏳':''}</div>
@@ -2486,7 +2498,7 @@ function openDet(id){
         </div>
       </td>
       <td style="white-space:nowrap;color:var(--green)">${fd(e.fim)||'—'}</td>
-      <td>${sitEtapa(e)}</td>
+      <td>${sitEtapa(e,p)}</td>
       <td style="min-width:160px;font-size:11.5px;vertical-align:middle">
         ${ETAPAS_SEM_PRAZO_AUTO.has(e.lb)
           ? `<input class="fi ii" type="text" placeholder="Observação…"
