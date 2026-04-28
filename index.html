@@ -1360,54 +1360,16 @@ function _isApostilaIsentaAtraso(p, e){
   const lb = (e.lb||'').toLowerCase();
   return lb.includes('validação final') || lb.includes('upload');
 }
-// Retorna a etapa ATUAL do projeto (primeira não concluída na sequência)
+// Primeira etapa não concluída do projeto (etapa atual)
 function etapaAtual(p){
   return (p.etapas||[]).find(e => !e.done) || null;
 }
 
-// Verifica se a etapa atual está bloqueada aguardando (sem prazo, tipo sem data auto)
-function _etapaAtualBloqueada(p){
-  const atual = etapaAtual(p);
-  if(!atual) return false;
-  return ETAPAS_SEM_PRAZO_AUTO.has(atual.lb) || !atual.prazo;
-}
-
-// Verifica se a etapa atual é "Material Base Recebido" (aguardando cliente)
+// Etapa atual é "Material Base Recebido" (aguardando cliente)
 function _aguardandoMaterialBase(p){
   const atual = etapaAtual(p);
   if(!atual) return false;
   return (atual.lb||'').toLowerCase().includes('material base');
-}
-
-function delInf(p){
-  // Etapa atual = primeira não concluída
-  const atual = etapaAtual(p);
-  let eq=0, cl=0;
-
-  if(!atual){
-    // Sem etapas pendentes mas projeto atrasado → fallback prazo do projeto
-    if(calcSit(p)==='atrasado') eq = dd(p.prazo, td());
-    return{eq,cl};
-  }
-
-  // Se a etapa atual não tem prazo ou é sem prazo auto → projeto não está atrasado por etapas
-  if(!atual.prazo || ETAPAS_SEM_PRAZO_AUTO.has(atual.lb) || _isApostilaIsentaAtraso(p, atual)){
-    // Mas pode estar atrasado pelo prazo do projeto
-    if(calcSit(p)==='atrasado' && p.prazo) eq = dd(p.prazo, td());
-    return{eq,cl};
-  }
-
-  // Etapa atual tem prazo — só mostra atraso se JÁ VENCEU
-  const hoje = new Date(); hoje.setHours(0,0,0,0);
-  const prazoEtapa = new Date(atual.prazo+'T00:00:00');
-  if(prazoEtapa < hoje){
-    const d = dd(atual.prazo, td());
-    if(atual.r === 'cl') cl = d; else eq = d;
-  }
-
-  // Fallback: prazo do projeto vencido mesmo sem atraso por etapa
-  if(!eq && !cl && calcSit(p)==='atrasado') eq = dd(p.prazo, td());
-  return{eq,cl};
 }
 
 // Dias aguardando material base (a partir do prazo do projeto ou criação)
@@ -1419,6 +1381,35 @@ function diasAguardandoMaterial(p){
   const refD = new Date(ref+'T00:00:00');
   if(refD >= hoje) return 0;
   return Math.round((hoje - refD) / 864e5);
+}
+
+function delInf(p){
+  // Etapa atual = primeira não concluída
+  const atual = etapaAtual(p);
+  let eq=0, cl=0;
+
+  if(!atual){
+    if(calcSit(p)==='atrasado') eq = dd(p.prazo, td());
+    return{eq,cl};
+  }
+
+  // Etapa atual sem prazo, sem prazo auto ou isenta → não conta atraso por etapa
+  if(!atual.prazo || ETAPAS_SEM_PRAZO_AUTO.has(atual.lb) || _isApostilaIsentaAtraso(p, atual)){
+    if(calcSit(p)==='atrasado' && p.prazo) eq = dd(p.prazo, td());
+    return{eq,cl};
+  }
+
+  // Só mostra atraso se a etapa atual já venceu
+  const hoje = new Date(); hoje.setHours(0,0,0,0);
+  const prazoEtapa = new Date(atual.prazo+'T00:00:00');
+  if(prazoEtapa < hoje){
+    const d = dd(atual.prazo, td());
+    if(atual.r === 'cl') cl = d; else eq = d;
+  }
+
+  // Fallback: prazo do projeto vencido
+  if(!eq && !cl && calcSit(p)==='atrasado') eq = dd(p.prazo, td());
+  return{eq,cl};
 }
 
 function progH(p,mw='80px'){
@@ -2317,12 +2308,11 @@ function rAtrasos(){
       if(ETAPAS_SEM_PRAZO_AUTO.has(e.lb)) return;
       // Apostila/E-book: Validação Final e Upload isentas de atraso
       if(_isApostilaIsentaAtraso(p, e)) return;
-      // Se essa etapa não é a atual (primeira não concluída), não conta atraso
-      const _etAtual = etapaAtual(p);
-      if(_etAtual && e.lb !== _etAtual.lb) return;
+      // Se projeto aguarda material base, não entra no relatório de atrasos
+      if(_aguardandoMaterialBase(p)) return;
       // Etapas concluídas não aparecem mais no relatório
       if(e.done) return;
-      // Para etapas em aberto: mostrar apenas a próxima etapa não concluída
+      // Para etapas em aberto: mostrar apenas a próxima etapa não concluída (etapa atual)
       if(i !== proximaIdx) return;
 
       // Data em que a etapa anterior foi concluída (referência de início real)
