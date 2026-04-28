@@ -907,6 +907,10 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
           style="padding:6px 10px;border:1px solid var(--bdr);border-radius:7px;font-size:12.5px;font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(--txt);outline:none;cursor:pointer">
           <option value="">📤 Enviada Por — Todos</option>
         </select>
+        <select id="homFiltroMedicao" onchange="rHomologacoes()"
+          style="padding:6px 10px;border:1px solid var(--bdr);border-radius:7px;font-size:12.5px;font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(--txt);outline:none;cursor:pointer">
+          <option value="">📅 Medição — Todos</option>
+        </select>
         <button onclick="limparFiltrosHomolog()" class="btn bg2 bsm" style="font-size:11.5px">✕ Limpar</button>
         <span id="homFiltroContador" style="font-size:11px;color:var(--mu);margin-left:auto"></span>
       </div>
@@ -5149,11 +5153,40 @@ function buildHomologCard(p){
   </div>`;
 }
 
+// Retorna o label da quinzena de medição para uma data ISO (ex: "Abril01", "Maio02")
+// Regra: dia 26 mês M até dia 09 mês M+1 = "MêsM+101"
+//        dia 10 mês M até dia 25 mês M   = "MêsM02"
+const _MESES_MEDICAO = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+
+function _labelMedicao(isoDate){
+  if(!isoDate) return null;
+  const [y, m, d] = isoDate.split('-').map(Number);
+  if(d >= 10 && d <= 25){
+    // Segunda quinzena do mês m
+    return _MESES_MEDICAO[m-1] + '02';
+  } else if(d >= 26){
+    // Primeira quinzena do mês seguinte (m+1)
+    const proxMes = m === 12 ? 0 : m;
+    return _MESES_MEDICAO[proxMes] + '01';
+  } else {
+    // d >= 1 && d <= 9 → primeira quinzena do mês m
+    return _MESES_MEDICAO[m-1] + '01';
+  }
+}
+
+// Verifica se uma data ISO pertence ao label de quinzena informado
+function _dataEmMedicao(isoDate, label){
+  if(!isoDate || !label) return false;
+  return _labelMedicao(isoDate) === label;
+}
+
 function limparFiltrosHomolog(){
   const s = document.getElementById('homFiltroSolicitante');
   const e = document.getElementById('homFiltroEnviadaPor');
+  const m = document.getElementById('homFiltroMedicao');
   if(s) s.value = '';
   if(e) e.value = '';
+  if(m) m.value = '';
   rHomologacoes();
 }
 
@@ -5161,17 +5194,34 @@ function _popularFiltrosHomolog(lista){
   const solicitantes = [...new Set(lista.map(p=>p.homolog?.solicitante).filter(Boolean))].sort();
   const enviadosPor  = [...new Set(lista.map(p=>p.homolog?.enviadaPor).filter(Boolean))].sort();
 
+  // Quinzenas: gerar a partir das datas de instalação presentes
+  const labelsSet = new Set(lista.map(p=>_labelMedicao(p.homolog?.dtInstalacao)).filter(Boolean));
+  // Ordenar cronologicamente: extrair mês e quinzena do label
+  const labelsOrdenados = [...labelsSet].sort((a,b)=>{
+    const mi = n => _MESES_MEDICAO.indexOf(n.slice(0,-2));
+    const qi = n => parseInt(n.slice(-2));
+    return mi(a)!==mi(b) ? mi(a)-mi(b) : qi(a)-qi(b);
+  });
+
   const sel1 = document.getElementById('homFiltroSolicitante');
   const sel2 = document.getElementById('homFiltroEnviadaPor');
+  const sel3 = document.getElementById('homFiltroMedicao');
   if(!sel1 || !sel2) return;
 
   const val1 = sel1.value;
   const val2 = sel2.value;
+  const val3 = sel3?.value || '';
 
   sel1.innerHTML = '<option value="">👤 Solicitou a Homologação — Todos</option>'
     + solicitantes.map(s=>`<option value="${s}" ${val1===s?'selected':''}>${s}</option>`).join('');
   sel2.innerHTML = '<option value="">📤 Homologado Por — Todos</option>'
     + enviadosPor.map(s=>`<option value="${s}" ${val2===s?'selected':''}>${s}</option>`).join('');
+  if(sel3){
+    // Label de exibição: "Abril01" → "Abril 1ª Quinzena", "Abril02" → "Abril 2ª Quinzena"
+    const fmtLabel = l => l.slice(0,-2) + (l.slice(-2)==='01' ? ' — 1ª Quinzena' : ' — 2ª Quinzena');
+    sel3.innerHTML = '<option value="">📅 Medição — Todos</option>'
+      + labelsOrdenados.map(l=>`<option value="${l}" ${val3===l?'selected':''}>${fmtLabel(l)}</option>`).join('');
+  }
 }
 
 function rHomologacoes(){
@@ -5227,19 +5277,21 @@ function rHomologacoes(){
   }
 
   // Aplicar filtros
-  const filtroSolic  = document.getElementById('homFiltroSolicitante')?.value || '';
-  const filtroEnvPor = document.getElementById('homFiltroEnviadaPor')?.value  || '';
+  const filtroSolic   = document.getElementById('homFiltroSolicitante')?.value || '';
+  const filtroEnvPor  = document.getElementById('homFiltroEnviadaPor')?.value  || '';
+  const filtroMedicao = document.getElementById('homFiltroMedicao')?.value     || '';
 
   const lista = listaTotal.filter(p => {
-    if(filtroSolic  && (p.homolog?.solicitante || '') !== filtroSolic)  return false;
-    if(filtroEnvPor && (p.homolog?.enviadaPor  || '') !== filtroEnvPor) return false;
+    if(filtroSolic   && (p.homolog?.solicitante || '') !== filtroSolic)  return false;
+    if(filtroEnvPor  && (p.homolog?.enviadaPor  || '') !== filtroEnvPor) return false;
+    if(filtroMedicao && !_dataEmMedicao(p.homolog?.dtInstalacao, filtroMedicao)) return false;
     return true;
   });
 
   // Contador de resultados quando filtro ativo
   const contador = document.getElementById('homFiltroContador');
   if(contador){
-    const ativo = filtroSolic || filtroEnvPor;
+    const ativo = filtroSolic || filtroEnvPor || filtroMedicao;
     contador.textContent = ativo ? `${lista.length} de ${listaTotal.length} projeto(s)` : '';
   }
 
