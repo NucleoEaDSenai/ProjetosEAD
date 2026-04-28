@@ -1360,17 +1360,65 @@ function _isApostilaIsentaAtraso(p, e){
   const lb = (e.lb||'').toLowerCase();
   return lb.includes('validação final') || lb.includes('upload');
 }
+// Retorna a etapa ATUAL do projeto (primeira não concluída na sequência)
+function etapaAtual(p){
+  return (p.etapas||[]).find(e => !e.done) || null;
+}
+
+// Verifica se a etapa atual está bloqueada aguardando (sem prazo, tipo sem data auto)
+function _etapaAtualBloqueada(p){
+  const atual = etapaAtual(p);
+  if(!atual) return false;
+  return ETAPAS_SEM_PRAZO_AUTO.has(atual.lb) || !atual.prazo;
+}
+
+// Verifica se a etapa atual é "Material Base Recebido" (aguardando cliente)
+function _aguardandoMaterialBase(p){
+  const atual = etapaAtual(p);
+  if(!atual) return false;
+  return (atual.lb||'').toLowerCase().includes('material base');
+}
+
 function delInf(p){
-  // Próxima etapa que conta para atraso: não concluída, fora das etapas sem prazo automático e não isenta
-  const proxima = (p.etapas||[]).find(e => !e.done && !ETAPAS_SEM_PRAZO_AUTO.has(e.lb) && !_isApostilaIsentaAtraso(p, e));
+  // Etapa atual = primeira não concluída
+  const atual = etapaAtual(p);
   let eq=0, cl=0;
-  if(proxima && proxima.prazo && new Date(proxima.prazo)<new Date()){
-    const d = dd(proxima.prazo, td());
-    if(proxima.r === 'cl') cl = d; else eq = d;
+
+  if(!atual){
+    // Sem etapas pendentes mas projeto atrasado → fallback prazo do projeto
+    if(calcSit(p)==='atrasado') eq = dd(p.prazo, td());
+    return{eq,cl};
   }
-  // Fallback: sem etapas mapeadas mas projeto atrasado — usa prazo do projeto
+
+  // Se a etapa atual não tem prazo ou é sem prazo auto → projeto não está atrasado por etapas
+  if(!atual.prazo || ETAPAS_SEM_PRAZO_AUTO.has(atual.lb) || _isApostilaIsentaAtraso(p, atual)){
+    // Mas pode estar atrasado pelo prazo do projeto
+    if(calcSit(p)==='atrasado' && p.prazo) eq = dd(p.prazo, td());
+    return{eq,cl};
+  }
+
+  // Etapa atual tem prazo — só mostra atraso se JÁ VENCEU
+  const hoje = new Date(); hoje.setHours(0,0,0,0);
+  const prazoEtapa = new Date(atual.prazo+'T00:00:00');
+  if(prazoEtapa < hoje){
+    const d = dd(atual.prazo, td());
+    if(atual.r === 'cl') cl = d; else eq = d;
+  }
+
+  // Fallback: prazo do projeto vencido mesmo sem atraso por etapa
   if(!eq && !cl && calcSit(p)==='atrasado') eq = dd(p.prazo, td());
   return{eq,cl};
+}
+
+// Dias aguardando material base (a partir do prazo do projeto ou criação)
+function diasAguardandoMaterial(p){
+  if(!_aguardandoMaterialBase(p)) return 0;
+  const ref = p.prazo || p.criado;
+  if(!ref) return 0;
+  const hoje = new Date(); hoje.setHours(0,0,0,0);
+  const refD = new Date(ref+'T00:00:00');
+  if(refD >= hoje) return 0;
+  return Math.round((hoje - refD) / 864e5);
 }
 
 function progH(p,mw='80px'){
@@ -1468,8 +1516,10 @@ function rKanban(){
             <span>Criado: ${fd(p.criado)}</span>
             ${p.inicio?`<span>Início ${fd(p.inicio)}</span>`:''}
             <span class="${sit==='atrasado'?'ov':''}">Prazo: ${fd(p.prazo)}</span>
-            ${eq>0?`<span class="ov">At. Equipe: ${eq} dias</span>`:''}
-            ${cl>0?`<span class="wc">Atras Cliente: ${cl} dias</span>`:''}
+            ${_aguardandoMaterialBase(p) && diasAguardandoMaterial(p)>0
+              ? `<span class="wc" style="background:#FEF9C3;border-color:#FCD34D;color:#92400E">⏳ Aguard. material: ${diasAguardandoMaterial(p)}d</span>`
+              : eq>0 ? `<span class="ov">At. Equipe: ${eq} dias</span>` : ''}
+            ${!_aguardandoMaterialBase(p) && cl>0?`<span class="wc">Atras Cliente: ${cl} dias</span>`:''}
           </div>
           <div class="pbar"><div class="pf" style="width:${p.pct}%;background:${p.pct===100?'var(--green)':sit==='atrasado'?'var(--red)':'var(--blue)'}"></div></div>
           <div style="display:flex;align-items:center;justify-content:space-between;margin-top:6px">
@@ -2267,6 +2317,9 @@ function rAtrasos(){
       if(ETAPAS_SEM_PRAZO_AUTO.has(e.lb)) return;
       // Apostila/E-book: Validação Final e Upload isentas de atraso
       if(_isApostilaIsentaAtraso(p, e)) return;
+      // Se essa etapa não é a atual (primeira não concluída), não conta atraso
+      const _etAtual = etapaAtual(p);
+      if(_etAtual && e.lb !== _etAtual.lb) return;
       // Etapas concluídas não aparecem mais no relatório
       if(e.done) return;
       // Para etapas em aberto: mostrar apenas a próxima etapa não concluída
@@ -2546,8 +2599,10 @@ function openDet(id){
       <div class="dcard" style="${p.termino?'background:#DCFCE7':''}"><div class="dcard-l">✅ Término</div><div class="dcard-v" style="${p.termino?'color:var(--green)':'color:var(--mu)'}">${fd(p.termino)||'—'}</div></div>
     </div>
     <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px">
-      ${eq>0?`<span class="db deq" style="font-size:12px;padding:4px 11px">⚠️ Atraso Equipe: ${eq} dias</span>`:''}
-      ${cl>0?`<span class="db dcl" style="font-size:12px;padding:4px 11px">⏳ Aguard. Cliente: ${cl} dias</span>`:''}
+      ${_aguardandoMaterialBase(p) && diasAguardandoMaterial(p)>0
+        ? `<span class="db" style="font-size:12px;padding:4px 11px;background:#FEF9C3;border:1.5px solid #FCD34D;color:#92400E;border-radius:8px">⏳ Aguardando material base há ${diasAguardandoMaterial(p)} dias</span>`
+        : eq>0 ? `<span class="db deq" style="font-size:12px;padding:4px 11px">⚠️ Atraso Equipe: ${eq} dias</span>` : ''}
+      ${!_aguardandoMaterialBase(p) && cl>0?`<span class="db dcl" style="font-size:12px;padding:4px 11px">⏳ Aguard. Cliente: ${cl} dias</span>`:''}
       ${!eq&&!cl?`<span class="db dok" style="font-size:12px;padding:4px 11px">✅ Em dia</span>`:''}
     </div>
     ${p.desc?`<div style="background:var(--s2);border-radius:8px;padding:11px;font-size:12.5px;color:var(--mu);margin-bottom:14px;white-space:pre-wrap;word-break:break-word">${linkify(p.desc)}</div>`:''}
