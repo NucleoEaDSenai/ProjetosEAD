@@ -1334,6 +1334,8 @@ function atrasadoPorEquipe(p){
 function calcSit(p){
   if(p.cancelado) return 'cancelado';
   if(p.pct===100 || p.col===14) return 'concluido';
+  // Material Base Recebido: condição especial — nunca atrasado
+  if(_aguardandoMaterialBase(p)) return (p.inicio||(p.etapas||[]).some(e=>e.done))?'andamento':'aguardando';
   // atraso: prazo passou e não concluído
   if(p.prazo && new Date(p.prazo)<new Date() && p.pct<100) return 'atrasado';
   // em andamento: tem data de início ou etapas em curso
@@ -1393,9 +1395,11 @@ function delInf(p){
     return{eq,cl};
   }
 
-  // Etapa atual sem prazo, sem prazo auto ou isenta → não conta atraso por etapa
+  // Material Base Recebido: condição especial sem data — zero atraso
+  if(_aguardandoMaterialBase(p)) return{eq,cl};
+
+  // Etapa atual sem prazo, sem prazo auto ou isenta → sem atraso
   if(!atual.prazo || ETAPAS_SEM_PRAZO_AUTO.has(atual.lb) || _isApostilaIsentaAtraso(p, atual)){
-    if(calcSit(p)==='atrasado' && p.prazo) eq = dd(p.prazo, td());
     return{eq,cl};
   }
 
