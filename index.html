@@ -2525,7 +2525,7 @@ function openDet(id){
         <div style="display:flex;gap:3px;align-items:center">
           ${ETAPAS_SEM_PRAZO_AUTO.has(e.lb)
             ? '<i style="color:#CBD5E1;font-size:11px">sem data definida</i>'
-            : `<span id="ep_prazo_txt_${id}_${i}" style="font-size:11.5px;color:var(--txt)">${e.prazo?fd(e.prazo):'—'}</span>`
+            : `<span id="ep_prazo_txt_${id}_${i}" style="font-size:11.5px;color:${e.prazo?'var(--txt)':'#94A3B8'};font-style:${e.prazo?'normal':'italic'}">${e.prazo?fd(e.prazo):'a definir'}</span>`
           }
           <div id="ep_prazo_inp_${id}_${i}" style="display:none;gap:3px;align-items:center">
             <input class="ii" type="number" id="ep_d_${id}_${i}" placeholder="DD" min="1" max="31"
@@ -3690,12 +3690,24 @@ function _renderEF(){
             <div style="display:flex;gap:3px">
               ${ETAPAS_SEM_PRAZO_AUTO.has(e.lb)
                 ? `<span style="font-size:11px;color:#CBD5E1;font-style:italic">sem data definida</span>`
-                : `<input class="fi ii" type="number" id="ep_d_${i}" placeholder="DD" min="1" max="31"
-                    value="${e.prazo?parseInt(e.prazo.split('-')[2]):''}" style="width:48px;padding:5px 4px;font-size:11.5px" onchange="_efCascata(${i})">
-                  <input class="fi ii" type="number" id="ep_m_${i}" placeholder="MM" min="1" max="12"
-                    value="${e.prazo?parseInt(e.prazo.split('-')[1]):''}" style="width:48px;padding:5px 4px;font-size:11.5px" onchange="_efCascata(${i})">
-                  <input class="fi ii" type="number" id="ep_a_${i}" placeholder="AAAA" min="2020" max="2099"
-                    value="${e.prazo?parseInt(e.prazo.split('-')[0]):''}" style="width:60px;padding:5px 4px;font-size:11.5px" onchange="_efCascata(${i})">`
+                : e.prazo
+                  ? `<input class="fi ii" type="number" id="ep_d_${i}" placeholder="DD" min="1" max="31"
+                      value="${parseInt(e.prazo.split('-')[2])}" style="width:48px;padding:5px 4px;font-size:11.5px" onchange="_efCascata(${i})">
+                    <input class="fi ii" type="number" id="ep_m_${i}" placeholder="MM" min="1" max="12"
+                      value="${parseInt(e.prazo.split('-')[1])}" style="width:48px;padding:5px 4px;font-size:11.5px" onchange="_efCascata(${i})">
+                    <input class="fi ii" type="number" id="ep_a_${i}" placeholder="AAAA" min="2020" max="2099"
+                      value="${parseInt(e.prazo.split('-')[0])}" style="width:60px;padding:5px 4px;font-size:11.5px" onchange="_efCascata(${i})">`
+                  : `<span class="ef-a-definir" onclick="abrirInputPrazo(${i})"
+                      style="font-size:11.5px;color:#94A3B8;font-style:italic;cursor:pointer;padding:5px 8px;border:1px dashed #CBD5E1;border-radius:6px;white-space:nowrap"
+                      title="Clique para definir a data">a definir</span>
+                    <div id="ef_inp_prazo_${i}" style="display:none;gap:3px">
+                      <input class="fi ii" type="number" id="ep_d_${i}" placeholder="DD" min="1" max="31"
+                        style="width:48px;padding:5px 4px;font-size:11.5px" onchange="_efCascata(${i})">
+                      <input class="fi ii" type="number" id="ep_m_${i}" placeholder="MM" min="1" max="12"
+                        style="width:48px;padding:5px 4px;font-size:11.5px" onchange="_efCascata(${i})">
+                      <input class="fi ii" type="number" id="ep_a_${i}" placeholder="AAAA" min="2020" max="2099"
+                        style="width:60px;padding:5px 4px;font-size:11.5px" onchange="_efCascata(${i})">
+                    </div>`
               }
             </div>
           </td>
@@ -3724,6 +3736,17 @@ function _renderEF(){
 
 // Lê estado atual dos inputs para _efEtapas antes de operar
 // Cascata de datas no formulário de criação/edição
+function abrirInputPrazo(i){
+  const span = document.querySelector(`.ef-a-definir[onclick="abrirInputPrazo(${i})"]`);
+  const inp  = document.getElementById('ef_inp_prazo_'+i);
+  if(span) span.style.display='none';
+  if(inp){
+    inp.style.display='flex';
+    const d = document.getElementById('ep_d_'+i);
+    if(d) d.focus();
+  }
+}
+
 function _efToggleCascata(){
   _efSync();
   _efCascataAtiva = !_efCascataAtiva;
