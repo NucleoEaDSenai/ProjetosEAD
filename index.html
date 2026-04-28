@@ -3516,6 +3516,18 @@ function aplicarCronograma(recurso, dataInicio){
   _renderEF();
 }
 
+// Chamada pelo onchange dos campos de data — re-renderiza se data apagada (para mostrar "a definir")
+function _efOnChangePrazo(i){
+  _efSync();
+  const e = _efEtapas[i];
+  if(!e.prazo){
+    _efEtapas[i]._prazoAntes = null;
+    _renderEF();
+  } else {
+    _efCascata(i);
+  }
+}
+
 function toggleRec(el, recurso){
   el.classList.toggle('sel');
   atualizarEstadoPrazo();
@@ -3692,21 +3704,21 @@ function _renderEF(){
                 ? `<span style="font-size:11px;color:#CBD5E1;font-style:italic">sem data definida</span>`
                 : e.prazo
                   ? `<input class="fi ii" type="number" id="ep_d_${i}" placeholder="DD" min="1" max="31"
-                      value="${parseInt(e.prazo.split('-')[2])}" style="width:48px;padding:5px 4px;font-size:11.5px" onchange="_efCascata(${i})">
+                      value="${parseInt(e.prazo.split('-')[2])}" style="width:48px;padding:5px 4px;font-size:11.5px" onchange="_efOnChangePrazo(${i})">
                     <input class="fi ii" type="number" id="ep_m_${i}" placeholder="MM" min="1" max="12"
-                      value="${parseInt(e.prazo.split('-')[1])}" style="width:48px;padding:5px 4px;font-size:11.5px" onchange="_efCascata(${i})">
+                      value="${parseInt(e.prazo.split('-')[1])}" style="width:48px;padding:5px 4px;font-size:11.5px" onchange="_efOnChangePrazo(${i})">
                     <input class="fi ii" type="number" id="ep_a_${i}" placeholder="AAAA" min="2020" max="2099"
-                      value="${parseInt(e.prazo.split('-')[0])}" style="width:60px;padding:5px 4px;font-size:11.5px" onchange="_efCascata(${i})">`
+                      value="${parseInt(e.prazo.split('-')[0])}" style="width:60px;padding:5px 4px;font-size:11.5px" onchange="_efOnChangePrazo(${i})">`
                   : `<span class="ef-a-definir" onclick="abrirInputPrazo(${i})"
                       style="font-size:11.5px;color:#94A3B8;font-style:italic;cursor:pointer;padding:5px 8px;border:1px dashed #CBD5E1;border-radius:6px;white-space:nowrap"
                       title="Clique para definir a data">a definir</span>
                     <div id="ef_inp_prazo_${i}" style="display:none;gap:3px">
                       <input class="fi ii" type="number" id="ep_d_${i}" placeholder="DD" min="1" max="31"
-                        style="width:48px;padding:5px 4px;font-size:11.5px" onchange="_efCascata(${i})">
+                        style="width:48px;padding:5px 4px;font-size:11.5px" onchange="_efOnChangePrazo(${i})">
                       <input class="fi ii" type="number" id="ep_m_${i}" placeholder="MM" min="1" max="12"
-                        style="width:48px;padding:5px 4px;font-size:11.5px" onchange="_efCascata(${i})">
+                        style="width:48px;padding:5px 4px;font-size:11.5px" onchange="_efOnChangePrazo(${i})">
                       <input class="fi ii" type="number" id="ep_a_${i}" placeholder="AAAA" min="2020" max="2099"
-                        style="width:60px;padding:5px 4px;font-size:11.5px" onchange="_efCascata(${i})">
+                        style="width:60px;padding:5px 4px;font-size:11.5px" onchange="_efOnChangePrazo(${i})">
                     </div>`
               }
             </div>
@@ -3810,17 +3822,20 @@ function _efCascata(idx){
 
 function _efSync(){
   _efEtapas = _efEtapas.map((e,i)=>{
-    const novoPrazo = dma2iso(
-      document.getElementById('ep_d_'+i)?.value,
-      document.getElementById('ep_m_'+i)?.value,
-      document.getElementById('ep_a_'+i)?.value
-    ) || e.prazo || null;
+    const dEl = document.getElementById('ep_d_'+i);
+    const mEl = document.getElementById('ep_m_'+i);
+    const aEl = document.getElementById('ep_a_'+i);
+    // Se os campos existem no DOM, usar o valor deles (mesmo que vazio → null)
+    // Se não existem (etapa exibindo "a definir" sem input visível), preservar prazo anterior
+    const camposExistem = !!(dEl && mEl && aEl);
+    const novoPrazo = camposExistem
+      ? (dma2iso(dEl.value, mEl.value, aEl.value) || null)
+      : e.prazo || null;
     return {
       ...e,
       lb: document.getElementById('ef_lb_'+i)?.value.trim() || e.lb,
       r:  document.getElementById('er'+i)?.value || e.r,
       prazo: novoPrazo,
-      // Preservar _prazoAntes — só é atualizado pela cascata após edição
       _prazoAntes: e._prazoAntes !== undefined ? e._prazoAntes : novoPrazo,
     };
   });
