@@ -1919,7 +1919,7 @@ function rKPIs(){
   const atrasCl = act.filter(p=>atrasadoPorCliente(p)).length;
   const andando = act.filter(p=>calcSit(p)==='andamento').length;
   const aguard  = act.filter(p=>calcSit(p)==='aguardando').length;
-  const homolPend = todos.filter(p=>(p.col===11||p.homolog?.preenchido)&&!p.homolog?.dtInstalacao).length;
+  const homolPend = todos.filter(p=>(p.col===11||p.homologPassou||p.homolog?.preenchido)&&!p.homolog?.dtInstalacao).length;
   const medicPend = todos.filter(p=>p.enviadoMedicao&&!p.medicaoFeita).length;
   const avg     = total>0 ? Math.round(act.reduce((a,p)=>a+p.pct,0)/total) : 0;
   const txConc  = total>0 ? Math.round(conc/total*100) : 0;
@@ -2979,10 +2979,14 @@ function avancarColuna(p){
   if(novaCol !== p.col){
     const avancou = novaCol > p.col;
     p.col = novaCol;
+    // Marcar que projeto já passou pela col 11 (Homologação) — persiste mesmo avançando
+    if(novaCol === 11 && !p.homologPassou) p.homologPassou = true;
     const colNome = COLUNAS.find(c=>c.k===novaCol)?.l||'';
     showToast((avancou ? '📌 ' : '↩️ ') + (p.nome.length>22?p.nome.slice(0,20)+'…':p.nome)+' → '+colNome);
     return true;
   }
+  // Também marcar se já está na col 11 (projetos que chegaram antes desta correção)
+  if(p.col === 11 && !p.homologPassou) p.homologPassou = true;
   return false;
 }
 
@@ -4161,7 +4165,7 @@ function exportXLSX(){
   const hdrH = ['Projeto','Situação','RP','Academia','ID Curso','Pacote SCORM','Solicitou a Homologação','Homologado Por','RT','Conclusão','Nota de Corte','Novo/Manutenção','Serviço','Dt. Homologação','Dt. Autorização','Dt. Instalação SIRH','Status'];
   const todosTodos = activeDB().concat(cancelDB());
   const rowsH = todosTodos
-    .filter(p => p.col === 11 || p.homolog?.preenchido)
+    .filter(p => p.col === 11 || p.homologPassou || p.homolog?.preenchido)
     .map(p => {
       const h = p.homolog || {};
       return [
@@ -4447,7 +4451,7 @@ function exportPDFLista(){
   // ══ NOVA PÁGINA: Homologações ══
   doc.addPage(); cabecalho('Homologações'); y=30;
   const todosTodos2 = activeDB().concat(cancelDB());
-  const homList = todosTodos2.filter(p => p.col === 11 || p.homolog?.preenchido)
+  const homList = todosTodos2.filter(p => p.col === 11 || p.homologPassou || p.homolog?.preenchido)
     .sort((a,b) => {
       const ai = !!(a.homolog?.dtInstalacao), bi = !!(b.homolog?.dtInstalacao);
       if(ai !== bi) return ai ? 1 : -1;
@@ -4550,7 +4554,7 @@ function exportPDFHomologacoes(){
   // ── Dados ──
   const todos = activeDB().concat(cancelDB());
   const lista = todos
-    .filter(p => p.col === 11 || p.homolog?.preenchido)
+    .filter(p => p.col === 11 || p.homologPassou || p.homolog?.preenchido)
     .sort((a,b) => a.nome.localeCompare(b.nome,'pt-BR'));
 
   const grpPendente   = lista.filter(p => !(p.homolog?.dtHomolog) && !(p.homolog?.dtAutorizacao) && !(p.homolog?.dtInstalacao));
@@ -4920,6 +4924,7 @@ function salvarHomolog(pid){
   h.dtInstalacao  = g('dtInstalacao');
   h.servico       = g('servico');
   h.preenchido    = true; // marca que o usuário já iniciou o preenchimento
+  p.homologPassou  = true; // projeto já esteve na col 11
 
   p.homolog = h;
   const dtStr = h.dtInstalacao ? `Instalação: ${h.dtInstalacao.split('-').reverse().join('/')}` :
@@ -5135,7 +5140,7 @@ function rHomologacoes(){
   const todos = activeDB().concat(cancelDB());
 
   // Todos que aparecem na lista
-  const listaTotal = todos.filter(p => p.col === 11 || p.homolog?.preenchido);
+  const listaTotal = todos.filter(p => p.col === 11 || p.homologPassou || p.homolog?.preenchido);
 
   // Ordenação alfabética dentro de cada grupo
   listaTotal.sort((a,b) => a.nome.localeCompare(b.nome, 'pt-BR'));
@@ -5247,7 +5252,11 @@ function rHomologacoes(){
 // ─────────────────────────────────────────────────────────────────────────────
 
 
-function renderAll(){rDash();rKanban();rList();rTimeline();rKPIs();rAtrasos();rCancelados();rMedicao();rHomologacoes();rCarga();rHistorico();limparNotifObsoletas();detectarNotificacoes();}
+function renderAll(){
+  // Garantir que projetos já na col 11 tenham homologPassou marcado
+  DB.forEach(p=>{ if(p.col===11 && !p.homologPassou){ p.homologPassou=true; fbSalvarProjeto(p); } });
+  rDash();rKanban();rList();rTimeline();rKPIs();rAtrasos();rCancelados();rMedicao();rHomologacoes();rCarga();rHistorico();limparNotifObsoletas();detectarNotificacoes();
+}
 
 // ══════════════════════════════════════════════
 //  FIREBASE — PERSISTÊNCIA EM TEMPO REAL
@@ -6111,7 +6120,7 @@ function detectarNotificacoes(){
     }
 
     // 3. Homologação pendente (sem data de instalação)
-    if((p.col===11 || p.homolog?.preenchido) && !p.homolog?.dtInstalacao){
+    if((p.col===11 || p.homologPassou || p.homolog?.preenchido) && !p.homolog?.dtInstalacao){
       const id = _notifId('homolog', p.id, 'pend');
       if(!idsExist.has(id) && !descartados.has(id)){
         novas.push({
