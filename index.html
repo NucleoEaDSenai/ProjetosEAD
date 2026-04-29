@@ -390,6 +390,18 @@ tr.canc-row td{opacity:.55}
 .hom-status-homolog{background:#FEF08A;color:#92400E}
 .hom-status-autorizado{background:#EFF6FF;color:#1D4ED8}
 .hom-empty{text-align:center;padding:48px 20px;color:var(--mu);font-size:13px}
+.med-group{margin-bottom:18px;border:1px solid var(--bdr);border-radius:10px;overflow:hidden}
+.med-group-hd{display:flex;align-items:center;justify-content:space-between;padding:11px 16px;cursor:pointer;user-select:none;background:var(--s2);transition:background .15s}
+.med-group-hd:hover{background:var(--bdr)}
+.med-group-hd .med-group-title{font-size:12px;font-weight:700;color:var(--txt);display:flex;align-items:center;gap:8px}
+.med-group-hd .med-group-count{font-size:11px;padding:2px 8px;border-radius:10px;font-weight:700}
+.med-group-hd .med-group-chev{font-size:10px;color:var(--mu);transition:transform .2s}
+.med-group.closed .med-group-chev{transform:rotate(-90deg)}
+.med-group-body{display:block}
+.med-group.closed .med-group-body{display:none}
+.med-group-pendente .med-group-hd{background:#FEF9C3}
+.med-group-pendente .med-group-title{color:#92400E}
+.med-group-pendente .med-group-count{background:#FDE68A;color:#92400E}
 .hom-group-title{display:flex;align-items:center;gap:8px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;padding:8px 14px;border-radius:8px;margin-bottom:10px;margin-top:4px}
 .hom-group-title.pendente{background:#FEE2E2;color:#B91C1C}
 .hom-group-title.homologado{background:#FEF08A;color:#92400E}
@@ -931,15 +943,7 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
       <div class="st" style="margin-bottom:6px">📐 Medição</div>
       <div style="font-size:12.5px;color:var(--mu);margin-bottom:20px">Projetos com todas as etapas concluídas e enviados para medição.</div>
       <div id="medicaoStats" style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:22px"></div>
-      <div class="tw"><table>
-        <thead><tr>
-          <th>Projeto</th><th>Responsáveis</th><th>Recursos</th>
-          <th>Concluído em</th><th>Enviado para Medição em</th>
-          <th style="text-align:center">Medição Feita</th>
-          <th style="text-align:center">Confirmada por</th><th></th>
-        </tr></thead>
-        <tbody id="medicaoTbl"></tbody>
-      </table></div>
+      <div id="medicaoGrupos"></div>
     </div>
 
     <!-- CARGA DA EQUIPE -->
@@ -4885,6 +4889,64 @@ function confirmarMedicao(id){
   showToast('🎉 Medição confirmada! Faça o upload dos arquivos para concluir.');
 }
 
+function _buildMedRow(p){
+  return `<tr style="${p.medicaoFeita?'opacity:.75':''}">
+    <td>
+      <span style="font-weight:600;cursor:pointer;color:var(--blue)" onclick="openDet(${p.id})">${p.nome}</span>
+      ${p.cancelado?'<span style="font-size:10px;color:var(--mu);margin-left:6px">(cancelado)</span>':''}
+    </td>
+    <td>${avList(p.resps)}</td>
+    <td>${recTags(p.recursos)}</td>
+    <td style="white-space:nowrap">${fd(p.termino||p.enviadoMedicao)}</td>
+    <td style="white-space:nowrap">${fd(p.enviadoMedicao)}</td>
+    <td style="text-align:center">
+      ${p.medicaoFeita
+        ? `<span class="badge-medicao-ok">✅ Feita em ${fd(p.medicaoFeitaEm)}</span>`
+        : `<span class="badge-medicao-pend">⏳ Pendente</span>`}
+    </td>
+    <td style="text-align:center">
+      ${p.medicaoFeita && p.medicaoConfirmadaPor
+        ? `<span style="font-size:11.5px;font-weight:600;color:var(--green);display:flex;align-items:center;justify-content:center;gap:4px">
+             <span style="width:22px;height:22px;border-radius:50%;background:var(--green);color:#fff;font-size:9px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0">${p.medicaoConfirmadaPor.charAt(0).toUpperCase()}</span>
+             ${p.medicaoConfirmadaPor}
+           </span>`
+        : `<span style="font-size:11px;color:var(--mu);font-style:italic">—</span>`}
+    </td>
+    <td style="text-align:center">
+      <button onclick="confirmarMedicao(${p.id})"
+        style="padding:5px 12px;border:none;border-radius:6px;cursor:pointer;font-size:11.5px;font-weight:600;font-family:'Plus Jakarta Sans',sans-serif;
+        background:${p.medicaoFeita?'var(--s2)':'var(--green)'};color:${p.medicaoFeita?'var(--mu)':'#fff'};transition:opacity .15s"
+        title="${p.medicaoFeita?'Desmarcar medição':'Confirmar medição feita'}">
+        ${p.medicaoFeita ? '↩️ Desmarcar' : '✅ Confirmar'}
+      </button>
+    </td>
+  </tr>`;
+}
+
+function _buildMedTabela(projetos){
+  if(!projetos.length) return '';
+  return `<div class="tw" style="margin:0;border-radius:0;border:none">
+    <table>
+      <thead><tr>
+        <th>Projeto</th><th>Responsáveis</th><th>Recursos</th>
+        <th>Concluído em</th><th>Enviado para Medição em</th>
+        <th style="text-align:center">Medição Feita</th>
+        <th style="text-align:center">Confirmada por</th><th></th>
+      </tr></thead>
+      <tbody>${projetos.map(_buildMedRow).join('')}</tbody>
+    </table>
+  </div>`;
+}
+
+function toggleMedGroup(id){
+  const g = document.getElementById(id);
+  if(!g) return;
+  g.classList.toggle('closed');
+  const st = JSON.parse(localStorage.getItem('firjan_med_groups')||'{}');
+  st[id] = g.classList.contains('closed');
+  localStorage.setItem('firjan_med_groups', JSON.stringify(st));
+}
+
 function rMedicao(){
   const lista = activeDB().concat(cancelDB()).filter(p => p.enviadoMedicao);
   const pendentes  = lista.filter(p => !p.medicaoFeita).length;
@@ -4897,49 +4959,77 @@ function rMedicao(){
     <div class="sc cg"><div class="sc-l">Medição Concluída</div><div class="sc-v">${concluidas}</div><div class="sc-s">já medidos</div><div class="sc-i">✅</div></div>
   `;
 
-  const tbl = document.getElementById('medicaoTbl');
-  if(!tbl) return;
+  const el = document.getElementById('medicaoGrupos');
+  if(!el) return;
+
   if(lista.length === 0){
-    tbl.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:28px;color:var(--mu)">Nenhum projeto enviado para medição ainda.</td></tr>';
+    el.innerHTML = '<div style="text-align:center;padding:48px;color:var(--mu)">Nenhum projeto enviado para medição ainda.</div>';
     return;
   }
-  // Pendentes primeiro, depois concluídos
-  const sorted = [...lista].sort((a,b) => {
-    if(a.medicaoFeita === b.medicaoFeita) return (b.enviadoMedicao||'').localeCompare(a.enviadoMedicao||'');
-    return a.medicaoFeita ? 1 : -1;
+
+  // ── Separar pendentes e confirmados ──
+  const grpPend = lista.filter(p => !p.medicaoFeita)
+    .sort((a,b) => (b.enviadoMedicao||'').localeCompare(a.enviadoMedicao||''));
+
+  const confirmados = lista.filter(p => p.medicaoFeita)
+    .sort((a,b) => (b.medicaoFeitaEm||'').localeCompare(a.medicaoFeitaEm||''));
+
+  // ── Agrupar confirmados por quinzena (usa medicaoFeitaEm) ──
+  const quinzenas = {};
+  confirmados.forEach(p => {
+    const label = _labelMedicao(p.medicaoFeitaEm || p.termino || p.enviadoMedicao) || 'Sem data';
+    if(!quinzenas[label]) quinzenas[label] = [];
+    quinzenas[label].push(p);
   });
-  tbl.innerHTML = sorted.map(p => `
-    <tr style="${p.medicaoFeita?'opacity:.7':''}">
-      <td>
-        <span style="font-weight:600;cursor:pointer;color:var(--blue)" onclick="openDet(${p.id})">${p.nome}</span>
-        ${p.cancelado?'<span style="font-size:10px;color:var(--mu);margin-left:6px">(cancelado)</span>':''}
-      </td>
-      <td>${avList(p.resps)}</td>
-      <td>${recTags(p.recursos)}</td>
-      <td style="white-space:nowrap">${fd(p.termino||p.enviadoMedicao)}</td>
-      <td style="white-space:nowrap">${fd(p.enviadoMedicao)}</td>
-      <td style="text-align:center">
-        ${p.medicaoFeita
-          ? `<span class="badge-medicao-ok">✅ Feita em ${fd(p.medicaoFeitaEm)}</span>`
-          : `<span class="badge-medicao-pend">⏳ Pendente</span>`}
-      </td>
-      <td style="text-align:center">
-        ${p.medicaoFeita && p.medicaoConfirmadaPor
-          ? `<span style="font-size:11.5px;font-weight:600;color:var(--green);display:flex;align-items:center;justify-content:center;gap:4px">
-               <span style="width:22px;height:22px;border-radius:50%;background:var(--green);color:#fff;font-size:9px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0">${p.medicaoConfirmadaPor.charAt(0).toUpperCase()}</span>
-               ${p.medicaoConfirmadaPor}
-             </span>`
-          : `<span style="font-size:11px;color:var(--mu);font-style:italic">—</span>`}
-      </td>
-      <td style="text-align:center">
-        <button onclick="confirmarMedicao(${p.id})"
-          style="padding:5px 12px;border:none;border-radius:6px;cursor:pointer;font-size:11.5px;font-weight:600;font-family:'Plus Jakarta Sans',sans-serif;
-          background:${p.medicaoFeita?'var(--s2)':'var(--green)'};color:${p.medicaoFeita?'var(--mu)':'#fff'};transition:opacity .15s"
-          title="${p.medicaoFeita?'Desmarcar medição':'Confirmar medição feita'}">
-          ${p.medicaoFeita ? '↩️ Desmarcar' : '✅ Confirmar'}
-        </button>
-      </td>
-    </tr>`).join('');
+
+  // Ordenar quinzenas cronologicamente
+  const quinzenasOrdenadas = Object.keys(quinzenas).sort((a,b) => {
+    if(a==='Sem data') return 1;
+    if(b==='Sem data') return -1;
+    const mi = n => _MESES_MEDICAO.indexOf(n.slice(0,-2));
+    const qi = n => parseInt(n.slice(-2));
+    return mi(a)!==mi(b) ? mi(b)-mi(a) : qi(b)-qi(a); // mais recente primeiro
+  });
+
+  // Restaurar estado das gavetas
+  const st = JSON.parse(localStorage.getItem('firjan_med_groups')||'{}');
+
+  let html = '';
+
+  // ── Grupo Pendentes ──
+  if(grpPend.length){
+    const gid = 'medg_pendentes';
+    const fechado = st[gid] ? 'closed' : '';
+    html += `<div class="med-group med-group-pendente ${fechado}" id="${gid}">
+      <div class="med-group-hd" onclick="toggleMedGroup('${gid}')">
+        <span class="med-group-title">⏳ Aguardando Medição
+          <span class="med-group-count">${grpPend.length}</span>
+        </span>
+        <span class="med-group-chev">▼</span>
+      </div>
+      <div class="med-group-body">${_buildMedTabela(grpPend)}</div>
+    </div>`;
+  }
+
+  // ── Grupos por quinzena ──
+  quinzenasOrdenadas.forEach(label => {
+    const projs = quinzenas[label];
+    const gid = 'medg_'+label.replace(/\s/g,'_').replace(/[^\w]/g,'');
+    const fechado = st[gid] ? 'closed' : '';
+    const fmtLabel = label === 'Sem data' ? '📅 Sem data de medição'
+      : label.slice(0,-2) + (label.slice(-2)==='01' ? ' — 1ª Quinzena' : ' — 2ª Quinzena');
+    html += `<div class="med-group ${fechado}" id="${gid}">
+      <div class="med-group-hd" onclick="toggleMedGroup('${gid}')">
+        <span class="med-group-title">✅ ${fmtLabel}
+          <span class="med-group-count" style="background:#DCFCE7;color:#15803D">${projs.length}</span>
+        </span>
+        <span class="med-group-chev">▼</span>
+      </div>
+      <div class="med-group-body">${_buildMedTabela(projs)}</div>
+    </div>`;
+  });
+
+  el.innerHTML = html;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
