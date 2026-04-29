@@ -4977,7 +4977,7 @@ function rMedicao(){
   // ── Agrupar confirmados por quinzena (usa medicaoFeitaEm) ──
   const quinzenas = {};
   confirmados.forEach(p => {
-    const label = _labelMedicao(p.medicaoFeitaEm || p.termino || p.enviadoMedicao) || 'Sem data';
+    const label = _labelMedicao(p.homolog?.dtInstalacao || p.medicaoFeitaEm || p.termino || p.enviadoMedicao) || 'Sem data';
     if(!quinzenas[label]) quinzenas[label] = [];
     quinzenas[label].push(p);
   });
@@ -5015,7 +5015,7 @@ function rMedicao(){
   quinzenasOrdenadas.forEach(label => {
     const projs = quinzenas[label];
     const gid = 'medg_'+label.replace(/\s/g,'_').replace(/[^\w]/g,'');
-    const fechado = st[gid] === false ? '' : 'closed'; // default: fechado
+    const fechado = st[gid] ? 'closed' : '';
     const fmtLabel = label === 'Sem data' ? '📅 Sem data de medição'
       : label.slice(0,-2) + (label.slice(-2)==='01' ? ' — 1ª Quinzena' : ' — 2ª Quinzena');
     html += `<div class="med-group ${fechado}" id="${gid}">
