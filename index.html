@@ -3526,14 +3526,47 @@ function aplicarCronograma(recurso, dataInicio){
 
 // Chamada pelo onchange dos campos de data — re-renderiza se data apagada (para mostrar "a definir")
 function _efOnChangePrazo(i){
-  _efSync();
-  const e = _efEtapas[i];
-  if(!e.prazo){
-    _efEtapas[i]._prazoAntes = null;
-    _renderEF();
-  } else {
-    _efCascata(i);
+  const dEl = document.getElementById('ep_d_'+i);
+  const mEl = document.getElementById('ep_m_'+i);
+  const aEl = document.getElementById('ep_a_'+i);
+
+  const dv = dEl?.value?.trim();
+  const mv = mEl?.value?.trim();
+  const av = aEl?.value?.trim();
+
+  // Todos os 3 preenchidos → tentar montar a data e agir
+  if(dv && mv && av){
+    _efSync();
+    const e = _efEtapas[i];
+    if(!e.prazo){
+      // Valores inválidos (ex: dia 99) → limpar e mostrar "a definir"
+      _efEtapas[i]._prazoAntes = null;
+      _renderEF();
+    } else {
+      _efCascata(i);
+    }
+    return;
   }
+
+  // Campos parcialmente preenchidos:
+  // Aguardar foco sair dos 3 campos antes de re-renderizar
+  // Usar setTimeout para verificar se o foco foi para outro campo do grupo
+  setTimeout(()=>{
+    const foco = document.activeElement;
+    const aindaNosInputs = foco === dEl || foco === mEl || foco === aEl;
+    if(!aindaNosInputs){
+      // Foco saiu do grupo: se todos vazios → mostrar "a definir"
+      const tdv = dEl?.value?.trim();
+      const tmv = mEl?.value?.trim();
+      const tav = aEl?.value?.trim();
+      if(!tdv && !tmv && !tav){
+        _efEtapas[i].prazo = null;
+        _efEtapas[i]._prazoAntes = null;
+        _renderEF();
+      }
+      // Se parcialmente preenchido mas saiu → não re-renderizar, deixar o usuário corrigir
+    }
+  }, 150);
 }
 
 function toggleRec(el, recurso){
@@ -3722,11 +3755,11 @@ function _renderEF(){
                       title="Clique para definir a data">a definir</span>
                     <div id="ef_inp_prazo_${i}" style="display:none;gap:3px">
                       <input class="fi ii" type="number" id="ep_d_${i}" placeholder="DD" min="1" max="31"
-                        style="width:48px;padding:5px 4px;font-size:11.5px" onchange="_efOnChangePrazo(${i})">
+                        style="width:48px;padding:5px 4px;font-size:11.5px" onblur="_efOnChangePrazo(${i})">
                       <input class="fi ii" type="number" id="ep_m_${i}" placeholder="MM" min="1" max="12"
-                        style="width:48px;padding:5px 4px;font-size:11.5px" onchange="_efOnChangePrazo(${i})">
+                        style="width:48px;padding:5px 4px;font-size:11.5px" onblur="_efOnChangePrazo(${i})">
                       <input class="fi ii" type="number" id="ep_a_${i}" placeholder="AAAA" min="2020" max="2099"
-                        style="width:60px;padding:5px 4px;font-size:11.5px" onchange="_efOnChangePrazo(${i})">
+                        style="width:60px;padding:5px 4px;font-size:11.5px" onblur="_efOnChangePrazo(${i})">
                     </div>`
               }
             </div>
