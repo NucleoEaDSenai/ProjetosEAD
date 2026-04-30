@@ -4952,6 +4952,11 @@ function _buildMedRow(p){
         title="${p.medicaoFeita?'Desmarcar medição':'Confirmar medição feita'}">
         ${p.medicaoFeita ? '↩️ Desmarcar' : '✅ Confirmar'}
       </button>
+      ${p.medicaoFeita
+        ? `<button onclick="abrirSeletorQuinzena(${p.id})"
+             title="Alterar quinzena de medição"
+             style="padding:5px 8px;border:1.5px solid #CBD5E1;border-radius:6px;background:#F8FAFC;cursor:pointer;font-size:12px;margin-left:4px">📅</button>`
+        : ''}
     </td>
   </tr>`;
 }
@@ -4969,6 +4974,66 @@ function _buildMedTabela(projetos){
       <tbody>${projetos.map(_buildMedRow).join('')}</tbody>
     </table>
   </div>`;
+}
+
+// Gera opções de quinzena para os próximos/anteriores 12 meses
+function _opcoesQuinzena(){
+  const hoje = new Date();
+  const opts = [];
+  for(let delta = -6; delta <= 6; delta++){
+    const d = new Date(hoje.getFullYear(), hoje.getMonth() + delta, 1);
+    const mes = _MESES_MEDICAO[d.getMonth()];
+    opts.push(mes+'01');
+    opts.push(mes+'02');
+  }
+  // Remover duplicatas mantendo ordem
+  return [...new Set(opts)];
+}
+
+function _fmtQuinzena(label){
+  if(!label) return '';
+  return label.slice(0,-2) + (label.slice(-2)==='01' ? ' — 1ª Quinzena' : ' — 2ª Quinzena');
+}
+
+function abrirSeletorQuinzena(pid){
+  const p = DB.find(x=>x.id===pid); if(!p) return;
+  const atual = p.medicaoQuinzena || _labelMedicao(p.homolog?.dtInstalacao || p.medicaoFeitaEm || p.termino || p.enviadoMedicao) || '';
+  const opts = _opcoesQuinzena();
+
+  // Criar modal inline
+  const existing = document.getElementById('quinzenaModal');
+  if(existing) existing.remove();
+
+  const div = document.createElement('div');
+  div.id = 'quinzenaModal';
+  div.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:9999;display:flex;align-items:center;justify-content:center';
+  div.innerHTML = `
+    <div style="background:#fff;border-radius:14px;padding:28px;min-width:320px;box-shadow:0 8px 32px rgba(0,0,0,.18)">
+      <div style="font-size:15px;font-weight:700;margin-bottom:6px">📅 Quinzena de Medição</div>
+      <div style="font-size:12px;color:#64748B;margin-bottom:18px">${p.nome.length>55?p.nome.slice(0,53)+'…':p.nome}</div>
+      <select id="quinzenaSelect" style="width:100%;padding:9px 12px;border:1.5px solid #CBD5E1;border-radius:8px;font-size:13px;font-family:'Plus Jakarta Sans',sans-serif;background:#F8FAFC;margin-bottom:20px">
+        ${opts.map(o=>`<option value="${o}" ${o===atual?'selected':''}>${_fmtQuinzena(o)}</option>`).join('')}
+      </select>
+      <div style="display:flex;gap:10px;justify-content:flex-end">
+        <button onclick="document.getElementById('quinzenaModal').remove()"
+          style="padding:8px 18px;border:1.5px solid #CBD5E1;border-radius:8px;background:#fff;cursor:pointer;font-size:13px;font-family:'Plus Jakarta Sans',sans-serif">Cancelar</button>
+        <button onclick="salvarQuinzenaMedicao(${pid})"
+          style="padding:8px 18px;border:none;border-radius:8px;background:#003DA5;color:#fff;cursor:pointer;font-size:13px;font-weight:700;font-family:'Plus Jakarta Sans',sans-serif">✅ Salvar</button>
+      </div>
+    </div>`;
+  div.addEventListener('click', e => { if(e.target===div) div.remove(); });
+  document.body.appendChild(div);
+}
+
+function salvarQuinzenaMedicao(pid){
+  const p = DB.find(x=>x.id===pid); if(!p) return;
+  const sel = document.getElementById('quinzenaSelect');
+  if(!sel) return;
+  p.medicaoQuinzena = sel.value;
+  fbSalvarProjeto(p);
+  document.getElementById('quinzenaModal')?.remove();
+  showToast('📅 Quinzena de medição atualizada!');
+  rMedicao();
 }
 
 function toggleMedGroup(id){
@@ -5010,7 +5075,7 @@ function rMedicao(){
   // ── Agrupar confirmados por quinzena (usa medicaoFeitaEm) ──
   const quinzenas = {};
   confirmados.forEach(p => {
-    const label = _labelMedicao(p.homolog?.dtInstalacao || p.medicaoFeitaEm || p.termino || p.enviadoMedicao) || 'Sem data';
+    const label = p.medicaoQuinzena || _labelMedicao(p.homolog?.dtInstalacao || p.medicaoFeitaEm || p.termino || p.enviadoMedicao) || 'Sem data';
     if(!quinzenas[label]) quinzenas[label] = [];
     quinzenas[label].push(p);
   });
