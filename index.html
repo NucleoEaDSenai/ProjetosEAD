@@ -4116,7 +4116,12 @@ function salvar(){
 
 function delP(id){
   if(!confirm('Remover permanentemente?'))return;
-  DB=DB.filter(p=>p.id!==id); fbExcluirProjeto(id); renderAll(); showToast('🗑️ Projeto removido');
+  // Salvar referência ANTES de remover do DB
+  const projParaDeletar = DB.find(p=>p.id===id);
+  DB=DB.filter(p=>p.id!==id);
+  fbExcluirProjeto(id, projParaDeletar);
+  renderAll();
+  showToast('🗑️ Projeto removido');
 }
 function cm(id){document.getElementById(id).classList.remove('on')}
 
@@ -5770,13 +5775,13 @@ function fbSalvarProjeto(proj){
 }
 
 // ── EXCLUIR UM PROJETO ──
-function fbExcluirProjeto(id){
+function fbExcluirProjeto(id, projRef){
   if(!fbProjetos) return;
   setStatus('sync','Removendo...');
 
-  // Salvar log de deleção ANTES de remover
-  const p = DB.find(x=>x.id===id);
-  if(p){
+  // Usar projeto passado como parâmetro (já removido do DB nesse ponto)
+  const p = projRef || DB.find(x=>x.id===id);
+  if(p && fbLogRef){
     const logEntry = {
       ts:        new Date().toISOString(),
       usuario:   nomeUsuarioAtual(),
@@ -5788,7 +5793,7 @@ function fbExcluirProjeto(id){
       pct:       p.pct||0,
       desc:      `Projeto "${p.nome}" (${p.idProjeto||'sem ID'}) deletado — coluna ${p.col}, ${p.pct||0}% concluido`,
     };
-    if(fbLogRef) fbLogRef.push(logEntry);
+    fbLogRef.push(logEntry);
   }
 
   fbProjetos.child('p' + id).remove()
