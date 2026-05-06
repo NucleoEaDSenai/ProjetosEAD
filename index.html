@@ -5611,6 +5611,7 @@ function renderAll(){
 const CFG_KEY  = 'firjan_fb_url';
 let fbProjetos = null;   // db.ref('projetos')
 let fbNxtRef   = null;   // db.ref('nxt')
+let fbLogRef   = null;   // db.ref('log_delecoes')
 let fbListening = false; // listener ativo?
 
 // ── STATUS UI ──
@@ -5787,7 +5788,7 @@ function fbExcluirProjeto(id){
       pct:       p.pct||0,
       desc:      `Projeto "${p.nome}" (${p.idProjeto||'sem ID'}) deletado — coluna ${p.col}, ${p.pct||0}% concluido`,
     };
-    fbProjetos.root.child('log_delecoes').push(logEntry);
+    if(fbLogRef) fbLogRef.push(logEntry);
   }
 
   fbProjetos.child('p' + id).remove()
@@ -5806,6 +5807,7 @@ function escutarFirebase(db){
   fbListening = true;
   fbProjetos = db.ref('projetos');
   fbNxtRef   = db.ref('nxt');
+  fbLogRef   = db.ref('log_delecoes');
 
   let primeiraVez = true;
 
@@ -6108,8 +6110,8 @@ function rHistorico(){
   });
 
   // Buscar log_delecoes do Firebase e re-renderizar após
-  if(fbProjetos && (!filtAcao || filtAcao === 'deletou projeto')){
-    fbProjetos.root.child('log_delecoes').once('value', snap => {
+  if(fbLogRef && (!filtAcao || filtAcao === 'deletou projeto')){
+    fbLogRef.once('value', snap => {
       const delRows = [];
       snap.forEach(child => {
         const l = child.val();
