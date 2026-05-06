@@ -673,7 +673,7 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
       </div>
     </div>
   </nav>
-  <div class="sb-foot" style="display:flex;align-items:center;justify-content:space-between"><span>v2.0 · Firjan SENAI</span><button class="dark-btn" id="darkBtn" onclick="toggleDark()">🌙</button></div>
+  <div class="sb-foot" style="display:flex;align-items:center;justify-content:space-between"><span>v2.0 · Firjan SENAI</span><div style="display:flex;gap:6px"><button class="dark-btn" id="darkBtn" onclick="toggleDark()">🌙</button><button class="dark-btn" onclick="diagProjeto()" title="Buscar/restaurar projeto">🔍</button></div></div>
 
 </aside>
 
@@ -5529,6 +5529,74 @@ function rHomologacoes(){
 
 // ─────────────────────────────────────────────────────────────────────────────
 
+
+function diagProjeto(){
+  const busca = prompt('ID ou trecho do nome do projeto a buscar:','HRC1587547');
+  if(!busca) return;
+  const q = busca.trim().toLowerCase();
+
+  if(!fbProjetos){
+    const ativos = DB.filter(p =>
+      (p.nome||'').toLowerCase().includes(q) ||
+      (p.idProjeto||'').toLowerCase().includes(q)
+    );
+    alert(ativos.length
+      ? 'Encontrado em memória:\n' + ativos.map(p=>`• ${p.nome} (col ${p.col})`).join('\n')
+      : 'Não encontrado em memória e Firebase não conectado.');
+    return;
+  }
+
+  fbProjetos.once('value', snap => {
+    const todos = [];
+    snap.forEach(child => {
+      const p = child.val();
+      if((p.nome||'').toLowerCase().includes(q) || (p.idProjeto||'').toLowerCase().includes(q)){
+        todos.push({_key: child.key, ...p});
+      }
+    });
+
+    if(todos.length === 0){
+      alert('❌ Projeto não encontrado no Firebase.\nBuscado: ' + busca);
+      return;
+    }
+
+    const COLS = {
+      1:'Aguardando Material Base',2:'Reunião Inicial',3:'Análise e Roteiro',
+      4:'Desenvolvimento',5:'Revisão Interna',6:'Revisão Cliente',7:'Ajustes Finais',
+      8:'Revisão Textual/Tradução',9:'PELD',10:'Homologação/Instalação',
+      11:'Homologação/Instalação',12:'Pré-Medição',13:'Upload BDOC',14:'Projetos Concluídos'
+    };
+
+    let msg = `🔍 Encontrado(s): ${todos.length} projeto(s)
+
+`;
+    todos.forEach(p => {
+      msg += `📋 ${p.nome}
+`;
+      msg += `   ID: ${p.idProjeto||'—'}
+`;
+      msg += `   Coluna: ${p.col} — ${COLS[p.col]||'desconhecida'}
+`;
+      msg += `   Cancelado: ${p.cancelado?'✅ SIM':'não'}
+`;
+      msg += `   Progresso: ${p.pct||0}%
+`;
+      msg += `   Etapas: ${(p.etapas||[]).filter(e=>e.done).length}/${(p.etapas||[]).length} concluídas
+
+`;
+    });
+
+    if(confirm(msg + 'Deseja restaurar o(s) projeto(s)?')){
+      todos.forEach(p => {
+        const todasFeitas = (p.etapas||[]).length > 0 && (p.etapas||[]).every(e=>e.done);
+        const novaCol = (p.pct===100 || todasFeitas) ? 14 : 12;
+        fbProjetos.child(p._key).update({col: novaCol, cancelado: false});
+      });
+      showToast('✅ Projeto restaurado! Recarregando...');
+      setTimeout(()=>location.reload(), 1500);
+    }
+  });
+}
 
 function renderAll(){
   // Garantir que projetos já na col 11 tenham homologPassou marcado
