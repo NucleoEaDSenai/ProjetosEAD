@@ -41,7 +41,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
 .si:hover{background:rgba(255,255,255,.05);color:#fff}
 .si.on{color:#fff;background:rgba(232,0,45,.12);border-left-color:var(--red)}
 .si-ic{font-size:15px;width:18px;text-align:center}
-.sb-foot{padding:12px 18px;border-top:1px solid rgba(255,255,255,.07);font-size:10px;color:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:space-between;flex-wrap:nowrap;overflow:visible;min-height:44px}
+.sb-foot{padding:12px 18px;border-top:1px solid rgba(255,255,255,.07);font-size:10px;color:rgba(255,255,255,.2)}
 /* MAIN */
 .main{margin-left:236px;flex:1;display:flex;flex-direction:column;min-width:0}
 .tp{background:#fff;border-bottom:1px solid var(--bdr);padding:13px 26px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
@@ -673,7 +673,7 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
       </div>
     </div>
   </nav>
-  <div class="sb-foot" style="display:flex;align-items:center;justify-content:space-between"><span>v2.0 · Firjan SENAI</span><div style="display:flex;gap:6px"><button class="dark-btn" id="darkBtn" onclick="toggleDark()">🌙</button><button class="dark-btn" onclick="diagProjeto()" title="Buscar/restaurar projeto">🔍</button></div></div>
+  <div class="sb-foot" style="display:flex;align-items:center;justify-content:space-between"><span>v2.0 · Firjan SENAI</span><button class="dark-btn" id="darkBtn" onclick="toggleDark()">🌙</button></div>
 
 </aside>
 
@@ -976,6 +976,7 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
               <option value="confirmou medição">🎉 Medição confirmada</option>
               <option value="desmarcou medição">↩️ Medição desmarcada</option>
               <option value="homologação salva">🔖 Homologação</option>
+              <option value="deletou projeto">🗑️ Deletou Projeto</option>
             </select>
           </div>
         </div>
@@ -5771,6 +5772,24 @@ function fbSalvarProjeto(proj){
 function fbExcluirProjeto(id){
   if(!fbProjetos) return;
   setStatus('sync','Removendo...');
+
+  // Salvar log de deleção ANTES de remover
+  const p = DB.find(x=>x.id===id);
+  if(p){
+    const logEntry = {
+      ts:        new Date().toISOString(),
+      usuario:   nomeUsuarioAtual(),
+      acao:      'deletou projeto',
+      projetoId: id,
+      idProjeto: p.idProjeto||'',
+      nome:      p.nome||'',
+      col:       p.col||0,
+      pct:       p.pct||0,
+      desc:      `Projeto "${p.nome}" (${p.idProjeto||'sem ID'}) deletado — coluna ${p.col}, ${p.pct||0}% concluido`,
+    };
+    fbProjetos.root.child('log_delecoes').push(logEntry);
+  }
+
   fbProjetos.child('p' + id).remove()
     .then(()  => setStatus('online','Removido ✓'))
     .catch(e  => { setStatus('offline','Erro ao remover'); console.error(e); });
@@ -6087,6 +6106,37 @@ function rHistorico(){
       rows.push({...h, projId: p.id, projNome: p.nome});
     });
   });
+
+  // Buscar log_delecoes do Firebase e re-renderizar após
+  if(fbProjetos && (!filtAcao || filtAcao === 'deletou projeto')){
+    fbProjetos.root.child('log_delecoes').once('value', snap => {
+      const delRows = [];
+      snap.forEach(child => {
+        const l = child.val();
+        if(filtUser && l.usuario !== filtUser) return;
+        delRows.push({
+          usuario:  l.usuario||'desconhecido',
+          acao:     'deletou projeto',
+          dt:       l.ts||'',
+          desc:     l.desc||'',
+          projId:   null,
+          projNome: l.nome||'(projeto removido)',
+        });
+      });
+      if(delRows.length){
+        // Mesclar e re-renderizar
+        const toMs = dt => {
+          if(!dt) return 0;
+          if(dt.includes('T') || (dt.includes('-') && !dt.includes('/'))) return new Date(dt).getTime();
+          const [datePart, timePart=''] = dt.split(', ');
+          const [d,m,y] = datePart.split('/');
+          return new Date(`${y}-${m}-${d}T${timePart||'00:00'}:00`).getTime();
+        };
+        const allRows = [...rows, ...delRows].sort((a,b)=>toMs(b.dt)-toMs(a.dt));
+        _renderHistRows(el, allRows);
+      }
+    });
+  }
   rows.sort((a,b) => {
     // Normalizar para ISO para comparação correta (suporta legado pt-BR e ISO)
     const toMs = dt => {
@@ -6117,6 +6167,7 @@ function rHistorico(){
     'confirmou medição':   '#1A8A4A',
     'desmarcou medição':   '#9CA3AF',
     'homologação salva':   '#0891B2',
+    'deletou projeto':     '#DC2626',
     'alterou prazo':       '#F59E0B',
     'alterou responsável': '#8B5CF6',
     'registrou motivo':    '#EF4444',
@@ -6134,6 +6185,7 @@ function rHistorico(){
     'confirmou medição':   '🎉',
     'desmarcou medição':   '↩️',
     'homologação salva':   '🔖',
+    'deletou projeto':     '🗑️',
     'alterou prazo':       '📅',
     'alterou responsável': '👤',
     'registrou motivo':    '⚠️',
@@ -6150,6 +6202,61 @@ function rHistorico(){
   };
   rows = rows.map(r => ({...r, usuario: _resolverNome(r.usuario)}));
 
+  _renderHistRows(el, rows);
+}
+
+function _renderHistRows(el, rows){
+  const acaoCor = {
+    'criou':               'var(--green)',
+    'editou':              'var(--blue)',
+    'duplicou':            'var(--pur)',
+    'cancelou':            'var(--red)',
+    'reativou':            'var(--org)',
+    'concluiu etapa':      '#1A8A4A',
+    'reabriu etapa':       '#9CA3AF',
+    'moveu coluna':        '#003DA5',
+    'enviou medição':      '#7C3AED',
+    'confirmou medição':   '#1A8A4A',
+    'desmarcou medição':   '#9CA3AF',
+    'homologação salva':   '#0891B2',
+    'alterou prazo':       '#F59E0B',
+    'alterou responsável': '#8B5CF6',
+    'registrou motivo':    '#EF4444',
+    'deletou projeto':     '#DC2626',
+  };
+  const acaoIcone = {
+    'criou':               '✨',
+    'editou':              '✏️',
+    'duplicou':            '📋',
+    'cancelou':            '🚫',
+    'reativou':            '🔄',
+    'concluiu etapa':      '✅',
+    'reabriu etapa':       '↩️',
+    'moveu coluna':        '📌',
+    'enviou medição':      '📐',
+    'confirmou medição':   '🎉',
+    'desmarcou medição':   '↩️',
+    'homologação salva':   '🔖',
+    'alterou prazo':       '📅',
+    'alterou responsável': '👤',
+    'registrou motivo':    '⚠️',
+    'deletou projeto':     '🗑️',
+  };
+  const _resolverNome = u => {
+    if(!u) return u;
+    const _el = u.toLowerCase();
+    if(EMAIL_NOMES[_el]) return EMAIL_NOMES[_el];
+    const _comDominio = _el + '@firjan.com.br';
+    if(EMAIL_NOMES[_comDominio]) return EMAIL_NOMES[_comDominio];
+    return u;
+  };
+  rows = rows.map(r => ({...r, usuario: _resolverNome(r.usuario)}));
+
+  if(!rows.length){
+    el.innerHTML = '<div style="padding:18px;color:var(--mu);font-size:13px">Nenhum registro ainda.</div>';
+    return;
+  }
+
   el.innerHTML = rows.map(ev => `
     <div class="hist-row">
       <div class="hist-av" style="background:${acaoCor[ev.acao]||'var(--mu)'}">
@@ -6159,7 +6266,9 @@ function rHistorico(){
         <div class="hist-line">
           <strong>${ev.usuario}</strong>
           <span style="color:${acaoCor[ev.acao]||'var(--mu)'};font-weight:600;margin:0 5px">${ev.acao}</span>
-          <span style="color:var(--blue);cursor:pointer;text-decoration:underline" onclick="openDet(${ev.projId})">${ev.projNome}</span>
+          ${ev.projId
+            ? `<span style="color:var(--blue);cursor:pointer;text-decoration:underline" onclick="openDet(${ev.projId})">${ev.projNome}</span>`
+            : `<span style="color:var(--red);font-style:italic">${ev.projNome}</span>`}
           <span style="color:var(--mu);font-size:11px;margin-left:6px">${_fmtDt(ev.dt)}</span>
         </div>
         ${ev.desc ? `<div class="hist-detail">${ev.desc}</div>` : ''}
