@@ -3999,6 +3999,8 @@ function openEdit(id){
     if(p.idCurso){_idTipoE.value='manual';_idInpE.value=p.idCurso;_idInpE.style.display='block';}
     else{_idTipoE.value='';_idInpE.value='';_idInpE.style.display='none';}
   }
+  // Travar etapas ANTES de buildRecChips para que toggleRec não sobrescreva as etapas salvas
+  _efEtapasLockadas = !!(p.etapas && p.etapas.length > 0);
   buildRecChips(p.recursos||[]);
   // Atualizar estado do campo prazo conforme recursos do projeto
   setTimeout(atualizarEstadoPrazo, 0);
@@ -4012,6 +4014,7 @@ function openEdit(id){
   const _lbEl=document.getElementById('fLinkBdoc');if(_lbEl)_lbEl.value=p.linkBdoc||'';
   stab(0,document.querySelectorAll('.tab')[0]);
   buildRespChips(p.resps||[]);
+  // Destrava após carregar os chips — buildEF vai carregar as etapas corretas do projeto
   _efEtapasLockadas = false;
   buildEF(p.etapas||ETPS_DEF.map(e=>({...e,prazo:null})));
   document.getElementById('ovNew').classList.add('on');
