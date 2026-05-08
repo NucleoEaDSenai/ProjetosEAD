@@ -187,6 +187,7 @@ tr:hover td{background:#FAFAF9}
 .et-lb-input:hover{border-color:var(--bdr);background:var(--bg)}
 .et-lb-input:focus{border-color:var(--blue);background:#fff}
 .et-btn{width:24px;height:24px;border:none;border-radius:5px;cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .15s,opacity .15s;background:transparent;opacity:.5}
+.ef-drag-row{cursor:default;transition:background .15s}.ef-drag-row.drag-over{border-top:2px solid var(--blue);background:var(--s2)}.ef-drag-handle{cursor:grab;color:var(--mu);font-size:14px;padding:0 4px;user-select:none}.ef-drag-handle:hover{color:var(--txt)}
 .et-btn:hover{opacity:1}
 .et-btn-del{color:var(--red)}
 .et-btn-del:hover{background:#FEE2E2}
@@ -1470,8 +1471,8 @@ function rDash(){
     <div class="sc cb"><div class="sc-l">Total de Cards Criados</div><div class="sc-v">${total}</div><div class="sc-s">total de projetos</div><div class="sc-i">🗂️</div></div>
     <div class="sc cr"><div class="sc-l">Projetos Em Andamento</div><div class="sc-v">${and}</div><div class="sc-s">em execução</div><div class="sc-i">🔄</div></div>
     <div class="sc cg"><div class="sc-l">Projetos Concluídos</div><div class="sc-v">${conc}</div><div class="sc-s">projetos entregues</div><div class="sc-i">✅</div></div>
-    <div class="sc cy"><div class="sc-l">Atrasados — Equipe</div><div class="sc-v">${atq}</div><div class="sc-s">próxima etapa da equipe</div><div class="sc-i">⚠️</div></div>
-    <div class="sc cp"><div class="sc-l">Atrasados — Cliente</div><div class="sc-v">${waitCl}</div><div class="sc-s">próxima etapa do cliente</div><div class="sc-i">⏳</div></div>
+    <div class="sc cy"><div class="sc-l">Projetos Atrasados - Equipe</div><div class="sc-v">${atq}</div><div class="sc-s">em atraso</div><div class="sc-i">⚠️</div></div>
+    <div class="sc cp"><div class="sc-l">Projetos Atrasados - Cliente</div><div class="sc-v">${waitCl}</div><div class="sc-s">em atraso</div><div class="sc-i">⏳</div></div>
     <div class="sc cgr"><div class="sc-l">Projetos Cancelados</div><div class="sc-v">${canc}</div><div class="sc-s"><a href="#" onclick="nav('cancelados');return false" style="color:var(--mu)">ver relatório</a></div><div class="sc-i">🚫</div></div>
   `;
 }
@@ -2586,6 +2587,12 @@ function openDet(id){
         ${p.idCurso?dl2('ID do Projeto',`<span style="font-weight:600;font-family:monospace">${p.idCurso}</span>`):''}${p.prioridade?dl2('Prioridade',prioBadge(p.prioridade)):''}${p.rp?dl2('RP',`<span style="font-weight:600">${p.rp}</span>`):''}${p.academia?dl2('Academia',`<span style="font-weight:600">${p.academia}</span>`):''}${dl2('Recursos',recTags(p.recursos))}
         ${dl2('Coluna',`<span style="display:inline-flex;align-items:center;gap:5px"><span style="width:8px;height:8px;border-radius:50%;background:${colDot(p.col)};display:inline-block"></span>${colLabel(p.col)}</span>`)}
         ${dl2('Situação',sitBdg(p))}
+        ${dl2('Mudou de escopo?',`<select onchange="setEscopo(${p.id},this.value)"
+          style="padding:5px 10px;border:1px solid var(--bdr);border-radius:7px;font-size:12.5px;font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(--txt);outline:none;cursor:pointer">
+          <option value="" ${!p.mudouEscopo?'selected':''}>— Não informado —</option>
+          <option value="nao" ${p.mudouEscopo==='nao'?'selected':''}>✅ Não</option>
+          <option value="sim" ${p.mudouEscopo==='sim'?'selected':''}>⚠️ Sim</option>
+        </select>`)}
 
       </div>
       <div>
@@ -3151,6 +3158,14 @@ function detRespOpts(resps, valorAtual){
   return opts.join('');
 }
 
+function setEscopo(pid, val){
+  const p = DB.find(x=>x.id===pid); if(!p) return;
+  p.mudouEscopo = val;
+  registrarHistorico(p, 'editou', `Mudou de escopo: ${val==='sim'?'Sim':val==='nao'?'Não':'não informado'}`);
+  fbSalvarProjeto(p);
+  showToast(val==='sim'?'⚠️ Escopo marcado como alterado':'✅ Escopo atualizado');
+}
+
 function setEObs(pid,idx,v){
   const p=DB.find(x=>x.id===pid);if(!p)return;
   p.etapas[idx].obs=(v||'').trim();
@@ -3596,23 +3611,38 @@ function toggleRec(el, recurso){
       !Object.values(TEMPLATES).some(t => t.etapas.some(te => te.lb === e.lb)));
 
   if(tmplRecurso && !temEtapasCustom){
-    // Recurso com template de etapas (Encapsulamento, Manutenção, etc.)
     const tmpl = TEMPLATES[tmplRecurso];
     const colEl = document.getElementById('fcol');
-    // Só aplica coluna inicial em projetos NOVOS — edição mantém a coluna atual
     if(colEl && !colEl._manuallyChanged && editId === null) colEl.value = tmpl.colInicial;
-    buildEF(tmpl.etapas.map(e => ({...e, prazo:null, done:false, fim:null})));
-    // Aplicar cronograma se houver data de início
-    if(CRONOGRAMAS[tmplRecurso] && dataInicio){
-      aplicarCronograma(tmplRecurso, dataInicio);
+
+    if(_efCascataAtiva){
+      // Cronograma LIGADO: substituir etapas pelo template, preservando datas existentes
+      const datasAntes = _efEtapas.filter(e=>e.prazo).map(e=>e.prazo).sort();
+      buildEF(tmpl.etapas.map(e => ({...e, prazo:null, done:false, fim:null})));
+      // Redistribuir datas preservadas proporcionalmente
+      if(datasAntes.length > 0 && dataInicio){
+        aplicarCronograma(tmplRecurso, dataInicio);
+      } else if(datasAntes.length > 0){
+        const etComPrazo = _efEtapas.filter(e=>!ETAPAS_SEM_PRAZO_AUTO.has(e.lb));
+        datasAntes.forEach((dt,i)=>{ if(etComPrazo[i]) etComPrazo[i].prazo = dt; });
+        _renderEF();
+      }
     }
+    // Cronograma DESLIGADO: não toca nas etapas nem datas
   } else if(!tmplRecurso && cronRecurso && !temEtapasCustom){
-    // Recurso sem template mas com cronograma (Web Rise Básico/Inter./Avançado)
-    // Usa ETPS_DEF como base de etapas + aplica cronograma
-    buildEF(ETPS_DEF.map(e => ({...e, prazo:null, done:false, fim:null})));
-    if(dataInicio){
-      aplicarCronograma(cronRecurso, dataInicio);
+    if(_efCascataAtiva){
+      // Cronograma LIGADO
+      const datasAntes = _efEtapas.filter(e=>e.prazo).map(e=>e.prazo).sort();
+      buildEF(ETPS_DEF.map(e => ({...e, prazo:null, done:false, fim:null})));
+      if(dataInicio){
+        aplicarCronograma(cronRecurso, dataInicio);
+      } else if(datasAntes.length > 0){
+        const etComPrazo = _efEtapas.filter(e=>!ETAPAS_SEM_PRAZO_AUTO.has(e.lb));
+        datasAntes.forEach((dt,i)=>{ if(etComPrazo[i]) etComPrazo[i].prazo = dt; });
+        _renderEF();
+      }
     }
+    // Cronograma DESLIGADO: não toca em nada
   } else if(!tmplRecurso && !cronRecurso && _efEtapas.length > 0){
     // Nenhum recurso com template ou cronograma — restaurar padrão se necessário
     const estaNoTemplate = Object.values(TEMPLATES).some(t =>
@@ -3657,7 +3687,7 @@ function getSelectedResps(){
 
 // Estado temporário das etapas no formulário (array mutável durante edição)
 let _efEtapas = [];
-let _efCascataAtiva = true;   // flag: cascateamento automático de datas
+let _efCascataAtiva = false;  // flag: cascateamento automático de datas (default: desligado)
 let _efEtapasLockadas = false; // flag: etapas bloqueadas contra regravação pelo template
 
 // Gera as <option> do select de responsável por etapa
@@ -3688,7 +3718,7 @@ function _efRespOpts(valorAtual){
 
 function buildEF(etapas){
   _efEtapas = etapas.map(e=>({...e, _prazoAntes: e.prazo||null})); // guarda prazo inicial para cascata
-  _efCascataAtiva = true; // sempre começa com cascata ativa
+  _efCascataAtiva = false; // default: desligado — usuário liga quando quiser
   // _efEtapasLockadas é gerenciado por openNew/openEdit/toggleCascata — não resetar aqui
   _renderEF();
 }
@@ -3729,8 +3759,9 @@ function _renderEF(){
         <th style="width:72px;text-align:center">Ações</th>
       </tr></thead>
       <tbody>
-        ${_efEtapas.map((e,i) => `<tr>
-          <td style="color:var(--mu);font-size:11px;text-align:center">${i+1}</td>
+        ${_efEtapas.map((e,i) => `<tr class="ef-drag-row"
+          ondragover="_efDragOver(event)" ondragleave="_efDragLeave(event)" ondrop="_efDrop(event,${i})">
+          <td style="color:var(--mu);font-size:11px;text-align:center"><span class="ef-drag-handle" draggable="true" ondragstart="_efDragStart(event,${i})" title="Arraste para reordenar">⠿</span></td>
           <td>
             <input class="et-lb-input" id="ef_lb_${i}" value="${(e.lb||'').replace(/"/g,'&quot;')}"
               placeholder="Nome da etapa" title="Clique para editar o nome">
@@ -3767,10 +3798,6 @@ function _renderEF(){
           </td>
           <td>
             <div style="display:flex;align-items:center;justify-content:center;gap:2px">
-              <button type="button" class="et-btn et-btn-up" onclick="_efMover(${i},-1)"
-                title="Mover para cima" ${i===0?'disabled style="opacity:.2;cursor:default"':''}>▲</button>
-              <button type="button" class="et-btn et-btn-dn" onclick="_efMover(${i},1)"
-                title="Mover para baixo" ${i===_efEtapas.length-1?'disabled style="opacity:.2;cursor:default"':''}>▼</button>
               <button type="button" class="et-btn et-btn-del" onclick="_efDel(${i})"
                 title="Remover etapa">✕</button>
             </div>
@@ -3799,6 +3826,21 @@ function abrirInputPrazo(i){
     const d = document.getElementById('ep_d_'+i);
     if(d) d.focus();
   }
+}
+
+let _efDragIdx = null;
+function _efDragStart(e, i){ _efDragIdx = i; e.dataTransfer.effectAllowed='move'; }
+function _efDragOver(e){ e.preventDefault(); e.currentTarget.classList.add('drag-over'); }
+function _efDragLeave(e){ e.currentTarget.classList.remove('drag-over'); }
+function _efDrop(e, toIdx){
+  e.preventDefault();
+  e.currentTarget.classList.remove('drag-over');
+  if(_efDragIdx === null || _efDragIdx === toIdx) return;
+  _efSync();
+  const moved = _efEtapas.splice(_efDragIdx, 1)[0];
+  _efEtapas.splice(toIdx, 0, moved);
+  _efDragIdx = null;
+  _renderEF();
 }
 
 function _efToggleCascata(){
