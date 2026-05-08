@@ -878,7 +878,7 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
 
     <!-- ATRASOS -->
     <div class="view" id="view-atrasos">
-      <div class="st" style="margin-bottom:16px">Relatório de Atrasos — Etapas em Aberto</div>
+      <div class="st" style="margin-bottom:16px">Relatórios de Atrasos — Projetos em Atraso</div>
       <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:22px" id="atrasosResumo"></div>
       <div class="fbox" style="margin-bottom:18px">
         <div class="fbox-row">
@@ -895,6 +895,13 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
               <option value="">Todos</option>
               <option value="eq">👥 Equipe</option>
               <option value="cl">🏢 Cliente</option>
+            </select>
+          </div>
+          <div class="fg-sm"><label class="fl-sm">Tipo de Atraso</label>
+            <select class="fi-sm" id="aFiltTipo" onchange="rAtrasos()">
+              <option value="">Todos</option>
+              <option value="prazo_real">🏁 Prazo real vencido</option>
+              <option value="etapa">⚠️ Etapa atrasada (prazo ok)</option>
             </select>
           </div>
           <button class="btn-lim" onclick="limparAFilts()">✕ Limpar</button>
@@ -2262,6 +2269,7 @@ function rAtrasos(){
 
   const filtSit    = document.getElementById('aFiltSit')?.value    || '';
   const filtResp   = document.getElementById('aFiltResp')?.value   || '';
+  const filtTipo   = document.getElementById('aFiltTipo')?.value   || '';
 
   // ── Montar lista de linhas de atraso ──────────────────────────────────────
   // Apenas etapas em aberto com prazo vencido (anterior ao dia de hoje).
@@ -2328,6 +2336,14 @@ function rAtrasos(){
       // Filtro de responsável
       if(filtResp && e.r !== filtResp) return;
 
+      // Verificar se prazo REAL do projeto também está vencido
+      const _ah2=new Date();_ah2.setHours(0,0,0,0);
+      const prazoProjVencido = !!(p.prazo && new Date(p.prazo+'T00:00:00') < _ah2);
+      const tipoAtraso = prazoProjVencido ? 'prazo_real' : 'etapa';
+
+      // Aplicar filtro de tipo
+      if(filtTipo && tipoAtraso !== filtTipo) return;
+
       rows.push({
         projId: p.id,
         proj: p.nome,
@@ -2343,6 +2359,8 @@ function rAtrasos(){
         motivo: e.atrasoMotivo || null,
         diasCl: e.diasCl || null,
         resp: (p.resps||[]).join(', '),
+        prazoProjVencido,
+        tipoAtraso,
       });
     });
   });
@@ -2352,9 +2370,9 @@ function rAtrasos(){
 
   // ── Cards resumo ──────────────────────────────────────────────────────────
   document.getElementById('atrasosResumo').innerHTML = `
-    <div class="sc cy"><div class="sc-l">Etapas em Atraso (aberto)</div><div class="sc-v">${totalAberto}</div><div class="sc-s">requerem atenção</div><div class="sc-i">⚠️</div></div>
-    <div class="sc cr"><div class="sc-l">Atrasos por Equipe</div><div class="sc-v">${totalEq}</div><div class="sc-s">equipe interna</div><div class="sc-i">👥</div></div>
-    <div class="sc cp"><div class="sc-l">Atrasos por Cliente</div><div class="sc-v">${totalCl}</div><div class="sc-s">aguardando cliente</div><div class="sc-i">🏢</div></div>
+    <div class="sc cy"><div class="sc-l">Projetos em Atraso</div><div class="sc-v">${totalAberto}</div><div class="sc-s">requerem atenção</div><div class="sc-i">⚠️</div></div>
+    <div class="sc cr"><div class="sc-l">Atrasos da Equipe</div><div class="sc-v">${totalEq}</div><div class="sc-s">projetos atrasados pela equipe</div><div class="sc-i">👥</div></div>
+    <div class="sc cp"><div class="sc-l">Atrasos do Cliente</div><div class="sc-v">${totalCl}</div><div class="sc-s">aguardando cliente</div><div class="sc-i">🏢</div></div>
     <div class="sc cg"><div class="sc-l">Histórico (concluídas c/ atraso)</div><div class="sc-v">${totalHistorico}</div><div class="sc-s">já finalizadas</div><div class="sc-i">📋</div></div>
   `;
 
@@ -2435,7 +2453,7 @@ function toggleAtrasoProj(hd){
 }
 
 function limparAFilts(){
-  ['aFiltSit','aFiltResp'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
+  ['aFiltSit','aFiltResp','aFiltTipo'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
   rAtrasos();
 }
 
