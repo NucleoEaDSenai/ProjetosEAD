@@ -872,7 +872,7 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
         <div class="kk"><div class="kkt">⏳ Espera por Cliente (por etapa)</div><div id="kpiEsperaCl"></div></div>
-        <div class="kk"><div class="kkt">✅ Taxa de Cumprimento de Prazo por Etapa</div><div id="kpiCumprimento"></div></div>
+        <div class="kk"><div class="kkt">🔄 Projetos com Mudança de Escopo</div><div id="kpiEscopo"></div></div>
       </div>
     </div>
 
@@ -2235,45 +2235,21 @@ function rKPIs(){
 
   // ── 10. Por prioridade ──
   // ── 11. Taxa de cumprimento de prazo por etapa ──
-  const cumpEl = document.getElementById('kpiCumprimento');
-  if(cumpEl){
-    const etMap = {};
-    todos.forEach(p=>{
-      (p.etapas||[]).forEach(e=>{
-        if(!e.prazo || !e.done) return; // só etapas concluídas com prazo
-        if(ETAPAS_SEM_PRAZO_AUTO.has(e.lb)) return; // excluir etapas sem prazo automático
-        if(!etMap[e.lb]) etMap[e.lb] = {noPrazo:0, comAtraso:0};
-        if(e.fim && new Date(e.fim) <= new Date(e.prazo)) etMap[e.lb].noPrazo++;
-        else etMap[e.lb].comAtraso++;
-      });
-    });
-    const etArr = Object.entries(etMap)
-      .map(([lb,v])=>({ lb, total:v.noPrazo+v.comAtraso, tx:Math.round(v.noPrazo/(v.noPrazo+v.comAtraso)*100) }))
-      .filter(e=>e.total>=2) // mínimo 2 amostras
-      .sort((a,b)=>a.tx-b.tx); // pior primeiro
-    cumpEl.innerHTML = etArr.length===0
-      ? '<div style="color:var(--mu);font-size:12px">Dados insuficientes (mínimo 2 conclusões por etapa)</div>'
-      : (()=>{
-          // Cor relativa: melhor (maior %) = verde, pior (menor %) = vermelho
-          const _txMn=etArr.length?etArr[0].tx:0;
-          const _txMx=etArr.length?etArr[etArr.length-1].tx:100;
-          const _cumpCor=(tx)=>{
-            const rng=_txMx-_txMn||1;
-            const t=(_txMx-tx)/rng; // 0=melhor, 1=pior
-            if(t<0.33) return `hsl(${Math.round(120-t*3*40)},72%,38%)`;
-            if(t<0.66) return `hsl(${Math.round(40-(t-0.33)*3*20)},85%,44%)`;
-            return `hsl(${Math.round(20-(t-0.66)*3*20)},90%,42%)`;
-          };
-          return etArr.slice(0,10).map(e=>{
-            const cor=_cumpCor(e.tx);
-            return `<div class="kpi-bar-row">
-              <div class="kpi-bar-row-head">
-                <span>${e.lb}<span style="color:var(--mu);font-size:10px;margin-left:4px">(${e.total}x)</span></span>
-                <strong style="color:${cor}">${e.tx}%</strong>
-              </div>
-              <div class="kpi-bar-track"><div class="kpi-bar-fill" style="width:${e.tx}%;background:${cor}"></div></div>
-            </div>`;}).join('');
-        })();
+  const escopoEl = document.getElementById('kpiEscopo');
+  if(escopoEl){
+    const sim = todos.filter(p => p.mudouEscopo === 'sim').length;
+    const nao = todos.filter(p => p.mudouEscopo === 'nao').length;
+    escopoEl.innerHTML = `
+      <div style="display:flex;gap:14px">
+        <div style="flex:1;background:#FEE2E2;border-radius:10px;padding:18px 16px;text-align:center">
+          <div style="font-size:36px;font-weight:800;color:#DC2626">${sim}</div>
+          <div style="font-size:12px;color:#991B1B;font-weight:600;margin-top:4px">⚠️ Sim</div>
+        </div>
+        <div style="flex:1;background:#DCFCE7;border-radius:10px;padding:18px 16px;text-align:center">
+          <div style="font-size:36px;font-weight:800;color:#16A34A">${nao}</div>
+          <div style="font-size:12px;color:#15803D;font-weight:600;margin-top:4px">✅ Não</div>
+        </div>
+      </div>`;
   }
 
 }
