@@ -3596,6 +3596,16 @@ function toggleRec(el, recurso){
   // Data de início preenchida no formulário
   const dataInicio = getDateField('fi');
 
+  // Projeto EXISTENTE (editando): nunca sobrescrever etapas ao trocar recurso
+  // Só aplica datas se cronograma estiver ligado
+  if(editId !== null && _efEtapas.length > 0){
+    if(_efCascataAtiva){
+      const recursoParaCron = tmplRecurso || cronRecurso;
+      if(recursoParaCron && dataInicio) aplicarCronograma(recursoParaCron, dataInicio);
+    }
+    return;
+  }
+
   // Se etapas estão travadas (modo manual), nunca sobrescrever nomes/estrutura
   if(_efEtapasLockadas) return;
 
@@ -3614,7 +3624,6 @@ function toggleRec(el, recurso){
     buildEF(tmpl.etapas.map(e => ({...e, prazo:null, done:false, fim:null})));
 
     if(_efCascataAtiva){
-      // Cronograma LIGADO: aplicar datas automaticamente
       if(dataInicio){
         aplicarCronograma(tmplRecurso, dataInicio);
       } else if(datasAntes.length > 0){
@@ -3623,15 +3632,12 @@ function toggleRec(el, recurso){
         _renderEF();
       }
     }
-    // Cronograma DESLIGADO: carrega etapas sem datas
 
   } else if(!tmplRecurso && cronRecurso && !temEtapasCustom){
-    // Sem template mas com cronograma (Web Rise)
     const datasAntes = _efEtapas.filter(e=>e.prazo).map(e=>e.prazo).sort();
     buildEF(ETPS_DEF.map(e => ({...e, prazo:null, done:false, fim:null})));
 
     if(_efCascataAtiva){
-      // Cronograma LIGADO: aplicar datas automaticamente
       if(dataInicio){
         aplicarCronograma(cronRecurso, dataInicio);
       } else if(datasAntes.length > 0){
@@ -3640,7 +3646,6 @@ function toggleRec(el, recurso){
         _renderEF();
       }
     }
-    // Cronograma DESLIGADO: carrega etapas sem datas
   } else if(!tmplRecurso && !cronRecurso && _efEtapas.length > 0){
     // Nenhum recurso com template ou cronograma — restaurar padrão se necessário
     const estaNoTemplate = Object.values(TEMPLATES).some(t =>
