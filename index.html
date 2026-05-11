@@ -4095,6 +4095,9 @@ function salvar(){
     academia:document.getElementById('fAcademia')?.value||'',
     tags:editId?(DB.find(x=>x.id===editId)?.tags||[]):[],
     linkBdoc:document.getElementById('fLinkBdoc')?.value.trim()||projAnterior?.linkBdoc||'',  // preserva tags existentes
+    mudouEscopo:projAnterior?.mudouEscopo||'',  // preserva campo de escopo
+    homologPassou:projAnterior?.homologPassou||false,
+    medicaoQuinzena:projAnterior?.medicaoQuinzena||'',
     historico:projAnterior?.historico||[],
     etapas,
   };
