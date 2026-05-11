@@ -3207,8 +3207,8 @@ function buildRecChips(selected){
 function atualizarEstadoPrazo(){
   const selecionados = getSelectedRecs();
   const temCron = selecionados.some(r => CRONOGRAMAS[r]);
-  // Se cronograma desligado (modo manual), prazo sempre editável
-  const bloquear = temCron && !_efEtapasLockadas;
+  // Prazo só é bloqueado se há cronograma E o cronograma automático está LIGADO
+  const bloquear = temCron && _efCascataAtiva;
   const campos = ['fp_d','fp_m','fp_a'];
   const lbl = document.getElementById('lblPrazo');
   campos.forEach(id => {
