@@ -3925,7 +3925,8 @@ function _efDel(i){
   _efSync();
   _efEtapas.splice(i,1);
   _renderEF();
-  _efReaplicarCronograma();
+  // Só reaplicar cronograma se estiver LIGADO
+  if(_efCascataAtiva) _efReaplicarCronograma();
 }
 
 function _efMover(i, dir){
@@ -3945,7 +3946,8 @@ function _efAdd(){
   _efSync();
   _efEtapas.push({lb:'Nova Etapa', r:'eq', prazo:null, inicio:null, fim:null, done:false, _prazoAntes:null});
   _renderEF();
-  _efReaplicarCronograma();
+  // Só reaplicar cronograma se estiver LIGADO
+  if(_efCascataAtiva) _efReaplicarCronograma();
   setTimeout(()=>{
     const inp = document.getElementById('ef_lb_'+(_efEtapas.length-1));
     if(inp){ inp.focus(); inp.select(); }
@@ -3954,7 +3956,7 @@ function _efAdd(){
 
 // Reaplica cronograma automaticamente se houver recurso + data início preenchidos
 function _efReaplicarCronograma(){
-  if(_efEtapasLockadas) return; // modo manual: nunca reaplicar
+  if(!_efCascataAtiva) return; // cronograma desligado: nunca reaplicar
   const dataInicio = getDateField('fi');
   if(!dataInicio) return;
   const selecionados = getSelectedRecs();
