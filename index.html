@@ -3609,12 +3609,13 @@ function toggleRec(el, recurso){
     const colEl = document.getElementById('fcol');
     if(colEl && !colEl._manuallyChanged && editId === null) colEl.value = tmpl.colInicial;
 
+    // Sempre carrega as etapas do template (com ou sem cronograma)
+    const datasAntes = _efEtapas.filter(e=>e.prazo).map(e=>e.prazo).sort();
+    buildEF(tmpl.etapas.map(e => ({...e, prazo:null, done:false, fim:null})));
+
     if(_efCascataAtiva){
-      // Cronograma LIGADO: substituir etapas pelo template, preservando datas existentes
-      const datasAntes = _efEtapas.filter(e=>e.prazo).map(e=>e.prazo).sort();
-      buildEF(tmpl.etapas.map(e => ({...e, prazo:null, done:false, fim:null})));
-      // Redistribuir datas preservadas proporcionalmente
-      if(datasAntes.length > 0 && dataInicio){
+      // Cronograma LIGADO: aplicar datas automaticamente
+      if(dataInicio){
         aplicarCronograma(tmplRecurso, dataInicio);
       } else if(datasAntes.length > 0){
         const etComPrazo = _efEtapas.filter(e=>!ETAPAS_SEM_PRAZO_AUTO.has(e.lb));
@@ -3622,12 +3623,15 @@ function toggleRec(el, recurso){
         _renderEF();
       }
     }
-    // Cronograma DESLIGADO: não toca nas etapas nem datas
+    // Cronograma DESLIGADO: carrega etapas sem datas
+
   } else if(!tmplRecurso && cronRecurso && !temEtapasCustom){
+    // Sem template mas com cronograma (Web Rise)
+    const datasAntes = _efEtapas.filter(e=>e.prazo).map(e=>e.prazo).sort();
+    buildEF(ETPS_DEF.map(e => ({...e, prazo:null, done:false, fim:null})));
+
     if(_efCascataAtiva){
-      // Cronograma LIGADO
-      const datasAntes = _efEtapas.filter(e=>e.prazo).map(e=>e.prazo).sort();
-      buildEF(ETPS_DEF.map(e => ({...e, prazo:null, done:false, fim:null})));
+      // Cronograma LIGADO: aplicar datas automaticamente
       if(dataInicio){
         aplicarCronograma(cronRecurso, dataInicio);
       } else if(datasAntes.length > 0){
@@ -3636,7 +3640,7 @@ function toggleRec(el, recurso){
         _renderEF();
       }
     }
-    // Cronograma DESLIGADO: não toca em nada
+    // Cronograma DESLIGADO: carrega etapas sem datas
   } else if(!tmplRecurso && !cronRecurso && _efEtapas.length > 0){
     // Nenhum recurso com template ou cronograma — restaurar padrão se necessário
     const estaNoTemplate = Object.values(TEMPLATES).some(t =>
