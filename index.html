@@ -4107,6 +4107,7 @@ function salvar(){
     tags:editId?(DB.find(x=>x.id===editId)?.tags||[]):[],
     linkBdoc:document.getElementById('fLinkBdoc')?.value.trim()||projAnterior?.linkBdoc||'',  // preserva tags existentes
     mudouEscopo:projAnterior?.mudouEscopo||'',  // preserva campo de escopo
+    homolog:projAnterior?.homolog||{},          // preserva dados de homologação
     homologPassou:projAnterior?.homologPassou||false,
     medicaoQuinzena:projAnterior?.medicaoQuinzena||'',
     historico:projAnterior?.historico||[],
@@ -5193,6 +5194,40 @@ function rMedicao(){
 
 // ── HOMOLOGAÇÕES ─────────────────────────────────────────────────────────────
 
+// Auto-save silencioso ao sair de qualquer campo de homologação
+function _homAutoSave(pid){
+  const p = DB.find(x=>x.id===pid); if(!p) return;
+  const h = p.homolog || {};
+  const g = fld => document.getElementById('hom_'+pid+'_'+fld)?.value?.trim() || '';
+  const gd = fld => { const v=document.getElementById('hom_'+pid+'_'+fld)?.value; return v||null; };
+
+  // Preservar dados existentes e sobrescrever só o que está no DOM
+  const campos = {
+    idCurso:      g('idCurso')      || h.idCurso      || '',
+    pacoteScorm:  g('pacoteScorm')  || h.pacoteScorm  || '',
+    nPaginas:     g('nPaginas')     || h.nPaginas     || '',
+    solicitante:  g('solicitante')  || h.solicitante  || '',
+    enviadaPor:   g('enviadaPor')   || h.enviadaPor   || '',
+    rt:           g('rt')           || h.rt           || '',
+    academia:     g('academia')     || h.academia     || '',
+    conclusao:    g('conclusao')    || h.conclusao    || '',
+    notaCorte:    g('notaCorte')    || h.notaCorte    || '',
+    novoManut:    g('novoManut')    || h.novoManut    || '',
+    servico:      g('servico')      || h.servico      || '',
+    dtHomolog:    gd('dtHomolog')   ?? h.dtHomolog    ?? null,
+    dtAutorizacao:gd('dtAutorizacao')?? h.dtAutorizacao?? null,
+    dtInstalacao: gd('dtInstalacao')?? h.dtInstalacao ?? null,
+  };
+
+  // Só salvar se houve alguma mudança real
+  const mudou = Object.keys(campos).some(k => campos[k] !== (h[k]||null) && campos[k] !== (h[k]||''));
+  if(!mudou && h.preenchido) return;
+
+  p.homolog = { ...h, ...campos, preenchido: true };
+  p.homologPassou = true;
+  fbSalvarProjeto(p);
+}
+
 function salvarHomolog(pid){
   const p = DB.find(x=>x.id===pid); if(!p) return;
   const h = p.homolog || {};
@@ -5236,11 +5271,12 @@ function salvarHomolog(pid){
 
 function _homSel(pid, fld, opts, val){
   const sel = opts.map(o => `<option value="${o}" ${val===o?'selected':''}>${o}</option>`).join('');
-  return `<select id="hom_${pid}_${fld}">${sel}</select>`;
+  return `<select id="hom_${pid}_${fld}" onchange="_homAutoSave(${pid})">${sel}</select>`;
 }
 
 function _homInput(pid, fld, val, type='text', placeholder=''){
-  return `<input type="${type}" id="hom_${pid}_${fld}" value="${val||''}" placeholder="${placeholder}" style="width:100%">`;
+  const evtAttr = type==='date' ? `onchange="_homAutoSave(${pid})"` : `onblur="_homAutoSave(${pid})"`;
+  return `<input type="${type}" id="hom_${pid}_${fld}" value="${val||''}" placeholder="${placeholder}" style="width:100%" ${evtAttr}>`;
 }
 
 function toggleHomolog(id){
