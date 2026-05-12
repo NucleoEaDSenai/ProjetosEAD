@@ -2283,6 +2283,8 @@ function rAtrasos(){
   todos.forEach(p => {
     // Filtro de situação do projeto
     const sitP = p.cancelado ? 'cancelado' : calcSit(p);
+    // Por default, excluir cancelados — só aparecem se filtro for explicitamente "Cancelados"
+    if(p.cancelado && filtSit !== 'cancelado') return;
     if(filtSit === 'ativo'     && (p.cancelado || sitP==='concluido')) return;
     if(filtSit === 'concluido' && sitP !== 'concluido') return;
     if(filtSit === 'cancelado' && !p.cancelado) return;
