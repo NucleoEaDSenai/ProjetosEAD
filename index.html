@@ -887,7 +887,6 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
               <option value="">Todos</option>
               <option value="ativo">Ativos</option>
               <option value="concluido">Concluídos</option>
-              <option value="cancelado">Cancelados</option>
             </select>
           </div>
           <div class="fg-sm"><label class="fl-sm">Responsável da Etapa</label>
@@ -2264,8 +2263,8 @@ function rKPIs(){
 
 // ── ATRASOS ──
 function rAtrasos(){
-  // Junta todos os projetos: ativos + concluidos + cancelados
-  const todos = activeDB().concat(cancelDB());
+  // Apenas projetos ativos e concluídos — cancelados ficam só na aba Cancelados
+  const todos = activeDB();
 
   const filtSit    = document.getElementById('aFiltSit')?.value    || '';
   const filtResp   = document.getElementById('aFiltResp')?.value   || '';
@@ -2283,11 +2282,8 @@ function rAtrasos(){
   todos.forEach(p => {
     // Filtro de situação do projeto
     const sitP = p.cancelado ? 'cancelado' : calcSit(p);
-    // Por default, excluir cancelados — só aparecem se filtro for explicitamente "Cancelados"
-    if(p.cancelado && filtSit !== 'cancelado') return;
-    if(filtSit === 'ativo'     && (p.cancelado || sitP==='concluido')) return;
+    if(filtSit === 'ativo'     && sitP==='concluido') return;
     if(filtSit === 'concluido' && sitP !== 'concluido') return;
-    if(filtSit === 'cancelado' && !p.cancelado) return;
 
     const etapas = p.etapas || [];
 
