@@ -791,6 +791,11 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
               <option value="concluido">✅ Concluído</option>
             </select>
           </div>
+          <div class="fg-sm"><label class="fl-sm">Academia</label>
+            <select class="fi-sm" id="lFiltAcad" onchange="applyLFilts()">
+              <option value="">Todas</option>
+            </select>
+          </div>
           <div class="fg-sm"><label class="fl-sm">Coluna</label>
             <select class="fi-sm" id="lFiltCol" onchange="applyLFilts()">
               <option value="">Todas</option>
@@ -1593,14 +1598,19 @@ function rKanban(){
 function populateFiltSelects(){
   const resps=[...new Set(activeDB().flatMap(p=>p.resps||[]))].sort();
   // Popular Academia no Kanban
+  const _ACADS_FIXAS=["CCT-FSGC", "CEEI", "CL", "COA/T&D", "EXP", "FSGC", "GL", "GPTDI", "ITD", "Local", "NTTE", "PO\u00c7OS", "PPRG", "SMS", "SUB-NAV"];
+  const _acadsProj=[...new Set(activeDB().map(p=>p.academia).filter(Boolean))];
+  const _acads=[...new Set([..._ACADS_FIXAS,..._acadsProj])].sort();
+  const _acadOpts = (cur) =>
+    '<option value="">Todas</option>'
+    +_acads.map(a=>`<option value="${a}"${cur===a?' selected':''}>${a}</option>`).join('')
+    +'<option value="__sem_academia__"'+(cur==='__sem_academia__'?' selected':'')+'>— Não definida —</option>';
+
   const kAcadEl = document.getElementById('kFiltAcad');
-  if(kAcadEl){
-    const ACADS_FIXAS=["CCT-FSGC", "CEEI", "CL", "COA/T&D", "EXP", "FSGC", "GL", "GPTDI", "ITD", "Local", "NTTE", "PO\u00c7OS", "PPRG", "SMS", "SUB-NAV"];
-    const acadsProj=[...new Set(activeDB().map(p=>p.academia).filter(Boolean))];
-    const acads=[...new Set([...ACADS_FIXAS,...acadsProj])].sort();
-    const cur=kAcadEl.value;
-    kAcadEl.innerHTML='<option value="">Todas</option>'+acads.map(a=>`<option value="${a}"${cur===a?' selected':''}>${a}</option>`).join('');
-  }
+  if(kAcadEl){ kAcadEl.innerHTML = _acadOpts(kAcadEl.value); }
+
+  const lAcadEl = document.getElementById('lFiltAcad');
+  if(lAcadEl){ lAcadEl.innerHTML = _acadOpts(lAcadEl.value); }
   ['kFiltResp','lFiltResp'].forEach(id=>{
     const s=document.getElementById(id); if(!s)return;
     const cur=s.value;
@@ -1627,6 +1637,7 @@ function getLFilts(){
   return{
     resp:document.getElementById('lFiltResp')?.value||'',
     sit:document.getElementById('lFiltSit')?.value||'',
+    acad:document.getElementById('lFiltAcad')?.value||'',
     col:document.getElementById('lFiltCol')?.value||'',
     de:document.getElementById('lFiltDe')?.value||'',
     ate:document.getElementById('lFiltAte')?.value||'',
@@ -1636,7 +1647,7 @@ function applyFilt(data,f){
   let r=data;
   if(f.resp) r=r.filter(p=>(p.resps||[]).includes(f.resp));
   if(f.sit)  r=r.filter(p=>calcSit(p)===f.sit);
-  if(f.acad) r=r.filter(p=>p.academia===f.acad);
+  if(f.acad) r=r.filter(p=>f.acad==='__sem_academia__' ? !p.academia : p.academia===f.acad);
   if(f.col!=='') r=r.filter(p=>p.col===parseInt(f.col));
   if(f.de)   r=r.filter(p=>p.criado&&p.criado>=f.de);
   if(f.ate)  r=r.filter(p=>p.criado&&p.criado<=f.ate);
@@ -1658,7 +1669,7 @@ function limparKFilts(){
   rKanban();
 }
 function limparLFilts(){
-  ['lFiltResp','lFiltSit','lFiltCol'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
+  ['lFiltResp','lFiltSit','lFiltAcad','lFiltCol'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
   ['lFiltDe','lFiltAte'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
   rList();
 }
