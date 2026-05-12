@@ -5254,17 +5254,8 @@ function salvarHomolog(pid){
                 'Dados atualizados';
   registrarHistorico(p, 'homologação salva', dtStr);
   fbSalvarProjeto(p);
-  showToast('💾 Homologação salva!');
-  // Capturar quais cards estão abertos antes de re-renderizar
-  const abertosAntes = [...document.querySelectorAll('.hom-body.open')].map(el => el.id.replace('hom_body_',''));
-  rHomologacoes();
-  // Restaurar estado aberto após re-render
-  abertosAntes.forEach(id => {
-    const body = document.getElementById('hom_body_'+id);
-    const chev = document.getElementById('hom_chev_'+id);
-    if(body){ body.classList.add('open'); }
-    if(chev){ chev.classList.add('open'); }
-  });
+  showToast('💾 Dados salvos!');
+  // Não re-renderiza — gaveta permanece aberta para continuar editando
 }
 
 function _homSel(pid, fld, opts, val){
@@ -5617,7 +5608,16 @@ function rHomologacoes(){
     html += grpInstalado.map(p => buildHomologCard(p)).join('');
   }
 
+  // Salvar gavetas abertas antes de re-renderizar
+  const _gavetasAbertas = [...document.querySelectorAll('.hom-body.open')].map(el=>el.id.replace('hom_body_',''));
   listaEl.innerHTML = html;
+  // Restaurar gavetas abertas após re-render
+  _gavetasAbertas.forEach(id => {
+    const body = document.getElementById('hom_body_'+id);
+    const chev = document.getElementById('hom_chev_'+id);
+    if(body) body.classList.add('open');
+    if(chev) chev.classList.add('open');
+  });
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
