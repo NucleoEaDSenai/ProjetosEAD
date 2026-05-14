@@ -1070,6 +1070,7 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
               <option value="NTTE">NTTE</option>
               <option value="POÇOS">POÇOS</option>
               <option value="PPRG">PPRG</option>
+              <option value="RES &amp; EE">RES &amp; EE</option>
               <option value="SMS">SMS</option>
               <option value="SUB-NAV">SUB-NAV</option>
             </select>
@@ -1599,7 +1600,7 @@ function rKanban(){
 function populateFiltSelects(){
   const resps=[...new Set(activeDB().flatMap(p=>p.resps||[]))].sort();
   // Popular Academia no Kanban
-  const _ACADS_FIXAS=["CCT-FSGC", "CEEI", "CL", "COA/T&D", "EXP", "FSGC", "GL", "GPTDI", "ITD", "Local", "NTTE", "PO\u00c7OS", "PPRG", "SMS", "SUB-NAV"];
+  const _ACADS_FIXAS=["CCT-FSGC", "CEEI", "CL", "COA/T&D", "EXP", "FSGC", "GL", "GPTDI", "ITD", "Local", "NTTE", "PO\u00c7OS", "PPRG", "RES & EE", "SMS", "SUB-NAV"];
   const _acadsProj=[...new Set(activeDB().map(p=>p.academia).filter(Boolean))];
   const _acads=[...new Set([..._ACADS_FIXAS,..._acadsProj])].sort();
   const _acadOpts = (cur) =>
