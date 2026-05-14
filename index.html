@@ -683,7 +683,8 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
     <div class="tp-title" id="pageTitle">Quadro Kanban</div>
     <div class="tp-r">
       <span class="tp-date" id="topDate"></span>
-      <span style="font-size:11px;color:var(--mu);margin-left:12px;opacity:.8">· Sistema atualizado em 14/05/2026 às 13:53</span>
+      <span style="font-size:11px;color:var(--mu);margin-left:12px;opacity:.8">&middot; Sistema atualizado em 14/05/2026 às 14:12</span>
+      <span style="font-size:11px;color:var(--mu);margin-left:12px;opacity:.8">· Sistema atualizado em 14/05/2026 às 16:35</span>
       <div class="search-box">
         <span class="search-icon">🔍</span>
         <input id="searchInp" placeholder="Buscar projeto..." oninput="buscarGlobal(this.value)" onblur="setTimeout(()=>fecharBusca(),180)">
@@ -2591,35 +2592,7 @@ function openDet(id){
         ${p.idCurso?dl2('ID do Projeto',`<span style="font-weight:600;font-family:monospace">${p.idCurso}</span>`):''}${p.prioridade?dl2('Prioridade',prioBadge(p.prioridade)):''}${p.rp?dl2('RP',`<span style="font-weight:600">${p.rp}</span>`):''}${p.academia?dl2('Academia',`<span style="font-weight:600">${p.academia}</span>`):''}${dl2('Recursos',recTags(p.recursos))}
         ${dl2('Coluna',`<span style="display:inline-flex;align-items:center;gap:5px"><span style="width:8px;height:8px;border-radius:50%;background:${colDot(p.col)};display:inline-block"></span>${colLabel(p.col)}</span>`)}
         ${dl2('Situação',sitBdg(p))}
-        ${dl2('Mudou de escopo?',`
-          <div style="display:flex;flex-direction:column;gap:8px">
-            <select onchange="setEscopo(${p.id},this.value)"
-              style="padding:5px 10px;border:1px solid var(--bdr);border-radius:7px;font-size:12.5px;font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(--txt);outline:none;cursor:pointer">
-              <option value="" ${!p.mudouEscopo?'selected':''}>— Não informado —</option>
-              <option value="nao" ${p.mudouEscopo==='nao'?'selected':''}>✅ Não</option>
-              <option value="sim" ${p.mudouEscopo==='sim'?'selected':''}>⚠️ Sim</option>
-            </select>
-            ${p.mudouEscopo==='sim' ? \`
-              <div style="display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap">
-                <div style="display:flex;flex-direction:column;gap:3px">
-                  <span style="font-size:10px;font-weight:700;color:var(--mu);text-transform:uppercase;letter-spacing:.5px">Antigo Recurso</span>
-                  <select onchange="setEscopoRecurso(\${p.id},'escopoAntigoRecurso',this.value)"
-                    style="padding:5px 10px;border:1px solid var(--bdr);border-radius:7px;font-size:12px;font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(--txt);outline:none;cursor:pointer;min-width:160px">
-                    <option value="">— Selecione —</option>
-                    \${RECURSOS.map(r=>\`<option value="\${r}" \${p.escopoAntigoRecurso===r?'selected':''}>\${r}</option>\`).join('')}
-                  </select>
-                </div>
-                <span style="font-size:16px;color:var(--mu);padding-bottom:6px">→</span>
-                <div style="display:flex;flex-direction:column;gap:3px">
-                  <span style="font-size:10px;font-weight:700;color:var(--mu);text-transform:uppercase;letter-spacing:.5px">Novo Recurso</span>
-                  <select onchange="setEscopoRecurso(\${p.id},'escopoNovoRecurso',this.value)"
-                    style="padding:5px 10px;border:1px solid var(--bdr);border-radius:7px;font-size:12px;font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(--txt);outline:none;cursor:pointer;min-width:160px">
-                    <option value="">— Selecione —</option>
-                    \${RECURSOS.map(r=>\`<option value="\${r}" \${p.escopoNovoRecurso===r?'selected':''}>\${r}</option>\`).join('')}
-                  </select>
-                </div>
-              </div>\` : ''}
-          </div>`)}
+        ${dl2('Mudou de escopo?', _buildEscopoHtml(p))}
 
       </div>
       <div>
@@ -3183,6 +3156,42 @@ function detRespOpts(resps, valorAtual){
   const selCl = (valorAtual === 'cl') ? 'selected' : '';
   opts.push(`<option value="cl" ${selCl}>🏢 Cliente</option>`);
   return opts.join('');
+}
+
+// Gera HTML do bloco de escopo sem template literals aninhados
+function _buildEscopoHtml(p){
+  const selStyle = 'padding:5px 10px;border:1px solid var(--bdr);border-radius:7px;font-size:12px;font-family:\'Plus Jakarta Sans\',sans-serif;background:var(--bg);color:var(--txt);outline:none;cursor:pointer;min-width:160px';
+  const optsEscopo = RECURSOS.map(r => {
+    const sel = (v) => v===r ? ' selected' : '';
+    return '<option value="' + r + '"' + sel(r) + '>' + r + '</option>';
+  }).join('');
+
+  let html = '<div style="display:flex;flex-direction:column;gap:8px">';
+  html += '<select onchange="setEscopo(' + p.id + ',this.value)" style="' + selStyle + '">';
+  html += '<option value=""' + (!p.mudouEscopo?' selected':'') + '>— Não informado —</option>';
+  html += '<option value="nao"' + (p.mudouEscopo==='nao'?' selected':'') + '>✅ Não</option>';
+  html += '<option value="sim"' + (p.mudouEscopo==='sim'?' selected':'') + '>⚠️ Sim</option>';
+  html += '</select>';
+
+  if(p.mudouEscopo === 'sim'){
+    const optsA = RECURSOS.map(r => '<option value="' + r + '"' + (p.escopoAntigoRecurso===r?' selected':'') + '>' + r + '</option>').join('');
+    const optsN = RECURSOS.map(r => '<option value="' + r + '"' + (p.escopoNovoRecurso===r?' selected':'') + '>' + r + '</option>').join('');
+    html += '<div style="display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap">';
+    html += '<div style="display:flex;flex-direction:column;gap:3px">';
+    html += '<span style="font-size:10px;font-weight:700;color:var(--mu);text-transform:uppercase;letter-spacing:.5px">Antigo Recurso</span>';
+    html += '<select onchange="setEscopoRecurso(' + p.id + ',\'escopoAntigoRecurso\',this.value)" style="' + selStyle + '">';
+    html += '<option value="">— Selecione —</option>' + optsA;
+    html += '</select></div>';
+    html += '<span style="font-size:16px;color:var(--mu);padding-bottom:6px">→</span>';
+    html += '<div style="display:flex;flex-direction:column;gap:3px">';
+    html += '<span style="font-size:10px;font-weight:700;color:var(--mu);text-transform:uppercase;letter-spacing:.5px">Novo Recurso</span>';
+    html += '<select onchange="setEscopoRecurso(' + p.id + ',\'escopoNovoRecurso\',this.value)" style="' + selStyle + '">';
+    html += '<option value="">— Selecione —</option>' + optsN;
+    html += '</select></div>';
+    html += '</div>';
+  }
+  html += '</div>';
+  return html;
 }
 
 function setEscopo(pid, val){
