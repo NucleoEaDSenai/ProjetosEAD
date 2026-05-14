@@ -683,6 +683,7 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
     <div class="tp-title" id="pageTitle">Quadro Kanban</div>
     <div class="tp-r">
       <span class="tp-date" id="topDate"></span>
+      <span style="font-size:11px;color:var(--mu);margin-left:12px;opacity:.8">· Sistema atualizado em 14/05/2026 às 16:35</span>
       <div class="search-box">
         <span class="search-icon">🔍</span>
         <input id="searchInp" placeholder="Buscar projeto..." oninput="buscarGlobal(this.value)" onblur="setTimeout(()=>fecharBusca(),180)">
@@ -2596,6 +2597,26 @@ function openDet(id){
           <option value="nao" ${p.mudouEscopo==='nao'?'selected':''}>✅ Não</option>
           <option value="sim" ${p.mudouEscopo==='sim'?'selected':''}>⚠️ Sim</option>
         </select>`)}
+        ${p.mudouEscopo==='sim' ? `
+          <div style="display:flex;gap:12px;margin-top:8px;flex-wrap:wrap;align-items:center">
+            <div style="display:flex;flex-direction:column;gap:4px">
+              <span style="font-size:10.5px;font-weight:700;color:var(--mu);text-transform:uppercase;letter-spacing:.5px">Antigo Recurso</span>
+              <select onchange="setEscopoRecurso(${p.id},'escopoAntigoRecurso',this.value)"
+                style="padding:5px 10px;border:1px solid var(--bdr);border-radius:7px;font-size:12.5px;font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(--txt);outline:none;cursor:pointer;min-width:180px">
+                <option value="">— Selecione —</option>
+                ${RECURSOS.map(r=>`<option value="${r}" ${p.escopoAntigoRecurso===r?'selected':''}>${r}</option>`).join('')}
+              </select>
+            </div>
+            <span style="font-size:18px;color:var(--mu);margin-top:16px">→</span>
+            <div style="display:flex;flex-direction:column;gap:4px">
+              <span style="font-size:10.5px;font-weight:700;color:var(--mu);text-transform:uppercase;letter-spacing:.5px">Novo Recurso</span>
+              <select onchange="setEscopoRecurso(${p.id},'escopoNovoRecurso',this.value)"
+                style="padding:5px 10px;border:1px solid var(--bdr);border-radius:7px;font-size:12.5px;font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(--txt);outline:none;cursor:pointer;min-width:180px">
+                <option value="">— Selecione —</option>
+                ${RECURSOS.map(r=>`<option value="${r}" ${p.escopoNovoRecurso===r?'selected':''}>${r}</option>`).join('')}
+              </select>
+            </div>
+          </div>` : ''}
 
       </div>
       <div>
@@ -3164,9 +3185,20 @@ function detRespOpts(resps, valorAtual){
 function setEscopo(pid, val){
   const p = DB.find(x=>x.id===pid); if(!p) return;
   p.mudouEscopo = val;
+  if(val !== 'sim'){ p.escopoAntigoRecurso = ''; p.escopoNovoRecurso = ''; }
   registrarHistorico(p, 'editou', `Mudou de escopo: ${val==='sim'?'Sim':val==='nao'?'Não':'não informado'}`);
   fbSalvarProjeto(p);
+  renderAll();
   showToast(val==='sim'?'⚠️ Escopo marcado como alterado':'✅ Escopo atualizado');
+}
+
+function setEscopoRecurso(pid, campo, val){
+  const p = DB.find(x=>x.id===pid); if(!p) return;
+  p[campo] = val;
+  const label = campo==='escopoAntigoRecurso' ? 'Antigo recurso' : 'Novo recurso';
+  registrarHistorico(p, 'editou', `${label}: ${val||'não definido'}`);
+  fbSalvarProjeto(p);
+  showToast('💾 Salvo!');
 }
 
 function setEObs(pid,idx,v){
@@ -4115,7 +4147,9 @@ function salvar(){
     academia:document.getElementById('fAcademia')?.value||'',
     tags:editId?(DB.find(x=>x.id===editId)?.tags||[]):[],
     linkBdoc:document.getElementById('fLinkBdoc')?.value.trim()||projAnterior?.linkBdoc||'',  // preserva tags existentes
-    mudouEscopo:projAnterior?.mudouEscopo||'',  // preserva campo de escopo
+    mudouEscopo:projAnterior?.mudouEscopo||'',
+    escopoAntigoRecurso:projAnterior?.escopoAntigoRecurso||'',
+    escopoNovoRecurso:projAnterior?.escopoNovoRecurso||'',
     homolog:projAnterior?.homolog||{},          // preserva dados de homologação
     homologPassou:projAnterior?.homologPassou||false,
     medicaoQuinzena:projAnterior?.medicaoQuinzena||'',
