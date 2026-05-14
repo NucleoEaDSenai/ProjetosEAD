@@ -3199,7 +3199,8 @@ function setEscopo(pid, val){
   if(val !== 'sim'){ p.escopoAntigoRecurso = ''; p.escopoNovoRecurso = ''; }
   registrarHistorico(p, 'editou', `Mudou de escopo: ${val==='sim'?'Sim':val==='nao'?'Não':'não informado'}`);
   fbSalvarProjeto(p);
-  renderAll();
+  // Reabrir o modal para mostrar/esconder os dropdowns sem fechar
+  openDet(pid);
   showToast(val==='sim'?'⚠️ Escopo marcado como alterado':'✅ Escopo atualizado');
 }
 
