@@ -61,7 +61,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
 .view{display:none}.view.on{display:block}
 /* STATS */
 .sts{display:grid;grid-template-columns:repeat(6,1fr);gap:11px;margin-bottom:22px}
-.sc{background:#fff;border-radius:var(--r);padding:15px;border:1px solid var(--bdr);position:relative;overflow:hidden}.sc.sc-clickable{cursor:pointer;transition:transform .12s,box-shadow .12s}.sc.sc-clickable:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,0,0,.12)}.sc.sc-active{outline:2.5px solid var(--blue)}
+.sc{background:#fff;border-radius:var(--r);padding:15px;border:1px solid var(--bdr);position:relative;overflow:hidden}
 .sc::before{content:'';position:absolute;top:0;left:0;right:0;height:3px}
 .sc.cr::before{background:var(--red)}.sc.cb::before{background:var(--blue)}
 .sc.cg::before{background:var(--green)}.sc.cy::before{background:var(--yel)}
@@ -476,16 +476,8 @@ body.dark .sri-hl{background:rgba(255,202,40,.25)}
 
 /* ═══ CARGA DA EQUIPE ═══ */
 .carga-grid{display:flex;flex-direction:column;gap:10px}
-.carga-card{background:#fff;border:1px solid var(--bdr);border-radius:14px;overflow:hidden;transition:box-shadow .15s,transform .15s;margin-bottom:12px}
-.carga-card:hover{box-shadow:0 4px 16px rgba(0,0,0,.1);transform:translateY(-1px)}
-.carga-hd{display:flex;align-items:center;gap:12px;padding:14px 18px;cursor:pointer;background:#fff;border-bottom:1px solid transparent;transition:background .15s}
-.carga-hd:hover{background:var(--s2)}
-.carga-hd.open{border-bottom-color:var(--bdr)}
-.carga-proj-item{display:flex;align-items:center;gap:10px;padding:10px 18px;border-bottom:1px solid var(--s2);cursor:pointer;transition:background .15s}
-.carga-proj-item:hover{background:var(--s2)}
-.carga-proj-item:last-child{border-bottom:none}
-.carga-proj-status{width:8px;height:8px;border-radius:50%;flex-shrink:0}
-.carga-etapa-badge{font-size:10px;padding:1px 6px;border-radius:4px;white-space:nowrap;font-weight:600}
+.carga-card{background:var(--surface);border:1px solid var(--bdr);border-radius:12px;overflow:hidden;transition:box-shadow .15s}
+.carga-card:hover{box-shadow:0 2px 12px rgba(0,0,0,.08)}
 .carga-hd{display:flex;align-items:center;gap:12px;padding:14px 16px;cursor:pointer;user-select:none}
 .carga-hd:hover{background:var(--s2)}
 .carga-av{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;color:#fff;flex-shrink:0}
@@ -690,7 +682,7 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
   <div class="tp" role="banner">
     <div class="tp-title" id="pageTitle">Quadro Kanban</div>
     <div class="tp-r">
-      <span class="tp-date" id="topDate"></span><span id="topSysVer" style="font-size:11px;color:var(--mu);margin-left:10px;opacity:.7"></span>
+      <span class="tp-date" id="topDate"></span>
       <div class="search-box">
         <span class="search-icon">🔍</span>
         <input id="searchInp" placeholder="Buscar projeto..." oninput="buscarGlobal(this.value)" onblur="setTimeout(()=>fecharBusca(),180)">
@@ -799,20 +791,6 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
               <option value="concluido">✅ Concluído</option>
             </select>
           </div>
-          <div class="fg-sm"><label class="fl-sm">Recurso</label>
-            <select class="fi-sm" id="lFiltRecurso" onchange="applyLFilts()">
-              <option value="">Todos</option>
-            </select>
-          </div>
-          <div class="fg-sm"><label class="fl-sm">Prioridade</label>
-            <select class="fi-sm" id="lFiltPrio" onchange="applyLFilts()">
-              <option value="">Todas</option>
-              <option value="urgente">🔴 Urgente</option>
-              <option value="alta">🟠 Alta</option>
-              <option value="media">🟡 Média</option>
-              <option value="baixa">🟢 Baixa</option>
-            </select>
-          </div>
           <div class="fg-sm"><label class="fl-sm">Academia</label>
             <select class="fi-sm" id="lFiltAcad" onchange="applyLFilts()">
               <option value="">Todas</option>
@@ -833,18 +811,7 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
         </div>
       </div>
       <div class="tw"><table>
-        <thead><tr>
-  <th style="cursor:pointer" onclick="toggleListSort('nome')">Projeto <span id="lSortIco_nome"></span></th>
-  <th>Recursos</th>
-  <th>Responsável(is)</th>
-  <th style="cursor:pointer" onclick="toggleListSort('col')">Coluna <span id="lSortIco_col"></span></th>
-  <th style="cursor:pointer" onclick="toggleListSort('sit')">Situação <span id="lSortIco_sit"></span></th>
-  <th style="cursor:pointer" onclick="toggleListSort('criado')">Criado <span id="lSortIco_criado"></span></th>
-  <th>Início</th>
-  <th style="cursor:pointer" onclick="toggleListSort('prazo')">Prazo <span id="lSortIco_prazo"></span></th>
-  <th>Término</th>
-  <th>Eq.</th><th>Cl.</th><th>Prog.</th><th></th>
-</tr></thead>
+        <thead><tr><th>Projeto</th><th>Recursos</th><th>Responsável(is)</th><th>Coluna</th><th>Situação</th><th>Criado</th><th>Início</th><th>Prazo</th><th>Término</th><th>Eq.</th><th>Cl.</th><th>Prog.</th><th></th></tr></thead>
         <tbody id="listTbl"></tbody>
       </table></div>
     </div>
@@ -917,7 +884,7 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
     <!-- ATRASOS -->
     <div class="view" id="view-atrasos">
       <div class="st" style="margin-bottom:16px">Relatórios de Atrasos — Projetos em Atraso</div>
-      <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin-bottom:22px" id="atrasosResumo"></div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:22px" id="atrasosResumo"></div>
       <div class="fbox" style="margin-bottom:18px">
         <div class="fbox-row">
           <div class="fg-sm"><label class="fl-sm">Situação do Projeto</label>
@@ -986,61 +953,16 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
     <!-- MEDIÇÃO -->
     <div class="view" id="view-medicao">
       <div class="st" style="margin-bottom:6px">📐 Medição</div>
-      <div style="font-size:12.5px;color:var(--mu);margin-bottom:16px">Projetos com todas as etapas concluídas e enviados para medição.</div>
-      <div id="medicaoStats" style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:18px"></div>
-      <div class="fbox" style="margin-bottom:18px">
-        <div class="fbox-row">
-          <div class="fg-sm"><label class="fl-sm">RP</label>
-            <select class="fi-sm" id="mFiltRP" onchange="rMedicao()"><option value="">Todos</option></select>
-          </div>
-          <div class="fg-sm"><label class="fl-sm">Academia</label>
-            <select class="fi-sm" id="mFiltAcad" onchange="rMedicao()"><option value="">Todas</option></select>
-          </div>
-          <div class="fg-sm"><label class="fl-sm">Recurso</label>
-            <select class="fi-sm" id="mFiltRecurso" onchange="rMedicao()"><option value="">Todos</option></select>
-          </div>
-          <div class="fg-sm"><label class="fl-sm">Responsável</label>
-            <select class="fi-sm" id="mFiltResp" onchange="rMedicao()"><option value="">Todos</option></select>
-          </div>
-          <div class="fg-sm"><label class="fl-sm">Situação</label>
-            <select class="fi-sm" id="mFiltSit" onchange="rMedicao()">
-              <option value="">Todos</option>
-              <option value="pendente">⏳ Pendentes</option>
-              <option value="feita">✅ Confirmados</option>
-            </select>
-          </div>
-          <button class="btn-lim" onclick="limparMFilts()">✕ Limpar</button>
-        </div>
-      </div>
+      <div style="font-size:12.5px;color:var(--mu);margin-bottom:20px">Projetos com todas as etapas concluídas e enviados para medição.</div>
+      <div id="medicaoStats" style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:22px"></div>
       <div id="medicaoGrupos"></div>
     </div>
 
     <!-- CARGA DA EQUIPE -->
     <div class="view" id="view-carga">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:10px">
-        <div class="st" style="margin:0">👥 Carga da Equipe</div>
-        <div id="cargaResumo" style="font-size:12px;color:var(--mu)"></div>
-      </div>
-      <div class="fbox" style="margin-bottom:18px">
-        <div class="fbox-row">
-          <div class="fg-sm"><label class="fl-sm">Membro</label>
-            <select class="fi-sm" id="cFiltMembro" onchange="rCarga()"><option value="">Todos</option></select>
-          </div>
-          <div class="fg-sm"><label class="fl-sm">Recurso</label>
-            <select class="fi-sm" id="cFiltRecurso" onchange="rCarga()"><option value="">Todos</option></select>
-          </div>
-          <div class="fg-sm"><label class="fl-sm">Situação</label>
-            <select class="fi-sm" id="cFiltSit" onchange="rCarga()">
-              <option value="">Todas</option>
-              <option value="atrasado">⚠️ Com atraso</option>
-              <option value="andamento">🔄 Em andamento</option>
-              <option value="aguardando">⏳ Aguardando</option>
-            </select>
-          </div>
-          <button class="btn-lim" onclick="limparCFilts()">✕ Limpar</button>
-        </div>
-      </div>
-      <div id="cargaGrid"></div>
+      <div class="st" style="margin-bottom:6px">👥 Dashboard de Carga da Equipe</div>
+      <div style="font-size:12.5px;color:var(--mu);margin-bottom:16px">Projetos ativos por membro. Clique em um projeto para abrir o card.</div>
+      <div id="cargaGrid" class="carga-grid"></div>
     </div>
 
     <!-- HISTÓRICO DE EDIÇÕES -->
@@ -1689,13 +1611,6 @@ function populateFiltSelects(){
 
   const lAcadEl = document.getElementById('lFiltAcad');
   if(lAcadEl){ lAcadEl.innerHTML = _acadOpts(lAcadEl.value); }
-
-  const lRecEl = document.getElementById('lFiltRecurso');
-  if(lRecEl){
-    const cur = lRecEl.value;
-    lRecEl.innerHTML = '<option value="">Todos</option>'
-      + RECURSOS.map(r=>`<option value="${r}"${cur===r?' selected':''}>${r}</option>`).join('');
-  }
   ['kFiltResp','lFiltResp'].forEach(id=>{
     const s=document.getElementById(id); if(!s)return;
     const cur=s.value;
@@ -1720,14 +1635,12 @@ function getKFilts(){
 }
 function getLFilts(){
   return{
-    resp:    document.getElementById('lFiltResp')?.value||'',
-    sit:     document.getElementById('lFiltSit')?.value||'',
-    acad:    document.getElementById('lFiltAcad')?.value||'',
-    col:     document.getElementById('lFiltCol')?.value||'',
-    recurso: document.getElementById('lFiltRecurso')?.value||'',
-    prio:    document.getElementById('lFiltPrio')?.value||'',
-    de:      document.getElementById('lFiltDe')?.value||'',
-    ate:     document.getElementById('lFiltAte')?.value||'',
+    resp:document.getElementById('lFiltResp')?.value||'',
+    sit:document.getElementById('lFiltSit')?.value||'',
+    acad:document.getElementById('lFiltAcad')?.value||'',
+    col:document.getElementById('lFiltCol')?.value||'',
+    de:document.getElementById('lFiltDe')?.value||'',
+    ate:document.getElementById('lFiltAte')?.value||'',
   };
 }
 function applyFilt(data,f){
@@ -1735,8 +1648,6 @@ function applyFilt(data,f){
   if(f.resp) r=r.filter(p=>(p.resps||[]).includes(f.resp));
   if(f.sit)  r=r.filter(p=>calcSit(p)===f.sit);
   if(f.acad) r=r.filter(p=>f.acad==='__sem_academia__' ? !p.academia : p.academia===f.acad);
-  if(f.recurso) r=r.filter(p=>(p.recursos||[]).includes(f.recurso));
-  if(f.prio) r=r.filter(p=>p.prioridade===f.prio);
   if(f.col!=='') r=r.filter(p=>p.col===parseInt(f.col));
   if(f.de)   r=r.filter(p=>p.criado&&p.criado>=f.de);
   if(f.ate)  r=r.filter(p=>p.criado&&p.criado<=f.ate);
@@ -1758,8 +1669,7 @@ function limparKFilts(){
   rKanban();
 }
 function limparLFilts(){
-  ['lFiltResp','lFiltSit','lFiltAcad','lFiltCol','lFiltRecurso','lFiltPrio'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
-  _listSortCol=''; _listSortDir=1;;
+  ['lFiltResp','lFiltSit','lFiltAcad','lFiltCol'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
   ['lFiltDe','lFiltAte'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
   rList();
 }
@@ -1861,42 +1771,20 @@ function onDrop(e,col){
 function cardClick(e,id){if(e.detail===0)return;openDet(id);}
 
 // ── LIST ──
-let _listSortCol = ''; // coluna de ordenação atual
-let _listSortDir = 1;  // 1=asc, -1=desc
-
-function toggleListSort(col){
-  if(_listSortCol === col){ _listSortDir *= -1; }
-  else { _listSortCol = col; _listSortDir = 1; }
-  rList();
-}
-
 function rList(){
   populateFiltSelects();
   let data=applyFilt(activeDB(),getLFilts());
 
-  // Ordenação dinâmica
+  // Ordenar: prioridade → situação → data de criação
   const _ordPrioList={urgente:0,alta:1,media:2,baixa:3};
   const _ordSitList={atrasado:0,andamento:1,aguardando:2,concluido:3,cancelado:4};
   data=[...data].sort((a,b)=>{
-    if(_listSortCol){
-      let va, vb;
-      if(_listSortCol==='nome')   { va=a.nome||''; vb=b.nome||''; return va.localeCompare(vb,'pt-BR')*_listSortDir; }
-      if(_listSortCol==='col')    { va=a.col||0; vb=b.col||0; return (va-vb)*_listSortDir; }
-      if(_listSortCol==='sit')    { va=_ordSitList[calcSit(a)]??5; vb=_ordSitList[calcSit(b)]??5; return (va-vb)*_listSortDir; }
-      if(_listSortCol==='criado') { va=a.criado||''; vb=b.criado||''; return va.localeCompare(vb)*_listSortDir; }
-      if(_listSortCol==='prazo')  { va=a.prazo||'9999'; vb=b.prazo||'9999'; return va.localeCompare(vb)*_listSortDir; }
-    }
-    // Default: prioridade → situação → criação
     const pA=_ordPrioList[a.prioridade]??4, pB=_ordPrioList[b.prioridade]??4;
     if(pA!==pB) return pA-pB;
-    const sA=_ordSitList[calcSit(a)]??5, sB=_ordSitList[calcSit(b)]??5;
+    const sA=_ordSitList[a.cancelado?'cancelado':calcSit(a)]??5;
+    const sB=_ordSitList[b.cancelado?'cancelado':calcSit(b)]??5;
     if(sA!==sB) return sA-sB;
     return new Date(a.criado||0)-new Date(b.criado||0);
-  });
-  // Atualizar ícones de ordenação
-  ['nome','col','sit','criado','prazo'].forEach(col=>{
-    const el=document.getElementById('lSortIco_'+col);
-    if(el) el.textContent = _listSortCol===col ? (_listSortDir===1?'↑':'↓') : '';
   });
 
   document.getElementById('listTbl').innerHTML=data.map(p=>{
@@ -2366,44 +2254,25 @@ function rKPIs(){
   // ── 11. Taxa de cumprimento de prazo por etapa ──
   const escopoEl = document.getElementById('kpiEscopo');
   if(escopoEl){
-    const comEscopo = todos.filter(p => p.mudouEscopo === 'sim');
-    if(comEscopo.length === 0){
-      escopoEl.innerHTML = '<div style="color:var(--mu);font-size:12px;padding:8px 0">Nenhum projeto com mudança de escopo registrada.</div>';
-    } else {
-      escopoEl.innerHTML = `
-        <div style="font-size:11px;font-weight:700;color:var(--mu);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">
-          ⚠️ ${comEscopo.length} projeto(s) com mudança de escopo
+    const sim = todos.filter(p => p.mudouEscopo === 'sim').length;
+    const nao = todos.filter(p => p.mudouEscopo === 'nao').length;
+    escopoEl.innerHTML = `
+      <div style="display:flex;gap:14px">
+        <div style="flex:1;background:#FEE2E2;border-radius:10px;padding:18px 16px;text-align:center">
+          <div style="font-size:36px;font-weight:800;color:#DC2626">${sim}</div>
+          <div style="font-size:12px;color:#991B1B;font-weight:600;margin-top:4px">⚠️ Sim</div>
         </div>
-        <div style="display:flex;flex-direction:column;gap:6px;max-height:320px;overflow-y:auto">
-          ${comEscopo.map(p => `
-            <div style="background:var(--s2);border-radius:8px;padding:9px 12px;display:flex;flex-direction:column;gap:3px">
-              <div style="font-size:12px;font-weight:600;color:var(--txt);cursor:pointer;text-decoration:underline" onclick="openDet(${p.id})">${p.nome}</div>
-              <div style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--mu);flex-wrap:wrap">
-                ${p.escopoAntigoRecurso
-                  ? `<span style="background:#FEE2E2;color:#991B1B;padding:1px 7px;border-radius:4px;font-weight:600">${p.escopoAntigoRecurso}</span>
-                     <span>→</span>
-                     <span style="background:#DCFCE7;color:#15803D;padding:1px 7px;border-radius:4px;font-weight:600">${p.escopoNovoRecurso||'não definido'}</span>`
-                  : '<span style="font-style:italic">recursos não informados</span>'}
-                ${p.rp ? `<span style="margin-left:4px">· RP: <strong>${p.rp}</strong></span>` : ''}
-              </div>
-            </div>`).join('')}
-        </div>`;
-    }
+        <div style="flex:1;background:#DCFCE7;border-radius:10px;padding:18px 16px;text-align:center">
+          <div style="font-size:36px;font-weight:800;color:#16A34A">${nao}</div>
+          <div style="font-size:12px;color:#15803D;font-weight:600;margin-top:4px">✅ Não</div>
+        </div>
+      </div>`;
   }
 
 }
 
 
 // ── ATRASOS ──
-function _aFiltClick(tipo, resp){
-  const tEl = document.getElementById('aFiltTipo');
-  const rEl = document.getElementById('aFiltResp');
-  // Toggle: se já está ativo, limpa; senão aplica
-  if(tEl) tEl.value = (tEl.value === tipo && tipo) ? '' : tipo;
-  if(rEl) rEl.value = (rEl.value === resp && resp) ? '' : resp;
-  rAtrasos();
-}
-
 function rAtrasos(){
   // Apenas projetos ativos e concluídos — cancelados ficam só na aba Cancelados
   const todos = activeDB();
@@ -2509,43 +2378,11 @@ function rAtrasos(){
   rows.sort((a,b) => b.diasAtraso - a.diasAtraso);
 
   // ── Cards resumo ──────────────────────────────────────────────────────────
-  // Calcular tipo de atraso para cards
-  const _rowsAll = rows; // já filtrados
-  const _totalPrazoReal = [...new Set(_rowsAll.filter(r=>r.tipoAtraso==='prazo_real').map(r=>r.projId))].length;
-  const _totalEtapaOk   = [...new Set(_rowsAll.filter(r=>r.tipoAtraso==='etapa').map(r=>r.projId))].length;
-
-  const _atFiltTipo  = document.getElementById('aFiltTipo')?.value||'';
-  const _atFiltResp  = document.getElementById('aFiltResp')?.value||'';
-  const _scActive = (tipo, resp) => {
-    const tOk = !tipo || _atFiltTipo===tipo;
-    const rOk = !resp || _atFiltResp===resp;
-    return tOk && rOk ? 'sc-active' : '';
-  };
-
   document.getElementById('atrasosResumo').innerHTML = `
-    <div class="sc cy sc-clickable ${_scActive('','')}" onclick="_aFiltClick('','')">
-      <div class="sc-l">Projetos em Atraso</div><div class="sc-v">${totalAberto}</div>
-      <div class="sc-s">requerem atenção</div><div class="sc-i">⚠️</div>
-    </div>
-    <div class="sc cr sc-clickable ${_scActive('','eq')}" onclick="_aFiltClick('','eq')">
-      <div class="sc-l">Atrasos da Equipe</div><div class="sc-v">${totalEq}</div>
-      <div class="sc-s">projetos atrasados pela equipe</div><div class="sc-i">👥</div>
-    </div>
-    <div class="sc cp sc-clickable ${_scActive('','cl')}" onclick="_aFiltClick('','cl')">
-      <div class="sc-l">Atrasos do Cliente</div><div class="sc-v">${totalCl}</div>
-      <div class="sc-s">aguardando cliente</div><div class="sc-i">🏢</div>
-    </div>
-    <div class="sc cg"><div class="sc-l">Histórico (c/ atraso)</div><div class="sc-v">${totalHistorico}</div>
-      <div class="sc-s">já finalizadas</div><div class="sc-i">📋</div>
-    </div>
-    <div class="sc sc-clickable" style="border-left-color:#DC2626;${_scActive('prazo_real','')}" onclick="_aFiltClick('prazo_real','')">
-      <div class="sc-l" style="color:#DC2626">Data Final Comprometida</div><div class="sc-v" style="color:#DC2626">${_totalPrazoReal}</div>
-      <div class="sc-s">prazo real vencido</div><div class="sc-i">🏁</div>
-    </div>
-    <div class="sc sc-clickable" style="border-left-color:#F59E0B;${_scActive('etapa','')}" onclick="_aFiltClick('etapa','')">
-      <div class="sc-l" style="color:#92400E">Etapa Atrasada</div><div class="sc-v" style="color:#92400E">${_totalEtapaOk}</div>
-      <div class="sc-s">data final ainda ok</div><div class="sc-i">⚠️</div>
-    </div>
+    <div class="sc cy"><div class="sc-l">Projetos em Atraso</div><div class="sc-v">${totalAberto}</div><div class="sc-s">requerem atenção</div><div class="sc-i">⚠️</div></div>
+    <div class="sc cr"><div class="sc-l">Atrasos da Equipe</div><div class="sc-v">${totalEq}</div><div class="sc-s">projetos atrasados pela equipe</div><div class="sc-i">👥</div></div>
+    <div class="sc cp"><div class="sc-l">Atrasos do Cliente</div><div class="sc-v">${totalCl}</div><div class="sc-s">aguardando cliente</div><div class="sc-i">🏢</div></div>
+    <div class="sc cg"><div class="sc-l">Histórico (concluídas c/ atraso)</div><div class="sc-v">${totalHistorico}</div><div class="sc-s">já finalizadas</div><div class="sc-i">📋</div></div>
   `;
 
   // ── Tabela ──────────────────────────────────────────────────────────────────
@@ -2759,19 +2596,6 @@ function openDet(id){
           <option value="nao" ${p.mudouEscopo==='nao'?'selected':''}>✅ Não</option>
           <option value="sim" ${p.mudouEscopo==='sim'?'selected':''}>⚠️ Sim</option>
         </select>`)}
-        ${p.mudouEscopo==='sim' ? `
-        <div style="display:flex;gap:10px;margin-top:6px;flex-wrap:wrap">
-          ${dl2('Antigo Recurso',`<select onchange="setEscopoRecurso(${p.id},'escopoAntigoRecurso',this.value)"
-            style="padding:5px 10px;border:1px solid var(--bdr);border-radius:7px;font-size:12.5px;font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(--txt);outline:none;cursor:pointer;min-width:180px">
-            <option value="">— Selecione —</option>
-            ${RECURSOS.map(r=>`<option value="${r}" ${p.escopoAntigoRecurso===r?'selected':''}>${r}</option>`).join('')}
-          </select>`)}
-          ${dl2('Novo Recurso',`<select onchange="setEscopoRecurso(${p.id},'escopoNovoRecurso',this.value)"
-            style="padding:5px 10px;border:1px solid var(--bdr);border-radius:7px;font-size:12.5px;font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(--txt);outline:none;cursor:pointer;min-width:180px">
-            <option value="">— Selecione —</option>
-            ${RECURSOS.map(r=>`<option value="${r}" ${p.escopoNovoRecurso===r?'selected':''}>${r}</option>`).join('')}
-          </select>`)}
-        </div>` : ''}
 
       </div>
       <div>
@@ -3340,20 +3164,9 @@ function detRespOpts(resps, valorAtual){
 function setEscopo(pid, val){
   const p = DB.find(x=>x.id===pid); if(!p) return;
   p.mudouEscopo = val;
-  // Limpar recursos de escopo ao desmarcar Sim
-  if(val !== 'sim'){ p.escopoAntigoRecurso = ''; p.escopoNovoRecurso = ''; }
   registrarHistorico(p, 'editou', `Mudou de escopo: ${val==='sim'?'Sim':val==='nao'?'Não':'não informado'}`);
   fbSalvarProjeto(p);
-  renderAll();
   showToast(val==='sim'?'⚠️ Escopo marcado como alterado':'✅ Escopo atualizado');
-}
-
-function setEscopoRecurso(pid, campo, val){
-  const p = DB.find(x=>x.id===pid); if(!p) return;
-  p[campo] = val;
-  registrarHistorico(p, 'editou', `${campo==='escopoAntigoRecurso'?'Antigo recurso':'Novo recurso'}: ${val||'não definido'}`);
-  fbSalvarProjeto(p);
-  showToast('💾 Recurso de escopo salvo!');
 }
 
 function setEObs(pid,idx,v){
@@ -4302,9 +4115,7 @@ function salvar(){
     academia:document.getElementById('fAcademia')?.value||'',
     tags:editId?(DB.find(x=>x.id===editId)?.tags||[]):[],
     linkBdoc:document.getElementById('fLinkBdoc')?.value.trim()||projAnterior?.linkBdoc||'',  // preserva tags existentes
-    mudouEscopo:projAnterior?.mudouEscopo||'',         // preserva campo de escopo
-    escopoAntigoRecurso:projAnterior?.escopoAntigoRecurso||'',
-    escopoNovoRecurso:projAnterior?.escopoNovoRecurso||'',
+    mudouEscopo:projAnterior?.mudouEscopo||'',  // preserva campo de escopo
     homolog:projAnterior?.homolog||{},          // preserva dados de homologação
     homologPassou:projAnterior?.homologPassou||false,
     medicaoQuinzena:projAnterior?.medicaoQuinzena||'',
@@ -5303,30 +5114,6 @@ function toggleMedGroup(id){
   localStorage.setItem('firjan_med_groups', JSON.stringify(st));
 }
 
-function limparMFilts(){
-  ['mFiltRP','mFiltAcad','mFiltRecurso','mFiltResp','mFiltSit'].forEach(id=>{
-    const e=document.getElementById(id); if(e) e.value='';
-  });
-  rMedicao();
-}
-
-function _popularMFilts(lista){
-  const rps    = [...new Set(lista.map(p=>p.rp).filter(Boolean))].sort();
-  const acads  = [...new Set(lista.map(p=>p.academia).filter(Boolean))].sort();
-  const recs   = [...new Set(lista.flatMap(p=>p.recursos||[]))].sort();
-  const resps  = [...new Set(lista.flatMap(p=>p.resps||[]))].sort();
-  const _pop = (id, opts, lbl) => {
-    const el = document.getElementById(id); if(!el) return;
-    const cur = el.value;
-    el.innerHTML = `<option value="">${lbl}</option>`
-      + opts.map(o=>`<option value="${o}"${cur===o?' selected':''}>${o}</option>`).join('');
-  };
-  _pop('mFiltRP',      rps,   'Todos');
-  _pop('mFiltAcad',    acads, 'Todas');
-  _pop('mFiltRecurso', recs,  'Todos');
-  _pop('mFiltResp',    resps, 'Todos');
-}
-
 function rMedicao(){
   const lista = activeDB().concat(cancelDB()).filter(p => p.enviadoMedicao);
   const pendentes  = lista.filter(p => !p.medicaoFeita).length;
@@ -5342,33 +5129,16 @@ function rMedicao(){
   const el = document.getElementById('medicaoGrupos');
   if(!el) return;
 
-  if(listaF.length === 0){
-    el.innerHTML = '<div style="text-align:center;padding:48px;color:var(--mu)">Nenhum projeto encontrado com os filtros selecionados.</div>';
+  if(lista.length === 0){
+    el.innerHTML = '<div style="text-align:center;padding:48px;color:var(--mu)">Nenhum projeto enviado para medição ainda.</div>';
     return;
   }
 
-  // ── Popular e aplicar filtros ──
-  _popularMFilts(lista);
-  const _mRP      = document.getElementById('mFiltRP')?.value||'';
-  const _mAcad    = document.getElementById('mFiltAcad')?.value||'';
-  const _mRecurso = document.getElementById('mFiltRecurso')?.value||'';
-  const _mResp    = document.getElementById('mFiltResp')?.value||'';
-  const _mSit     = document.getElementById('mFiltSit')?.value||'';
-  const listaF = lista.filter(p => {
-    if(_mRP      && p.rp !== _mRP) return false;
-    if(_mAcad    && p.academia !== _mAcad) return false;
-    if(_mRecurso && !(p.recursos||[]).includes(_mRecurso)) return false;
-    if(_mResp    && !(p.resps||[]).includes(_mResp)) return false;
-    if(_mSit==='pendente' && p.medicaoFeita) return false;
-    if(_mSit==='feita'    && !p.medicaoFeita) return false;
-    return true;
-  });
-
   // ── Separar pendentes e confirmados ──
-  const grpPend = listaF.filter(p => !p.medicaoFeita)
+  const grpPend = lista.filter(p => !p.medicaoFeita)
     .sort((a,b) => (b.enviadoMedicao||'').localeCompare(a.enviadoMedicao||''));
 
-  const confirmados = listaF.filter(p => p.medicaoFeita)
+  const confirmados = lista.filter(p => p.medicaoFeita)
     .sort((a,b) => (b.medicaoFeitaEm||'').localeCompare(a.medicaoFeitaEm||''));
 
   // ── Agrupar confirmados por quinzena (usa medicaoFeitaEm) ──
@@ -5944,8 +5714,7 @@ function renderAll(){
 const CFG_KEY  = 'firjan_fb_url';
 let fbProjetos = null;   // db.ref('projetos')
 let fbNxtRef   = null;   // db.ref('nxt')
-let fbLogRef    = null;   // db.ref('log_delecoes')
-let fbVersaoRef = null;   // db.ref('versao')
+let fbLogRef   = null;   // db.ref('log_delecoes')
 let fbListening = false; // listener ativo?
 
 // ── STATUS UI ──
@@ -6095,7 +5864,6 @@ function _cronogramaEtapasSilencioso(etapas, cron, dataInicio){
 // Usamos set no nó individual para evitar sobrescrever dados de outros usuários
 function fbSalvarProjeto(proj){
   if(!fbProjetos){ showToast('⚠️ Sem conexão com Firebase'); return; }
-
   // Limpar undefined (Firebase rejeita undefined values)
   const limpo = JSON.parse(JSON.stringify(proj, (k,v) => v === undefined ? null : v));
   setStatus('sync','Salvando...');
@@ -6140,20 +5908,9 @@ function fbSalvarNxt(){
 function escutarFirebase(db){
   if(fbListening) return;
   fbListening = true;
-  fbProjetos  = db.ref('projetos');
-  fbNxtRef    = db.ref('nxt');
-  fbLogRef    = db.ref('log_delecoes');
-  fbVersaoRef = db.ref('versao');
-
-  // Escutar versão do sistema
-  fbVersaoRef.on('value', snap => {
-    const v = snap.val();
-    const el = document.getElementById('topSysVer');
-    if(el && v && v.data){
-      el.textContent = '· Atualizado em ' + v.data;
-      el.title = v.notas || '';
-    }
-  });
+  fbProjetos = db.ref('projetos');
+  fbNxtRef   = db.ref('nxt');
+  fbLogRef   = db.ref('log_delecoes');
 
   let primeiraVez = true;
 
@@ -6635,148 +6392,50 @@ function toggleCarga(uid){
   if(arrow) arrow.classList.toggle('open', open);
 }
 
-function limparCFilts(){
-  ['cFiltMembro','cFiltRecurso','cFiltSit'].forEach(id=>{
-    const e=document.getElementById(id); if(e) e.value='';
-  });
-  rCarga();
-}
-
 function rCarga(){
   const el = document.getElementById('cargaGrid'); if(!el) return;
   const ativos = activeDB().filter(p => calcSit(p) !== 'concluido');
-
-  // Popular filtros
-  const todosMembros = [...new Set(ativos.flatMap(p=>p.resps||[]))].sort();
-  const todosRecs    = [...new Set(ativos.flatMap(p=>p.recursos||[]))].sort();
-  const cFMEl = document.getElementById('cFiltMembro');
-  const cFREl = document.getElementById('cFiltRecurso');
-  if(cFMEl){ const cv=cFMEl.value; cFMEl.innerHTML='<option value="">Todos</option>'+todosMembros.map(m=>`<option value="${m}"${cv===m?' selected':''}>${m}</option>`).join(''); }
-  if(cFREl){ const cv=cFREl.value; cFREl.innerHTML='<option value="">Todos</option>'+todosRecs.map(r=>`<option value="${r}"${cv===r?' selected':''}>${r}</option>`).join(''); }
-
-  const _cFiltMembro  = document.getElementById('cFiltMembro')?.value||'';
-  const _cFiltRecurso = document.getElementById('cFiltRecurso')?.value||'';
-  const _cFiltSit     = document.getElementById('cFiltSit')?.value||'';
-
-  // Montar membros
   const membros = {};
   ativos.forEach(p => {
-    if(_cFiltRecurso && !(p.recursos||[]).includes(_cFiltRecurso)) return;
-    const sit = calcSit(p);
-    if(_cFiltSit && sit !== _cFiltSit && !(_cFiltSit==='atrasado'&&sit==='atrasado')) return;
     (p.resps||[]).forEach(r => {
-      if(_cFiltMembro && r !== _cFiltMembro) return;
-      if(!membros[r]) membros[r] = {projetos:[], atrasados:0, cl:0, andamento:0, aguardando:0};
+      if(!membros[r]) membros[r] = {projetos:[], atrasados:0, cl:0, andamento:0};
       membros[r].projetos.push(p);
-      if(atrasadoPorEquipe(p))   membros[r].atrasados++;
+      if(atrasadoPorEquipe(p)) membros[r].atrasados++;
       else if(atrasadoPorCliente(p)) membros[r].cl++;
-      else if(sit==='aguardando') membros[r].aguardando++;
       else membros[r].andamento++;
     });
   });
-
-  const resumoEl = document.getElementById('cargaResumo');
-  if(resumoEl){
-    const nMembros = Object.keys(membros).length;
-    const nProj    = [...new Set(Object.values(membros).flatMap(m=>m.projetos.map(p=>p.id)))].length;
-    resumoEl.textContent = `${nMembros} membro(s) · ${nProj} projeto(s) ativo(s)`;
-  }
-
   if(!Object.keys(membros).length){
-    el.innerHTML = '<div style="color:var(--mu);font-size:13px;padding:40px;text-align:center">Nenhum membro encontrado com os filtros selecionados.</div>';
-    return;
+    el.innerHTML = '<div style="color:var(--mu);font-size:13px;padding:16px 0">Nenhum membro com projetos ativos.</div>'; return;
   }
-
-  const max = Math.max(...Object.values(membros).map(m=>m.projetos.length), 1);
-
+  const max = Math.max(...Object.values(membros).map(m => m.projetos.length), 1);
   el.innerHTML = Object.entries(membros)
-    .sort((a,b) => {
-      // Ordenar: quem tem atraso primeiro, depois pelo nº de projetos
-      if(b[1].atrasados !== a[1].atrasados) return b[1].atrasados - a[1].atrasados;
-      return b[1].projetos.length - a[1].projetos.length;
-    })
-    .map(([nome, d]) => {
-      const corPessoal = NOME_CORES[nome] || 'var(--blue)';
-      const corStatus  = d.atrasados>0 ? '#DC2626' : d.projetos.length>=5 ? '#D97706' : '#16A34A';
+    .sort((a,b) => b[1].projetos.length - a[1].projetos.length)
+    .map(([nome, d], idx) => {
+      const pct = Math.round(d.projetos.length / max * 100);
+      const corStatus = d.atrasados > 0 ? 'var(--red)' : d.projetos.length >= 4 ? 'var(--yel)' : 'var(--blue)';
+      const corPessoal = NOME_CORES[nome] || corStatus;
       const uid = 'carga_' + nome.replace(/\W/g,'_');
-      const pct = Math.round(d.projetos.length/max*100);
-
-      // Nível de carga
-      const nivelCarga = d.projetos.length >= 6 ? {txt:'Alta', bg:'#FEE2E2', cor:'#DC2626'} :
-                         d.projetos.length >= 4 ? {txt:'Média', bg:'#FEF9C3', cor:'#92400E'} :
-                         {txt:'Normal', bg:'#DCFCE7', cor:'#15803D'};
-
       return `<div class="carga-card">
-        <div class="carga-hd" id="${uid}_hd" onclick="toggleCarga('${uid}')">
-          <!-- Avatar -->
-          <div style="width:42px;height:42px;border-radius:50%;background:${corPessoal};color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;flex-shrink:0">${iniciais(nome)}</div>
-
-          <!-- Info principal -->
-          <div style="flex:1;min-width:0">
-            <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
-              <span style="font-weight:700;font-size:14px;color:var(--txt)">${nome}</span>
-              <span style="font-size:11px;padding:2px 8px;border-radius:10px;font-weight:700;background:${nivelCarga.bg};color:${nivelCarga.cor}">
-                ${nivelCarga.txt}
-              </span>
-            </div>
-            <div style="display:flex;gap:10px;margin-top:4px;flex-wrap:wrap">
-              ${d.atrasados>0  ? `<span style="font-size:11.5px;color:#DC2626;font-weight:600">⚠️ ${d.atrasados} atrasado(s)</span>` : ''}
-              ${d.cl>0         ? `<span style="font-size:11.5px;color:#D97706">⏳ ${d.cl} aguard. cliente</span>` : ''}
-              ${d.andamento>0  ? `<span style="font-size:11.5px;color:#2563EB">🔄 ${d.andamento} em andamento</span>` : ''}
-              ${d.aguardando>0 ? `<span style="font-size:11.5px;color:var(--mu)">⏸ ${d.aguardando} aguardando</span>` : ''}
-            </div>
-            <!-- Barra de carga -->
-            <div style="height:5px;background:var(--s2);border-radius:3px;margin-top:7px;overflow:hidden">
-              <div style="height:100%;width:${pct}%;background:${corStatus};border-radius:3px;transition:width .4s"></div>
+        <div class="carga-hd" onclick="toggleCarga('${uid}')">
+          <div class="carga-av" style="background:${corPessoal}">${iniciais(nome)}</div>
+          <div class="carga-info">
+            <div class="carga-name">${nome}</div>
+            <div class="carga-meta">
+              ${d.andamento > 0 ? `<span style="font-size:11px;color:var(--blue)">🔄 ${d.andamento} em andamento</span>` : ''}
+              ${d.atrasados > 0 ? `<span style="font-size:11px;color:var(--red);font-weight:600">⚠️ ${d.atrasados} atraso(s) equipe</span>` : ''}
+              ${d.cl > 0 ? `<span style="font-size:11px;color:var(--org)">⏳ ${d.cl} atraso(s) cliente</span>` : ''}
             </div>
           </div>
-
-          <!-- Contador -->
-          <div style="text-align:center;flex-shrink:0">
-            <div style="font-size:24px;font-weight:800;color:${corStatus};line-height:1">${d.projetos.length}</div>
-            <div style="font-size:10px;color:var(--mu)">projetos</div>
-          </div>
-
-          <span style="font-size:12px;color:var(--mu);flex-shrink:0;transition:transform .2s" id="${uid}_arrow">▼</span>
+          <div class="carga-bar-bg"><div class="carga-bar-fill" style="width:${pct}%;background:${corStatus}"></div></div>
+          <div class="carga-count" style="color:${corStatus}">${d.projetos.length}</div>
+          <span style="font-size:11px;color:var(--mu);flex-shrink:0">proj.</span>
+          <span class="carga-arrow" id="${uid}_arrow">▼</span>
         </div>
-
-        <!-- Projetos -->
         <div class="carga-body" id="${uid}_body">
-          ${d.projetos
-            .sort((a,b)=> {
-              const ord = {atrasado:0, aguardando:1, andamento:2, concluido:3};
-              return (ord[calcSit(a)]??4) - (ord[calcSit(b)]??4);
-            })
-            .map(p => {
-              const sit    = calcSit(p);
-              const corDot = sit==='atrasado'?'#DC2626':sit==='aguardando'?'#D97706':sit==='andamento'?'#2563EB':'#16A34A';
-              const etapasP = (p.etapas||[]).filter(e=>(e.resps||[e.r]).includes(nome)||e.r===nome.toLowerCase()||
-                (p.resps||[]).includes(nome));
-              const etapasNaoPendentes = (p.etapas||[]).filter(e=>!e.done);
-              const etapaAtualP = etapasNaoPendentes[0];
-              // Contar etapas onde a pessoa é responsável
-              const etapasDaPessoa = (p.etapas||[]).filter(e=>!e.done && (e.r==='eq'||e.r===nome));
-              const nEtapas = etapasDaPessoa.length;
-
-              return `<div class="carga-proj-item" onclick="openDet(${p.id})">
-                <div class="carga-proj-status" style="background:${corDot}"></div>
-                <div style="flex:1;min-width:0">
-                  <div style="font-size:12.5px;font-weight:600;color:var(--txt);white-space:nowrap;overflow:hidden;text-overflow:ellipsis"
-                       title="${p.nome}">${p.nome.length>60?p.nome.slice(0,58)+'…':p.nome}</div>
-                  <div style="display:flex;gap:8px;margin-top:3px;align-items:center;flex-wrap:wrap">
-                    ${recTags(p.recursos)}
-                    ${etapaAtualP ? `<span style="font-size:10.5px;color:var(--mu)">▸ ${etapaAtualP.lb||''}</span>` : ''}
-                  </div>
-                </div>
-                <div style="display:flex;flex-direction:column;align-items:flex-end;gap:3px;flex-shrink:0">
-                  ${sit==='atrasado' ? '<span class="carga-etapa-badge" style="background:#FEE2E2;color:#DC2626">⚠️ Atrasado</span>' :
-                    sit==='aguardando' ? '<span class="carga-etapa-badge" style="background:#FEF9C3;color:#92400E">⏳ Aguardando</span>' :
-                    '<span class="carga-etapa-badge" style="background:#EFF6FF;color:#1D4ED8">🔄 Em dia</span>'}
-                  ${nEtapas>0 ? `<span style="font-size:10px;color:var(--mu)">${nEtapas} etapa(s) pendente(s)</span>` : ''}
-                  ${p.prazo ? `<span style="font-size:10px;color:${calcSit(p)==='atrasado'?'#DC2626':'var(--mu)'}">📅 ${fd(p.prazo)}</span>` : ''}
-                </div>
-              </div>`;
-            }).join('')}
+          ${d.projetos.map(p => `<div class="carga-proj" onclick="openDet(${p.id})" title="${p.nome}">
+            ${calcSit(p)==='atrasado'?'⚠️ ':calcSit(p)==='aguardando'?'⏳ ':'▸ '}${p.nome.length>55?p.nome.slice(0,53)+'…':p.nome}
+          </div>`).join('')}
         </div>
       </div>`;
     }).join('');
