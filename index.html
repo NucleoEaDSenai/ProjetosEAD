@@ -1681,7 +1681,9 @@ function cancelDB(){return DB.filter(p=>p.cancelado)}
 function rDash(){
   const act=activeDB();
   const conc=act.filter(p=>calcSit(p)==='concluido').length;
-  const and=act.filter(p=>calcSit(p)==='andamento').length;
+  // "Em Andamento" inclui projetos no estado 'andamento' E 'aguardando'
+  // (aguardando = sem início, sem etapas concluídas, prazo ainda não vencido)
+  const and=act.filter(p=>{const s=calcSit(p);return s==='andamento'||s==='aguardando'}).length;
   const atq=act.filter(p=>atrasadoPorEquipe(p)).length;
   const atqCl=act.filter(p=>atrasadoPorCliente(p)).length;
   const canc=cancelDB().length;
@@ -1691,7 +1693,7 @@ function rDash(){
   if(!el) return;
   el.innerHTML=`
     <div class="sc cb"><div class="sc-l">Total de Cards Criados</div><div class="sc-v">${total}</div><div class="sc-s">total de projetos</div><div class="sc-i">🗂️</div></div>
-    <div class="sc cr"><div class="sc-l">Projetos Em Andamento</div><div class="sc-v">${and}</div><div class="sc-s">em execução</div><div class="sc-i">🔄</div></div>
+    <div class="sc cr"><div class="sc-l">Projetos Em Andamento</div><div class="sc-v">${and}</div><div class="sc-s">em execução ou aguardando</div><div class="sc-i">🔄</div></div>
     <div class="sc cg"><div class="sc-l">Projetos Concluídos</div><div class="sc-v">${conc}</div><div class="sc-s">projetos entregues</div><div class="sc-i">✅</div></div>
     <div class="sc cy"><div class="sc-l">Projetos Atrasados - Equipe</div><div class="sc-v">${atq}</div><div class="sc-s">em atraso</div><div class="sc-i">⚠️</div></div>
     <div class="sc cp"><div class="sc-l">Projetos Atrasados - Cliente</div><div class="sc-v">${waitCl}</div><div class="sc-s">em atraso</div><div class="sc-i">⏳</div></div>
