@@ -2281,107 +2281,86 @@ function rAtrasos(){
   // Se não há etapa anterior, usa o prazo da própria etapa como referência.
   // ──────────────────────────────────────────────────────────────────────────
 
-  let rows = [];
+  // ── Função auxiliar: processar etapas atrasadas de um projeto ──
+  function _processarEtapasAtraso(p, aplicarFiltros){
+    const sitP = p.cancelado ? 'cancelado' : calcSit(p);
+    const etapas = p.etapas || [];
+    const proximaIdx = etapas.findIndex(e => !e.done && !ETAPAS_SEM_PRAZO_AUTO.has(e.lb));
+    const resultado = [];
+
+    etapas.forEach((e, i) => {
+      if(!e.prazo && !e.fim) return;
+      if(ETAPAS_SEM_PRAZO_AUTO.has(e.lb)) return;
+      if(_isApostilaIsentaAtraso(p, e)) return;
+      if(_aguardandoMaterialBase(p)) return;
+      if(e.done) return;
+      if(i !== proximaIdx) return;
+
+      const _ah=new Date();_ah.setHours(0,0,0,0);
+      const _ap=new Date(e.prazo+'T00:00:00');
+      if(!(_ap<_ah)) return;
+
+      let antFim = null;
+      for(let j = i-1; j >= 0; j--){
+        if(etapas[j] && etapas[j].done && etapas[j].fim){ antFim = etapas[j].fim; break; }
+      }
+
+      const base = antFim && new Date(antFim+'T00:00:00') > _ap ? antFim : e.prazo;
+      const diasAtraso = Math.round((_ah - new Date(base+'T00:00:00')) / 864e5);
+      const prazoProjVencido = !!(p.prazo && new Date(p.prazo+'T00:00:00') < _ah);
+      const tipoAtraso = prazoProjVencido ? 'prazo_real' : 'etapa';
+
+      if(aplicarFiltros){
+        if(filtResp && e.r !== filtResp) return;
+        if(filtTipo && tipoAtraso !== filtTipo) return;
+      }
+
+      resultado.push({
+        projId: p.id, proj: p.nome, sitProjeto: sitP, cancelado: p.cancelado,
+        etapa: e.lb, r: e.r, prazo: e.prazo, antFim, diasAtraso, statusEtapa:'aberta_atraso',
+        fim: e.fim||null, motivo: e.atrasoMotivo||null, diasCl: e.diasCl||null,
+        resp: (p.resps||[]).join(', '), prazoProjVencido, tipoAtraso,
+      });
+    });
+    return resultado;
+  }
+
+  // ── 1. Calcular totais SEM filtros (para os cards — sempre fixos) ──
   let totalEq=0, totalCl=0, totalAberto=0, totalHistorico=0;
+  let _totalPrazoComp=0, _totalPrazoOk=0;
 
   todos.forEach(p => {
-    // Filtro de situação do projeto
-    const sitP = p.cancelado ? 'cancelado' : calcSit(p);
-
-
     const etapas = p.etapas || [];
-
-    // Contar etapas concluídas com atraso (só para o card resumo)
     etapas.forEach(e => {
       if(e.done && e.fim && e.prazo && !ETAPAS_SEM_PRAZO_AUTO.has(e.lb)){
         if(new Date(e.prazo) < new Date(e.fim)) totalHistorico++;
       }
     });
-
-    // Identificar a próxima etapa não concluída do projeto
-    const proximaIdx = etapas.findIndex(e => !e.done && !ETAPAS_SEM_PRAZO_AUTO.has(e.lb));
-
-    etapas.forEach((e, i) => {
-      // Etapas sem prazo E sem fim real não entram no relatório
-      if(!e.prazo && !e.fim) return;
-      // Etapas sem prazo automático nunca entram no relatório de atrasos
-      if(ETAPAS_SEM_PRAZO_AUTO.has(e.lb)) return;
-      // Apostila/E-book: Validação Final e Upload isentas de atraso
-      if(_isApostilaIsentaAtraso(p, e)) return;
-      // Se projeto aguarda material base, não entra no relatório de atrasos
-      if(_aguardandoMaterialBase(p)) return;
-      // Etapas concluídas não aparecem mais no relatório
-      if(e.done) return;
-      // Para etapas em aberto: mostrar apenas a próxima etapa não concluída (etapa atual)
-      if(i !== proximaIdx) return;
-
-      // Data em que a etapa anterior foi concluída (referência de início real)
-      let antFim = null;
-      for(let j = i-1; j >= 0; j--){
-        if(etapas[j] && etapas[j].done && etapas[j].fim){
-          antFim = etapas[j].fim;
-          break;
-        }
-      }
-
-      // Calcular atraso (só conta se prazo < hoje sem hora)
-      const _ah=new Date();_ah.setHours(0,0,0,0);
-      const _ap=new Date(e.prazo+'T00:00:00');
-      if(!(_ap<_ah)) return; // prazo é hoje ou futuro → não é atraso
-
-      const base = antFim && new Date(antFim+'T00:00:00') > _ap ? antFim : e.prazo;
-      const diasAtraso = Math.round((_ah - new Date(base+'T00:00:00')) / 864e5);
-      const statusEtapa = 'aberta_atraso';
+    const rowsSemFiltro = _processarEtapasAtraso(p, false);
+    rowsSemFiltro.forEach(r => {
       totalAberto++;
-      if(e.r!=='cl') totalEq++; else totalCl++;
-
-      // Filtro de responsável
-      if(filtResp && e.r !== filtResp) return;
-
-      // Verificar se prazo REAL do projeto também está vencido
-      const _ah2=new Date();_ah2.setHours(0,0,0,0);
-      const prazoProjVencido = !!(p.prazo && new Date(p.prazo+'T00:00:00') < _ah2);
-      const tipoAtraso = prazoProjVencido ? 'prazo_real' : 'etapa';
-
-      // Aplicar filtro de tipo
-      if(filtTipo && tipoAtraso !== filtTipo) return;
-
-      rows.push({
-        projId: p.id,
-        proj: p.nome,
-        sitProjeto: sitP,
-        cancelado: p.cancelado,
-        etapa: e.lb,
-        r: e.r,
-        prazo: e.prazo,
-        antFim: antFim,
-        diasAtraso,
-        statusEtapa,
-        fim: e.fim || null,
-        motivo: e.atrasoMotivo || null,
-        diasCl: e.diasCl || null,
-        resp: (p.resps||[]).join(', '),
-        prazoProjVencido,
-        tipoAtraso,
-      });
+      if(r.r !== 'cl') totalEq++; else totalCl++;
+      if(r.tipoAtraso === 'prazo_real') _totalPrazoComp++;
+      else _totalPrazoOk++;
     });
+  });
+
+  // ── 2. Calcular rows COM filtros (para a tabela) ──
+  let rows = [];
+  todos.forEach(p => {
+    rows.push(..._processarEtapasAtraso(p, true));
   });
 
   // Ordenar: mais atraso primeiro
   rows.sort((a,b) => b.diasAtraso - a.diasAtraso);
 
-  // ── Cards resumo ──────────────────────────────────────────────────────────
-  // Calcular prazo comprometido vs não comprometido
-  const _projAbertosUniq  = [...new Set(rows.filter(r=>!r.fim).map(r=>r.projId))];
-  const _totalPrazoComp   = [...new Set(rows.filter(r=>r.tipoAtraso==='prazo_real').map(r=>r.projId))].length;
-  const _totalPrazoOk     = [...new Set(rows.filter(r=>r.tipoAtraso==='etapa').map(r=>r.projId))].length;
-
+  // ── Cards resumo — valores sempre fixos, sem influência dos filtros ──
   document.getElementById('atrasosResumo').innerHTML = `
     <div class="sc cy"><div class="sc-l">Projetos em Atraso</div><div class="sc-v">${totalAberto}</div><div class="sc-s">total de projetos</div><div class="sc-i">⚠️</div></div>
     <div class="sc cr"><div class="sc-l">Atrasos da Equipe</div><div class="sc-v">${totalEq}</div><div class="sc-s">projetos atrasados pela equipe</div><div class="sc-i">👥</div></div>
     <div class="sc cp"><div class="sc-l">Atrasos do Cliente</div><div class="sc-v">${totalCl}</div><div class="sc-s">aguardando cliente</div><div class="sc-i">🏢</div></div>
-    <div class="sc" style="border-left:4px solid #DC2626"><div class="sc-l" style="color:#DC2626">Prazo Final Comprometido</div><div class="sc-v" style="color:#DC2626">${_totalPrazoComp}</div><div class="sc-s">prazo real vencido</div><div class="sc-i">🔴</div></div>
-    <div class="sc" style="border-left:4px solid #F59E0B"><div class="sc-l" style="color:#92400E">Prazo Final Não Comprometido</div><div class="sc-v" style="color:#92400E">${_totalPrazoOk}</div><div class="sc-s">etapa atrasada, prazo ok</div><div class="sc-i">🟡</div></div>
+    <div class="sc" style="border-left:4px solid #DC2626"><div class="sc-l">Prazo Final Comprometido</div><div class="sc-v">${_totalPrazoComp}</div><div class="sc-s">prazo real vencido</div><div class="sc-i">🔴</div></div>
+    <div class="sc" style="border-left:4px solid #F59E0B"><div class="sc-l">Prazo Final Não Comprometido</div><div class="sc-v">${_totalPrazoOk}</div><div class="sc-s">etapa atrasada, prazo ok</div><div class="sc-i">🟡</div></div>
   `;
 
   // ── Tabela ──────────────────────────────────────────────────────────────────
