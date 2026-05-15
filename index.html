@@ -242,6 +242,21 @@ tr:hover td{background:#FAFAF9}
 .kpi-stat-num{font-family:'Plus Jakarta Sans',sans-serif;font-size:22px;font-weight:800;line-height:1.1;margin-bottom:2px}
 .kpi-stat-lbl{font-size:10px;color:var(--mu);text-transform:uppercase;letter-spacing:.6px;margin-bottom:6px}
 .kpi-stat-sub{font-size:11px;color:var(--mu)}
+/* KPI — Mudança de Escopo */
+.kpi-escopo-list{display:flex;flex-direction:column;gap:6px;max-height:280px;overflow-y:auto}
+.kpi-escopo-item{padding:9px 11px;background:#FFFBEB;border:1px solid #FEF3C7;border-left:3px solid #F59E0B;border-radius:7px;cursor:pointer;transition:all .15s}
+.kpi-escopo-item:hover{background:#FEF3C7;border-color:#FCD34D;transform:translateX(2px)}
+.kpi-escopo-nome{font-size:12px;font-weight:600;color:var(--txt);line-height:1.3;margin-bottom:4px;display:flex;align-items:center}
+.kpi-escopo-trans{display:flex;align-items:center;gap:6px;font-size:11px;flex-wrap:wrap}
+.kpi-escopo-rec{padding:2px 8px;border-radius:10px;font-weight:600;white-space:nowrap}
+.kpi-escopo-rec.ant{background:#FEE2E2;color:#991B1B;text-decoration:line-through;text-decoration-color:rgba(153,27,27,.4)}
+.kpi-escopo-rec.nov{background:#DCFCE7;color:#15803D}
+.kpi-escopo-arrow{color:#A16207;font-weight:700;font-size:12px}
+body.dark .kpi-escopo-item{background:rgba(245,158,11,.08);border-color:rgba(245,158,11,.25)}
+body.dark .kpi-escopo-item:hover{background:rgba(245,158,11,.15)}
+body.dark .kpi-escopo-nome{color:var(--txt)}
+body.dark .kpi-escopo-rec.ant{background:rgba(220,38,38,.18);color:#FCA5A5}
+body.dark .kpi-escopo-rec.nov{background:rgba(22,163,74,.18);color:#86EFAC}
 .kpi-phase-row{display:flex;align-items:center;gap:8px;margin-bottom:7px;font-size:12px}
 .kpi-phase-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
 .kpi-phase-name{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:11px}
@@ -494,6 +509,10 @@ body.dark .sri-hl{background:rgba(255,202,40,.25)}
 .carga-card.over-load{border-color:#FCA5A5;background:linear-gradient(180deg,#FEF2F2 0%,var(--surface) 50px)}
 .carga-card.over-load:not(.dark){border-color:#FCA5A5}
 body.dark .carga-card.over-load{background:linear-gradient(180deg,rgba(220,38,38,.15) 0%,var(--surface) 50px);border-color:#7F1D1D}
+/* Card especial Cliente — visual distinto (azul claro / ciano) */
+.carga-card-cliente{border-color:#BAE6FD;background:linear-gradient(180deg,#F0F9FF 0%,var(--surface) 70px)}
+body.dark .carga-card-cliente{background:linear-gradient(180deg,rgba(14,165,233,.12) 0%,var(--surface) 70px);border-color:rgba(14,165,233,.35)}
+.carga-card-cliente .carga-av{box-shadow:0 2px 8px rgba(14,165,233,.35)}
 
 .carga-hd{display:flex;align-items:center;gap:14px;padding:16px 18px;cursor:pointer;user-select:none;position:relative}
 .carga-hd:hover{background:var(--s2)}
@@ -530,6 +549,7 @@ body.dark .carga-stat-pill.blue{background:rgba(30,64,175,.22);color:#93C5FD}
 .carga-proj-card.aguardando{border-left:3px solid var(--yel)}
 .carga-proj-card.andamento{border-left:3px solid var(--blue)}
 .carga-proj-card.atraso-cliente{border-left:3px solid var(--org)}
+.carga-proj-card.aguard-cliente{border-left:3px solid #0EA5E9}
 .carga-proj-hd{display:flex;align-items:flex-start;gap:8px;padding:10px 12px;cursor:pointer;user-select:none}
 .carga-proj-hd:hover{background:var(--s2)}
 .carga-proj-titulo{flex:1;min-width:0}
@@ -2615,21 +2635,48 @@ function rKPIs(){
   // ── 11. Taxa de cumprimento de prazo por etapa ──
   const escopoEl = document.getElementById('kpiEscopo');
   if(escopoEl){
-    const sim = todos.filter(p => p.mudouEscopo === 'sim').length;
-    const nao = todos.filter(p => p.mudouEscopo === 'nao').length;
-    escopoEl.innerHTML = `
-      <div style="display:flex;gap:14px">
-        <div style="flex:1;background:#FEE2E2;border-radius:10px;padding:18px 16px;text-align:center">
-          <div style="font-size:36px;font-weight:800;color:#DC2626">${sim}</div>
-          <div style="font-size:12px;color:#991B1B;font-weight:600;margin-top:4px">⚠️ Sim</div>
-        </div>
-        <div style="flex:1;background:#DCFCE7;border-radius:10px;padding:18px 16px;text-align:center">
-          <div style="font-size:36px;font-weight:800;color:#16A34A">${nao}</div>
-          <div style="font-size:12px;color:#15803D;font-weight:600;margin-top:4px">✅ Não</div>
-        </div>
-      </div>`;
-  }
+    const comMudanca = todos.filter(p => p.mudouEscopo === 'sim');
+    const sim = comMudanca.length;
 
+    if(sim === 0){
+      escopoEl.innerHTML = `
+        <div style="text-align:center;padding:28px 16px;background:#F9FAFB;border-radius:10px;border:1px dashed var(--bdr)">
+          <div style="font-size:32px;margin-bottom:6px;opacity:.5">✅</div>
+          <div style="font-size:13px;font-weight:600;color:var(--txt);margin-bottom:3px">Nenhuma mudança de escopo</div>
+          <div style="font-size:11px;color:var(--mu)">Nenhum projeto teve alteração de escopo registrada</div>
+        </div>`;
+    } else {
+      // Ordenar: cancelados ao final, depois por nome
+      const ordenados = [...comMudanca].sort((a,b) => {
+        if(a.cancelado !== b.cancelado) return a.cancelado ? 1 : -1;
+        return (a.nome||'').localeCompare(b.nome||'', 'pt-BR');
+      });
+
+      const linhas = ordenados.map(p => {
+        const ant = p.escopoAntigoRecurso || '<em style="color:var(--mu);font-weight:400">não informado</em>';
+        const nov = p.escopoNovoRecurso   || '<em style="color:var(--mu);font-weight:400">não informado</em>';
+        const cancBdg = p.cancelado ? '<span style="font-size:9px;background:#FEE2E2;color:#991B1B;padding:1px 6px;border-radius:8px;font-weight:700;margin-left:5px">CANC.</span>' : '';
+        return `<div class="kpi-escopo-item" onclick="openDet(${p.id})">
+          <div class="kpi-escopo-nome">${p.nome}${cancBdg}</div>
+          <div class="kpi-escopo-trans">
+            <span class="kpi-escopo-rec ant">${ant}</span>
+            <span class="kpi-escopo-arrow">→</span>
+            <span class="kpi-escopo-rec nov">${nov}</span>
+          </div>
+        </div>`;
+      }).join('');
+
+      escopoEl.innerHTML = `
+        <div style="display:flex;align-items:baseline;gap:10px;margin-bottom:12px;padding:12px 14px;background:#FEF3C7;border:1px solid #FDE68A;border-radius:10px">
+          <span style="font-size:30px;font-weight:800;color:#B45309;line-height:1;font-family:'Plus Jakarta Sans',sans-serif">${sim}</span>
+          <div>
+            <div style="font-size:12px;font-weight:700;color:#92400E">projeto${sim>1?'s':''} com mudança</div>
+            <div style="font-size:10.5px;color:#A16207;margin-top:1px">${sim>1?'tiveram':'teve'} alteração de escopo</div>
+          </div>
+        </div>
+        <div class="kpi-escopo-list">${linhas}</div>`;
+    }
+  }
 }
 
 
@@ -6961,22 +7008,32 @@ function _etapaAtualEhDaPessoa(p, nome){
 
 function _cargaStatusBadge(status){
   const map = {
-    atraso_equipe:   {lbl:'⚠️ Atrasado',          bg:'#FEE2E2', cor:'#991B1B'},
-    atraso_cliente:  {lbl:'⏳ Atraso Cliente',    bg:'#FFF7ED', cor:'#9A3412'},
-    andamento:       {lbl:'🔄 Em Andamento',      bg:'#EFF6FF', cor:'#1E40AF'},
-    aguardando:      {lbl:'⏳ Aguardando',        bg:'#F3F4F6', cor:'#374151'},
+    atraso_equipe:   {lbl:'⚠️ Atrasado',                  bg:'#FEE2E2', cor:'#991B1B'},
+    atraso_cliente:  {lbl:'⏳ Cliente atrasado',          bg:'#FFF7ED', cor:'#9A3412'},
+    aguard_cliente:  {lbl:'📨 Aguardando retorno',        bg:'#E0F2FE', cor:'#0369A1'},
+    andamento:       {lbl:'🔄 Em Andamento',              bg:'#EFF6FF', cor:'#1E40AF'},
+    aguardando:      {lbl:'⏳ Aguardando',                bg:'#F3F4F6', cor:'#374151'},
   };
   const m = map[status] || map.andamento;
   return `<span class="carga-proj-status-badge" style="background:${m.bg};color:${m.cor}">${m.lbl}</span>`;
 }
 
 function _populateCargaFiltros(membros, ativos){
-  // Pessoa
-  const respList = Object.keys(membros).sort();
+  // Pessoa — inclui Cliente como opção especial quando há projetos com ele
+  const respList = Object.keys(membros)
+    .filter(k => k !== '__cliente__')
+    .sort();
+  const hasCliente = '__cliente__' in membros;
   const ddR = document.getElementById('msDd_cargaResp');
   if(ddR){
     const sel = _msGetVals('cargaResp');
-    ddR.innerHTML = respList.map(r=>`<label class="ms-opt"><input type="checkbox" value="${r}" onchange="_msChange('cargaResp')"${sel.includes(r)?' checked':''}> ${r}</label>`).join('')
+    const itensPessoas = respList.map(r =>
+      `<label class="ms-opt"><input type="checkbox" value="${r}" onchange="_msChange('cargaResp')"${sel.includes(r)?' checked':''}> ${r}</label>`
+    ).join('');
+    const itemCliente = hasCliente
+      ? `<label class="ms-opt"><input type="checkbox" value="__cliente__" onchange="_msChange('cargaResp')"${sel.includes('__cliente__')?' checked':''}> 🏢 Cliente</label>`
+      : '';
+    ddR.innerHTML = itensPessoas + (itensPessoas && itemCliente ? '<div class="ms-sep"></div>' : '') + itemCliente
       + '<div class="ms-sep"></div><div class="ms-clear" data-ms-clear="cargaResp">✕ Limpar</div>';
     _msUpdateBtn('cargaResp');
   }
@@ -6999,9 +7056,19 @@ function rCarga(){
 
   // ── Agrupar por membro: incluir somente projetos cuja etapa atual está
   //    com a pessoa (etapa atribuída ao nome dela ou genérica para a equipe).
-  //    Projetos com etapa atual com cliente/outra pessoa não entram. ──
+  //    Projetos com etapa atual com cliente entram em uma gaveta especial. ──
   const membrosTotal = {};
+  const projsCliente = [];   // projetos cuja etapa atual está com o cliente
+  const seenCl = new Set();
+
   ativos.forEach(p => {
+    const et = etapaAtual(p);
+    if(et && et.r === 'cl'){
+      // Etapa atual está com o cliente
+      if(!seenCl.has(p.id)){ projsCliente.push(p); seenCl.add(p.id); }
+      return;
+    }
+    // Etapa atual está com a equipe — distribuir entre os responsáveis
     (p.resps||[]).forEach(r => {
       if(!_etapaAtualEhDaPessoa(p, r)) return;
       if(!membrosTotal[r]) membrosTotal[r] = [];
@@ -7009,20 +7076,23 @@ function rCarga(){
     });
   });
 
+  // Adicionar "Cliente" como uma gaveta especial se houver projetos
+  const membrosTotalComCl = {...membrosTotal};
+  if(projsCliente.length) membrosTotalComCl['__cliente__'] = projsCliente;
+
   // ── Popular filtros ──
-  _populateCargaFiltros(membrosTotal, ativos);
+  _populateCargaFiltros(membrosTotalComCl, ativos);
 
   // ── Stats globais ──
-  // Total de projetos atribuídos ativamente à equipe (etapa atual com alguém)
-  const totalProjetos = new Set(Object.values(membrosTotal).flat().map(p=>p.id)).size;
+  const totalAtivosEquipe = new Set(Object.values(membrosTotal).flat().map(p=>p.id)).size;
+  const totalAtivosCliente = projsCliente.length;
   const totalAtrasoEq = ativos.filter(atrasadoPorEquipe).length;
   const totalAtrasoCl = ativos.filter(p => !atrasadoPorEquipe(p) && atrasadoPorCliente(p)).length;
-  const totalMembros  = Object.keys(membrosTotal).length;
   const statsEl = document.getElementById('cargaStats');
   if(statsEl){
     statsEl.innerHTML = `
-      <div class="sc cb"><div class="sc-l">Membros Ativos</div><div class="sc-v">${totalMembros}</div><div class="sc-s">com etapa em curso</div><div class="sc-i">👥</div></div>
-      <div class="sc cp"><div class="sc-l">Projetos Ativos</div><div class="sc-v">${totalProjetos}</div><div class="sc-s">etapa atual com a equipe</div><div class="sc-i">📁</div></div>
+      <div class="sc cp"><div class="sc-l">Projetos Ativos - Equipe</div><div class="sc-v">${totalAtivosEquipe}</div><div class="sc-s">etapa atual com a equipe</div><div class="sc-i">👥</div></div>
+      <div class="sc cb"><div class="sc-l">Projetos Ativos - Cliente</div><div class="sc-v">${totalAtivosCliente}</div><div class="sc-s">na vez do cliente</div><div class="sc-i">🏢</div></div>
       <div class="sc cr"><div class="sc-l">Atrasos Equipe</div><div class="sc-v">${totalAtrasoEq}</div><div class="sc-s">projetos atrasados</div><div class="sc-i">⚠️</div></div>
       <div class="sc cy"><div class="sc-l">Atrasos Cliente</div><div class="sc-v">${totalAtrasoCl}</div><div class="sc-s">aguardando cliente</div><div class="sc-i">⏳</div></div>
     `;
@@ -7034,9 +7104,9 @@ function rCarga(){
   const fRec  = _msGetVals('cargaRec');
   const fPrio = _msGetVals('cargaPrio');
 
-  // Filtragem dos projetos por membro
+  // Filtragem dos projetos por membro (e cliente)
   const membros = {};
-  Object.entries(membrosTotal).forEach(([nome, projs]) => {
+  Object.entries(membrosTotalComCl).forEach(([nome, projs]) => {
     if(fResp.length && !fResp.includes(nome)) return;
     const projsFilt = projs.filter(p => {
       if(fStat.length && !fStat.includes(_cargaStatusProj(p))) return false;
@@ -7052,12 +7122,12 @@ function rCarga(){
   if(ct){
     const ativo = fResp.length || fStat.length || fRec.length || fPrio.length;
     const totalFiltrados = Object.values(membros).reduce((s,a)=>s+a.length,0);
-    ct.textContent = ativo ? `${Object.keys(membros).length} pessoa(s) · ${totalFiltrados} projeto(s)` : '';
+    ct.textContent = ativo ? `${Object.keys(membros).length} ${Object.keys(membros).length===1?'item':'itens'} · ${totalFiltrados} projeto(s)` : '';
   }
 
   // ── Vazio ──
   if(!Object.keys(membros).length){
-    el.innerHTML = '<div style="text-align:center;padding:48px 16px;color:var(--mu);font-size:13px;grid-column:1/-1">Nenhum membro encontrado com os filtros selecionados.</div>';
+    el.innerHTML = '<div style="text-align:center;padding:48px 16px;color:var(--mu);font-size:13px;grid-column:1/-1">Nenhum item encontrado com os filtros selecionados.</div>';
     return;
   }
 
@@ -7065,74 +7135,125 @@ function rCarga(){
   const max = Math.max(...Object.values(membros).map(arr => arr.length), 1);
   const stOpen = JSON.parse(localStorage.getItem('firjan_carga_open')||'{}');
 
-  // Ordenação prioritária: prioriza membros sobrecarregados ou com atrasos
-  const ordenados = Object.entries(membros).sort((a,b) => {
-    const aAtr = a[1].filter(atrasadoPorEquipe).length;
-    const bAtr = b[1].filter(atrasadoPorEquipe).length;
-    if(aAtr !== bAtr) return bAtr - aAtr;
-    return b[1].length - a[1].length;
-  });
+  // Ordenação: DECRESCENTE pelo número de projetos (Cliente entra no ranking
+  // como qualquer outra gaveta — fica onde a quantidade dele encaixar)
+  const ordenados = Object.entries(membros).sort((a,b) => b[1].length - a[1].length);
 
   el.innerHTML = ordenados.map(([nome, projs]) => {
-    // Projetos atrasados onde a etapa atual está com a pessoa (não com cliente)
-    // — pelo critério de inclusão na carga, todos os projs aqui têm etapa atual
-    // com a equipe, então "atraso por equipe" = atrasados.
-    const atrasados = projs.filter(atrasadoPorEquipe).length;
-    const andamento = projs.filter(p => !atrasadoPorEquipe(p) && calcSit(p) === 'andamento').length;
-    const aguard = projs.filter(p => calcSit(p) === 'aguardando').length;
-
-    const pct = Math.round(projs.length / max * 100);
-    const overload = projs.length >= 5 || atrasados >= 2;
-    const corStatus = atrasados > 0 ? 'var(--red)' : projs.length >= 5 ? 'var(--yel)' : 'var(--blue)';
-    const labelCarga = atrasados > 0 ? 'Atenção' : projs.length >= 5 ? 'Sobrecarga' : projs.length >= 3 ? 'Carga regular' : 'Carga leve';
-    const corPessoal = NOME_CORES[nome] || corStatus;
-    const uid = 'carga_' + nome.replace(/\W/g,'_');
-    const isOpen = stOpen[uid] === true;
-
-    // Ordenar projetos: atrasados primeiro, depois prioridade, depois prazo
-    const _ordPrio={urgente:0,alta:1,media:2,baixa:3};
-    const projsOrdenados = [...projs].sort((a,b) => {
-      const sA = _cargaStatusProj(a), sB = _cargaStatusProj(b);
-      const ordSt = {atraso_equipe:0, andamento:1, aguardando:2};
-      if(ordSt[sA] !== ordSt[sB]) return (ordSt[sA]??9) - (ordSt[sB]??9);
-      const pA = _ordPrio[a.prioridade]??4, pB = _ordPrio[b.prioridade]??4;
-      if(pA !== pB) return pA - pB;
-      return (a.prazo||'9999').localeCompare(b.prazo||'9999');
-    });
-
-    return `<div class="carga-card${overload?' over-load':''}">
-      <div class="carga-hd" onclick="toggleCarga('${uid}')">
-        <div class="carga-av" style="background:${corPessoal}">
-          ${iniciais(nome)}
-          ${atrasados>0?`<span class="carga-av-badge">${atrasados}</span>`:''}
-        </div>
-        <div class="carga-info">
-          <div class="carga-name">${nome}</div>
-          <div class="carga-load-label" style="color:${corStatus}">${labelCarga}</div>
-        </div>
-        <div class="carga-count-wrap">
-          <div class="carga-count" style="color:${corStatus}">${projs.length}</div>
-          <div class="carga-count-lbl">projetos</div>
-        </div>
-        <span class="carga-arrow${isOpen?' open':''}" id="${uid}_arrow">▼</span>
-      </div>
-      <div class="carga-bar-bg"><div class="carga-bar-fill" style="width:${pct}%;background:${corStatus}"></div></div>
-      <div class="carga-stats-row">
-        ${atrasados > 0 ? `<span class="carga-stat-pill red">⚠️ ${atrasados} atraso${atrasados>1?'s':''}</span>` : ''}
-        ${andamento > 0 ? `<span class="carga-stat-pill blue">🔄 ${andamento} andamento</span>` : ''}
-        ${aguard > 0 ? `<span class="carga-stat-pill gray">⏸️ ${aguard} aguardando</span>` : ''}
-      </div>
-      <div class="carga-body${isOpen?' open':''}" id="${uid}_body">
-        <div class="carga-proj-list">
-          ${projsOrdenados.map(p => _buildCargaProjCard(p, nome)).join('')}
-        </div>
-      </div>
-    </div>`;
+    if(nome === '__cliente__') return _buildCargaCardCliente(projs, max, stOpen);
+    return _buildCargaCardPessoa(nome, projs, max, stOpen);
   }).join('');
 }
 
+function _buildCargaCardPessoa(nome, projs, max, stOpen){
+  // Projetos atrasados onde a etapa atual está com a pessoa (não com cliente)
+  const atrasados = projs.filter(atrasadoPorEquipe).length;
+  const andamento = projs.filter(p => !atrasadoPorEquipe(p) && calcSit(p) === 'andamento').length;
+  const aguard = projs.filter(p => calcSit(p) === 'aguardando').length;
+
+  const pct = Math.round(projs.length / max * 100);
+  const overload = projs.length >= 5 || atrasados >= 2;
+  const corStatus = atrasados > 0 ? 'var(--red)' : projs.length >= 5 ? 'var(--yel)' : 'var(--blue)';
+  const labelCarga = atrasados > 0 ? 'Atenção' : projs.length >= 5 ? 'Sobrecarga' : projs.length >= 3 ? 'Carga regular' : 'Carga leve';
+  const corPessoal = NOME_CORES[nome] || corStatus;
+  const uid = 'carga_' + nome.replace(/\W/g,'_');
+  const isOpen = stOpen[uid] === true;
+
+  // Ordenar projetos: atrasados primeiro, depois prioridade, depois prazo
+  const _ordPrio={urgente:0,alta:1,media:2,baixa:3};
+  const projsOrdenados = [...projs].sort((a,b) => {
+    const sA = _cargaStatusProj(a), sB = _cargaStatusProj(b);
+    const ordSt = {atraso_equipe:0, andamento:1, aguardando:2};
+    if(ordSt[sA] !== ordSt[sB]) return (ordSt[sA]??9) - (ordSt[sB]??9);
+    const pA = _ordPrio[a.prioridade]??4, pB = _ordPrio[b.prioridade]??4;
+    if(pA !== pB) return pA - pB;
+    return (a.prazo||'9999').localeCompare(b.prazo||'9999');
+  });
+
+  return `<div class="carga-card${overload?' over-load':''}">
+    <div class="carga-hd" onclick="toggleCarga('${uid}')">
+      <div class="carga-av" style="background:${corPessoal}">
+        ${iniciais(nome)}
+        ${atrasados>0?`<span class="carga-av-badge">${atrasados}</span>`:''}
+      </div>
+      <div class="carga-info">
+        <div class="carga-name">${nome}</div>
+        <div class="carga-load-label" style="color:${corStatus}">${labelCarga}</div>
+      </div>
+      <div class="carga-count-wrap">
+        <div class="carga-count" style="color:${corStatus}">${projs.length}</div>
+        <div class="carga-count-lbl">projetos</div>
+      </div>
+      <span class="carga-arrow${isOpen?' open':''}" id="${uid}_arrow">▼</span>
+    </div>
+    <div class="carga-bar-bg"><div class="carga-bar-fill" style="width:${pct}%;background:${corStatus}"></div></div>
+    <div class="carga-stats-row">
+      ${atrasados > 0 ? `<span class="carga-stat-pill red">⚠️ ${atrasados} atraso${atrasados>1?'s':''}</span>` : ''}
+      ${andamento > 0 ? `<span class="carga-stat-pill blue">🔄 ${andamento} andamento</span>` : ''}
+      ${aguard > 0 ? `<span class="carga-stat-pill gray">⏸️ ${aguard} aguardando</span>` : ''}
+    </div>
+    <div class="carga-body${isOpen?' open':''}" id="${uid}_body">
+      <div class="carga-proj-list">
+        ${projsOrdenados.map(p => _buildCargaProjCard(p, nome)).join('')}
+      </div>
+    </div>
+  </div>`;
+}
+
+function _buildCargaCardCliente(projs, max, stOpen){
+  // Gaveta especial para projetos cuja etapa atual está com o cliente
+  const atrasados = projs.filter(atrasadoPorCliente).length;
+  const aguardando = projs.length - atrasados;
+  const pct = Math.round(projs.length / max * 100);
+  const corStatus = atrasados > 0 ? 'var(--org)' : '#0EA5E9';
+  const labelCarga = atrasados > 0 ? `${atrasados} atrasado${atrasados>1?'s':''}` : 'Aguardando retorno';
+  const uid = 'carga___cliente__';
+  const isOpen = stOpen[uid] === true;
+
+  // Ordenar: atrasados primeiro, depois prioridade, depois prazo
+  const _ordPrio={urgente:0,alta:1,media:2,baixa:3};
+  const projsOrdenados = [...projs].sort((a,b) => {
+    const atA = atrasadoPorCliente(a)?0:1, atB = atrasadoPorCliente(b)?0:1;
+    if(atA !== atB) return atA - atB;
+    const pA = _ordPrio[a.prioridade]??4, pB = _ordPrio[b.prioridade]??4;
+    if(pA !== pB) return pA - pB;
+    return (a.prazo||'9999').localeCompare(b.prazo||'9999');
+  });
+
+  return `<div class="carga-card carga-card-cliente">
+    <div class="carga-hd" onclick="toggleCarga('${uid}')">
+      <div class="carga-av" style="background:${corStatus};font-size:22px">
+        🏢
+        ${atrasados>0?`<span class="carga-av-badge" style="background:var(--org)">${atrasados}</span>`:''}
+      </div>
+      <div class="carga-info">
+        <div class="carga-name">Cliente</div>
+        <div class="carga-load-label" style="color:${corStatus}">${labelCarga}</div>
+      </div>
+      <div class="carga-count-wrap">
+        <div class="carga-count" style="color:${corStatus}">${projs.length}</div>
+        <div class="carga-count-lbl">projetos</div>
+      </div>
+      <span class="carga-arrow${isOpen?' open':''}" id="${uid}_arrow">▼</span>
+    </div>
+    <div class="carga-bar-bg"><div class="carga-bar-fill" style="width:${pct}%;background:${corStatus}"></div></div>
+    <div class="carga-stats-row">
+      ${atrasados > 0 ? `<span class="carga-stat-pill org">⏳ ${atrasados} atrasado${atrasados>1?'s':''}</span>` : ''}
+      ${aguardando > 0 ? `<span class="carga-stat-pill blue">📨 ${aguardando} aguardando retorno</span>` : ''}
+    </div>
+    <div class="carga-body${isOpen?' open':''}" id="${uid}_body">
+      <div class="carga-proj-list">
+        ${projsOrdenados.map(p => _buildCargaProjCard(p, '__cliente__')).join('')}
+      </div>
+    </div>
+  </div>`;
+}
+
 function _buildCargaProjCard(p, nome){
-  const status = _cargaStatusProj(p);
+  const ehGavetaCliente = nome === '__cliente__';
+  let status = _cargaStatusProj(p);
+  // Na gaveta Cliente: projetos não-atrasados ficam como "aguardando retorno"
+  if(ehGavetaCliente && status !== 'atraso_cliente') status = 'aguard_cliente';
   const uid = 'cprj_'+nome.replace(/\W/g,'_')+'_'+p.id;
   const sit = calcSit(p);
   const col = COLUNAS.find(c => c.k === p.col);
@@ -7156,7 +7277,13 @@ function _buildCargaProjCard(p, nome){
 
   const nomeProj = p.nome.length > 70 ? p.nome.slice(0,68)+'…' : p.nome;
 
-  return `<div class="carga-proj-card ${status==='atraso_equipe'?'atrasado':status==='atraso_cliente'?'atraso-cliente':status}" id="${uid}">
+  // Classe da borda lateral
+  const classeCard = status==='atraso_equipe'?'atrasado'
+                    : status==='atraso_cliente'?'atraso-cliente'
+                    : status==='aguard_cliente'?'aguard-cliente'
+                    : status;
+
+  return `<div class="carga-proj-card ${classeCard}" id="${uid}">
     <div class="carga-proj-hd" onclick="toggleCargaProj('${uid}')">
       <div class="carga-proj-titulo">
         <div class="carga-proj-nome">
@@ -7201,6 +7328,15 @@ function _buildCargaProjCard(p, nome){
             ${eq>0?`${eq}d equipe`:cl>0?`${cl}d cliente`:'No prazo'}
           </span>
         </div>
+        ${nome === '__cliente__' ? `
+        <div class="carga-proj-detail-item" style="grid-column:span 2">
+          <span class="lbl">👥 Responsáveis (Equipe)</span>
+          <span class="val" style="display:flex;gap:5px;flex-wrap:wrap;align-items:center">
+            ${(p.resps||[]).length
+              ? (p.resps||[]).map(r=>`<span style="display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:10px;background:var(--s2);font-size:11px;font-weight:600"><span style="width:16px;height:16px;border-radius:50%;background:${NOME_CORES[r]||'var(--blue)'};color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:8px;font-weight:800">${iniciais(r)}</span>${r}</span>`).join('')
+              : '<span style="color:var(--mu);font-style:italic;font-weight:400">Nenhum responsável</span>'}
+          </span>
+        </div>` : ''}
       </div>
       <div class="carga-proj-detail-actions">
         <button class="carga-proj-action-btn" onclick="event.stopPropagation();openDet(${p.id})">🔎 Abrir Card</button>
