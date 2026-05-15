@@ -277,6 +277,18 @@ tr.canc-row td{opacity:.55}
 .fg-sm{display:flex;flex-direction:column;gap:4px;min-width:160px;flex:1}
 .fl-sm{font-size:10px;font-weight:700;color:var(--mu);text-transform:uppercase;letter-spacing:.5px}
 .fi-sm{padding:6px 10px;border:1px solid var(--bdr);border-radius:6px;font-family:'Plus Jakarta Sans',sans-serif;font-size:12.5px;color:var(--txt);background:var(--bg);outline:none}
+.ms-wrap{position:relative;display:inline-block}
+.ms-btn{border:1px solid var(--bdr);border-radius:6px;padding:5px 26px 5px 8px;font-size:12px;background:var(--bg);color:var(--txt);cursor:pointer;white-space:nowrap;min-width:90px;text-align:left;position:relative;font-family:'Plus Jakarta Sans',sans-serif}
+.ms-btn::after{content:'▼';position:absolute;right:7px;top:50%;transform:translateY(-50%);font-size:9px;color:var(--mu)}
+.ms-btn.ms-active{border-color:var(--blue);color:var(--blue)}
+.ms-dropdown{display:none;position:absolute;top:calc(100% + 4px);left:0;min-width:190px;background:#fff;border:1px solid var(--bdr);border-radius:8px;box-shadow:0 4px 16px rgba(0,0,0,.12);z-index:9999;padding:6px 0;max-height:260px;overflow-y:auto}
+.ms-dropdown.open{display:block}
+.ms-opt{display:flex;align-items:center;gap:8px;padding:7px 12px;cursor:pointer;font-size:12.5px;color:var(--txt)}
+.ms-opt:hover{background:var(--s2)}
+.ms-opt input[type=checkbox]{accent-color:var(--blue);width:14px;height:14px;flex-shrink:0;cursor:pointer}
+.ms-sep{height:1px;background:var(--bdr);margin:4px 0}
+.ms-clear{padding:5px 12px;font-size:11.5px;color:var(--blue);cursor:pointer;text-align:right}
+.ms-clear:hover{text-decoration:underline}
 .fi-sm:focus{border-color:var(--blue);background:#fff}
 .btn-lim{padding:6px 12px;border-radius:6px;border:1px solid var(--bdr);background:transparent;cursor:pointer;font-size:12px;color:var(--mu);font-family:'Plus Jakarta Sans',sans-serif;white-space:nowrap;align-self:flex-end}
 .btn-lim:hover{background:var(--s2)}
@@ -777,20 +789,44 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
     <div class="view" id="view-projetos">
       <div class="sh"><div class="st">Lista de Projetos</div></div>
       <div class="fbox">
-        <div class="fbox-row">
+        <div class="fbox-row" style="flex-wrap:wrap;gap:8px;align-items:flex-end">
           <div class="fg-sm"><label class="fl-sm">Responsável</label>
-            <select class="fi-sm" id="lFiltResp" onchange="applyLFilts()">
-              <option value="">Todos</option>
-            </select>
+            <div class="ms-wrap" id="msWrap_lResp">
+              <button class="ms-btn" id="msBtn_lResp" onclick="_msToggle('lResp')">Todos</button>
+              <div class="ms-dropdown" id="msDd_lResp"></div>
+            </div>
           </div>
           <div class="fg-sm"><label class="fl-sm">Situação</label>
-            <select class="fi-sm" id="lFiltSit" onchange="applyLFilts()">
-              <option value="">Todas</option>
-              <option value="aguardando">⏳ Aguardando</option>
-              <option value="andamento">🔄 Em Andamento</option>
-              <option value="atrasado">⚠️ Atrasado</option>
-              <option value="concluido">✅ Concluído</option>
-            </select>
+            <div class="ms-wrap" id="msWrap_lSit">
+              <button class="ms-btn" id="msBtn_lSit" onclick="_msToggle('lSit')">Todas</button>
+              <div class="ms-dropdown" id="msDd_lSit">
+                <label class="ms-opt"><input type="checkbox" value="aguardando" onchange="_msChange('lSit')"> ⏳ Aguardando</label>
+                <label class="ms-opt"><input type="checkbox" value="andamento" onchange="_msChange('lSit')"> 🔄 Em Andamento</label>
+                <label class="ms-opt"><input type="checkbox" value="atrasado" onchange="_msChange('lSit')"> ⚠️ Atrasado</label>
+                <label class="ms-opt"><input type="checkbox" value="concluido" onchange="_msChange('lSit')"> ✅ Concluído</label>
+                <div class="ms-sep"></div>
+                <div class="ms-clear" onclick="_msClear('lSit')">✕ Limpar</div>
+              </div>
+            </div>
+          </div>
+          <div class="fg-sm"><label class="fl-sm">Recurso</label>
+            <div class="ms-wrap" id="msWrap_lRec">
+              <button class="ms-btn" id="msBtn_lRec" onclick="_msToggle('lRec')">Todos</button>
+              <div class="ms-dropdown" id="msDd_lRec"></div>
+            </div>
+          </div>
+          <div class="fg-sm"><label class="fl-sm">Prioridade</label>
+            <div class="ms-wrap" id="msWrap_lPrio">
+              <button class="ms-btn" id="msBtn_lPrio" onclick="_msToggle('lPrio')">Todas</button>
+              <div class="ms-dropdown" id="msDd_lPrio">
+                <label class="ms-opt"><input type="checkbox" value="urgente" onchange="_msChange('lPrio')"> 🔴 Urgente</label>
+                <label class="ms-opt"><input type="checkbox" value="alta" onchange="_msChange('lPrio')"> 🟠 Alta</label>
+                <label class="ms-opt"><input type="checkbox" value="media" onchange="_msChange('lPrio')"> 🟡 Média</label>
+                <label class="ms-opt"><input type="checkbox" value="baixa" onchange="_msChange('lPrio')"> 🟢 Baixa</label>
+                <div class="ms-sep"></div>
+                <div class="ms-clear" onclick="_msClear('lPrio')">✕ Limpar</div>
+              </div>
+            </div>
           </div>
           <div class="fg-sm"><label class="fl-sm">Academia</label>
             <select class="fi-sm" id="lFiltAcad" onchange="applyLFilts()">
@@ -812,7 +848,21 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
         </div>
       </div>
       <div class="tw"><table>
-        <thead><tr><th>Projeto</th><th>Recursos</th><th>Responsável(is)</th><th>Coluna</th><th>Situação</th><th>Criado</th><th>Início</th><th>Prazo</th><th>Término</th><th>Eq.</th><th>Cl.</th><th>Prog.</th><th></th></tr></thead>
+        <thead><tr>
+  <th style="cursor:pointer;white-space:nowrap" onclick="toggleListSort('nome')">Projeto <span id="lSI_nome" style="font-size:10px;color:var(--mu)"></span></th>
+  <th style="cursor:pointer;white-space:nowrap" onclick="toggleListSort('rec')">Recursos <span id="lSI_rec" style="font-size:10px;color:var(--mu)"></span></th>
+  <th style="cursor:pointer;white-space:nowrap" onclick="toggleListSort('resp')">Responsável(is) <span id="lSI_resp" style="font-size:10px;color:var(--mu)"></span></th>
+  <th style="cursor:pointer;white-space:nowrap" onclick="toggleListSort('col')">Coluna <span id="lSI_col" style="font-size:10px;color:var(--mu)"></span></th>
+  <th style="cursor:pointer;white-space:nowrap" onclick="toggleListSort('sit')">Situação <span id="lSI_sit" style="font-size:10px;color:var(--mu)"></span></th>
+  <th style="cursor:pointer;white-space:nowrap" onclick="toggleListSort('criado')">Criado <span id="lSI_criado" style="font-size:10px;color:var(--mu)"></span></th>
+  <th style="cursor:pointer;white-space:nowrap" onclick="toggleListSort('inicio')">Início <span id="lSI_inicio" style="font-size:10px;color:var(--mu)"></span></th>
+  <th style="cursor:pointer;white-space:nowrap" onclick="toggleListSort('prazo')">Prazo <span id="lSI_prazo" style="font-size:10px;color:var(--mu)"></span></th>
+  <th style="cursor:pointer;white-space:nowrap" onclick="toggleListSort('termino')">Término <span id="lSI_termino" style="font-size:10px;color:var(--mu)"></span></th>
+  <th style="cursor:pointer;white-space:nowrap" onclick="toggleListSort('eq')">Eq. <span id="lSI_eq" style="font-size:10px;color:var(--mu)"></span></th>
+  <th style="cursor:pointer;white-space:nowrap" onclick="toggleListSort('cl')">Cl. <span id="lSI_cl" style="font-size:10px;color:var(--mu)"></span></th>
+  <th style="cursor:pointer;white-space:nowrap" onclick="toggleListSort('prog')">Prog. <span id="lSI_prog" style="font-size:10px;color:var(--mu)"></span></th>
+  <th></th>
+</tr></thead>
         <tbody id="listTbl"></tbody>
       </table></div>
     </div>
@@ -1611,11 +1661,29 @@ function populateFiltSelects(){
 
   const lAcadEl = document.getElementById('lFiltAcad');
   if(lAcadEl){ lAcadEl.innerHTML = _acadOpts(lAcadEl.value); }
-  ['kFiltResp','lFiltResp'].forEach(id=>{
-    const s=document.getElementById(id); if(!s)return;
-    const cur=s.value;
-    s.innerHTML='<option value="">Todos</option>'+resps.map(r=>`<option value="${r}"${cur===r?' selected':''}>${r}</option>`).join('');
-  });
+  // Popular kFiltResp (Kanban — select simples)
+  const kRespEl = document.getElementById('kFiltResp');
+  if(kRespEl){ const cur=kRespEl.value; kRespEl.innerHTML='<option value="">Todos</option>'+resps.map(r=>`<option value="${r}"${cur===r?' selected':''}>${r}</option>`).join(''); }
+
+  // Popular multi-select de Responsável (Lista)
+  const _ddResp = document.getElementById('msDd_lResp');
+  if(_ddResp){
+    const _selResps = _msGetVals('lResp');
+    _ddResp.innerHTML = resps.map(r=>
+      `<label class="ms-opt"><input type="checkbox" value="${r}" onchange="_msChange('lResp')"${_selResps.includes(r)?' checked':''}> ${r}</label>`
+    ).join('') + '<div class="ms-sep"></div><div class="ms-clear" onclick="_msClear('lResp')">✕ Limpar</div>';
+    _msUpdateBtn('lResp');
+  }
+
+  // Popular multi-select de Recurso (Lista)
+  const _ddRec = document.getElementById('msDd_lRec');
+  if(_ddRec){
+    const _selRecs = _msGetVals('lRec');
+    _ddRec.innerHTML = RECURSOS.map(r=>
+      `<label class="ms-opt"><input type="checkbox" value="${r}" onchange="_msChange('lRec')"${_selRecs.includes(r)?' checked':''}> ${r}</label>`
+    ).join('') + '<div class="ms-sep"></div><div class="ms-clear" onclick="_msClear('lRec')">✕ Limpar</div>';
+    _msUpdateBtn('lRec');
+  }
   ['kFiltCol','lFiltCol'].forEach(id=>{
     const s=document.getElementById(id); if(!s)return;
     const cur=s.value;
@@ -1633,20 +1701,53 @@ function getKFilts(){
     ate:document.getElementById('kFiltAte')?.value||'',
   };
 }
+// ── Multi-select helpers ──
+function _msGetVals(id){
+  const dd = document.getElementById('msDd_'+id);
+  if(!dd) return [];
+  return [...dd.querySelectorAll('input[type=checkbox]:checked')].map(cb=>cb.value);
+}
+function _msToggle(id){
+  document.querySelectorAll('.ms-dropdown.open').forEach(d=>{ if(d.id!=='msDd_'+id) d.classList.remove('open'); });
+  document.getElementById('msDd_'+id)?.classList.toggle('open');
+}
+function _msChange(id){ applyLFilts(); _msUpdateBtn(id); }
+function _msClear(id){
+  const dd=document.getElementById('msDd_'+id);
+  if(dd) dd.querySelectorAll('input[type=checkbox]').forEach(cb=>cb.checked=false);
+  _msUpdateBtn(id); applyLFilts();
+}
+function _msUpdateBtn(id){
+  const vals=_msGetVals(id);
+  const btn=document.getElementById('msBtn_'+id);
+  if(!btn) return;
+  const labels={'lResp':'Todos','lSit':'Todas','lRec':'Todos','lPrio':'Todas'};
+  if(vals.length===0){ btn.textContent=labels[id]||'Todos'; btn.classList.remove('ms-active'); }
+  else { btn.textContent=vals.length+' selecionado(s)'; btn.classList.add('ms-active'); }
+}
+// Fechar dropdowns ao clicar fora
+document.addEventListener('click', e=>{
+  if(!e.target.closest('.ms-wrap')) document.querySelectorAll('.ms-dropdown.open').forEach(d=>d.classList.remove('open'));
+});
+
 function getLFilts(){
   return{
-    resp:document.getElementById('lFiltResp')?.value||'',
-    sit:document.getElementById('lFiltSit')?.value||'',
-    acad:document.getElementById('lFiltAcad')?.value||'',
-    col:document.getElementById('lFiltCol')?.value||'',
-    de:document.getElementById('lFiltDe')?.value||'',
-    ate:document.getElementById('lFiltAte')?.value||'',
+    resps: _msGetVals('lResp'),
+    sits:  _msGetVals('lSit'),
+    recs:  _msGetVals('lRec'),
+    prios: _msGetVals('lPrio'),
+    acad:  document.getElementById('lFiltAcad')?.value||'',
+    col:   document.getElementById('lFiltCol')?.value||'',
+    de:    document.getElementById('lFiltDe')?.value||'',
+    ate:   document.getElementById('lFiltAte')?.value||'',
   };
 }
 function applyFilt(data,f){
   let r=data;
-  if(f.resp) r=r.filter(p=>(p.resps||[]).includes(f.resp));
-  if(f.sit)  r=r.filter(p=>calcSit(p)===f.sit);
+  if(f.resps&&f.resps.length) r=r.filter(p=>f.resps.some(rv=>(p.resps||[]).includes(rv)));
+  if(f.sits &&f.sits.length)  r=r.filter(p=>f.sits.includes(calcSit(p)));
+  if(f.recs &&f.recs.length)  r=r.filter(p=>f.recs.some(rv=>(p.recursos||[]).includes(rv)));
+  if(f.prios&&f.prios.length) r=r.filter(p=>f.prios.includes(p.prioridade));
   if(f.acad) r=r.filter(p=>f.acad==='__sem_academia__' ? !p.academia : p.academia===f.acad);
   if(f.col!=='') r=r.filter(p=>p.col===parseInt(f.col));
   if(f.de)   r=r.filter(p=>p.criado&&p.criado>=f.de);
@@ -1669,8 +1770,10 @@ function limparKFilts(){
   rKanban();
 }
 function limparLFilts(){
-  ['lFiltResp','lFiltSit','lFiltAcad','lFiltCol'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
+  ['lResp','lSit','lRec','lPrio'].forEach(id=>_msClear(id));
+  ['lFiltAcad','lFiltCol'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
   ['lFiltDe','lFiltAte'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
+  _listSortCol=''; _listSortDir=1;
   rList();
 }
 
@@ -1771,20 +1874,52 @@ function onDrop(e,col){
 function cardClick(e,id){if(e.detail===0)return;openDet(id);}
 
 // ── LIST ──
+let _listSortCol='';
+let _listSortDir=1;
+function toggleListSort(col){
+  if(_listSortCol===col){ _listSortDir*=-1; }
+  else{ _listSortCol=col; _listSortDir=1; }
+  rList();
+}
 function rList(){
   populateFiltSelects();
   let data=applyFilt(activeDB(),getLFilts());
 
-  // Ordenar: prioridade → situação → data de criação
+  // Ordenação dinâmica — todas as colunas
   const _ordPrioList={urgente:0,alta:1,media:2,baixa:3};
   const _ordSitList={atrasado:0,andamento:1,aguardando:2,concluido:3,cancelado:4};
+  const _dStr=v=>v||'9999-99-99';
+  let _lsc=typeof _listSortCol!=='undefined'?_listSortCol:'';
+  let _lsd=typeof _listSortDir!=='undefined'?_listSortDir:1;
   data=[...data].sort((a,b)=>{
-    const pA=_ordPrioList[a.prioridade]??4, pB=_ordPrioList[b.prioridade]??4;
+    if(_lsc){
+      const d=_lsd;
+      const {eq:aeq,cl:acl}=delInf(a),{eq:beq,cl:bcl}=delInf(b);
+      switch(_lsc){
+        case 'nome':    return (a.nome||'').localeCompare(b.nome||'','pt-BR')*d;
+        case 'rec':     return ((a.recursos||[]).join('')).localeCompare((b.recursos||[]).join(''))*d;
+        case 'resp':    return ((a.resps||[]).join('')).localeCompare((b.resps||[]).join(''))*d;
+        case 'col':     return ((a.col||0)-(b.col||0))*d;
+        case 'sit':     return ((_ordSitList[calcSit(a)]??5)-(_ordSitList[calcSit(b)]??5))*d;
+        case 'criado':  return _dStr(a.criado).localeCompare(_dStr(b.criado))*d;
+        case 'inicio':  return _dStr(a.inicio).localeCompare(_dStr(b.inicio))*d;
+        case 'prazo':   return _dStr(a.prazo).localeCompare(_dStr(b.prazo))*d;
+        case 'termino': return _dStr(a.termino).localeCompare(_dStr(b.termino))*d;
+        case 'eq':      return (aeq-beq)*d;
+        case 'cl':      return (acl-bcl)*d;
+        case 'prog':    return ((a.pct||0)-(b.pct||0))*d;
+      }
+    }
+    const pA=_ordPrioList[a.prioridade]??4,pB=_ordPrioList[b.prioridade]??4;
     if(pA!==pB) return pA-pB;
-    const sA=_ordSitList[a.cancelado?'cancelado':calcSit(a)]??5;
-    const sB=_ordSitList[b.cancelado?'cancelado':calcSit(b)]??5;
+    const sA=_ordSitList[calcSit(a)]??5,sB=_ordSitList[calcSit(b)]??5;
     if(sA!==sB) return sA-sB;
     return new Date(a.criado||0)-new Date(b.criado||0);
+  });
+  // Atualizar ícones
+  ['nome','rec','resp','col','sit','criado','inicio','prazo','termino','eq','cl','prog'].forEach(col=>{
+    const el=document.getElementById('lSI_'+col);
+    if(el) el.textContent=_lsc===col?(_lsd===1?'↑':'↓'):'⇅';
   });
 
   document.getElementById('listTbl').innerHTML=data.map(p=>{
