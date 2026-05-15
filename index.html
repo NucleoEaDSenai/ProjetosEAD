@@ -2311,7 +2311,9 @@ function rAtrasos(){
       const tipoAtraso = prazoProjVencido ? 'prazo_real' : 'etapa';
 
       if(aplicarFiltros){
-        if(filtResp && e.r !== filtResp) return;
+        // 'eq' = qualquer responsável que não seja 'cl' (equipe interna ou nome de pessoa)
+      if(filtResp === 'eq' && e.r === 'cl') return;
+      if(filtResp === 'cl' && e.r !== 'cl') return;
         if(filtTipo && tipoAtraso !== filtTipo) return;
       }
 
@@ -2339,7 +2341,7 @@ function rAtrasos(){
     const rowsSemFiltro = _processarEtapasAtraso(p, false);
     rowsSemFiltro.forEach(r => {
       totalAberto++;
-      if(r.r !== 'cl') totalEq++; else totalCl++;
+      if(r.r === 'cl') totalCl++; else totalEq++; // qualquer r≠cl = equipe
       if(r.tipoAtraso === 'prazo_real') _totalPrazoComp++;
       else _totalPrazoOk++;
     });
