@@ -488,7 +488,7 @@ body.dark .sri-hl{background:rgba(255,202,40,.25)}
 
 /* ═══ CARGA DA EQUIPE ═══ */
 /* ═══ CARGA DA EQUIPE — REPAGINADA ═══ */
-.carga-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(380px,1fr));gap:14px}
+.carga-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(380px,1fr));gap:14px;align-items:start}
 .carga-card{background:var(--surface);border:1px solid var(--bdr);border-radius:14px;overflow:hidden;transition:all .2s;position:relative}
 .carga-card:hover{box-shadow:0 4px 20px rgba(0,0,0,.08);transform:translateY(-1px)}
 .carga-card.over-load{border-color:#FCA5A5;background:linear-gradient(180deg,#FEF2F2 0%,var(--surface) 50px)}
@@ -1124,7 +1124,7 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
     <!-- CARGA DA EQUIPE -->
     <div class="view" id="view-carga">
       <div class="st" style="margin-bottom:6px">👥 Dashboard de Carga da Equipe</div>
-      <div style="font-size:12.5px;color:var(--mu);margin-bottom:16px">Distribuição de projetos ativos por membro da equipe. Clique em um membro para ver seus projetos.</div>
+      <div style="font-size:12.5px;color:var(--mu);margin-bottom:16px">Projetos cuja <strong>etapa atual</strong> está com cada pessoa da equipe. Projetos aguardando cliente ou em etapas de outra pessoa não aparecem aqui.</div>
       <!-- Stats -->
       <div id="cargaStats" style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:18px"></div>
       <!-- Filtros -->
@@ -1140,8 +1140,7 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
             <div class="ms-wrap" id="msWrap_cargaStat">
               <button class="ms-btn" id="msBtn_cargaStat" onclick="_msToggle('cargaStat')">Todos</button>
               <div class="ms-dropdown" id="msDd_cargaStat">
-                <label class="ms-opt"><input type="checkbox" value="atraso_equipe" onchange="_msChange('cargaStat')"> ⚠️ Atrasados (equipe)</label>
-                <label class="ms-opt"><input type="checkbox" value="atraso_cliente" onchange="_msChange('cargaStat')"> ⏳ Atrasados (cliente)</label>
+                <label class="ms-opt"><input type="checkbox" value="atraso_equipe" onchange="_msChange('cargaStat')"> ⚠️ Atrasados</label>
                 <label class="ms-opt"><input type="checkbox" value="andamento" onchange="_msChange('cargaStat')"> 🔄 Em Andamento</label>
                 <label class="ms-opt"><input type="checkbox" value="aguardando" onchange="_msChange('cargaStat')"> ⏳ Aguardando</label>
                 <div class="ms-sep"></div>
@@ -6945,6 +6944,21 @@ function _cargaStatusProj(p){
   return 'andamento';
 }
 
+// Retorna true se a etapa atual do projeto está com a pessoa especificada.
+// Critério: a etapa atual (primeira não concluída) deve estar atribuída
+// explicitamente ao nome da pessoa, OU atribuída genericamente à equipe ('eq')
+// — caso em que qualquer responsável do projeto pode estar trabalhando nela.
+// Exclui: etapa com cliente ('cl') ou com outra pessoa específica.
+function _etapaAtualEhDaPessoa(p, nome){
+  const et = etapaAtual(p);
+  if(!et) return false;            // sem etapa em aberto
+  if(et.r === 'cl') return false;  // etapa com cliente
+  if(et.r === 'eq' || !et.r){      // etapa genérica para a equipe
+    return (p.resps||[]).includes(nome);
+  }
+  return et.r === nome;            // etapa específica para uma pessoa
+}
+
 function _cargaStatusBadge(status){
   const map = {
     atraso_equipe:   {lbl:'⚠️ Atrasado',          bg:'#FEE2E2', cor:'#991B1B'},
@@ -6983,10 +6997,13 @@ function rCarga(){
   const el = document.getElementById('cargaGrid'); if(!el) return;
   const ativos = activeDB().filter(p => calcSit(p) !== 'concluido');
 
-  // ── Agrupar por membro (todos ativos, sem filtro ainda) ──
+  // ── Agrupar por membro: incluir somente projetos cuja etapa atual está
+  //    com a pessoa (etapa atribuída ao nome dela ou genérica para a equipe).
+  //    Projetos com etapa atual com cliente/outra pessoa não entram. ──
   const membrosTotal = {};
   ativos.forEach(p => {
     (p.resps||[]).forEach(r => {
+      if(!_etapaAtualEhDaPessoa(p, r)) return;
       if(!membrosTotal[r]) membrosTotal[r] = [];
       membrosTotal[r].push(p);
     });
@@ -6996,15 +7013,16 @@ function rCarga(){
   _populateCargaFiltros(membrosTotal, ativos);
 
   // ── Stats globais ──
-  const totalProjetos = ativos.length;
+  // Total de projetos atribuídos ativamente à equipe (etapa atual com alguém)
+  const totalProjetos = new Set(Object.values(membrosTotal).flat().map(p=>p.id)).size;
   const totalAtrasoEq = ativos.filter(atrasadoPorEquipe).length;
   const totalAtrasoCl = ativos.filter(p => !atrasadoPorEquipe(p) && atrasadoPorCliente(p)).length;
   const totalMembros  = Object.keys(membrosTotal).length;
   const statsEl = document.getElementById('cargaStats');
   if(statsEl){
     statsEl.innerHTML = `
-      <div class="sc cb"><div class="sc-l">Membros Ativos</div><div class="sc-v">${totalMembros}</div><div class="sc-s">com projetos em curso</div><div class="sc-i">👥</div></div>
-      <div class="sc cp"><div class="sc-l">Projetos Ativos</div><div class="sc-v">${totalProjetos}</div><div class="sc-s">não concluídos</div><div class="sc-i">📁</div></div>
+      <div class="sc cb"><div class="sc-l">Membros Ativos</div><div class="sc-v">${totalMembros}</div><div class="sc-s">com etapa em curso</div><div class="sc-i">👥</div></div>
+      <div class="sc cp"><div class="sc-l">Projetos Ativos</div><div class="sc-v">${totalProjetos}</div><div class="sc-s">etapa atual com a equipe</div><div class="sc-i">📁</div></div>
       <div class="sc cr"><div class="sc-l">Atrasos Equipe</div><div class="sc-v">${totalAtrasoEq}</div><div class="sc-s">projetos atrasados</div><div class="sc-i">⚠️</div></div>
       <div class="sc cy"><div class="sc-l">Atrasos Cliente</div><div class="sc-v">${totalAtrasoCl}</div><div class="sc-s">aguardando cliente</div><div class="sc-i">⏳</div></div>
     `;
@@ -7056,9 +7074,11 @@ function rCarga(){
   });
 
   el.innerHTML = ordenados.map(([nome, projs]) => {
+    // Projetos atrasados onde a etapa atual está com a pessoa (não com cliente)
+    // — pelo critério de inclusão na carga, todos os projs aqui têm etapa atual
+    // com a equipe, então "atraso por equipe" = atrasados.
     const atrasados = projs.filter(atrasadoPorEquipe).length;
-    const clRet = projs.filter(p => !atrasadoPorEquipe(p) && atrasadoPorCliente(p)).length;
-    const andamento = projs.filter(p => !atrasadoPorEquipe(p) && !atrasadoPorCliente(p) && calcSit(p) === 'andamento').length;
+    const andamento = projs.filter(p => !atrasadoPorEquipe(p) && calcSit(p) === 'andamento').length;
     const aguard = projs.filter(p => calcSit(p) === 'aguardando').length;
 
     const pct = Math.round(projs.length / max * 100);
@@ -7073,8 +7093,8 @@ function rCarga(){
     const _ordPrio={urgente:0,alta:1,media:2,baixa:3};
     const projsOrdenados = [...projs].sort((a,b) => {
       const sA = _cargaStatusProj(a), sB = _cargaStatusProj(b);
-      const ordSt = {atraso_equipe:0, atraso_cliente:1, andamento:2, aguardando:3};
-      if(ordSt[sA] !== ordSt[sB]) return ordSt[sA] - ordSt[sB];
+      const ordSt = {atraso_equipe:0, andamento:1, aguardando:2};
+      if(ordSt[sA] !== ordSt[sB]) return (ordSt[sA]??9) - (ordSt[sB]??9);
       const pA = _ordPrio[a.prioridade]??4, pB = _ordPrio[b.prioridade]??4;
       if(pA !== pB) return pA - pB;
       return (a.prazo||'9999').localeCompare(b.prazo||'9999');
@@ -7098,8 +7118,7 @@ function rCarga(){
       </div>
       <div class="carga-bar-bg"><div class="carga-bar-fill" style="width:${pct}%;background:${corStatus}"></div></div>
       <div class="carga-stats-row">
-        ${atrasados > 0 ? `<span class="carga-stat-pill red">⚠️ ${atrasados} atraso${atrasados>1?'s':''} equipe</span>` : ''}
-        ${clRet > 0 ? `<span class="carga-stat-pill org">⏳ ${clRet} c/ cliente</span>` : ''}
+        ${atrasados > 0 ? `<span class="carga-stat-pill red">⚠️ ${atrasados} atraso${atrasados>1?'s':''}</span>` : ''}
         ${andamento > 0 ? `<span class="carga-stat-pill blue">🔄 ${andamento} andamento</span>` : ''}
         ${aguard > 0 ? `<span class="carga-stat-pill gray">⏸️ ${aguard} aguardando</span>` : ''}
       </div>
