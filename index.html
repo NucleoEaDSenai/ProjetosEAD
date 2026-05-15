@@ -1671,7 +1671,7 @@ function populateFiltSelects(){
     const _selResps = _msGetVals('lResp');
     _ddResp.innerHTML = resps.map(r=>
       `<label class="ms-opt"><input type="checkbox" value="${r}" onchange="_msChange('lResp')"${_selResps.includes(r)?' checked':''}> ${r}</label>`
-    ).join('') + '<div class="ms-sep"></div><div class="ms-clear" onclick="_msClear('lResp')">✕ Limpar</div>';
+    ).join('') + '<div class="ms-sep"></div><div class="ms-clear" data-ms-clear="lResp">✕ Limpar</div>';
     _msUpdateBtn('lResp');
   }
 
@@ -1681,7 +1681,7 @@ function populateFiltSelects(){
     const _selRecs = _msGetVals('lRec');
     _ddRec.innerHTML = RECURSOS.map(r=>
       `<label class="ms-opt"><input type="checkbox" value="${r}" onchange="_msChange('lRec')"${_selRecs.includes(r)?' checked':''}> ${r}</label>`
-    ).join('') + '<div class="ms-sep"></div><div class="ms-clear" onclick="_msClear('lRec')">✕ Limpar</div>';
+    ).join('') + '<div class="ms-sep"></div><div class="ms-clear" data-ms-clear="lRec">✕ Limpar</div>';
     _msUpdateBtn('lRec');
   }
   ['kFiltCol','lFiltCol'].forEach(id=>{
@@ -1725,8 +1725,10 @@ function _msUpdateBtn(id){
   if(vals.length===0){ btn.textContent=labels[id]||'Todos'; btn.classList.remove('ms-active'); }
   else { btn.textContent=vals.length+' selecionado(s)'; btn.classList.add('ms-active'); }
 }
-// Fechar dropdowns ao clicar fora
+// Fechar dropdowns ao clicar fora + delegação para botões de limpar
 document.addEventListener('click', e=>{
+  const clearTarget = e.target.closest('[data-ms-clear]');
+  if(clearTarget){ _msClear(clearTarget.dataset.msClear); return; }
   if(!e.target.closest('.ms-wrap')) document.querySelectorAll('.ms-dropdown.open').forEach(d=>d.classList.remove('open'));
 });
 
