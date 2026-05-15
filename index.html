@@ -895,6 +895,11 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
               <option value="cl">🏢 Cliente</option>
             </select>
           </div>
+          <div class="fg-sm"><label class="fl-sm">Responsável da Etapa</label>
+            <select class="fi-sm" id="aFiltRespEtapa" onchange="rAtrasos()">
+              <option value="">Todos</option>
+            </select>
+          </div>
           <div class="fg-sm"><label class="fl-sm">Prazo Final</label>
             <select class="fi-sm" id="aFiltTipo" onchange="rAtrasos()">
               <option value="">Todos</option>
@@ -2272,8 +2277,9 @@ function rAtrasos(){
   // Apenas projetos ativos e concluídos — cancelados ficam só na aba Cancelados
   const todos = activeDB();
 
-  const filtResp   = document.getElementById('aFiltResp')?.value   || '';
-  const filtTipo   = document.getElementById('aFiltTipo')?.value   || '';
+  const filtResp      = document.getElementById('aFiltResp')?.value     || '';
+  const filtRespEtapa = document.getElementById('aFiltRespEtapa')?.value || '';
+  const filtTipo      = document.getElementById('aFiltTipo')?.value      || '';
 
   // ── Montar lista de linhas de atraso ──────────────────────────────────────
   // Apenas etapas em aberto com prazo vencido (anterior ao dia de hoje).
@@ -2311,9 +2317,15 @@ function rAtrasos(){
       const tipoAtraso = prazoProjVencido ? 'prazo_real' : 'etapa';
 
       if(aplicarFiltros){
-        // 'eq' = qualquer responsável que não seja 'cl' (equipe interna ou nome de pessoa)
-      if(filtResp === 'eq' && e.r === 'cl') return;
-      if(filtResp === 'cl' && e.r !== 'cl') return;
+        // Filtro geral: equipe vs cliente
+        if(filtResp === 'eq' && e.r === 'cl') return;
+        if(filtResp === 'cl' && e.r !== 'cl') return;
+        // Filtro específico de responsável da etapa
+        if(filtRespEtapa){
+          const respNome = e.r === 'cl' ? 'Cliente' : e.r === 'eq' ? 'Equipe' : e.r;
+          if(filtRespEtapa === 'cl' && e.r !== 'cl') return;
+          if(filtRespEtapa !== 'cl' && respNome !== filtRespEtapa) return;
+        }
         if(filtTipo && tipoAtraso !== filtTipo) return;
       }
 
@@ -2355,6 +2367,30 @@ function rAtrasos(){
 
   // Ordenar: mais atraso primeiro
   rows.sort((a,b) => b.diasAtraso - a.diasAtraso);
+
+  // ── Popular select de responsável da etapa com valores reais ──
+  const _selRE = document.getElementById('aFiltRespEtapa');
+  if(_selRE){
+    const _curRE = _selRE.value;
+    // Coletar todos os responsáveis únicos das etapas atrasadas (sem filtro)
+    const _respSet = new Set();
+    todos.forEach(p => {
+      _processarEtapasAtraso(p, false).forEach(r => {
+        _respSet.add(r.r === 'cl' ? 'cl' : r.r === 'eq' ? 'Equipe' : r.r);
+      });
+    });
+    const _respList = [..._respSet].sort((a,b)=>{
+      if(a==='cl') return 1; if(b==='cl') return -1;
+      if(a==='Equipe') return -1; if(b==='Equipe') return 1;
+      return a.localeCompare(b,'pt-BR');
+    });
+    _selRE.innerHTML = '<option value="">Todos</option>'
+      + _respList.map(r => {
+          const val = r === 'cl' ? 'cl' : r;
+          const lbl = r === 'cl' ? '🏢 Cliente' : r === 'Equipe' ? '👥 Equipe' : '👤 '+r;
+          return `<option value="${val}"${_curRE===val?' selected':''}>${lbl}</option>`;
+        }).join('');
+  }
 
   // ── Cards resumo — valores sempre fixos, sem influência dos filtros ──
   document.getElementById('atrasosResumo').innerHTML = `
@@ -2442,7 +2478,7 @@ function toggleAtrasoProj(hd){
 }
 
 function limparAFilts(){
-  ['aFiltResp','aFiltTipo'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
+  ['aFiltResp','aFiltRespEtapa','aFiltTipo'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
   rAtrasos();
 }
 
