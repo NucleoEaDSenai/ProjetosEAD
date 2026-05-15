@@ -1101,7 +1101,7 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
               <div class="ms-dropdown" id="msDd_medRec"></div>
             </div>
           </div>
-          <div class="fg-sm"><label class="fl-sm">Status</label>
+          <div class="fg-sm"><label class="fl-sm">Situação</label>
             <div class="ms-wrap" id="msWrap_medStat">
               <button class="ms-btn" id="msBtn_medStat" onclick="_msToggle('medStat')">Todos</button>
               <div class="ms-dropdown" id="msDd_medStat">
@@ -1134,7 +1134,7 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
               <div class="ms-dropdown" id="msDd_cargaResp"></div>
             </div>
           </div>
-          <div class="fg-sm"><label class="fl-sm">Status do Projeto</label>
+          <div class="fg-sm"><label class="fl-sm">Situação do Projeto</label>
             <div class="ms-wrap" id="msWrap_cargaStat">
               <button class="ms-btn" id="msBtn_cargaStat" onclick="_msToggle('cargaStat')">Todos</button>
               <div class="ms-dropdown" id="msDd_cargaStat">
@@ -4712,7 +4712,7 @@ function exportXLSX(){
   XLSX.utils.book_append_sheet(wb, wsE, 'Etapas');
 
   // ── Aba 3: Atrasos ──
-  const hdrA = ['Projeto','Situação Projeto','Etapa','Responsável','Prazo Etapa','Dias de Atraso','Status Etapa','Motivo'];
+  const hdrA = ['Projeto','Situação Projeto','Etapa','Responsável','Prazo Etapa','Dias de Atraso','Situação Etapa','Motivo'];
   const rowsA = [];
   todos.forEach(p=>{
     const proximaIdxX = (p.etapas||[]).findIndex(e => !e.done && !ETAPAS_SEM_PRAZO_AUTO.has(e.lb));
