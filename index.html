@@ -487,26 +487,78 @@ body.dark .sri-hl{background:rgba(255,202,40,.25)}
 .hist-detail{font-size:11.5px;color:var(--mu);margin-top:2px}
 
 /* ═══ CARGA DA EQUIPE ═══ */
-.carga-grid{display:flex;flex-direction:column;gap:10px}
-.carga-card{background:var(--surface);border:1px solid var(--bdr);border-radius:12px;overflow:hidden;transition:box-shadow .15s}
-.carga-card:hover{box-shadow:0 2px 12px rgba(0,0,0,.08)}
-.carga-hd{display:flex;align-items:center;gap:12px;padding:14px 16px;cursor:pointer;user-select:none}
+/* ═══ CARGA DA EQUIPE — REPAGINADA ═══ */
+.carga-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(380px,1fr));gap:14px}
+.carga-card{background:var(--surface);border:1px solid var(--bdr);border-radius:14px;overflow:hidden;transition:all .2s;position:relative}
+.carga-card:hover{box-shadow:0 4px 20px rgba(0,0,0,.08);transform:translateY(-1px)}
+.carga-card.over-load{border-color:#FCA5A5;background:linear-gradient(180deg,#FEF2F2 0%,var(--surface) 50px)}
+.carga-card.over-load:not(.dark){border-color:#FCA5A5}
+body.dark .carga-card.over-load{background:linear-gradient(180deg,rgba(220,38,38,.15) 0%,var(--surface) 50px);border-color:#7F1D1D}
+
+.carga-hd{display:flex;align-items:center;gap:14px;padding:16px 18px;cursor:pointer;user-select:none;position:relative}
 .carga-hd:hover{background:var(--s2)}
-.carga-av{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;color:#fff;flex-shrink:0}
+.carga-av{width:46px;height:46px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;color:#fff;flex-shrink:0;box-shadow:0 2px 6px rgba(0,0,0,.12);position:relative}
+.carga-av-badge{position:absolute;top:-3px;right:-3px;background:var(--red);color:#fff;border-radius:50%;width:18px;height:18px;font-size:10px;font-weight:800;display:flex;align-items:center;justify-content:center;border:2px solid var(--surface)}
 .carga-info{flex:1;min-width:0}
-.carga-name{font-weight:700;font-size:13.5px}
-.carga-meta{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:3px}
-.carga-count{font-size:22px;font-weight:800;font-family:'Plus Jakarta Sans',sans-serif;line-height:1;flex-shrink:0}
-.carga-bar-bg{height:4px;background:var(--bdr);border-radius:2px;overflow:hidden;width:80px;flex-shrink:0}
-.carga-bar-fill{height:100%;border-radius:2px;transition:width .4s}
-.carga-arrow{font-size:11px;color:var(--mu);transition:transform .2s;flex-shrink:0}
+.carga-name{font-weight:700;font-size:14px;color:var(--txt);line-height:1.2}
+.carga-load-label{font-size:10.5px;color:var(--mu);margin-top:2px;text-transform:uppercase;letter-spacing:.5px;font-weight:600}
+.carga-count-wrap{display:flex;flex-direction:column;align-items:flex-end;flex-shrink:0;gap:2px}
+.carga-count{font-size:26px;font-weight:800;font-family:'Plus Jakarta Sans',sans-serif;line-height:1}
+.carga-count-lbl{font-size:10px;color:var(--mu);text-transform:uppercase;letter-spacing:.5px;font-weight:600}
+.carga-arrow{font-size:11px;color:var(--mu);transition:transform .25s;flex-shrink:0;margin-left:6px}
 .carga-arrow.open{transform:rotate(180deg)}
-.carga-body{display:none;padding:0 16px 14px;border-top:1px solid var(--bdr)}
+.carga-bar-bg{height:6px;background:var(--bdr);border-radius:3px;overflow:hidden;margin:0 18px 8px;flex-shrink:0}
+.carga-bar-fill{height:100%;border-radius:3px;transition:width .5s ease}
+.carga-stats-row{display:flex;gap:6px;padding:0 18px 14px;flex-wrap:wrap}
+.carga-stat-pill{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:12px;font-size:11px;font-weight:600;background:var(--s2);color:var(--txt)}
+.carga-stat-pill.red{background:#FEE2E2;color:#991B1B}
+.carga-stat-pill.org{background:#FFF7ED;color:#9A3412}
+.carga-stat-pill.blue{background:#EFF6FF;color:#1E40AF}
+.carga-stat-pill.gray{background:var(--s2);color:var(--mu)}
+body.dark .carga-stat-pill.red{background:rgba(220,38,38,.18);color:#FCA5A5}
+body.dark .carga-stat-pill.org{background:rgba(234,88,12,.18);color:#FDBA74}
+body.dark .carga-stat-pill.blue{background:rgba(30,64,175,.22);color:#93C5FD}
+
+.carga-body{display:none;border-top:1px solid var(--bdr);background:var(--s2)}
 .carga-body.open{display:block}
-.carga-proj{font-size:11.5px;color:var(--blue);cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding:3px 0;border-bottom:1px solid var(--bdr)}
-.carga-proj:last-child{border-bottom:none}
-.carga-proj:hover{text-decoration:underline}
+
+/* Sub-gavetas de projetos */
+.carga-proj-list{padding:10px 12px;display:flex;flex-direction:column;gap:8px;max-height:540px;overflow-y:auto}
+.carga-proj-card{background:var(--surface);border:1px solid var(--bdr);border-radius:10px;overflow:hidden;transition:all .15s}
+.carga-proj-card:hover{border-color:var(--blue);box-shadow:0 2px 8px rgba(0,0,0,.06)}
+.carga-proj-card.atrasado{border-left:3px solid var(--red)}
+.carga-proj-card.aguardando{border-left:3px solid var(--yel)}
+.carga-proj-card.andamento{border-left:3px solid var(--blue)}
+.carga-proj-card.atraso-cliente{border-left:3px solid var(--org)}
+.carga-proj-hd{display:flex;align-items:flex-start;gap:8px;padding:10px 12px;cursor:pointer;user-select:none}
+.carga-proj-hd:hover{background:var(--s2)}
+.carga-proj-titulo{flex:1;min-width:0}
+.carga-proj-nome{font-size:12.5px;font-weight:600;color:var(--txt);line-height:1.3;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.carga-proj-nome .open-icon{font-size:10px;color:var(--mu);opacity:.5;transition:transform .2s}
+.carga-proj-card.proj-open .open-icon{transform:rotate(90deg);opacity:1;color:var(--blue)}
+.carga-proj-meta{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-top:4px;font-size:10.5px;color:var(--mu)}
+.carga-proj-status-badge{display:inline-flex;align-items:center;gap:3px;padding:2px 7px;border-radius:10px;font-size:10px;font-weight:700;white-space:nowrap}
+.carga-proj-detail{display:none;padding:0 12px 12px;border-top:1px dashed var(--bdr);background:var(--s2)}
+.carga-proj-card.proj-open .carga-proj-detail{display:block}
+.carga-proj-detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px 14px;padding:10px 0;font-size:11.5px}
+.carga-proj-detail-item{display:flex;flex-direction:column;gap:1px}
+.carga-proj-detail-item .lbl{font-size:9.5px;color:var(--mu);text-transform:uppercase;letter-spacing:.5px;font-weight:700}
+.carga-proj-detail-item .val{font-size:11.5px;color:var(--txt);font-weight:600;word-break:break-word}
+.carga-proj-detail-item .val.red{color:var(--red)}
+.carga-proj-detail-item .val.org{color:var(--org)}
+.carga-proj-detail-item .val.green{color:var(--green)}
+.carga-proj-detail-actions{display:flex;gap:6px;padding-top:6px;border-top:1px solid var(--bdr);justify-content:flex-end}
+.carga-proj-action-btn{padding:5px 10px;border:1px solid var(--bdr);border-radius:6px;background:var(--surface);color:var(--txt);font-size:11px;font-weight:600;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;transition:all .15s;display:inline-flex;align-items:center;gap:4px}
+.carga-proj-action-btn:hover{border-color:var(--blue);color:var(--blue);background:#EFF6FF}
+body.dark .carga-proj-action-btn:hover{background:rgba(59,130,246,.15)}
+.carga-progress{height:4px;background:var(--bdr);border-radius:2px;overflow:hidden;margin-top:5px}
+.carga-progress-fill{height:100%;background:var(--blue);border-radius:2px;transition:width .4s}
+
+.carga-empty{text-align:center;padding:32px 16px;color:var(--mu);font-size:12.5px;font-style:italic}
+
 body.dark .carga-card{background:var(--surface);border-color:var(--bdr)}
+body.dark .carga-proj-card{background:var(--surface)}
+body.dark .carga-body{background:var(--s2)}
 
 /* ═══ DARK TOGGLE ═══ */
 .dark-btn{background:transparent;border:1px solid rgba(255,255,255,.18);color:rgba(255,255,255,.65);border-radius:20px;padding:4px 12px;cursor:pointer;font-size:12px;transition:all .2s;white-space:nowrap}
@@ -695,7 +747,7 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
     <div class="tp-title" id="pageTitle">Quadro Kanban</div>
     <div class="tp-r">
       <span class="tp-date" id="topDate"></span>
-      <span style="font-size:11px;color:var(--mu);margin-left:12px;opacity:.8">&middot; Sistema atualizado em 14/05/2026 às 14:12</span>
+      <span style="font-size:11px;color:var(--mu);margin-left:12px;opacity:.8">&middot; Sistema atualizado em 15/05/2026 às 09:32</span>
       <div class="search-box">
         <span class="search-icon">🔍</span>
         <input id="searchInp" placeholder="Buscar projeto..." oninput="buscarGlobal(this.value)" onblur="setTimeout(()=>fecharBusca(),180)">
@@ -745,28 +797,35 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
       <div class="fbox">
         <div class="fbox-row">
           <div class="fg-sm"><label class="fl-sm">Responsável</label>
-            <select class="fi-sm" id="kFiltResp" onchange="applyKFilts()">
-              <option value="">Todos</option>
-            </select>
+            <div class="ms-wrap" id="msWrap_kResp">
+              <button class="ms-btn" id="msBtn_kResp" onclick="_msToggle('kResp')">Todos</button>
+              <div class="ms-dropdown" id="msDd_kResp"></div>
+            </div>
           </div>
           <div class="fg-sm"><label class="fl-sm">Situação</label>
-            <select class="fi-sm" id="kFiltSit" onchange="applyKFilts()">
-              <option value="">Todas</option>
-              <option value="aguardando">⏳ Aguardando</option>
-              <option value="andamento">🔄 Em Andamento</option>
-              <option value="atrasado">⚠️ Atrasado</option>
-              <option value="concluido">✅ Concluído</option>
-            </select>
+            <div class="ms-wrap" id="msWrap_kSit">
+              <button class="ms-btn" id="msBtn_kSit" onclick="_msToggle('kSit')">Todas</button>
+              <div class="ms-dropdown" id="msDd_kSit">
+                <label class="ms-opt"><input type="checkbox" value="aguardando" onchange="_msChange('kSit')"> ⏳ Aguardando</label>
+                <label class="ms-opt"><input type="checkbox" value="andamento" onchange="_msChange('kSit')"> 🔄 Em Andamento</label>
+                <label class="ms-opt"><input type="checkbox" value="atrasado" onchange="_msChange('kSit')"> ⚠️ Atrasado</label>
+                <label class="ms-opt"><input type="checkbox" value="concluido" onchange="_msChange('kSit')"> ✅ Concluído</label>
+                <div class="ms-sep"></div>
+                <div class="ms-clear" data-ms-clear="kSit">✕ Limpar</div>
+              </div>
+            </div>
           </div>
           <div class="fg-sm"><label class="fl-sm">Academia</label>
-            <select class="fi-sm" id="kFiltAcad" onchange="applyKFilts()">
-              <option value="">Todas</option>
-            </select>
+            <div class="ms-wrap" id="msWrap_kAcad">
+              <button class="ms-btn" id="msBtn_kAcad" onclick="_msToggle('kAcad')">Todas</button>
+              <div class="ms-dropdown" id="msDd_kAcad"></div>
+            </div>
           </div>
           <div class="fg-sm"><label class="fl-sm">Coluna</label>
-            <select class="fi-sm" id="kFiltCol" onchange="applyKFilts()">
-              <option value="">Todas</option>
-            </select>
+            <div class="ms-wrap" id="msWrap_kCol">
+              <button class="ms-btn" id="msBtn_kCol" onclick="_msToggle('kCol')">Todas</button>
+              <div class="ms-dropdown" id="msDd_kCol"></div>
+            </div>
           </div>
           <div class="fg-sm"><label class="fl-sm">Criado após</label>
             <input class="fi-sm" type="date" id="kFiltDe" onchange="applyKFilts()">
@@ -789,7 +848,7 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
     <div class="view" id="view-projetos">
       <div class="sh"><div class="st">Lista de Projetos</div></div>
       <div class="fbox">
-        <div class="fbox-row" style="flex-wrap:wrap;gap:8px;align-items:flex-end">
+        <div class="fbox-row" style="flex-wrap:wrap;gap:10px;align-items:flex-end">
           <div class="fg-sm"><label class="fl-sm">Responsável</label>
             <div class="ms-wrap" id="msWrap_lResp">
               <button class="ms-btn" id="msBtn_lResp" onclick="_msToggle('lResp')">Todos</button>
@@ -829,14 +888,16 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
             </div>
           </div>
           <div class="fg-sm"><label class="fl-sm">Academia</label>
-            <select class="fi-sm" id="lFiltAcad" onchange="applyLFilts()">
-              <option value="">Todas</option>
-            </select>
+            <div class="ms-wrap" id="msWrap_lAcad">
+              <button class="ms-btn" id="msBtn_lAcad" onclick="_msToggle('lAcad')">Todas</button>
+              <div class="ms-dropdown" id="msDd_lAcad"></div>
+            </div>
           </div>
           <div class="fg-sm"><label class="fl-sm">Coluna</label>
-            <select class="fi-sm" id="lFiltCol" onchange="applyLFilts()">
-              <option value="">Todas</option>
-            </select>
+            <div class="ms-wrap" id="msWrap_lCol">
+              <button class="ms-btn" id="msBtn_lCol" onclick="_msToggle('lCol')">Todas</button>
+              <div class="ms-dropdown" id="msDd_lCol"></div>
+            </div>
           </div>
           <div class="fg-sm"><label class="fl-sm">Criado após</label>
             <input class="fi-sm" type="date" id="lFiltDe" onchange="applyLFilts()">
@@ -939,23 +1000,32 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
       <div class="fbox" style="margin-bottom:18px">
         <div class="fbox-row">
           <div class="fg-sm"><label class="fl-sm">Projetos em Atraso</label>
-            <select class="fi-sm" id="aFiltResp" onchange="rAtrasos()">
-              <option value="">Todos</option>
-              <option value="eq">👥 Equipe</option>
-              <option value="cl">🏢 Cliente</option>
-            </select>
+            <div class="ms-wrap" id="msWrap_aTipo">
+              <button class="ms-btn" id="msBtn_aTipo" onclick="_msToggle('aTipo')">Todos</button>
+              <div class="ms-dropdown" id="msDd_aTipo">
+                <label class="ms-opt"><input type="checkbox" value="eq" onchange="_msChange('aTipo')"> 👥 Equipe</label>
+                <label class="ms-opt"><input type="checkbox" value="cl" onchange="_msChange('aTipo')"> 🏢 Cliente</label>
+                <div class="ms-sep"></div>
+                <div class="ms-clear" data-ms-clear="aTipo">✕ Limpar</div>
+              </div>
+            </div>
           </div>
           <div class="fg-sm"><label class="fl-sm">Responsável da Etapa</label>
-            <select class="fi-sm" id="aFiltRespEtapa" onchange="rAtrasos()">
-              <option value="">Todos</option>
-            </select>
+            <div class="ms-wrap" id="msWrap_aRespEt">
+              <button class="ms-btn" id="msBtn_aRespEt" onclick="_msToggle('aRespEt')">Todos</button>
+              <div class="ms-dropdown" id="msDd_aRespEt"></div>
+            </div>
           </div>
           <div class="fg-sm"><label class="fl-sm">Prazo Final</label>
-            <select class="fi-sm" id="aFiltTipo" onchange="rAtrasos()">
-              <option value="">Todos</option>
-              <option value="prazo_real">🔴 Comprometido</option>
-              <option value="etapa">🟡 Não comprometido</option>
-            </select>
+            <div class="ms-wrap" id="msWrap_aRespGeral">
+              <button class="ms-btn" id="msBtn_aRespGeral" onclick="_msToggle('aRespGeral')">Todos</button>
+              <div class="ms-dropdown" id="msDd_aRespGeral">
+                <label class="ms-opt"><input type="checkbox" value="prazo_real" onchange="_msChange('aRespGeral')"> 🔴 Comprometido</label>
+                <label class="ms-opt"><input type="checkbox" value="etapa" onchange="_msChange('aRespGeral')"> 🟡 Não comprometido</label>
+                <div class="ms-sep"></div>
+                <div class="ms-clear" data-ms-clear="aRespGeral">✕ Limpar</div>
+              </div>
+            </div>
           </div>
           <button class="btn-lim" onclick="limparAFilts()">✕ Limpar</button>
         </div>
@@ -970,22 +1040,28 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
       <div style="font-size:12.5px;color:var(--mu);margin-bottom:16px">Projetos na etapa Homologação/Instalação. Preencha os dados e acompanhe o status.</div>
       <div id="homologStats" style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:18px"></div>
       <!-- Filtros -->
-      <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:20px;padding:12px 16px;background:#fff;border:1px solid var(--bdr);border-radius:var(--r)">
-        <span style="font-size:11px;font-weight:700;color:var(--mu);text-transform:uppercase;letter-spacing:.6px">Filtrar por</span>
-        <select id="homFiltroSolicitante" onchange="rHomologacoes()"
-          style="padding:6px 10px;border:1px solid var(--bdr);border-radius:7px;font-size:12.5px;font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(--txt);outline:none;cursor:pointer">
-          <option value="">👤 Solicitante — Todos</option>
-        </select>
-        <select id="homFiltroEnviadaPor" onchange="rHomologacoes()"
-          style="padding:6px 10px;border:1px solid var(--bdr);border-radius:7px;font-size:12.5px;font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(--txt);outline:none;cursor:pointer">
-          <option value="">📤 Enviada Por — Todos</option>
-        </select>
-        <select id="homFiltroMedicao" onchange="rHomologacoes()"
-          style="padding:6px 10px;border:1px solid var(--bdr);border-radius:7px;font-size:12.5px;font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(--txt);outline:none;cursor:pointer">
-          <option value="">📅 Medição — Todos</option>
-        </select>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;margin-bottom:20px;padding:12px 16px;background:#fff;border:1px solid var(--bdr);border-radius:var(--r)">
+        <span style="font-size:11px;font-weight:700;color:var(--mu);text-transform:uppercase;letter-spacing:.6px;align-self:center">Filtrar por</span>
+        <div class="fg-sm"><label class="fl-sm">👤 Solicitante</label>
+          <div class="ms-wrap" id="msWrap_homSol">
+            <button class="ms-btn" id="msBtn_homSol" onclick="_msToggle('homSol')">Todos</button>
+            <div class="ms-dropdown" id="msDd_homSol"></div>
+          </div>
+        </div>
+        <div class="fg-sm"><label class="fl-sm">📤 Homologado Por</label>
+          <div class="ms-wrap" id="msWrap_homEnv">
+            <button class="ms-btn" id="msBtn_homEnv" onclick="_msToggle('homEnv')">Todos</button>
+            <div class="ms-dropdown" id="msDd_homEnv"></div>
+          </div>
+        </div>
+        <div class="fg-sm"><label class="fl-sm">📅 Medição</label>
+          <div class="ms-wrap" id="msWrap_homMed">
+            <button class="ms-btn" id="msBtn_homMed" onclick="_msToggle('homMed')">Todos</button>
+            <div class="ms-dropdown" id="msDd_homMed"></div>
+          </div>
+        </div>
         <button onclick="limparFiltrosHomolog()" class="btn bg2 bsm" style="font-size:11.5px">✕ Limpar</button>
-        <span id="homFiltroContador" style="font-size:11px;color:var(--mu);margin-left:auto"></span>
+        <span id="homFiltroContador" style="font-size:11px;color:var(--mu);margin-left:auto;align-self:center"></span>
       </div>
       <div id="homologLista"></div>
     </div>
@@ -1004,13 +1080,96 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
       <div class="st" style="margin-bottom:6px">📐 Medição</div>
       <div style="font-size:12.5px;color:var(--mu);margin-bottom:20px">Projetos com todas as etapas concluídas e enviados para medição.</div>
       <div id="medicaoStats" style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:22px"></div>
+      <!-- Filtros -->
+      <div class="fbox" style="margin-bottom:18px">
+        <div class="fbox-row" style="flex-wrap:wrap;gap:10px;align-items:flex-end">
+          <div class="fg-sm"><label class="fl-sm">Confirmada Por</label>
+            <div class="ms-wrap" id="msWrap_medConf">
+              <button class="ms-btn" id="msBtn_medConf" onclick="_msToggle('medConf')">Todos</button>
+              <div class="ms-dropdown" id="msDd_medConf"></div>
+            </div>
+          </div>
+          <div class="fg-sm"><label class="fl-sm">Responsável</label>
+            <div class="ms-wrap" id="msWrap_medResp">
+              <button class="ms-btn" id="msBtn_medResp" onclick="_msToggle('medResp')">Todos</button>
+              <div class="ms-dropdown" id="msDd_medResp"></div>
+            </div>
+          </div>
+          <div class="fg-sm"><label class="fl-sm">Recurso</label>
+            <div class="ms-wrap" id="msWrap_medRec">
+              <button class="ms-btn" id="msBtn_medRec" onclick="_msToggle('medRec')">Todos</button>
+              <div class="ms-dropdown" id="msDd_medRec"></div>
+            </div>
+          </div>
+          <div class="fg-sm"><label class="fl-sm">Status</label>
+            <div class="ms-wrap" id="msWrap_medStat">
+              <button class="ms-btn" id="msBtn_medStat" onclick="_msToggle('medStat')">Todos</button>
+              <div class="ms-dropdown" id="msDd_medStat">
+                <label class="ms-opt"><input type="checkbox" value="pendente" onchange="_msChange('medStat')"> ⏳ Aguardando Medição</label>
+                <label class="ms-opt"><input type="checkbox" value="feita" onchange="_msChange('medStat')"> ✅ Medição Confirmada</label>
+                <div class="ms-sep"></div>
+                <div class="ms-clear" data-ms-clear="medStat">✕ Limpar</div>
+              </div>
+            </div>
+          </div>
+          <button class="btn-lim" onclick="limparMedFilts()">✕ Limpar</button>
+          <span id="medFiltroContador" style="font-size:11px;color:var(--mu);margin-left:auto;align-self:center"></span>
+        </div>
+      </div>
       <div id="medicaoGrupos"></div>
     </div>
 
     <!-- CARGA DA EQUIPE -->
     <div class="view" id="view-carga">
       <div class="st" style="margin-bottom:6px">👥 Dashboard de Carga da Equipe</div>
-      <div style="font-size:12.5px;color:var(--mu);margin-bottom:16px">Projetos ativos por membro. Clique em um projeto para abrir o card.</div>
+      <div style="font-size:12.5px;color:var(--mu);margin-bottom:16px">Distribuição de projetos ativos por membro da equipe. Clique em um membro para ver seus projetos.</div>
+      <!-- Stats -->
+      <div id="cargaStats" style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:18px"></div>
+      <!-- Filtros -->
+      <div class="fbox" style="margin-bottom:18px">
+        <div class="fbox-row" style="flex-wrap:wrap;gap:10px;align-items:flex-end">
+          <div class="fg-sm"><label class="fl-sm">Pessoa</label>
+            <div class="ms-wrap" id="msWrap_cargaResp">
+              <button class="ms-btn" id="msBtn_cargaResp" onclick="_msToggle('cargaResp')">Todos</button>
+              <div class="ms-dropdown" id="msDd_cargaResp"></div>
+            </div>
+          </div>
+          <div class="fg-sm"><label class="fl-sm">Status do Projeto</label>
+            <div class="ms-wrap" id="msWrap_cargaStat">
+              <button class="ms-btn" id="msBtn_cargaStat" onclick="_msToggle('cargaStat')">Todos</button>
+              <div class="ms-dropdown" id="msDd_cargaStat">
+                <label class="ms-opt"><input type="checkbox" value="atraso_equipe" onchange="_msChange('cargaStat')"> ⚠️ Atrasados (equipe)</label>
+                <label class="ms-opt"><input type="checkbox" value="atraso_cliente" onchange="_msChange('cargaStat')"> ⏳ Atrasados (cliente)</label>
+                <label class="ms-opt"><input type="checkbox" value="andamento" onchange="_msChange('cargaStat')"> 🔄 Em Andamento</label>
+                <label class="ms-opt"><input type="checkbox" value="aguardando" onchange="_msChange('cargaStat')"> ⏳ Aguardando</label>
+                <div class="ms-sep"></div>
+                <div class="ms-clear" data-ms-clear="cargaStat">✕ Limpar</div>
+              </div>
+            </div>
+          </div>
+          <div class="fg-sm"><label class="fl-sm">Recurso</label>
+            <div class="ms-wrap" id="msWrap_cargaRec">
+              <button class="ms-btn" id="msBtn_cargaRec" onclick="_msToggle('cargaRec')">Todos</button>
+              <div class="ms-dropdown" id="msDd_cargaRec"></div>
+            </div>
+          </div>
+          <div class="fg-sm"><label class="fl-sm">Prioridade</label>
+            <div class="ms-wrap" id="msWrap_cargaPrio">
+              <button class="ms-btn" id="msBtn_cargaPrio" onclick="_msToggle('cargaPrio')">Todas</button>
+              <div class="ms-dropdown" id="msDd_cargaPrio">
+                <label class="ms-opt"><input type="checkbox" value="urgente" onchange="_msChange('cargaPrio')"> 🔴 Urgente</label>
+                <label class="ms-opt"><input type="checkbox" value="alta" onchange="_msChange('cargaPrio')"> 🟠 Alta</label>
+                <label class="ms-opt"><input type="checkbox" value="media" onchange="_msChange('cargaPrio')"> 🟡 Média</label>
+                <label class="ms-opt"><input type="checkbox" value="baixa" onchange="_msChange('cargaPrio')"> 🟢 Baixa</label>
+                <div class="ms-sep"></div>
+                <div class="ms-clear" data-ms-clear="cargaPrio">✕ Limpar</div>
+              </div>
+            </div>
+          </div>
+          <button class="btn-lim" onclick="limparCargaFilts()">✕ Limpar</button>
+          <span id="cargaFiltroContador" style="font-size:11px;color:var(--mu);margin-left:auto;align-self:center"></span>
+        </div>
+      </div>
       <div id="cargaGrid" class="carga-grid"></div>
     </div>
 
@@ -1651,19 +1810,40 @@ function populateFiltSelects(){
   const _ACADS_FIXAS=["CCT-FSGC", "CEEI", "CL", "COA/T&D", "EXP", "FSGC", "GL", "GPTDI", "ITD", "Local", "NTTE", "PO\u00c7OS", "PPRG", "RES & EE", "SMS", "SUB-NAV"];
   const _acadsProj=[...new Set(activeDB().map(p=>p.academia).filter(Boolean))];
   const _acads=[...new Set([..._ACADS_FIXAS,..._acadsProj])].sort();
-  const _acadOpts = (cur) =>
-    '<option value="">Todas</option>'
-    +_acads.map(a=>`<option value="${a}"${cur===a?' selected':''}>${a}</option>`).join('')
-    +'<option value="__sem_academia__"'+(cur==='__sem_academia__'?' selected':'')+'>— Não definida —</option>';
 
-  const kAcadEl = document.getElementById('kFiltAcad');
-  if(kAcadEl){ kAcadEl.innerHTML = _acadOpts(kAcadEl.value); }
+  // ── Multi-select Academia (Kanban) ──
+  const _ddKAcad = document.getElementById('msDd_kAcad');
+  if(_ddKAcad){
+    const _selKAcads = _msGetVals('kAcad');
+    const _kAcadItems = _acads.map(a=>
+      `<label class="ms-opt"><input type="checkbox" value="${a}" onchange="_msChange('kAcad')"${_selKAcads.includes(a)?' checked':''}> ${a}</label>`
+    ).join('');
+    const _kSemAcad = `<label class="ms-opt"><input type="checkbox" value="__sem_academia__" onchange="_msChange('kAcad')"${_selKAcads.includes('__sem_academia__')?' checked':''}> — Não definida —</label>`;
+    _ddKAcad.innerHTML = _kAcadItems + _kSemAcad + '<div class="ms-sep"></div><div class="ms-clear" data-ms-clear="kAcad">✕ Limpar</div>';
+    _msUpdateBtn('kAcad');
+  }
 
-  const lAcadEl = document.getElementById('lFiltAcad');
-  if(lAcadEl){ lAcadEl.innerHTML = _acadOpts(lAcadEl.value); }
-  // Popular kFiltResp (Kanban — select simples)
-  const kRespEl = document.getElementById('kFiltResp');
-  if(kRespEl){ const cur=kRespEl.value; kRespEl.innerHTML='<option value="">Todos</option>'+resps.map(r=>`<option value="${r}"${cur===r?' selected':''}>${r}</option>`).join(''); }
+  // Multi-select Academia (Lista)
+  const _ddAcad = document.getElementById('msDd_lAcad');
+  if(_ddAcad){
+    const _selAcads = _msGetVals('lAcad');
+    const _acadItems = _acads.map(a=>
+      `<label class="ms-opt"><input type="checkbox" value="${a}" onchange="_msChange('lAcad')"${_selAcads.includes(a)?' checked':''}> ${a}</label>`
+    ).join('');
+    const _semAcad = `<label class="ms-opt"><input type="checkbox" value="__sem_academia__" onchange="_msChange('lAcad')"${_selAcads.includes('__sem_academia__')?' checked':''}> — Não definida —</label>`;
+    _ddAcad.innerHTML = _acadItems + _semAcad + '<div class="ms-sep"></div><div class="ms-clear" data-ms-clear="lAcad">✕ Limpar</div>';
+    _msUpdateBtn('lAcad');
+  }
+
+  // ── Multi-select Responsável (Kanban) ──
+  const _ddKResp = document.getElementById('msDd_kResp');
+  if(_ddKResp){
+    const _selKResps = _msGetVals('kResp');
+    _ddKResp.innerHTML = resps.map(r=>
+      `<label class="ms-opt"><input type="checkbox" value="${r}" onchange="_msChange('kResp')"${_selKResps.includes(r)?' checked':''}> ${r}</label>`
+    ).join('') + '<div class="ms-sep"></div><div class="ms-clear" data-ms-clear="kResp">✕ Limpar</div>';
+    _msUpdateBtn('kResp');
+  }
 
   // Popular multi-select de Responsável (Lista)
   const _ddResp = document.getElementById('msDd_lResp');
@@ -1684,21 +1864,36 @@ function populateFiltSelects(){
     ).join('') + '<div class="ms-sep"></div><div class="ms-clear" data-ms-clear="lRec">✕ Limpar</div>';
     _msUpdateBtn('lRec');
   }
-  ['kFiltCol','lFiltCol'].forEach(id=>{
-    const s=document.getElementById(id); if(!s)return;
-    const cur=s.value;
-    s.innerHTML='<option value="">Todas</option>'+COLUNAS.filter(col=>!COLUNAS_OCULTAS.has(col.k)).map(col=>`<option value="${col.k}"${cur!==''&&cur==col.k?' selected':''}>${col.l}</option>`).join('');
-  });
+
+  // ── Multi-select Coluna (Kanban) ──
+  const _ddKCol = document.getElementById('msDd_kCol');
+  if(_ddKCol){
+    const _selKCols = _msGetVals('kCol');
+    _ddKCol.innerHTML = COLUNAS.filter(col=>!COLUNAS_OCULTAS.has(col.k)).map(col=>
+      `<label class="ms-opt"><input type="checkbox" value="${col.k}" onchange="_msChange('kCol')"${_selKCols.includes(String(col.k))?' checked':''}> ${col.l}</label>`
+    ).join('') + '<div class="ms-sep"></div><div class="ms-clear" data-ms-clear="kCol">✕ Limpar</div>';
+    _msUpdateBtn('kCol');
+  }
+
+  // Multi-select Coluna (Lista)
+  const _ddCol = document.getElementById('msDd_lCol');
+  if(_ddCol){
+    const _selCols = _msGetVals('lCol');
+    _ddCol.innerHTML = COLUNAS.filter(col=>!COLUNAS_OCULTAS.has(col.k)).map(col=>
+      `<label class="ms-opt"><input type="checkbox" value="${col.k}" onchange="_msChange('lCol')"${_selCols.includes(String(col.k))?' checked':''}> ${col.l}</label>`
+    ).join('') + '<div class="ms-sep"></div><div class="ms-clear" data-ms-clear="lCol">✕ Limpar</div>';
+    _msUpdateBtn('lCol');
+  }
 }
 
 function getKFilts(){
   return{
-    resp:document.getElementById('kFiltResp')?.value||'',
-    sit:document.getElementById('kFiltSit')?.value||'',
-    acad:document.getElementById('kFiltAcad')?.value||'',
-    col:document.getElementById('kFiltCol')?.value||'',
-    de:document.getElementById('kFiltDe')?.value||'',
-    ate:document.getElementById('kFiltAte')?.value||'',
+    resps: _msGetVals('kResp'),
+    sits:  _msGetVals('kSit'),
+    acads: _msGetVals('kAcad'),
+    cols:  _msGetVals('kCol'),
+    de:    document.getElementById('kFiltDe')?.value||'',
+    ate:   document.getElementById('kFiltAte')?.value||'',
   };
 }
 // ── Multi-select helpers ──
@@ -1711,17 +1906,40 @@ function _msToggle(id){
   document.querySelectorAll('.ms-dropdown.open').forEach(d=>{ if(d.id!=='msDd_'+id) d.classList.remove('open'); });
   document.getElementById('msDd_'+id)?.classList.toggle('open');
 }
-function _msChange(id){ applyLFilts(); _msUpdateBtn(id); }
+function _msChange(id){
+  // Roteia para a função de re-render correta baseada no prefixo do id
+  if(id.startsWith('med')) rMedicao();
+  else if(id.startsWith('carga')) rCarga();
+  else if(id.startsWith('k') && id!=='kpiPer') rKanban();
+  else if(id.startsWith('a')) rAtrasos();
+  else if(id.startsWith('hom')) rHomologacoes();
+  else applyLFilts();
+  _msUpdateBtn(id);
+}
 function _msClear(id){
   const dd=document.getElementById('msDd_'+id);
   if(dd) dd.querySelectorAll('input[type=checkbox]').forEach(cb=>cb.checked=false);
-  _msUpdateBtn(id); applyLFilts();
+  _msUpdateBtn(id);
+  // Reaplica o filtro do contexto correto
+  if(id.startsWith('med')) rMedicao();
+  else if(id.startsWith('carga')) rCarga();
+  else if(id.startsWith('k') && id!=='kpiPer') rKanban();
+  else if(id.startsWith('a')) rAtrasos();
+  else if(id.startsWith('hom')) rHomologacoes();
+  else applyLFilts();
 }
 function _msUpdateBtn(id){
   const vals=_msGetVals(id);
   const btn=document.getElementById('msBtn_'+id);
   if(!btn) return;
-  const labels={'lResp':'Todos','lSit':'Todas','lRec':'Todos','lPrio':'Todas'};
+  const labels={
+    'lResp':'Todos','lSit':'Todas','lRec':'Todos','lPrio':'Todas','lAcad':'Todas','lCol':'Todas',
+    'medConf':'Todos','medResp':'Todos','medRec':'Todos','medStat':'Todos',
+    'cargaResp':'Todos','cargaStat':'Todos','cargaRec':'Todos','cargaPrio':'Todas',
+    'kResp':'Todos','kSit':'Todas','kAcad':'Todas','kCol':'Todas',
+    'aTipo':'Todos','aRespGeral':'Todos','aRespEt':'Todos',
+    'homSol':'Todos','homEnv':'Todos','homMed':'Todos'
+  };
   if(vals.length===0){ btn.textContent=labels[id]||'Todos'; btn.classList.remove('ms-active'); }
   else { btn.textContent=vals.length+' selecionado(s)'; btn.classList.add('ms-active'); }
 }
@@ -1738,8 +1956,8 @@ function getLFilts(){
     sits:  _msGetVals('lSit'),
     recs:  _msGetVals('lRec'),
     prios: _msGetVals('lPrio'),
-    acad:  document.getElementById('lFiltAcad')?.value||'',
-    col:   document.getElementById('lFiltCol')?.value||'',
+    acads: _msGetVals('lAcad'),
+    cols:  _msGetVals('lCol'),
     de:    document.getElementById('lFiltDe')?.value||'',
     ate:   document.getElementById('lFiltAte')?.value||'',
   };
@@ -1750,8 +1968,8 @@ function applyFilt(data,f){
   if(f.sits &&f.sits.length)  r=r.filter(p=>f.sits.includes(calcSit(p)));
   if(f.recs &&f.recs.length)  r=r.filter(p=>f.recs.some(rv=>(p.recursos||[]).includes(rv)));
   if(f.prios&&f.prios.length) r=r.filter(p=>f.prios.includes(p.prioridade));
-  if(f.acad) r=r.filter(p=>f.acad==='__sem_academia__' ? !p.academia : p.academia===f.acad);
-  if(f.col!=='') r=r.filter(p=>p.col===parseInt(f.col));
+  if(f.acads&&f.acads.length) r=r.filter(p=>f.acads.some(a=>a==='__sem_academia__'?!p.academia:p.academia===a));
+  if(f.cols &&f.cols.length)  r=r.filter(p=>f.cols.includes(String(p.col)));
   if(f.de)   r=r.filter(p=>p.criado&&p.criado>=f.de);
   if(f.ate)  r=r.filter(p=>p.criado&&p.criado<=f.ate);
   return r;
@@ -1767,13 +1985,16 @@ function _kbUpdateFades(){
 function applyKFilts(){rKanban();}
 function applyLFilts(){rList();}
 function limparKFilts(){
-  ['kFiltResp','kFiltSit','kFiltAcad','kFiltCol'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
+  ['kResp','kSit','kAcad','kCol'].forEach(id=>{
+    const dd=document.getElementById('msDd_'+id);
+    if(dd) dd.querySelectorAll('input[type=checkbox]').forEach(cb=>cb.checked=false);
+    _msUpdateBtn(id);
+  });
   ['kFiltDe','kFiltAte'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
   rKanban();
 }
 function limparLFilts(){
-  ['lResp','lSit','lRec','lPrio'].forEach(id=>_msClear(id));
-  ['lFiltAcad','lFiltCol'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
+  ['lResp','lSit','lRec','lPrio','lAcad','lCol'].forEach(id=>_msClear(id));
   ['lFiltDe','lFiltAte'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
   _listSortCol=''; _listSortDir=1;
   rList();
@@ -2414,9 +2635,9 @@ function rAtrasos(){
   // Apenas projetos ativos e concluídos — cancelados ficam só na aba Cancelados
   const todos = activeDB();
 
-  const filtResp      = document.getElementById('aFiltResp')?.value     || '';
-  const filtRespEtapa = document.getElementById('aFiltRespEtapa')?.value || '';
-  const filtTipo      = document.getElementById('aFiltTipo')?.value      || '';
+  const filtTipo      = _msGetVals('aTipo');     // ['eq','cl']
+  const filtRespEtapa = _msGetVals('aRespEt');   // multi
+  const filtPrazo     = _msGetVals('aRespGeral'); // ['prazo_real','etapa']
 
   // ── Montar lista de linhas de atraso ──────────────────────────────────────
   // Apenas etapas em aberto com prazo vencido (anterior ao dia de hoje).
@@ -2454,16 +2675,21 @@ function rAtrasos(){
       const tipoAtraso = prazoProjVencido ? 'prazo_real' : 'etapa';
 
       if(aplicarFiltros){
-        // Filtro geral: equipe vs cliente
-        if(filtResp === 'eq' && e.r === 'cl') return;
-        if(filtResp === 'cl' && e.r !== 'cl') return;
-        // Filtro específico de responsável da etapa
-        if(filtRespEtapa){
-          const respNome = e.r === 'cl' ? 'Cliente' : e.r === 'eq' ? 'Equipe' : e.r;
-          if(filtRespEtapa === 'cl' && e.r !== 'cl') return;
-          if(filtRespEtapa !== 'cl' && respNome !== filtRespEtapa) return;
+        // Filtro geral: equipe vs cliente (multi)
+        if(filtTipo.length){
+          const ehEq = e.r !== 'cl';
+          if(filtTipo.includes('eq') && filtTipo.includes('cl')){
+            // ambos selecionados — passa
+          } else if(filtTipo.includes('eq') && !ehEq) return;
+          else if(filtTipo.includes('cl') && ehEq) return;
         }
-        if(filtTipo && tipoAtraso !== filtTipo) return;
+        // Filtro específico de responsável da etapa (multi)
+        if(filtRespEtapa.length){
+          const respNome = e.r === 'cl' ? 'cl' : e.r === 'eq' ? 'Equipe' : e.r;
+          if(!filtRespEtapa.includes(respNome)) return;
+        }
+        // Filtro de prazo (multi)
+        if(filtPrazo.length && !filtPrazo.includes(tipoAtraso)) return;
       }
 
       resultado.push({
@@ -2505,10 +2731,9 @@ function rAtrasos(){
   // Ordenar: mais atraso primeiro
   rows.sort((a,b) => b.diasAtraso - a.diasAtraso);
 
-  // ── Popular select de responsável da etapa com valores reais ──
-  const _selRE = document.getElementById('aFiltRespEtapa');
-  if(_selRE){
-    const _curRE = _selRE.value;
+  // ── Popular multi-select de responsável da etapa com valores reais ──
+  const _ddRE = document.getElementById('msDd_aRespEt');
+  if(_ddRE){
     // Coletar todos os responsáveis únicos das etapas atrasadas (sem filtro)
     const _respSet = new Set();
     todos.forEach(p => {
@@ -2521,13 +2746,15 @@ function rAtrasos(){
       if(a==='Equipe') return -1; if(b==='Equipe') return 1;
       return a.localeCompare(b,'pt-BR');
     });
-    _selRE.innerHTML = '<option value="">Todos</option>'
-      + _respList.map(r => {
-          const val = r === 'cl' ? 'cl' : r;
-          const lbl = r === 'cl' ? '🏢 Cliente' : r === 'Equipe' ? '👥 Equipe' : '👤 '+r;
-          return `<option value="${val}"${_curRE===val?' selected':''}>${lbl}</option>`;
-        }).join('');
+    const _selRE = _msGetVals('aRespEt');
+    _ddRE.innerHTML = _respList.map(r => {
+      const lbl = r === 'cl' ? '🏢 Cliente' : r === 'Equipe' ? '👥 Equipe' : '👤 '+r;
+      return `<label class="ms-opt"><input type="checkbox" value="${r}" onchange="_msChange('aRespEt')"${_selRE.includes(r)?' checked':''}> ${lbl}</label>`;
+    }).join('') + '<div class="ms-sep"></div><div class="ms-clear" data-ms-clear="aRespEt">✕ Limpar</div>';
+    _msUpdateBtn('aRespEt');
   }
+  _msUpdateBtn('aTipo');
+  _msUpdateBtn('aRespGeral');
 
   // ── Cards resumo — valores sempre fixos, sem influência dos filtros ──
   document.getElementById('atrasosResumo').innerHTML = `
@@ -2615,7 +2842,11 @@ function toggleAtrasoProj(hd){
 }
 
 function limparAFilts(){
-  ['aFiltResp','aFiltRespEtapa','aFiltTipo'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
+  ['aTipo','aRespEt','aRespGeral'].forEach(id=>{
+    const dd=document.getElementById('msDd_'+id);
+    if(dd) dd.querySelectorAll('input[type=checkbox]').forEach(cb=>cb.checked=false);
+    _msUpdateBtn(id);
+  });
   rAtrasos();
 }
 
@@ -5307,19 +5538,62 @@ function toggleMedGroup(id){
   const g = document.getElementById(id);
   if(!g) return;
   g.classList.toggle('closed');
-  const st = JSON.parse(localStorage.getItem('firjan_med_groups')||'{}');
-  st[id] = g.classList.contains('closed');
-  localStorage.setItem('firjan_med_groups', JSON.stringify(st));
+  const st = JSON.parse(localStorage.getItem('firjan_med_groups_v2')||'{}');
+  // Salva true se a gaveta está ABERTA (sem classe closed), false se está fechada
+  st[id] = !g.classList.contains('closed');
+  localStorage.setItem('firjan_med_groups_v2', JSON.stringify(st));
+}
+
+function limparMedFilts(){
+  ['medConf','medResp','medRec','medStat'].forEach(id=>{
+    const dd=document.getElementById('msDd_'+id);
+    if(dd) dd.querySelectorAll('input[type=checkbox]').forEach(cb=>cb.checked=false);
+    _msUpdateBtn(id);
+  });
+  rMedicao();
+}
+
+function _populateMedFiltros(lista){
+  // Confirmada Por — apenas projetos com medição feita
+  const conf = [...new Set(lista.filter(p=>p.medicaoConfirmadaPor).map(p=>p.medicaoConfirmadaPor))].sort();
+  const ddC = document.getElementById('msDd_medConf');
+  if(ddC){
+    const sel = _msGetVals('medConf');
+    ddC.innerHTML = (conf.length
+      ? conf.map(c=>`<label class="ms-opt"><input type="checkbox" value="${c}" onchange="_msChange('medConf')"${sel.includes(c)?' checked':''}> ${c}</label>`).join('')
+      : '<div style="padding:10px 12px;font-size:11.5px;color:var(--mu);font-style:italic">Nenhuma medição confirmada ainda</div>')
+      + '<div class="ms-sep"></div><div class="ms-clear" data-ms-clear="medConf">✕ Limpar</div>';
+    _msUpdateBtn('medConf');
+  }
+  // Responsável
+  const resps = [...new Set(lista.flatMap(p=>p.resps||[]))].sort();
+  const ddR = document.getElementById('msDd_medResp');
+  if(ddR){
+    const sel = _msGetVals('medResp');
+    ddR.innerHTML = resps.map(r=>`<label class="ms-opt"><input type="checkbox" value="${r}" onchange="_msChange('medResp')"${sel.includes(r)?' checked':''}> ${r}</label>`).join('')
+      + '<div class="ms-sep"></div><div class="ms-clear" data-ms-clear="medResp">✕ Limpar</div>';
+    _msUpdateBtn('medResp');
+  }
+  // Recurso
+  const recs = [...new Set(lista.flatMap(p=>p.recursos||[]))].sort();
+  const ddRc = document.getElementById('msDd_medRec');
+  if(ddRc){
+    const sel = _msGetVals('medRec');
+    ddRc.innerHTML = recs.map(r=>`<label class="ms-opt"><input type="checkbox" value="${r}" onchange="_msChange('medRec')"${sel.includes(r)?' checked':''}> ${r}</label>`).join('')
+      + '<div class="ms-sep"></div><div class="ms-clear" data-ms-clear="medRec">✕ Limpar</div>';
+    _msUpdateBtn('medRec');
+  }
+  _msUpdateBtn('medStat');
 }
 
 function rMedicao(){
-  const lista = activeDB().concat(cancelDB()).filter(p => p.enviadoMedicao);
-  const pendentes  = lista.filter(p => !p.medicaoFeita).length;
-  const concluidas = lista.filter(p =>  p.medicaoFeita).length;
+  const listaTotal = activeDB().concat(cancelDB()).filter(p => p.enviadoMedicao);
+  const pendentes  = listaTotal.filter(p => !p.medicaoFeita).length;
+  const concluidas = listaTotal.filter(p =>  p.medicaoFeita).length;
 
   const statsEl = document.getElementById('medicaoStats');
   if(statsEl) statsEl.innerHTML = `
-    <div class="sc cp"><div class="sc-l">Total na Medição</div><div class="sc-v">${lista.length}</div><div class="sc-s">projetos enviados</div><div class="sc-i">📐</div></div>
+    <div class="sc cp"><div class="sc-l">Total na Medição</div><div class="sc-v">${listaTotal.length}</div><div class="sc-s">projetos enviados</div><div class="sc-i">📐</div></div>
     <div class="sc cy"><div class="sc-l">Aguardando Medição</div><div class="sc-v">${pendentes}</div><div class="sc-s">a medir</div><div class="sc-i">⏳</div></div>
     <div class="sc cg"><div class="sc-l">Medição Concluída</div><div class="sc-v">${concluidas}</div><div class="sc-s">já medidos</div><div class="sc-i">✅</div></div>
   `;
@@ -5327,8 +5601,41 @@ function rMedicao(){
   const el = document.getElementById('medicaoGrupos');
   if(!el) return;
 
-  if(lista.length === 0){
+  // Popular filtros (sempre baseado no total)
+  _populateMedFiltros(listaTotal);
+
+  if(listaTotal.length === 0){
     el.innerHTML = '<div style="text-align:center;padding:48px;color:var(--mu)">Nenhum projeto enviado para medição ainda.</div>';
+    const ct=document.getElementById('medFiltroContador'); if(ct) ct.textContent='';
+    return;
+  }
+
+  // Aplicar filtros multi-select
+  const fConf = _msGetVals('medConf');
+  const fResp = _msGetVals('medResp');
+  const fRec  = _msGetVals('medRec');
+  const fStat = _msGetVals('medStat');
+
+  const lista = listaTotal.filter(p => {
+    if(fConf.length && !fConf.includes(p.medicaoConfirmadaPor||'')) return false;
+    if(fResp.length && !fResp.some(r => (p.resps||[]).includes(r))) return false;
+    if(fRec.length  && !fRec.some(r => (p.recursos||[]).includes(r))) return false;
+    if(fStat.length){
+      const st = p.medicaoFeita ? 'feita' : 'pendente';
+      if(!fStat.includes(st)) return false;
+    }
+    return true;
+  });
+
+  // Contador de filtros
+  const ct=document.getElementById('medFiltroContador');
+  if(ct){
+    const ativo = fConf.length || fResp.length || fRec.length || fStat.length;
+    ct.textContent = ativo ? `${lista.length} de ${listaTotal.length} projeto(s)` : '';
+  }
+
+  if(lista.length === 0){
+    el.innerHTML = '<div style="text-align:center;padding:48px;color:var(--mu)">Nenhum resultado para os filtros selecionados.</div>';
     return;
   }
 
@@ -5356,15 +5663,16 @@ function rMedicao(){
     return mi(a)!==mi(b) ? mi(b)-mi(a) : qi(b)-qi(a); // mais recente primeiro
   });
 
-  // Restaurar estado das gavetas
-  const st = JSON.parse(localStorage.getItem('firjan_med_groups')||'{}');
+  // Restaurar estado das gavetas — DEFAULT: FECHADAS
+  // st[gid] = true → aberta (usuário abriu); st[gid] === false ou undefined → fechada
+  const st = JSON.parse(localStorage.getItem('firjan_med_groups_v2')||'{}');
 
   let html = '';
 
   // ── Grupo Pendentes ──
   if(grpPend.length){
     const gid = 'medg_pendentes';
-    const fechado = st[gid] ? 'closed' : '';
+    const fechado = st[gid] === true ? '' : 'closed';
     html += `<div class="med-group med-group-pendente ${fechado}" id="${gid}">
       <div class="med-group-hd" onclick="toggleMedGroup('${gid}')">
         <span class="med-group-title">⏳ Aguardando Medição
@@ -5380,7 +5688,7 @@ function rMedicao(){
   quinzenasOrdenadas.forEach(label => {
     const projs = quinzenas[label];
     const gid = 'medg_'+label.replace(/\s/g,'_').replace(/[^\w]/g,'');
-    const fechado = st[gid] ? 'closed' : '';
+    const fechado = st[gid] === true ? '' : 'closed';
     const fmtLabel = label === 'Sem data' ? '📅 Sem data de medição'
       : label.slice(0,-2) + (label.slice(-2)==='01' ? ' — 1ª Quinzena' : ' — 2ª Quinzena');
     html += `<div class="med-group ${fechado}" id="${gid}">
@@ -5662,12 +5970,11 @@ function _dataEmMedicao(isoDate, label){
 }
 
 function limparFiltrosHomolog(){
-  const s = document.getElementById('homFiltroSolicitante');
-  const e = document.getElementById('homFiltroEnviadaPor');
-  const m = document.getElementById('homFiltroMedicao');
-  if(s) s.value = '';
-  if(e) e.value = '';
-  if(m) m.value = '';
+  ['homSol','homEnv','homMed'].forEach(id=>{
+    const dd=document.getElementById('msDd_'+id);
+    if(dd) dd.querySelectorAll('input[type=checkbox]').forEach(cb=>cb.checked=false);
+    _msUpdateBtn(id);
+  });
   rHomologacoes();
 }
 
@@ -5684,24 +5991,40 @@ function _popularFiltrosHomolog(lista){
     return mi(a)!==mi(b) ? mi(a)-mi(b) : qi(a)-qi(b);
   });
 
-  const sel1 = document.getElementById('homFiltroSolicitante');
-  const sel2 = document.getElementById('homFiltroEnviadaPor');
-  const sel3 = document.getElementById('homFiltroMedicao');
-  if(!sel1 || !sel2) return;
+  // Label de exibição: "Abril01" → "Abril 1ª Quinzena", "Abril02" → "Abril 2ª Quinzena"
+  const fmtLabel = l => l.slice(0,-2) + (l.slice(-2)==='01' ? ' — 1ª Quinzena' : ' — 2ª Quinzena');
 
-  const val1 = sel1.value;
-  const val2 = sel2.value;
-  const val3 = sel3?.value || '';
+  // Multi-select Solicitante
+  const ddSol = document.getElementById('msDd_homSol');
+  if(ddSol){
+    const sel = _msGetVals('homSol');
+    ddSol.innerHTML = (solicitantes.length
+      ? solicitantes.map(s=>`<label class="ms-opt"><input type="checkbox" value="${s}" onchange="_msChange('homSol')"${sel.includes(s)?' checked':''}> ${s}</label>`).join('')
+      : '<div style="padding:10px 12px;font-size:11.5px;color:var(--mu);font-style:italic">Nenhum solicitante</div>')
+      + '<div class="ms-sep"></div><div class="ms-clear" data-ms-clear="homSol">✕ Limpar</div>';
+    _msUpdateBtn('homSol');
+  }
 
-  sel1.innerHTML = '<option value="">👤 Solicitou a Homologação — Todos</option>'
-    + solicitantes.map(s=>`<option value="${s}" ${val1===s?'selected':''}>${s}</option>`).join('');
-  sel2.innerHTML = '<option value="">📤 Homologado Por — Todos</option>'
-    + enviadosPor.map(s=>`<option value="${s}" ${val2===s?'selected':''}>${s}</option>`).join('');
-  if(sel3){
-    // Label de exibição: "Abril01" → "Abril 1ª Quinzena", "Abril02" → "Abril 2ª Quinzena"
-    const fmtLabel = l => l.slice(0,-2) + (l.slice(-2)==='01' ? ' — 1ª Quinzena' : ' — 2ª Quinzena');
-    sel3.innerHTML = '<option value="">📅 Medição — Todos</option>'
-      + labelsOrdenados.map(l=>`<option value="${l}" ${val3===l?'selected':''}>${fmtLabel(l)}</option>`).join('');
+  // Multi-select Enviada Por
+  const ddEnv = document.getElementById('msDd_homEnv');
+  if(ddEnv){
+    const sel = _msGetVals('homEnv');
+    ddEnv.innerHTML = (enviadosPor.length
+      ? enviadosPor.map(s=>`<label class="ms-opt"><input type="checkbox" value="${s}" onchange="_msChange('homEnv')"${sel.includes(s)?' checked':''}> ${s}</label>`).join('')
+      : '<div style="padding:10px 12px;font-size:11.5px;color:var(--mu);font-style:italic">Ninguém ainda</div>')
+      + '<div class="ms-sep"></div><div class="ms-clear" data-ms-clear="homEnv">✕ Limpar</div>';
+    _msUpdateBtn('homEnv');
+  }
+
+  // Multi-select Medição (quinzena)
+  const ddMed = document.getElementById('msDd_homMed');
+  if(ddMed){
+    const sel = _msGetVals('homMed');
+    ddMed.innerHTML = (labelsOrdenados.length
+      ? labelsOrdenados.map(l=>`<label class="ms-opt"><input type="checkbox" value="${l}" onchange="_msChange('homMed')"${sel.includes(l)?' checked':''}> ${fmtLabel(l)}</label>`).join('')
+      : '<div style="padding:10px 12px;font-size:11.5px;color:var(--mu);font-style:italic">Sem datas de instalação</div>')
+      + '<div class="ms-sep"></div><div class="ms-clear" data-ms-clear="homMed">✕ Limpar</div>';
+    _msUpdateBtn('homMed');
   }
 }
 
@@ -5757,22 +6080,22 @@ function rHomologacoes(){
     return;
   }
 
-  // Aplicar filtros
-  const filtroSolic   = document.getElementById('homFiltroSolicitante')?.value || '';
-  const filtroEnvPor  = document.getElementById('homFiltroEnviadaPor')?.value  || '';
-  const filtroMedicao = document.getElementById('homFiltroMedicao')?.value     || '';
+  // Aplicar filtros (multi-select)
+  const filtroSolic   = _msGetVals('homSol');
+  const filtroEnvPor  = _msGetVals('homEnv');
+  const filtroMedicao = _msGetVals('homMed');
 
   const lista = listaTotal.filter(p => {
-    if(filtroSolic   && (p.homolog?.solicitante || '') !== filtroSolic)  return false;
-    if(filtroEnvPor  && (p.homolog?.enviadaPor  || '') !== filtroEnvPor) return false;
-    if(filtroMedicao && !_dataEmMedicao(p.homolog?.dtInstalacao, filtroMedicao)) return false;
+    if(filtroSolic.length   && !filtroSolic.includes(p.homolog?.solicitante || ''))  return false;
+    if(filtroEnvPor.length  && !filtroEnvPor.includes(p.homolog?.enviadaPor  || '')) return false;
+    if(filtroMedicao.length && !filtroMedicao.some(l=>_dataEmMedicao(p.homolog?.dtInstalacao, l))) return false;
     return true;
   });
 
   // Contador de resultados quando filtro ativo
   const contador = document.getElementById('homFiltroContador');
   if(contador){
-    const ativo = filtroSolic || filtroEnvPor || filtroMedicao;
+    const ativo = filtroSolic.length || filtroEnvPor.length || filtroMedicao.length;
     contador.textContent = ativo ? `${lista.length} de ${listaTotal.length} projeto(s)` : '';
   }
 
@@ -6588,55 +6911,286 @@ function toggleCarga(uid){
   if(!body) return;
   const open = body.classList.toggle('open');
   if(arrow) arrow.classList.toggle('open', open);
+  // Persistir estado
+  const st = JSON.parse(localStorage.getItem('firjan_carga_open')||'{}');
+  st[uid] = open;
+  localStorage.setItem('firjan_carga_open', JSON.stringify(st));
+}
+
+function toggleCargaProj(uid){
+  const card = document.getElementById(uid);
+  if(!card) return;
+  card.classList.toggle('proj-open');
+}
+
+function limparCargaFilts(){
+  ['cargaResp','cargaStat','cargaRec','cargaPrio'].forEach(id=>{
+    const dd=document.getElementById('msDd_'+id);
+    if(dd) dd.querySelectorAll('input[type=checkbox]').forEach(cb=>cb.checked=false);
+    _msUpdateBtn(id);
+  });
+  rCarga();
+}
+
+// Determinar status de um projeto para a Carga
+function _cargaStatusProj(p){
+  if(atrasadoPorEquipe(p)) return 'atraso_equipe';
+  if(atrasadoPorCliente(p)) return 'atraso_cliente';
+  const s = calcSit(p);
+  if(s === 'aguardando') return 'aguardando';
+  return 'andamento';
+}
+
+function _cargaStatusBadge(status){
+  const map = {
+    atraso_equipe:   {lbl:'⚠️ Atrasado',          bg:'#FEE2E2', cor:'#991B1B'},
+    atraso_cliente:  {lbl:'⏳ Atraso Cliente',    bg:'#FFF7ED', cor:'#9A3412'},
+    andamento:       {lbl:'🔄 Em Andamento',      bg:'#EFF6FF', cor:'#1E40AF'},
+    aguardando:      {lbl:'⏳ Aguardando',        bg:'#F3F4F6', cor:'#374151'},
+  };
+  const m = map[status] || map.andamento;
+  return `<span class="carga-proj-status-badge" style="background:${m.bg};color:${m.cor}">${m.lbl}</span>`;
+}
+
+function _populateCargaFiltros(membros, ativos){
+  // Pessoa
+  const respList = Object.keys(membros).sort();
+  const ddR = document.getElementById('msDd_cargaResp');
+  if(ddR){
+    const sel = _msGetVals('cargaResp');
+    ddR.innerHTML = respList.map(r=>`<label class="ms-opt"><input type="checkbox" value="${r}" onchange="_msChange('cargaResp')"${sel.includes(r)?' checked':''}> ${r}</label>`).join('')
+      + '<div class="ms-sep"></div><div class="ms-clear" data-ms-clear="cargaResp">✕ Limpar</div>';
+    _msUpdateBtn('cargaResp');
+  }
+  // Recurso
+  const recs = [...new Set(ativos.flatMap(p=>p.recursos||[]))].sort();
+  const ddRc = document.getElementById('msDd_cargaRec');
+  if(ddRc){
+    const sel = _msGetVals('cargaRec');
+    ddRc.innerHTML = recs.map(r=>`<label class="ms-opt"><input type="checkbox" value="${r}" onchange="_msChange('cargaRec')"${sel.includes(r)?' checked':''}> ${r}</label>`).join('')
+      + '<div class="ms-sep"></div><div class="ms-clear" data-ms-clear="cargaRec">✕ Limpar</div>';
+    _msUpdateBtn('cargaRec');
+  }
+  _msUpdateBtn('cargaStat');
+  _msUpdateBtn('cargaPrio');
 }
 
 function rCarga(){
   const el = document.getElementById('cargaGrid'); if(!el) return;
   const ativos = activeDB().filter(p => calcSit(p) !== 'concluido');
-  const membros = {};
+
+  // ── Agrupar por membro (todos ativos, sem filtro ainda) ──
+  const membrosTotal = {};
   ativos.forEach(p => {
     (p.resps||[]).forEach(r => {
-      if(!membros[r]) membros[r] = {projetos:[], atrasados:0, cl:0, andamento:0};
-      membros[r].projetos.push(p);
-      if(atrasadoPorEquipe(p)) membros[r].atrasados++;
-      else if(atrasadoPorCliente(p)) membros[r].cl++;
-      else membros[r].andamento++;
+      if(!membrosTotal[r]) membrosTotal[r] = [];
+      membrosTotal[r].push(p);
     });
   });
-  if(!Object.keys(membros).length){
-    el.innerHTML = '<div style="color:var(--mu);font-size:13px;padding:16px 0">Nenhum membro com projetos ativos.</div>'; return;
+
+  // ── Popular filtros ──
+  _populateCargaFiltros(membrosTotal, ativos);
+
+  // ── Stats globais ──
+  const totalProjetos = ativos.length;
+  const totalAtrasoEq = ativos.filter(atrasadoPorEquipe).length;
+  const totalAtrasoCl = ativos.filter(p => !atrasadoPorEquipe(p) && atrasadoPorCliente(p)).length;
+  const totalMembros  = Object.keys(membrosTotal).length;
+  const statsEl = document.getElementById('cargaStats');
+  if(statsEl){
+    statsEl.innerHTML = `
+      <div class="sc cb"><div class="sc-l">Membros Ativos</div><div class="sc-v">${totalMembros}</div><div class="sc-s">com projetos em curso</div><div class="sc-i">👥</div></div>
+      <div class="sc cp"><div class="sc-l">Projetos Ativos</div><div class="sc-v">${totalProjetos}</div><div class="sc-s">não concluídos</div><div class="sc-i">📁</div></div>
+      <div class="sc cr"><div class="sc-l">Atrasos Equipe</div><div class="sc-v">${totalAtrasoEq}</div><div class="sc-s">projetos atrasados</div><div class="sc-i">⚠️</div></div>
+      <div class="sc cy"><div class="sc-l">Atrasos Cliente</div><div class="sc-v">${totalAtrasoCl}</div><div class="sc-s">aguardando cliente</div><div class="sc-i">⏳</div></div>
+    `;
   }
-  const max = Math.max(...Object.values(membros).map(m => m.projetos.length), 1);
-  el.innerHTML = Object.entries(membros)
-    .sort((a,b) => b[1].projetos.length - a[1].projetos.length)
-    .map(([nome, d], idx) => {
-      const pct = Math.round(d.projetos.length / max * 100);
-      const corStatus = d.atrasados > 0 ? 'var(--red)' : d.projetos.length >= 4 ? 'var(--yel)' : 'var(--blue)';
-      const corPessoal = NOME_CORES[nome] || corStatus;
-      const uid = 'carga_' + nome.replace(/\W/g,'_');
-      return `<div class="carga-card">
-        <div class="carga-hd" onclick="toggleCarga('${uid}')">
-          <div class="carga-av" style="background:${corPessoal}">${iniciais(nome)}</div>
-          <div class="carga-info">
-            <div class="carga-name">${nome}</div>
-            <div class="carga-meta">
-              ${d.andamento > 0 ? `<span style="font-size:11px;color:var(--blue)">🔄 ${d.andamento} em andamento</span>` : ''}
-              ${d.atrasados > 0 ? `<span style="font-size:11px;color:var(--red);font-weight:600">⚠️ ${d.atrasados} atraso(s) equipe</span>` : ''}
-              ${d.cl > 0 ? `<span style="font-size:11px;color:var(--org)">⏳ ${d.cl} atraso(s) cliente</span>` : ''}
-            </div>
-          </div>
-          <div class="carga-bar-bg"><div class="carga-bar-fill" style="width:${pct}%;background:${corStatus}"></div></div>
-          <div class="carga-count" style="color:${corStatus}">${d.projetos.length}</div>
-          <span style="font-size:11px;color:var(--mu);flex-shrink:0">proj.</span>
-          <span class="carga-arrow" id="${uid}_arrow">▼</span>
+
+  // ── Aplicar filtros ──
+  const fResp = _msGetVals('cargaResp');
+  const fStat = _msGetVals('cargaStat');
+  const fRec  = _msGetVals('cargaRec');
+  const fPrio = _msGetVals('cargaPrio');
+
+  // Filtragem dos projetos por membro
+  const membros = {};
+  Object.entries(membrosTotal).forEach(([nome, projs]) => {
+    if(fResp.length && !fResp.includes(nome)) return;
+    const projsFilt = projs.filter(p => {
+      if(fStat.length && !fStat.includes(_cargaStatusProj(p))) return false;
+      if(fRec.length && !fRec.some(r=>(p.recursos||[]).includes(r))) return false;
+      if(fPrio.length && !fPrio.includes(p.prioridade)) return false;
+      return true;
+    });
+    if(projsFilt.length) membros[nome] = projsFilt;
+  });
+
+  // ── Contador ──
+  const ct = document.getElementById('cargaFiltroContador');
+  if(ct){
+    const ativo = fResp.length || fStat.length || fRec.length || fPrio.length;
+    const totalFiltrados = Object.values(membros).reduce((s,a)=>s+a.length,0);
+    ct.textContent = ativo ? `${Object.keys(membros).length} pessoa(s) · ${totalFiltrados} projeto(s)` : '';
+  }
+
+  // ── Vazio ──
+  if(!Object.keys(membros).length){
+    el.innerHTML = '<div style="text-align:center;padding:48px 16px;color:var(--mu);font-size:13px;grid-column:1/-1">Nenhum membro encontrado com os filtros selecionados.</div>';
+    return;
+  }
+
+  // ── Renderizar cards ──
+  const max = Math.max(...Object.values(membros).map(arr => arr.length), 1);
+  const stOpen = JSON.parse(localStorage.getItem('firjan_carga_open')||'{}');
+
+  // Ordenação prioritária: prioriza membros sobrecarregados ou com atrasos
+  const ordenados = Object.entries(membros).sort((a,b) => {
+    const aAtr = a[1].filter(atrasadoPorEquipe).length;
+    const bAtr = b[1].filter(atrasadoPorEquipe).length;
+    if(aAtr !== bAtr) return bAtr - aAtr;
+    return b[1].length - a[1].length;
+  });
+
+  el.innerHTML = ordenados.map(([nome, projs]) => {
+    const atrasados = projs.filter(atrasadoPorEquipe).length;
+    const clRet = projs.filter(p => !atrasadoPorEquipe(p) && atrasadoPorCliente(p)).length;
+    const andamento = projs.filter(p => !atrasadoPorEquipe(p) && !atrasadoPorCliente(p) && calcSit(p) === 'andamento').length;
+    const aguard = projs.filter(p => calcSit(p) === 'aguardando').length;
+
+    const pct = Math.round(projs.length / max * 100);
+    const overload = projs.length >= 5 || atrasados >= 2;
+    const corStatus = atrasados > 0 ? 'var(--red)' : projs.length >= 5 ? 'var(--yel)' : 'var(--blue)';
+    const labelCarga = atrasados > 0 ? 'Atenção' : projs.length >= 5 ? 'Sobrecarga' : projs.length >= 3 ? 'Carga regular' : 'Carga leve';
+    const corPessoal = NOME_CORES[nome] || corStatus;
+    const uid = 'carga_' + nome.replace(/\W/g,'_');
+    const isOpen = stOpen[uid] === true;
+
+    // Ordenar projetos: atrasados primeiro, depois prioridade, depois prazo
+    const _ordPrio={urgente:0,alta:1,media:2,baixa:3};
+    const projsOrdenados = [...projs].sort((a,b) => {
+      const sA = _cargaStatusProj(a), sB = _cargaStatusProj(b);
+      const ordSt = {atraso_equipe:0, atraso_cliente:1, andamento:2, aguardando:3};
+      if(ordSt[sA] !== ordSt[sB]) return ordSt[sA] - ordSt[sB];
+      const pA = _ordPrio[a.prioridade]??4, pB = _ordPrio[b.prioridade]??4;
+      if(pA !== pB) return pA - pB;
+      return (a.prazo||'9999').localeCompare(b.prazo||'9999');
+    });
+
+    return `<div class="carga-card${overload?' over-load':''}">
+      <div class="carga-hd" onclick="toggleCarga('${uid}')">
+        <div class="carga-av" style="background:${corPessoal}">
+          ${iniciais(nome)}
+          ${atrasados>0?`<span class="carga-av-badge">${atrasados}</span>`:''}
         </div>
-        <div class="carga-body" id="${uid}_body">
-          ${d.projetos.map(p => `<div class="carga-proj" onclick="openDet(${p.id})" title="${p.nome}">
-            ${calcSit(p)==='atrasado'?'⚠️ ':calcSit(p)==='aguardando'?'⏳ ':'▸ '}${p.nome.length>55?p.nome.slice(0,53)+'…':p.nome}
-          </div>`).join('')}
+        <div class="carga-info">
+          <div class="carga-name">${nome}</div>
+          <div class="carga-load-label" style="color:${corStatus}">${labelCarga}</div>
         </div>
-      </div>`;
-    }).join('');
+        <div class="carga-count-wrap">
+          <div class="carga-count" style="color:${corStatus}">${projs.length}</div>
+          <div class="carga-count-lbl">projetos</div>
+        </div>
+        <span class="carga-arrow${isOpen?' open':''}" id="${uid}_arrow">▼</span>
+      </div>
+      <div class="carga-bar-bg"><div class="carga-bar-fill" style="width:${pct}%;background:${corStatus}"></div></div>
+      <div class="carga-stats-row">
+        ${atrasados > 0 ? `<span class="carga-stat-pill red">⚠️ ${atrasados} atraso${atrasados>1?'s':''} equipe</span>` : ''}
+        ${clRet > 0 ? `<span class="carga-stat-pill org">⏳ ${clRet} c/ cliente</span>` : ''}
+        ${andamento > 0 ? `<span class="carga-stat-pill blue">🔄 ${andamento} andamento</span>` : ''}
+        ${aguard > 0 ? `<span class="carga-stat-pill gray">⏸️ ${aguard} aguardando</span>` : ''}
+      </div>
+      <div class="carga-body${isOpen?' open':''}" id="${uid}_body">
+        <div class="carga-proj-list">
+          ${projsOrdenados.map(p => _buildCargaProjCard(p, nome)).join('')}
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function _buildCargaProjCard(p, nome){
+  const status = _cargaStatusProj(p);
+  const uid = 'cprj_'+nome.replace(/\W/g,'_')+'_'+p.id;
+  const sit = calcSit(p);
+  const col = COLUNAS.find(c => c.k === p.col);
+  const colNome = col ? col.l : '—';
+  const colCor  = col ? col.dot : 'var(--mu)';
+  const etAtual = etapaAtual(p);
+  const {eq, cl} = delInf(p);
+
+  // Texto do prazo
+  const hoje = new Date(); hoje.setHours(0,0,0,0);
+  const prazoData = p.prazo ? new Date(p.prazo+'T00:00:00') : null;
+  let prazoTxt = '—', prazoCls = '';
+  if(prazoData){
+    const dias = Math.round((prazoData - hoje) / 864e5);
+    prazoTxt = fd(p.prazo);
+    if(dias < 0){ prazoTxt += ` (${Math.abs(dias)}d atraso)`; prazoCls = 'red'; }
+    else if(dias === 0){ prazoTxt += ' (hoje)'; prazoCls = 'red'; }
+    else if(dias <= 3){ prazoTxt += ` (${dias}d)`; prazoCls = 'org'; }
+    else if(dias <= 7){ prazoTxt += ` (${dias}d)`; }
+  }
+
+  const nomeProj = p.nome.length > 70 ? p.nome.slice(0,68)+'…' : p.nome;
+
+  return `<div class="carga-proj-card ${status==='atraso_equipe'?'atrasado':status==='atraso_cliente'?'atraso-cliente':status}" id="${uid}">
+    <div class="carga-proj-hd" onclick="toggleCargaProj('${uid}')">
+      <div class="carga-proj-titulo">
+        <div class="carga-proj-nome">
+          <span class="open-icon">▶</span>
+          ${nomeProj}
+          ${prioBadge(p.prioridade)}
+        </div>
+        <div class="carga-proj-meta">
+          ${_cargaStatusBadge(status)}
+          <span style="display:inline-flex;align-items:center;gap:3px"><span style="width:6px;height:6px;border-radius:50%;background:${colCor}"></span>${colNome}</span>
+          ${recTags(p.recursos)}
+        </div>
+      </div>
+    </div>
+    <div class="carga-proj-detail">
+      <div class="carga-proj-detail-grid">
+        <div class="carga-proj-detail-item">
+          <span class="lbl">📅 Prazo</span>
+          <span class="val ${prazoCls}">${prazoTxt}</span>
+        </div>
+        <div class="carga-proj-detail-item">
+          <span class="lbl">▶️ Etapa atual</span>
+          <span class="val">${etAtual ? etAtual.lb : (sit==='concluido'?'Concluído':'—')}</span>
+        </div>
+        <div class="carga-proj-detail-item">
+          <span class="lbl">🆔 ID do Curso</span>
+          <span class="val">${p.idCurso || '<span style="color:var(--mu);font-style:italic;font-weight:400">Sem ID</span>'}</span>
+        </div>
+        <div class="carga-proj-detail-item">
+          <span class="lbl">🏛️ Academia</span>
+          <span class="val">${p.academia || '<span style="color:var(--mu);font-style:italic;font-weight:400">—</span>'}</span>
+        </div>
+        <div class="carga-proj-detail-item">
+          <span class="lbl">📊 Progresso</span>
+          <span class="val">${p.pct||0}%
+            <div class="carga-progress"><div class="carga-progress-fill" style="width:${p.pct||0}%;background:${corProgresso(sit)}"></div></div>
+          </span>
+        </div>
+        <div class="carga-proj-detail-item">
+          <span class="lbl">⏱️ Atraso</span>
+          <span class="val ${eq>0?'red':cl>0?'org':''}">
+            ${eq>0?`${eq}d equipe`:cl>0?`${cl}d cliente`:'No prazo'}
+          </span>
+        </div>
+      </div>
+      <div class="carga-proj-detail-actions">
+        <button class="carga-proj-action-btn" onclick="event.stopPropagation();openDet(${p.id})">🔎 Abrir Card</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+function corProgresso(sit){
+  if(sit==='atrasado') return 'var(--red)';
+  if(sit==='aguardando') return 'var(--yel)';
+  if(sit==='concluido') return 'var(--green)';
+  return 'var(--blue)';
 }
 
 // ══════════════════════════════════════════════
