@@ -272,16 +272,16 @@ hr.dv{border:none;border-top:1px solid var(--bdr);margin:14px 0}
 /* CANCELADO row */
 tr.canc-row td{opacity:.55}
 /* FILTROS AVANÇADOS */
-.fbox{background:#fff;border-radius:var(--r);border:1px solid var(--bdr);padding:14px 18px;margin-bottom:16px}
-.fbox-row{display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end}
-.fg-sm{display:flex;flex-direction:column;gap:4px;min-width:160px;flex:1}
+.fbox{background:#fff;border-radius:var(--r);border:1px solid var(--bdr);padding:12px 14px;margin-bottom:14px}
+.fbox-row{display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end}
+.fg-sm{display:flex;flex-direction:column;gap:3px;min-width:140px;flex:0 1 auto}
 .fl-sm{font-size:10px;font-weight:700;color:var(--mu);text-transform:uppercase;letter-spacing:.5px}
-.fi-sm{padding:6px 10px;border:1px solid var(--bdr);border-radius:6px;font-family:'Plus Jakarta Sans',sans-serif;font-size:12.5px;color:var(--txt);background:var(--bg);outline:none}
-.ms-wrap{position:relative;display:inline-block}
-.ms-btn{border:1px solid var(--bdr);border-radius:6px;padding:5px 26px 5px 8px;font-size:12px;background:var(--bg);color:var(--txt);cursor:pointer;white-space:nowrap;min-width:90px;text-align:left;position:relative;font-family:'Plus Jakarta Sans',sans-serif}
-.ms-btn::after{content:'▼';position:absolute;right:7px;top:50%;transform:translateY(-50%);font-size:9px;color:var(--mu)}
+.fi-sm{padding:6px 10px;border:1px solid var(--bdr);border-radius:6px;font-family:'Plus Jakarta Sans',sans-serif;font-size:12.5px;color:var(--txt);background:var(--bg);outline:none;min-width:140px}
+.ms-wrap{position:relative;display:block;min-width:140px}
+.ms-btn{width:100%;border:1px solid var(--bdr);border-radius:6px;padding:6px 26px 6px 10px;font-size:12.5px;background:var(--bg);color:var(--txt);cursor:pointer;white-space:nowrap;text-align:left;position:relative;font-family:'Plus Jakarta Sans',sans-serif;min-height:30px;overflow:hidden;text-overflow:ellipsis}
+.ms-btn::after{content:'▼';position:absolute;right:8px;top:50%;transform:translateY(-50%);font-size:9px;color:var(--mu)}
 .ms-btn.ms-active{border-color:var(--blue);color:var(--blue)}
-.ms-dropdown{display:none;position:absolute;top:calc(100% + 4px);left:0;min-width:190px;background:#fff;border:1px solid var(--bdr);border-radius:8px;box-shadow:0 4px 16px rgba(0,0,0,.12);z-index:9999;padding:6px 0;max-height:260px;overflow-y:auto}
+.ms-dropdown{display:none;position:absolute;top:calc(100% + 4px);left:0;min-width:200px;background:#fff;border:1px solid var(--bdr);border-radius:8px;box-shadow:0 4px 16px rgba(0,0,0,.12);z-index:9999;padding:6px 0;max-height:260px;overflow-y:auto}
 .ms-dropdown.open{display:block}
 .ms-opt{display:flex;align-items:center;gap:8px;padding:7px 12px;cursor:pointer;font-size:12.5px;color:var(--txt)}
 .ms-opt:hover{background:var(--s2)}
@@ -290,7 +290,7 @@ tr.canc-row td{opacity:.55}
 .ms-clear{padding:5px 12px;font-size:11.5px;color:var(--blue);cursor:pointer;text-align:right}
 .ms-clear:hover{text-decoration:underline}
 .fi-sm:focus{border-color:var(--blue);background:#fff}
-.btn-lim{padding:6px 12px;border-radius:6px;border:1px solid var(--bdr);background:transparent;cursor:pointer;font-size:12px;color:var(--mu);font-family:'Plus Jakarta Sans',sans-serif;white-space:nowrap;align-self:flex-end}
+.btn-lim{padding:6px 12px;border-radius:6px;border:1px solid var(--bdr);background:transparent;cursor:pointer;font-size:12px;color:var(--mu);font-family:'Plus Jakarta Sans',sans-serif;white-space:nowrap;align-self:flex-end;height:30px}
 .btn-lim:hover{background:var(--s2)}
 /* MULTI SELECT RECURSOS */
 .rec-wrap{display:flex;flex-wrap:wrap;gap:5px;margin-top:5px}
@@ -524,7 +524,7 @@ body.dark .carga-stat-pill.blue{background:rgba(30,64,175,.22);color:#93C5FD}
 
 /* Sub-gavetas de projetos */
 .carga-proj-list{padding:10px 12px;display:flex;flex-direction:column;gap:8px;max-height:540px;overflow-y:auto}
-.carga-proj-card{background:var(--surface);border:1px solid var(--bdr);border-radius:10px;overflow:hidden;transition:all .15s}
+.carga-proj-card{flex-shrink:0;background:var(--surface);border:1px solid var(--bdr);border-radius:10px;overflow:hidden;transition:all .15s}
 .carga-proj-card:hover{border-color:var(--blue);box-shadow:0 2px 8px rgba(0,0,0,.06)}
 .carga-proj-card.atrasado{border-left:3px solid var(--red)}
 .carga-proj-card.aguardando{border-left:3px solid var(--yel)}
@@ -1040,28 +1040,30 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
       <div style="font-size:12.5px;color:var(--mu);margin-bottom:16px">Projetos na etapa Homologação/Instalação. Preencha os dados e acompanhe o status.</div>
       <div id="homologStats" style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:18px"></div>
       <!-- Filtros -->
-      <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;margin-bottom:20px;padding:12px 16px;background:#fff;border:1px solid var(--bdr);border-radius:var(--r)">
-        <span style="font-size:11px;font-weight:700;color:var(--mu);text-transform:uppercase;letter-spacing:.6px;align-self:center">Filtrar por</span>
-        <div class="fg-sm"><label class="fl-sm">👤 Solicitante</label>
-          <div class="ms-wrap" id="msWrap_homSol">
-            <button class="ms-btn" id="msBtn_homSol" onclick="_msToggle('homSol')">Todos</button>
-            <div class="ms-dropdown" id="msDd_homSol"></div>
+      <div class="fbox" style="margin-bottom:18px">
+        <div class="fbox-row">
+          <span style="font-size:11px;font-weight:700;color:var(--mu);text-transform:uppercase;letter-spacing:.6px;align-self:center;padding-bottom:2px">Filtrar por</span>
+          <div class="fg-sm"><label class="fl-sm">👤 Solicitante</label>
+            <div class="ms-wrap" id="msWrap_homSol">
+              <button class="ms-btn" id="msBtn_homSol" onclick="_msToggle('homSol')">Todos</button>
+              <div class="ms-dropdown" id="msDd_homSol"></div>
+            </div>
           </div>
-        </div>
-        <div class="fg-sm"><label class="fl-sm">📤 Homologado Por</label>
-          <div class="ms-wrap" id="msWrap_homEnv">
-            <button class="ms-btn" id="msBtn_homEnv" onclick="_msToggle('homEnv')">Todos</button>
-            <div class="ms-dropdown" id="msDd_homEnv"></div>
+          <div class="fg-sm"><label class="fl-sm">📤 Homologado Por</label>
+            <div class="ms-wrap" id="msWrap_homEnv">
+              <button class="ms-btn" id="msBtn_homEnv" onclick="_msToggle('homEnv')">Todos</button>
+              <div class="ms-dropdown" id="msDd_homEnv"></div>
+            </div>
           </div>
-        </div>
-        <div class="fg-sm"><label class="fl-sm">📅 Medição</label>
-          <div class="ms-wrap" id="msWrap_homMed">
-            <button class="ms-btn" id="msBtn_homMed" onclick="_msToggle('homMed')">Todos</button>
-            <div class="ms-dropdown" id="msDd_homMed"></div>
+          <div class="fg-sm"><label class="fl-sm">📅 Medição</label>
+            <div class="ms-wrap" id="msWrap_homMed">
+              <button class="ms-btn" id="msBtn_homMed" onclick="_msToggle('homMed')">Todos</button>
+              <div class="ms-dropdown" id="msDd_homMed"></div>
+            </div>
           </div>
+          <button onclick="limparFiltrosHomolog()" class="btn-lim">✕ Limpar</button>
+          <span id="homFiltroContador" style="font-size:11px;color:var(--mu);margin-left:auto;align-self:center"></span>
         </div>
-        <button onclick="limparFiltrosHomolog()" class="btn bg2 bsm" style="font-size:11.5px">✕ Limpar</button>
-        <span id="homFiltroContador" style="font-size:11px;color:var(--mu);margin-left:auto;align-self:center"></span>
       </div>
       <div id="homologLista"></div>
     </div>
