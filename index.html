@@ -885,28 +885,21 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
     <!-- ATRASOS -->
     <div class="view" id="view-atrasos">
       <div class="st" style="margin-bottom:16px">Relatórios de Atrasos — Projetos em Atraso</div>
-      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:22px" id="atrasosResumo"></div>
+      <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:22px" id="atrasosResumo"></div>
       <div class="fbox" style="margin-bottom:18px">
         <div class="fbox-row">
-          <div class="fg-sm"><label class="fl-sm">Situação do Projeto</label>
-            <select class="fi-sm" id="aFiltSit" onchange="rAtrasos()">
-              <option value="">Todos</option>
-              <option value="ativo">Ativos</option>
-              <option value="concluido">Concluídos</option>
-            </select>
-          </div>
-          <div class="fg-sm"><label class="fl-sm">Responsável da Etapa</label>
+          <div class="fg-sm"><label class="fl-sm">Projetos em Atraso</label>
             <select class="fi-sm" id="aFiltResp" onchange="rAtrasos()">
               <option value="">Todos</option>
               <option value="eq">👥 Equipe</option>
               <option value="cl">🏢 Cliente</option>
             </select>
           </div>
-          <div class="fg-sm"><label class="fl-sm">Tipo de Atraso</label>
+          <div class="fg-sm"><label class="fl-sm">Prazo Final</label>
             <select class="fi-sm" id="aFiltTipo" onchange="rAtrasos()">
               <option value="">Todos</option>
-              <option value="prazo_real">🏁 Prazo real vencido</option>
-              <option value="etapa">⚠️ Etapa atrasada (prazo ok)</option>
+              <option value="prazo_real">🔴 Comprometido</option>
+              <option value="etapa">🟡 Não comprometido</option>
             </select>
           </div>
           <button class="btn-lim" onclick="limparAFilts()">✕ Limpar</button>
@@ -2279,7 +2272,6 @@ function rAtrasos(){
   // Apenas projetos ativos e concluídos — cancelados ficam só na aba Cancelados
   const todos = activeDB();
 
-  const filtSit    = document.getElementById('aFiltSit')?.value    || '';
   const filtResp   = document.getElementById('aFiltResp')?.value   || '';
   const filtTipo   = document.getElementById('aFiltTipo')?.value   || '';
 
@@ -2295,8 +2287,7 @@ function rAtrasos(){
   todos.forEach(p => {
     // Filtro de situação do projeto
     const sitP = p.cancelado ? 'cancelado' : calcSit(p);
-    if(filtSit === 'ativo'     && sitP==='concluido') return;
-    if(filtSit === 'concluido' && sitP !== 'concluido') return;
+
 
     const etapas = p.etapas || [];
 
@@ -2380,11 +2371,17 @@ function rAtrasos(){
   rows.sort((a,b) => b.diasAtraso - a.diasAtraso);
 
   // ── Cards resumo ──────────────────────────────────────────────────────────
+  // Calcular prazo comprometido vs não comprometido
+  const _projAbertosUniq  = [...new Set(rows.filter(r=>!r.fim).map(r=>r.projId))];
+  const _totalPrazoComp   = [...new Set(rows.filter(r=>r.tipoAtraso==='prazo_real').map(r=>r.projId))].length;
+  const _totalPrazoOk     = [...new Set(rows.filter(r=>r.tipoAtraso==='etapa').map(r=>r.projId))].length;
+
   document.getElementById('atrasosResumo').innerHTML = `
-    <div class="sc cy"><div class="sc-l">Projetos em Atraso</div><div class="sc-v">${totalAberto}</div><div class="sc-s">requerem atenção</div><div class="sc-i">⚠️</div></div>
+    <div class="sc cy"><div class="sc-l">Projetos em Atraso</div><div class="sc-v">${totalAberto}</div><div class="sc-s">total de projetos</div><div class="sc-i">⚠️</div></div>
     <div class="sc cr"><div class="sc-l">Atrasos da Equipe</div><div class="sc-v">${totalEq}</div><div class="sc-s">projetos atrasados pela equipe</div><div class="sc-i">👥</div></div>
     <div class="sc cp"><div class="sc-l">Atrasos do Cliente</div><div class="sc-v">${totalCl}</div><div class="sc-s">aguardando cliente</div><div class="sc-i">🏢</div></div>
-    <div class="sc cg"><div class="sc-l">Histórico (concluídas c/ atraso)</div><div class="sc-v">${totalHistorico}</div><div class="sc-s">já finalizadas</div><div class="sc-i">📋</div></div>
+    <div class="sc" style="border-left:4px solid #DC2626"><div class="sc-l" style="color:#DC2626">Prazo Final Comprometido</div><div class="sc-v" style="color:#DC2626">${_totalPrazoComp}</div><div class="sc-s">prazo real vencido</div><div class="sc-i">🔴</div></div>
+    <div class="sc" style="border-left:4px solid #F59E0B"><div class="sc-l" style="color:#92400E">Prazo Final Não Comprometido</div><div class="sc-v" style="color:#92400E">${_totalPrazoOk}</div><div class="sc-s">etapa atrasada, prazo ok</div><div class="sc-i">🟡</div></div>
   `;
 
   // ── Tabela ──────────────────────────────────────────────────────────────────
@@ -2464,7 +2461,7 @@ function toggleAtrasoProj(hd){
 }
 
 function limparAFilts(){
-  ['aFiltSit','aFiltResp','aFiltTipo'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
+  ['aFiltResp','aFiltTipo'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
   rAtrasos();
 }
 
