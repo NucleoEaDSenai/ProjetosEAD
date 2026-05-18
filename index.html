@@ -260,6 +260,15 @@ body.dark .kpi-hero{background:linear-gradient(135deg,#001A4A 0%,#003DA5 100%)}
 .kpi-tab-content.active{display:block}
 @keyframes kpiFadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
 
+/* Banner de período fora do histórico */
+.kpi-periodo-banner{display:none;margin-bottom:14px;background:linear-gradient(135deg,#EFF6FF 0%,#DBEAFE 100%);border:1px solid #BFDBFE;border-radius:12px;padding:14px 18px;animation:kpiFadeIn .3s ease}
+.kpi-periodo-banner-content{display:flex;align-items:flex-start;gap:12px;font-size:13px;color:#1E3A8A;line-height:1.5}
+.kpi-periodo-banner-ico{font-size:22px;flex-shrink:0;line-height:1}
+.kpi-periodo-banner-content strong{font-weight:700;color:#1E40AF}
+body.dark .kpi-periodo-banner{background:linear-gradient(135deg,rgba(59,130,246,.12) 0%,rgba(37,99,235,.18) 100%);border-color:rgba(59,130,246,.3)}
+body.dark .kpi-periodo-banner-content{color:#BFDBFE}
+body.dark .kpi-periodo-banner-content strong{color:#DBEAFE}
+
 /* Grid rows */
 .kpi-row{display:grid;gap:14px;margin-bottom:14px;grid-template-columns:1fr}
 
@@ -963,7 +972,7 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
         <div id="exportMenu" style="display:none;position:absolute;right:0;top:calc(100% + 6px);background:#fff;border:1px solid var(--bdr);border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.12);z-index:999;min-width:210px;overflow:hidden">
           <div onclick="exportXLSX();toggleExportMenu()" style="padding:11px 16px;cursor:pointer;font-size:13px;display:flex;align-items:center;gap:9px;transition:background .15s" onmouseover="this.style.background='var(--s2)'" onmouseout="this.style.background=''">📊 <span><strong>Exportar XLSX</strong><br><small style="color:var(--mu)">Projetos, Etapas, Atrasos, Homologações e Medição</small></span></div>
           <div style="border-top:1px solid var(--bdr);margin:0"></div>
-          <div onclick="exportPDFLista();toggleExportMenu()" style="padding:11px 16px;cursor:pointer;font-size:13px;display:flex;align-items:center;gap:9px;transition:background .15s" onmouseover="this.style.background='var(--s2)'" onmouseout="this.style.background=''">📋 <span><strong>PDF — Lista de Projetos</strong><br><small style="color:var(--mu)">Projetos + KPIs + Atrasos + Homologações + Medição</small></span></div>
+          <div onclick="exportPDFLista();toggleExportMenu()" style="padding:11px 16px;cursor:pointer;font-size:13px;display:flex;align-items:center;gap:9px;transition:background .15s" onmouseover="this.style.background='var(--s2)'" onmouseout="this.style.background=''">📊 <span><strong>PDF — Dashboard Executivo</strong><br><small style="color:var(--mu)">KPIs visuais + Lista + Atrasos + Homologações + Medição</small></span></div>
           <div style="border-top:1px solid var(--bdr);margin:0"></div>
           <div onclick="exportPDFHomologacoes();toggleExportMenu()" style="padding:11px 16px;cursor:pointer;font-size:13px;display:flex;align-items:center;gap:9px;transition:background .15s" onmouseover="this.style.background='var(--s2)'" onmouseout="this.style.background=''">🔖 <span><strong>PDF — Relatório de Homologações</strong><br><small style="color:var(--mu)">Todos os dados por grupo e status</small></span></div>
           <div style="border-top:1px solid var(--bdr);margin:0"></div>
@@ -1195,7 +1204,7 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
       <div class="kpi-tabs">
         <button class="kpi-tab active" data-tab="visao"    onclick="setKpiTab('visao',this)">📈 Visão Geral</button>
         <button class="kpi-tab"        data-tab="equipe"   onclick="setKpiTab('equipe',this)">👥 Pessoas &amp; Academias</button>
-        <button class="kpi-tab"        data-tab="pipeline" onclick="setKpiTab('pipeline',this)">🔄 Pipeline &amp; Throughput</button>
+        <button class="kpi-tab"        data-tab="pipeline" onclick="setKpiTab('pipeline',this)">🔄 Fluxo &amp; Entregas</button>
         <button class="kpi-tab"        data-tab="tempos"   onclick="setKpiTab('tempos',this)">⏱️ Tempos &amp; Eficiência</button>
       </div>
 
@@ -2676,8 +2685,46 @@ function rKPIs(){
   const dentroFiltro = p => !corte || (p.criado && new Date(p.criado) >= corte);
 
   const todos  = activeDB().concat(cancelDB());
+
+  // ── Detecção do "início do sistema" ──
+  // Pega a data de criação mais antiga entre todos os projetos. Se o filtro
+  // solicitado é anterior a essa data, o período está fora do histórico do
+  // sistema — exibimos um aviso para evitar números fora de contexto.
+  let dataMaisAntiga = null;
+  todos.forEach(p => {
+    if(!p.criado) return;
+    const d = new Date(p.criado);
+    if(isNaN(d)) return;
+    if(!dataMaisAntiga || d < dataMaisAntiga) dataMaisAntiga = d;
+  });
+  const periodoForaDoSistema = corte && dataMaisAntiga && corte < dataMaisAntiga;
+
   const act    = activeDB().filter(dentroFiltro);
   const todosF = todos.filter(dentroFiltro);
+
+  // ── Banner informativo ──
+  let bannerEl = document.getElementById('kpiPeriodoBanner');
+  if(!bannerEl){
+    bannerEl = document.createElement('div');
+    bannerEl.id = 'kpiPeriodoBanner';
+    bannerEl.className = 'kpi-periodo-banner';
+    const tabsEl = document.querySelector('.kpi-tabs');
+    if(tabsEl && tabsEl.parentNode) tabsEl.parentNode.insertBefore(bannerEl, tabsEl.nextSibling);
+  }
+  if(periodoForaDoSistema){
+    const fmtData = dataMaisAntiga.toLocaleDateString('pt-BR',{day:'2-digit',month:'long',year:'numeric'});
+    bannerEl.innerHTML = `
+      <div class="kpi-periodo-banner-content">
+        <span class="kpi-periodo-banner-ico">ℹ️</span>
+        <div>
+          <strong>Período anterior ao histórico disponível.</strong>
+          O primeiro projeto cadastrado é de <strong>${fmtData}</strong> — os indicadores abaixo refletem o histórico completo a partir dessa data.
+        </div>
+      </div>`;
+    bannerEl.style.display = 'block';
+  } else {
+    bannerEl.style.display = 'none';
+  }
 
   const total   = act.length;
   const conc    = act.filter(p=>calcSit(p)==='concluido').length;
@@ -2716,7 +2763,7 @@ function rKPIs(){
     resumoEl.innerHTML = `
       <div class="kpi-hcard tone-blue">
         <div class="kpi-hcard-icon">📁</div>
-        <div class="kpi-hcard-lbl">Total Ativos</div>
+        <div class="kpi-hcard-lbl">Total de Proj. Ativos</div>
         <div class="kpi-hcard-val" data-target="${total}">0</div>
         <div class="kpi-hcard-sub">${andando} em andamento</div>
       </div>
@@ -5437,12 +5484,65 @@ function exportPDFLista(){
   const { jsPDF } = jspdf;
   const doc = new jsPDF({ orientation:'landscape', unit:'mm', format:'a4' });
   const PW=297, PH=210, ML=12, MR=12, TW=PW-ML-MR;
-  let y=0;
 
+  // ── Paleta institucional (alinhada com o dashboard web) ──
+  const C = {
+    blue:[0,61,165], blueDark:[0,28,80], blueLight:[59,130,246],
+    red:[232,0,45], green:[26,138,74], amber:[217,119,6],
+    purple:[124,58,237], cyan:[8,145,178], orange:[234,88,12],
+    gray:[107,104,96], grayLight:[230,230,228], textMuted:[107,104,96],
+    bg:[245,247,250], white:[255,255,255], text:[26,26,26],
+    bgBlueSoft:[239,246,255], bgGreenSoft:[220,252,231],
+    bgRedSoft:[254,226,226], bgAmberSoft:[254,243,199],
+    bgPurpleSoft:[243,232,255], bgGraySoft:[243,244,246],
+    bgOrangeSoft:[255,247,237],
+  };
+
+  // ── Helpers de desenho ──
+  function setFill(c){ doc.setFillColor(c[0],c[1],c[2]); }
+  function setStroke(c){ doc.setDrawColor(c[0],c[1],c[2]); }
+  function setText(c){ doc.setTextColor(c[0],c[1],c[2]); }
+  // Retângulo arredondado com fill+stroke
+  function roundRect(x,y,w,h,r,fillC,strokeC,lw){
+    if(fillC){ setFill(fillC); }
+    if(strokeC){ setStroke(strokeC); doc.setLineWidth(lw||0.2); }
+    const style = fillC && strokeC ? 'FD' : fillC ? 'F' : strokeC ? 'S' : null;
+    if(style) doc.roundedRect(x,y,w,h,r,r,style);
+  }
+  function drawText(txt,x,y,opts){
+    opts = opts||{};
+    doc.setFont('helvetica', opts.bold ? 'bold' : 'normal');
+    doc.setFontSize(opts.size || 10);
+    setText(opts.color || C.text);
+    doc.text(String(txt), x, y, {align: opts.align || 'left', baseline: opts.baseline || 'alphabetic'});
+  }
+
+  // ── Cabeçalho hero (azul gradiente) ──
+  function heroPagina(titulo, subtitulo){
+    // Faixa azul superior (simulação de gradiente com 2 retângulos)
+    setFill(C.blueDark); doc.rect(0,0,PW*0.55,30,'F');
+    setFill(C.blue); doc.rect(PW*0.55,0,PW*0.45,30,'F');
+    // Texto do hero
+    setText(C.white);
+    doc.setFont('helvetica','bold'); doc.setFontSize(8);
+    doc.text('📊 DASHBOARD EXECUTIVO  ·  FIRJAN SENAI EAD', ML, 9);
+    doc.setFontSize(16);
+    doc.text(titulo, ML, 18);
+    if(subtitulo){
+      doc.setFont('helvetica','normal'); doc.setFontSize(9);
+      doc.text(subtitulo, ML, 24);
+    }
+    // Data à direita
+    doc.setFontSize(8); doc.setFont('helvetica','normal');
+    doc.text(`Gerado em ${isoToBR(td())}`, PW-MR, 9, {align:'right'});
+    doc.setFont('helvetica','bold'); doc.setFontSize(10);
+    doc.text(`Relatório Executivo`, PW-MR, 18, {align:'right'});
+  }
+
+  // ── Cabeçalho simples (páginas seguintes com tabelas) ──
   function cabecalho(titulo){
-    doc.setFillColor(0,61,165);
-    doc.rect(0,0,PW,22,'F');
-    doc.setTextColor(255,255,255);
+    setFill(C.blue); doc.rect(0,0,PW,22,'F');
+    setText(C.white);
     doc.setFont('helvetica','bold'); doc.setFontSize(13);
     doc.text('Firjan SENAI — Sistema de Gestão EAD', ML, 10);
     doc.setFontSize(9); doc.setFont('helvetica','normal');
@@ -5450,9 +5550,599 @@ function exportPDFLista(){
     doc.text(`Gerado em ${isoToBR(td())}`, PW-MR, 17,{align:'right'});
   }
 
-  // ══ PÁGINA 1: Lista de projetos ══
-  cabecalho('Lista Geral de Projetos'); y=30;
+  // ── Card KPI (estilo do dashboard) ──
+  function kpiCard(x, y, w, h, opts){
+    // Fundo branco com borda arredondada
+    roundRect(x, y, w, h, 3, C.white, C.grayLight, 0.3);
+    // Faixa colorida no topo (3mm)
+    setFill(opts.barColor || C.blue);
+    doc.rect(x, y, w, 1.2, 'F');
+    // Label
+    doc.setFont('helvetica','bold'); doc.setFontSize(7);
+    setText(C.textMuted);
+    doc.text((opts.label||'').toUpperCase(), x+3, y+6);
+    // Ícone à direita
+    if(opts.icon){
+      const iconSize = 6;
+      const iconX = x + w - iconSize - 3;
+      const iconY = y + 3;
+      roundRect(iconX, iconY, iconSize, iconSize, 1.2, opts.iconBg || C.bgBlueSoft, null);
+      doc.setFont('helvetica','bold'); doc.setFontSize(7);
+      setText(opts.iconColor || C.blue);
+      doc.text(opts.icon, iconX + iconSize/2, iconY + iconSize/2 + 1, {align:'center'});
+    }
+    // Valor grande
+    doc.setFont('helvetica','bold'); doc.setFontSize(18);
+    setText(opts.valColor || C.text);
+    doc.text(String(opts.value), x+3, y+15);
+    // Subtítulo
+    if(opts.sub){
+      doc.setFont('helvetica','normal'); doc.setFontSize(7);
+      setText(C.textMuted);
+      doc.text(opts.sub, x+3, y+h-3);
+    }
+  }
+
+  // ── Donut chart (situação) ──
+  function donut(cx, cy, rOuter, rInner, segments){
+    // segments = [{value, color}]
+    const total = segments.reduce((s,seg) => s + seg.value, 0) || 1;
+    let startAngle = -Math.PI/2;  // começa em cima
+    segments.forEach(seg => {
+      if(seg.value <= 0) return;
+      const sweep = (seg.value/total) * Math.PI * 2;
+      const endAngle = startAngle + sweep;
+      // Desenhar setor com vários triângulos finos
+      const steps = Math.max(2, Math.ceil(Math.abs(sweep)*30));
+      setFill(seg.color);
+      // Triangle fan
+      for(let i=0; i<steps; i++){
+        const a1 = startAngle + (sweep * i/steps);
+        const a2 = startAngle + (sweep * (i+1)/steps);
+        const x1 = cx + Math.cos(a1)*rOuter, y1 = cy + Math.sin(a1)*rOuter;
+        const x2 = cx + Math.cos(a2)*rOuter, y2 = cy + Math.sin(a2)*rOuter;
+        const x3 = cx + Math.cos(a2)*rInner, y3 = cy + Math.sin(a2)*rInner;
+        const x4 = cx + Math.cos(a1)*rInner, y4 = cy + Math.sin(a1)*rInner;
+        doc.lines([[x2-x1,y2-y1],[x3-x2,y3-y2],[x4-x3,y4-y3],[x1-x4,y1-y4]], x1,y1, [1,1], 'F', true);
+      }
+      startAngle = endAngle;
+    });
+  }
+
+  // ── Barra horizontal ──
+  function barraH(x, y, totalW, value, max, color, label, valTxt){
+    const trackH = 4;
+    // Label e valor acima
+    doc.setFont('helvetica','bold'); doc.setFontSize(8);
+    setText(C.text);
+    doc.text(label, x, y-1.5);
+    doc.text(valTxt || String(value), x+totalW, y-1.5, {align:'right'});
+    // Trilha cinza
+    roundRect(x, y, totalW, trackH, 2, C.bgGraySoft);
+    // Preenchimento colorido
+    const fw = max > 0 ? Math.max(0.5, (value/max)*totalW) : 0;
+    roundRect(x, y, fw, trackH, 2, color);
+  }
+
+  // ── Barra vertical (throughput mensal) ──
+  function barraV(x, y, w, h, color, valor, label){
+    if(valor > 0){
+      roundRect(x, y, w, h, 1, color);
+    } else {
+      // Linha base discreta
+      setFill(C.grayLight); doc.rect(x, y+h-0.5, w, 0.5, 'F');
+    }
+    // Valor acima
+    if(valor > 0){
+      doc.setFont('helvetica','bold'); doc.setFontSize(7);
+      setText(C.text);
+      doc.text(String(valor), x+w/2, y-1, {align:'center'});
+    }
+    // Label embaixo
+    doc.setFont('helvetica','normal'); doc.setFontSize(6.5);
+    setText(C.textMuted);
+    doc.text(label, x+w/2, y+h+3, {align:'center'});
+  }
+
+  // ── Cálculo dos dados de KPI ──
   const todos = activeDB().concat(cancelDB());
+  const act = activeDB();
+  const total = act.length;
+  const conc = act.filter(p=>calcSit(p)==='concluido').length;
+  const atras = act.filter(p=>calcSit(p)==='atrasado').length;
+  const atrasEqV = act.filter(p=>atrasadoPorEquipe(p)).length;
+  const atrasClV = act.filter(p=>atrasadoPorCliente(p)).length;
+  const andando = act.filter(p=>calcSit(p)==='andamento').length;
+  const aguard = act.filter(p=>calcSit(p)==='aguardando').length;
+  const homolPendV = todos.filter(p=>(p.col===11||p.homologPassou||p.homolog?.preenchido)&&!p.homolog?.dtInstalacao).length;
+  const medicPendV = todos.filter(p=>p.enviadoMedicao&&!p.medicaoFeita).length;
+  const avg = total>0 ? Math.round(act.reduce((a,p)=>a+p.pct,0)/total) : 0;
+  const txConc = total>0 ? Math.round(conc/total*100) : 0;
+  const txAtras = total>0 ? Math.round(atras/total*100) : 0;
+  const ciclos = todos.filter(p=>p.termino&&p.criado)
+    .map(p=>Math.round((new Date(p.termino)-new Date(p.criado))/864e5));
+  const tmCiclo = ciclos.length ? Math.round(ciclos.reduce((a,b)=>a+b,0)/ciclos.length) : null;
+
+  // ═══════════════════════════════════════════════════════
+  // PÁGINA 1 — VISÃO GERAL EXECUTIVA
+  // ═══════════════════════════════════════════════════════
+  heroPagina('KPIs & Indicadores de Produção EAD', 'Análise consolidada do desempenho da equipe e dos projetos');
+
+  // Faixa de KPI cards (6 cards em uma linha)
+  const cardY = 36, cardH = 22, cardGap = 3;
+  const cardW = (TW - 5*cardGap) / 6;
+  const kpis = [
+    {label:'Total de Proj. Ativos', value:total, sub:`${andando} em andamento`, icon:'P', barColor:C.blue, iconBg:C.bgBlueSoft, iconColor:C.blue, valColor:C.blue},
+    {label:'Taxa de Conclusão', value:txConc+'%', sub:`${conc} concluído${conc!==1?'s':''}`, icon:'✓', barColor:C.green, iconBg:C.bgGreenSoft, iconColor:C.green, valColor:C.green},
+    {label:'Taxa de Atraso', value:txAtras+'%', sub:`${atras} atrasado${atras!==1?'s':''}`,
+      icon:'!', barColor:(txAtras>20?C.red:txAtras>10?C.amber:C.green),
+      iconBg:(txAtras>20?C.bgRedSoft:txAtras>10?C.bgAmberSoft:C.bgGreenSoft),
+      iconColor:(txAtras>20?C.red:txAtras>10?C.amber:C.green),
+      valColor:(txAtras>20?C.red:txAtras>10?C.amber:C.green)},
+    {label:'Progresso Médio', value:avg+'%', sub:'média geral', icon:'~', barColor:C.purple, iconBg:C.bgPurpleSoft, iconColor:C.purple, valColor:C.purple},
+    {label:'Homolog. Pendentes', value:homolPendV, sub:`${medicPendV} aguard. medição`,
+      icon:'H', barColor:(homolPendV>0?C.amber:C.green),
+      iconBg:(homolPendV>0?C.bgAmberSoft:C.bgGreenSoft),
+      iconColor:(homolPendV>0?C.amber:C.green),
+      valColor:(homolPendV>0?C.amber:C.green)},
+    {label:'Tempo Médio Ciclo', value:tmCiclo!==null?tmCiclo+'d':'—',
+      sub:`${ciclos.length} proj. concluído${ciclos.length!==1?'s':''}`,
+      icon:'T', barColor:C.gray, iconBg:C.bgGraySoft, iconColor:C.gray, valColor:C.text},
+  ];
+  kpis.forEach((k,i) => kpiCard(ML + i*(cardW+cardGap), cardY, cardW, cardH, k));
+
+  // ── Donut + Legenda (situação) ──
+  const sec2Y = cardY + cardH + 6;
+  const sec2H = 60;
+  // Card grande à esquerda (Distribuição)
+  const leftW = TW * 0.42;
+  roundRect(ML, sec2Y, leftW, sec2H, 3, C.white, C.grayLight, 0.3);
+  drawText('Distribuição por Situação', ML+4, sec2Y+6, {size:11, bold:true, color:C.text});
+  drawText(`${total} projetos ativos`, ML+leftW-4, sec2Y+6, {size:8, color:C.textMuted, align:'right'});
+
+  // Donut
+  const sits = {
+    andamento: {value:andando, color:C.blueLight, label:'Em Andamento'},
+    atrasadoEq: {value:atrasEqV, color:C.red, label:'Atrasado — Equipe'},
+    atrasadoCl: {value:atrasClV, color:C.amber, label:'Atrasado — Cliente'},
+    concluido: {value:conc, color:C.green, label:'Concluído'},
+    aguardando: {value:aguard, color:C.gray, label:'Aguardando'},
+  };
+  const segs = Object.values(sits);
+  const donutCX = ML+22, donutCY = sec2Y+34;
+  if(total > 0){
+    donut(donutCX, donutCY, 17, 11, segs);
+    // Total no centro
+    doc.setFont('helvetica','bold'); doc.setFontSize(13);
+    setText(C.text);
+    doc.text(String(total), donutCX, donutCY+1, {align:'center'});
+    doc.setFont('helvetica','normal'); doc.setFontSize(6);
+    setText(C.textMuted);
+    doc.text('PROJETOS', donutCX, donutCY+5, {align:'center'});
+  } else {
+    drawText('Sem dados', donutCX, donutCY, {size:8, color:C.textMuted, align:'center'});
+  }
+  // Legenda à direita do donut
+  const legX = ML + 46, legW = leftW - 50;
+  let legY = sec2Y + 14;
+  segs.forEach(s => {
+    const pct = total>0 ? Math.round(s.value/total*100) : 0;
+    // Bolinha colorida
+    setFill(s.color); doc.rect(legX, legY-1.8, 2.5, 2.5, 'F');
+    drawText(s.label, legX+4, legY, {size:8.5, color:C.text});
+    drawText(`${s.value}`, legX+legW-12, legY, {size:8.5, bold:true, color:C.text, align:'right'});
+    drawText(`${pct}%`, legX+legW, legY, {size:7.5, color:C.textMuted, align:'right'});
+    legY += 6.5;
+  });
+
+  // Card à direita: Insights Rápidos
+  const rightX = ML + leftW + 6;
+  const rightW = TW - leftW - 6;
+  roundRect(rightX, sec2Y, rightW, sec2H, 3, C.white, C.grayLight, 0.3);
+  drawText('Insights Rápidos', rightX+4, sec2Y+6, {size:11, bold:true, color:C.text});
+
+  const insights = [];
+  if(atrasEqV>0) insights.push({tone:'danger', txt:`${atrasEqV} projeto${atrasEqV>1?'s':''} atrasado${atrasEqV>1?'s':''} com a equipe — requer ação imediata`});
+  if(atrasClV>0) insights.push({tone:'warn', txt:`${atrasClV} projeto${atrasClV>1?'s':''} atrasado${atrasClV>1?'s':''} aguardando o cliente`});
+  const venc7 = act.filter(p => {
+    if(calcSit(p)==='concluido' || !p.prazo) return false;
+    const d = Math.round((new Date(p.prazo) - new Date()) / 864e5);
+    return d>=0 && d<=7;
+  }).length;
+  if(venc7>0) insights.push({tone:'warn', txt:`${venc7} projeto${venc7>1?'s':''} vence${venc7>1?'m':''} em até 7 dias`});
+  if(homolPendV>0) insights.push({tone:'info', txt:`${homolPendV} homologa${homolPendV>1?'ções':'ção'} pendente${homolPendV>1?'s':''}`});
+  if(medicPendV>0) insights.push({tone:'info', txt:`${medicPendV} projeto${medicPendV>1?'s':''} aguardando medição`});
+  if(tmCiclo!==null) insights.push({tone:'info', txt:`Tempo médio de ciclo: ${tmCiclo} dias (${ciclos.length} projeto${ciclos.length!==1?'s':''} concluído${ciclos.length!==1?'s':''})`});
+  if(txConc>=70) insights.push({tone:'ok', txt:`Excelente taxa de conclusão: ${txConc}%`});
+  else if(txConc>=50) insights.push({tone:'info', txt:`Taxa de conclusão: ${txConc}% — bom desempenho`});
+  if(atrasEqV===0 && atrasClV===0 && total>0) insights.push({tone:'ok', txt:'Nenhum projeto em atraso — equipe em dia!'});
+
+  const tonePalette = {
+    danger:{bg:C.bgRedSoft, border:C.red, text:[127,29,29]},
+    warn:{bg:C.bgOrangeSoft, border:C.orange, text:[124,45,18]},
+    ok:{bg:C.bgGreenSoft, border:C.green, text:[20,83,45]},
+    info:{bg:C.bgGraySoft, border:C.gray, text:C.text},
+  };
+  let insY = sec2Y + 11;
+  insights.slice(0, 6).forEach(ins => {
+    const p = tonePalette[ins.tone] || tonePalette.info;
+    const insH = 6.8;
+    roundRect(rightX+3, insY, rightW-6, insH, 1.5, p.bg);
+    // Borda lateral esquerda
+    setFill(p.border); doc.rect(rightX+3, insY, 1, insH, 'F');
+    // Truncar texto se muito longo
+    const maxChars = 90;
+    const txt = ins.txt.length > maxChars ? ins.txt.slice(0, maxChars-1)+'…' : ins.txt;
+    drawText(txt, rightX+6, insY+4.5, {size:8, color:p.text});
+    insY += insH + 1.2;
+  });
+  if(insights.length === 0){
+    drawText('Sem alertas no momento — situação tranquila ✓', rightX+4, sec2Y+30, {size:9, color:C.textMuted});
+  }
+
+  // ── Rodapé da página 1 com info do banner se aplicável ──
+  let dataMaisAntiga = null;
+  todos.forEach(p => { if(p.criado){ const d=new Date(p.criado); if(!isNaN(d) && (!dataMaisAntiga || d < dataMaisAntiga)) dataMaisAntiga = d; }});
+  const linhaFinalY = sec2Y + sec2H + 6;
+  if(dataMaisAntiga){
+    roundRect(ML, linhaFinalY, TW, 8, 2, C.bgBlueSoft, [191,219,254], 0.3);
+    setText([30,64,175]);
+    doc.setFont('helvetica','bold'); doc.setFontSize(8);
+    doc.text(`ℹ  Histórico do sistema:`, ML+3, linhaFinalY+5.2);
+    doc.setFont('helvetica','normal');
+    const fmtData = dataMaisAntiga.toLocaleDateString('pt-BR',{day:'2-digit',month:'long',year:'numeric'});
+    doc.text(`primeiro projeto cadastrado em ${fmtData}  ·  ${todos.length} projetos no total  ·  ${act.length} ativos · ${cancelDB().length} cancelados`, ML+38, linhaFinalY+5.2);
+  }
+
+  // ═══════════════════════════════════════════════════════
+  // PÁGINA 2 — FLUXO & ENTREGAS
+  // ═══════════════════════════════════════════════════════
+  doc.addPage();
+  heroPagina('Fluxo & Entregas', 'Pipeline de produção, throughput mensal e mudanças de escopo');
+
+  // Pipeline por fase (esquerda)
+  const p2Y = 36;
+  const pipeW = TW * 0.50;
+  roundRect(ML, p2Y, pipeW, 100, 3, C.white, C.grayLight, 0.3);
+  drawText('Pipeline por Fase', ML+4, p2Y+6, {size:11, bold:true, color:C.text});
+  drawText('projetos ativos', ML+pipeW-4, p2Y+6, {size:8, color:C.textMuted, align:'right'});
+
+  const colCount = {};
+  act.forEach(p => { colCount[p.col] = (colCount[p.col]||0)+1; });
+  const colArr = COLUNAS.map(c => ({...c, n: colCount[c.k]||0})).filter(c => c.n > 0);
+  const mxPipe = colArr.length ? Math.max(...colArr.map(c => c.n)) : 1;
+  // Converter hex do c.dot para RGB
+  function hexToRgb(hex){
+    if(!hex) return C.blue;
+    const h = hex.replace('#','');
+    if(h.length!==6) return C.blue;
+    return [parseInt(h.slice(0,2),16), parseInt(h.slice(2,4),16), parseInt(h.slice(4,6),16)];
+  }
+  let pY = p2Y + 14;
+  const pipeLineH = 7;
+  colArr.slice(0, 12).forEach(c => {
+    const cor = hexToRgb(c.dot);
+    // Bolinha
+    setFill(cor); doc.circle(ML+6, pY-1.5, 1.5, 'F');
+    // Nome
+    drawText(c.l.length>34?c.l.slice(0,33)+'…':c.l, ML+10, pY, {size:8, color:C.text, bold:true});
+    // Trilha
+    const barX = ML+pipeW*0.55, barW = pipeW*0.32;
+    roundRect(barX, pY-2.5, barW, 3, 1.5, C.bgGraySoft);
+    const fw = mxPipe>0 ? Math.max(0.5, (c.n/mxPipe)*barW) : 0;
+    roundRect(barX, pY-2.5, fw, 3, 1.5, cor);
+    // Valor
+    drawText(String(c.n), ML+pipeW-4, pY, {size:8, bold:true, align:'right', color:C.text});
+    pY += pipeLineH;
+  });
+
+  // Throughput mensal (direita)
+  const thrX = ML + pipeW + 6;
+  const thrW = TW - pipeW - 6;
+  roundRect(thrX, p2Y, thrW, 100, 3, C.white, C.grayLight, 0.3);
+  drawText('Conclusões por Mês', thrX+4, p2Y+6, {size:11, bold:true, color:C.text});
+  drawText('últimos 12 meses', thrX+thrW-4, p2Y+6, {size:8, color:C.textMuted, align:'right'});
+
+  // Calcular meses
+  const agora = new Date();
+  const meses = [];
+  for(let i=11;i>=0;i--){
+    const d = new Date(agora.getFullYear(), agora.getMonth()-i, 1);
+    meses.push({y:d.getFullYear(), m:d.getMonth(), lbl:d.toLocaleString('pt-BR',{month:'short'}).replace('.',''), n:0});
+  }
+  todos.forEach(p => {
+    if(!p.termino) return;
+    const dt = new Date(p.termino);
+    const mes = meses.find(m => m.y===dt.getFullYear() && m.m===dt.getMonth());
+    if(mes) mes.n++;
+  });
+  const mxThr = Math.max(...meses.map(m=>m.n), 1);
+  const total12 = meses.reduce((a,m)=>a+m.n, 0);
+  const medMes = total12 ? Math.round(total12/12 * 10)/10 : 0;
+  const melhorMes = [...meses].sort((a,b)=>b.n-a.n)[0];
+
+  // 3 stats no topo
+  const statsY = p2Y + 16;
+  drawText(String(total12), thrX+5, statsY+4, {size:16, bold:true, color:C.text});
+  drawText('TOTAL 12 MESES', thrX+5, statsY+8, {size:6, color:C.textMuted});
+  drawText(String(medMes), thrX+35, statsY+4, {size:16, bold:true, color:C.text});
+  drawText('MÉDIA/MÊS', thrX+35, statsY+8, {size:6, color:C.textMuted});
+  drawText(melhorMes && melhorMes.n>0 ? String(melhorMes.n) : '0', thrX+65, statsY+4, {size:16, bold:true, color:C.text});
+  drawText(`MELHOR MÊS${melhorMes && melhorMes.n>0 ? ' ('+melhorMes.lbl.toUpperCase()+')' : ''}`, thrX+65, statsY+8, {size:6, color:C.textMuted});
+
+  // Barras verticais
+  const barsY = p2Y + 30;
+  const barsH = 55;
+  const colW = (thrW - 10) / 12;
+  const barColW = colW * 0.65;
+  meses.forEach((m, i) => {
+    const x = thrX + 5 + i*colW + (colW - barColW)/2;
+    const hRatio = m.n > 0 ? Math.max(m.n/mxThr, 0.08) : 0;
+    const barH = barsH * hRatio;
+    barraV(x, barsY + barsH - barH, barColW, barH, C.blue, m.n, m.lbl);
+  });
+
+  // Mudança de escopo (parte inferior — largura total)
+  const escY = p2Y + 106;
+  const escH = 50;
+  roundRect(ML, escY, TW, escH, 3, C.white, C.grayLight, 0.3);
+  drawText('Projetos com Mudança de Escopo', ML+4, escY+6, {size:11, bold:true, color:C.text});
+
+  const comMudanca = todos.filter(p => p.mudouEscopo === 'sim');
+  if(comMudanca.length === 0){
+    drawText('Nenhum projeto teve alteração de escopo registrada', ML+4, escY+25, {size:9, color:C.textMuted});
+  } else {
+    // Badge resumo à esquerda
+    roundRect(ML+4, escY+10, 60, 14, 2, C.bgAmberSoft);
+    drawText(String(comMudanca.length), ML+8, escY+20, {size:16, bold:true, color:[181,83,9]});
+    drawText(`projeto${comMudanca.length>1?'s':''} com mudança`, ML+24, escY+16, {size:8, bold:true, color:[146,64,14]});
+    drawText(comMudanca.length>1?'tiveram alteração de escopo':'teve alteração de escopo', ML+24, escY+21, {size:7, color:[161,98,7]});
+
+    // Lista (3 colunas para caber mais)
+    const listX = ML + 70, listW = TW - 75;
+    const ordenados = [...comMudanca].sort((a,b) => {
+      if(a.cancelado !== b.cancelado) return a.cancelado ? 1 : -1;
+      return (a.nome||'').localeCompare(b.nome||'', 'pt-BR');
+    }).slice(0, 6);
+    const colItemW = listW / Math.min(2, ordenados.length || 1);
+    ordenados.slice(0, 4).forEach((p, i) => {
+      const col = i % 2;
+      const row = Math.floor(i/2);
+      const ix = listX + col * colItemW + 2;
+      const iy = escY + 10 + row * 17;
+      // Card pequeno
+      roundRect(ix, iy, colItemW - 4, 14, 1.5, [255,251,235], [254,243,199], 0.2);
+      setFill([245,158,11]); doc.rect(ix, iy, 1, 14, 'F');
+      const nomeT = p.nome.length > 38 ? p.nome.slice(0,36)+'…' : p.nome;
+      drawText(nomeT, ix+3, iy+5, {size:8, bold:true, color:C.text});
+      const ant = p.escopoAntigoRecurso || 'não informado';
+      const nov = p.escopoNovoRecurso || 'não informado';
+      const antT = ant.length>16?ant.slice(0,14)+'…':ant;
+      const novT = nov.length>16?nov.slice(0,14)+'…':nov;
+      // Antigo (vermelho)
+      roundRect(ix+3, iy+7, doc.getTextWidth(antT)+3, 4, 1, C.bgRedSoft);
+      drawText(antT, ix+4.5, iy+10, {size:7, color:[153,27,27]});
+      const antW = doc.getTextWidth(antT)+3;
+      drawText('→', ix+5+antW, iy+10, {size:8, bold:true, color:C.amber});
+      // Novo (verde)
+      roundRect(ix+10+antW, iy+7, doc.getTextWidth(novT)+3, 4, 1, C.bgGreenSoft);
+      drawText(novT, ix+11.5+antW, iy+10, {size:7, color:[21,128,61]});
+    });
+    if(ordenados.length > 4){
+      drawText(`+ ${comMudanca.length-4} outros — ver tabela completa`, listX+3, escY+escH-3, {size:7, color:C.textMuted, bold:true});
+    }
+  }
+
+  // ═══════════════════════════════════════════════════════
+  // PÁGINA 3 — PESSOAS & ACADEMIAS
+  // ═══════════════════════════════════════════════════════
+  doc.addPage();
+  heroPagina('Pessoas & Academias', 'Distribuição de projetos por academia, responsável e tipo de recurso');
+
+  const p3Y = 36;
+  // Académia (esquerda)
+  const acadW = TW * 0.48;
+  roundRect(ML, p3Y, acadW, 100, 3, C.white, C.grayLight, 0.3);
+  drawText('Projetos por Academia', ML+4, p3Y+6, {size:11, bold:true, color:C.text});
+
+  const mapAcad = {};
+  act.forEach(p => { const a = p.academia || 'Não definida'; mapAcad[a] = (mapAcad[a]||0)+1; });
+  const arrAcad = Object.entries(mapAcad).sort((a,b) => b[1]-a[1]).slice(0, 12);
+  const mxAcad = arrAcad.length ? arrAcad[0][1] : 1;
+  const ACAD_COLS = [
+    [0,61,165], [8,145,178], [124,58,237], [217,119,6], [26,138,74],
+    [232,0,45], [236,72,153], [249,115,22], [20,184,166], [99,102,241],
+    [132,204,22], [190,24,93]
+  ];
+  let ay = p3Y + 14;
+  arrAcad.forEach(([nome, n], i) => {
+    barraH(ML+4, ay, acadW-8, n, mxAcad, ACAD_COLS[i%ACAD_COLS.length], nome, String(n));
+    ay += 7;
+  });
+
+  // RP (direita)
+  const rpX = ML + acadW + 6;
+  const rpW = TW - acadW - 6;
+  roundRect(rpX, p3Y, rpW, 100, 3, C.white, C.grayLight, 0.3);
+  drawText('Projetos por RP', rpX+4, p3Y+6, {size:11, bold:true, color:C.text});
+
+  const mapRP = {};
+  act.forEach(p => { const r = p.rp || 'Não definido'; mapRP[r] = (mapRP[r]||0)+1; });
+  const arrRP = Object.entries(mapRP).sort((a,b) => b[1]-a[1]).slice(0, 12);
+  const mxRP = arrRP.length ? arrRP[0][1] : 1;
+  let ry = p3Y + 14;
+  arrRP.forEach(([nome, n], i) => {
+    barraH(rpX+4, ry, rpW-8, n, mxRP, C.blue, nome, String(n));
+    ry += 7;
+  });
+
+  // Recursos (parte inferior — largura total)
+  const recY = p3Y + 106;
+  roundRect(ML, recY, TW, 50, 3, C.white, C.grayLight, 0.3);
+  drawText('Projetos por Recurso', ML+4, recY+6, {size:11, bold:true, color:C.text});
+
+  const recCount = {};
+  act.forEach(p => (p.recursos||[]).forEach(r => { recCount[r] = (recCount[r]||0)+1; }));
+  const arrRec = Object.entries(recCount).sort((a,b) => b[1]-a[1]).slice(0, 5);
+  const mxRec = arrRec.length ? arrRec[0][1] : 1;
+  let recYY = recY + 14;
+  arrRec.forEach(([nome, n], i) => {
+    barraH(ML+4, recYY, TW-8, n, mxRec, ACAD_COLS[i%ACAD_COLS.length], nome, String(n));
+    recYY += 7.5;
+  });
+
+  // ═══════════════════════════════════════════════════════
+  // PÁGINA 4 — TEMPOS & EFICIÊNCIA
+  // ═══════════════════════════════════════════════════════
+  doc.addPage();
+  heroPagina('Tempos & Eficiência', 'Tempo médio por etapa e espera por retorno do cliente');
+
+  const p4Y = 36;
+  // Tempo médio por etapa (esquerda)
+  const etW = TW * 0.55;
+  roundRect(ML, p4Y, etW, 156, 3, C.white, C.grayLight, 0.3);
+  drawText('Tempo Médio por Etapa', ML+4, p4Y+6, {size:11, bold:true, color:C.text});
+  drawText('dias médios para conclusão', ML+etW-4, p4Y+6, {size:7.5, color:C.textMuted, align:'right'});
+
+  // Lista de etapas (compartilhada com a função rKPIs)
+  const ETAPAS_MEDIR = [
+    {n:'Reunião Inicial', busca:['Reunião Inicial'], r:'eq'},
+    {n:'Mat. Base Recebido', busca:['Material Base Recebido'], r:'cl'},
+    {n:'Análise Mat. Base', busca:['Análise do material base'], r:'eq'},
+    {n:'Elaboração PICV/PI', busca:['Elaboração do PICV','Elaboração do PI'], r:'eq'},
+    {n:'Valid. PICV DI/DM', busca:['Validação PICV DI/DM Referência','Validação do PI'], r:'cl'},
+    {n:'Validação LD', busca:['Validação LD'], r:'cl'},
+    {n:'Rev. Textual PICV/PI', busca:['Revisão textual do PICV','Revisão Textual do PI'], r:'eq'},
+    {n:'Entrega PICV/PI cliente', busca:['Entrega do PICV ao cliente','Entrega do PI ao cliente'], r:'eq'},
+    {n:'Solic. Ajustes PICV', busca:['Solicitação de ajustes no PICV'], r:'cl'},
+    {n:'Impl. Ajustes (PI)', busca:['Implementação de ajustes','Implementação de Ajustes'], r:'eq'},
+    {n:'Valid. Final PICV', busca:['Validação final do PICV'], r:'cl'},
+    {n:'Desenho/Rot. Onepage', busca:['Desenho/roteirização do onepage','Desenho/Roteirização'], r:'eq'},
+    {n:'Valid. DI Referência', busca:['Validação DI Referência'], r:'cl'},
+    {n:'Prod. Recursos Gráficos', busca:['Produção de recursos gráficos','Produção de Recursos Gráficos'], r:'eq'},
+    {n:'Valid. DM Referência', busca:['Validação DM Referência'], r:'cl'},
+    {n:'Entrega Review cliente', busca:['Entrega do review ao cliente','Entrega do Review ao cliente'], r:'eq'},
+    {n:'Solic. Ajustes Review', busca:['Solicitação de ajustes','Solicitação de Ajustes'], r:'cl'},
+    {n:'Impl. Ajustes (Review)', busca:['Implementação de ajustes','Implementação de Ajustes'], r:'eq'},
+    {n:'Valid. Final Review', busca:['Validação final do review','Validação Final'], r:'cl'},
+    {n:'Rev. Textual Review', busca:['Revisão textual do review','Revisão Textual'], r:'eq'},
+    {n:'Homologação', busca:['Homologação'], r:'eq'},
+    {n:'Instalação SIRH', busca:['Instalação no SIRH'], r:'eq'},
+    {n:'Upload Arquivos Bdoc', busca:['Upload Arquivos Bdoc','Upload Arquivos'], r:'eq'},
+  ];
+  const etArrPdf = ETAPAS_MEDIR.map(def => {
+    const amostras = [];
+    todos.forEach(p => {
+      const et = (p.etapas||[]).find(e => def.busca.includes(e.lb));
+      if(!et || !et.done || !et.fim) return;
+      const ref = et.prazo || et.inicio;
+      const dias = ref ? Math.max(1, Math.round((new Date(et.fim)-new Date(ref))/864e5)) : 1;
+      amostras.push(dias);
+    });
+    const media = amostras.length ? Math.round(amostras.reduce((a,b)=>a+b,0)/amostras.length) : null;
+    return {n:def.n, d:media, r:def.r, amostras:amostras.length};
+  }).filter(e => e.d !== null);
+  const mxET = etArrPdf.length ? Math.max(...etArrPdf.map(e => e.d), 1) : 1;
+  const mnET = etArrPdf.length ? Math.min(...etArrPdf.map(e => e.d)) : 0;
+
+  if(etArrPdf.length === 0){
+    drawText('Nenhuma etapa concluída ainda', ML+4, p4Y+30, {size:9, color:C.textMuted});
+  } else {
+    let ey = p4Y + 12;
+    const etColW = etW - 8;
+    etArrPdf.slice(0, 20).forEach(e => {
+      // Cor relativa
+      const t = mxET===mnET ? 0.5 : (e.d-mnET)/(mxET-mnET);
+      let cor;
+      if(e.r === 'cl'){
+        // Verde → Laranja → Vermelho
+        const r2 = Math.round(40 + t*210);
+        const g2 = Math.round(170 - t*120);
+        const b2 = Math.round(70 - t*40);
+        cor = [r2, g2, b2];
+      } else {
+        // Azul claro → Azul escuro
+        const r2 = Math.round(80 - t*70);
+        const g2 = Math.round(140 - t*80);
+        const b2 = Math.round(220 - t*60);
+        cor = [r2, g2, b2];
+      }
+      // Tag EQ/CL
+      const tagX = ML+4, tagW = 8;
+      roundRect(tagX, ey-3, tagW, 3.5, 0.8, e.r==='cl'?C.bgAmberSoft:C.bgBlueSoft);
+      drawText(e.r==='cl'?'CL':'EQ', tagX+tagW/2, ey, {size:6, bold:true, color:e.r==='cl'?[146,64,14]:[29,78,216], align:'center'});
+      // Nome
+      drawText(e.n, ML+14, ey, {size:7.5, color:C.text, bold:true});
+      // Amostras
+      drawText(`${e.amostras}x`, ML+62, ey, {size:6.5, color:C.textMuted});
+      // Trilha + valor
+      const barX = ML+72, barW = etColW-72;
+      roundRect(barX, ey-2.5, barW, 3, 1.5, C.bgGraySoft);
+      const fw = Math.max(0.5, (e.d/mxET)*barW);
+      roundRect(barX, ey-2.5, fw, 3, 1.5, cor);
+      drawText(e.d+'d', ML+etW-4, ey, {size:7.5, bold:true, color:cor, align:'right'});
+      ey += 6.5;
+    });
+  }
+
+  // Espera por cliente (direita)
+  const espX = ML + etW + 6;
+  const espW = TW - etW - 6;
+  roundRect(espX, p4Y, espW, 156, 3, C.white, C.grayLight, 0.3);
+  drawText('Espera por Cliente', espX+4, p4Y+6, {size:11, bold:true, color:C.text});
+  drawText('dias médios aguardando retorno', espX+espW-4, p4Y+6, {size:7, color:C.textMuted, align:'right'});
+
+  const etCl = {};
+  todos.forEach(p => {
+    (p.etapas||[]).forEach(e => {
+      if(e.r==='cl' && e.done && e.diasCl != null){
+        if(!etCl[e.lb]) etCl[e.lb] = {total:0, n:0};
+        etCl[e.lb].total += e.diasCl; etCl[e.lb].n++;
+      }
+    });
+  });
+  const espArr = Object.entries(etCl).map(([lb,v]) => ({lb, media:Math.round(v.total/v.n), n:v.n}))
+    .sort((a,b) => b.media-a.media);
+  const mxEsp = espArr.length ? espArr[0].media : 1;
+  const mnEsp = espArr.length ? espArr[espArr.length-1].media : 0;
+  const mediaGeral = espArr.length ? Math.round(espArr.reduce((a,e) => a+e.media, 0)/espArr.length) : null;
+
+  if(espArr.length === 0){
+    drawText('Nenhuma etapa de cliente concluída ainda', espX+4, p4Y+30, {size:9, color:C.textMuted});
+  } else {
+    // Card âmbar com média geral
+    roundRect(espX+4, p4Y+11, espW-8, 16, 2, [255,247,237], [254,215,170], 0.3);
+    drawText(mediaGeral+'d', espX+8, p4Y+21, {size:18, bold:true, color:[154,52,18]});
+    drawText('média geral de espera', espX+30, p4Y+18, {size:8, bold:true, color:[124,45,18]});
+    drawText(`considerando ${espArr.length} etapa${espArr.length>1?'s':''}`, espX+30, p4Y+24, {size:7, color:[161,98,7]});
+
+    // Lista
+    let espY = p4Y + 32;
+    espArr.slice(0, 15).forEach(e => {
+      const t = mxEsp===mnEsp ? 0.5 : (e.media-mnEsp)/(mxEsp-mnEsp);
+      let cor;
+      if(t < 0.33){ cor = [80, 160, 70]; }     // verde
+      else if(t < 0.66){ cor = [210, 130, 30]; } // laranja
+      else { cor = [200, 50, 40]; }              // vermelho
+      // Nome
+      const lblTrunc = e.lb.length > 30 ? e.lb.slice(0,28)+'…' : e.lb;
+      drawText(lblTrunc, espX+4, espY, {size:7.5, color:C.text, bold:true});
+      drawText(`${e.n}x`, espX+espW-25, espY, {size:6.5, color:C.textMuted});
+      drawText(e.media+'d', espX+espW-4, espY, {size:8, bold:true, color:cor, align:'right'});
+      // Trilha
+      const barW = espW - 8;
+      roundRect(espX+4, espY+1.5, barW, 2.5, 1, C.bgGraySoft);
+      const fw = Math.max(0.5, (e.media/mxEsp)*barW);
+      roundRect(espX+4, espY+1.5, fw, 2.5, 1, cor);
+      espY += 7.5;
+    });
+  }
+
+  // ═══════════════════════════════════════════════════════
+  // PÁGINA 5+: TABELAS DETALHADAS (mantém o conteúdo original)
+  // ═══════════════════════════════════════════════════════
+  doc.addPage();
+  cabecalho('Lista Geral de Projetos'); let y = 30;
   const hdrL=[['ID','Nome','Recursos','Responsáveis','Situação','Coluna','Início','Prazo','Término','%']];
   const rowsL=todos.map(p=>[
     p.id, p.nome, (p.recursos||[]).join(', '),
@@ -5481,40 +6171,8 @@ function exportPDFLista(){
       }
     }
   });
-  y=doc.lastAutoTable.finalY+10;
 
-  // ── KPIs resumo (na mesma página se couber, senão nova) ──
-  if(y>170){doc.addPage();cabecalho('KPIs & Indicadores');y=30;}
-  else {
-    doc.setFillColor(240,244,255); doc.rect(ML,y,TW,8,'F');
-    doc.setFont('helvetica','bold'); doc.setFontSize(10); doc.setTextColor(0,61,165);
-    doc.text('KPIs & Indicadores', ML+2, y+5.5); y+=12;
-  }
-  const act=activeDB();
-  const total=act.length||1;
-  const conc=act.filter(p=>calcSit(p)==='concluido').length;
-  const atras=act.filter(p=>calcSit(p)==='atrasado').length;
-  const atrasEqPdf=act.filter(p=>atrasadoPorEquipe(p)).length;
-  const atrasCLPdf=act.filter(p=>atrasadoPorCliente(p)).length;
-  const avg=Math.round(act.reduce((a,p)=>a+p.pct,0)/total);
-  const kpiData=[
-    ['Total de Projetos Ativos',String(act.length)],
-    ['Concluídos',conc+' ('+Math.round(conc/total*100)+'%)'],
-    ['Atrasados — Equipe',atrasEqPdf+' ('+Math.round(atrasEqPdf/total*100)+'%)'],
-    ['Atrasados — Cliente',atrasCLPdf+' ('+Math.round(atrasCLPdf/total*100)+'%)'],
-    ['Total Atrasados',atras+' ('+Math.round(atras/total*100)+'%)'],
-    ['Progresso Médio',avg+'%'],
-  ];
-  doc.autoTable({
-    head:[['Indicador','Valor']],body:kpiData,startY:y,
-    margin:{left:ML,right:MR+180},
-    styles:{fontSize:9,cellPadding:3},
-    headStyles:{fillColor:[0,61,165],textColor:255,fontStyle:'bold'},
-    columnStyles:{0:{cellWidth:60},1:{cellWidth:30,halign:'center',fontStyle:'bold'}},
-  });
-  y=doc.lastAutoTable.finalY+10;
-
-  // ══ NOVA PÁGINA: Atrasos ══
+  // ── NOVA PÁGINA: Atrasos ──
   doc.addPage(); cabecalho('Relatório de Atrasos'); y=30;
   const hdrA=[['Projeto','Situação Proj.','Etapa','Resp.','Prazo Etapa','Dias Atraso','Status','Motivo']];
   const rowsA=[];
@@ -5556,10 +6214,9 @@ function exportPDFLista(){
     }
   });
 
-  // ══ NOVA PÁGINA: Homologações ══
+  // ── NOVA PÁGINA: Homologações ──
   doc.addPage(); cabecalho('Homologações'); y=30;
-  const todosTodos2 = activeDB().concat(cancelDB());
-  const homList = todosTodos2.filter(p => p.col === 11 || p.homologPassou || p.homolog?.preenchido)
+  const homList = todos.filter(p => p.col === 11 || p.homologPassou || p.homolog?.preenchido)
     .sort((a,b) => {
       const ai = !!(a.homolog?.dtInstalacao), bi = !!(b.homolog?.dtInstalacao);
       if(ai !== bi) return ai ? 1 : -1;
@@ -5596,9 +6253,9 @@ function exportPDFLista(){
     }
   });
 
-  // ══ NOVA PÁGINA: Medição ══
+  // ── NOVA PÁGINA: Medição ──
   doc.addPage(); cabecalho('Medição'); y=30;
-  const medicList = todosTodos2.filter(p => p.enviadoMedicao)
+  const medicList = todos.filter(p => p.enviadoMedicao)
     .sort((a,b) => (a.medicaoFeita===b.medicaoFeita) ? 0 : a.medicaoFeita ? 1 : -1);
   const hdrMpdf = [['Projeto','Responsáveis','Recursos','Coluna Atual','Enviado em','Medição Feita?','Concluído em']];
   const rowsMpdf = medicList.map(p => [
@@ -5627,7 +6284,7 @@ function exportPDFLista(){
     }
   });
 
-  // ── Rodapé todas as páginas ──
+  // ── Rodapé em todas as páginas ──
   const pages=doc.internal.getNumberOfPages();
   for(let i=1;i<=pages;i++){
     doc.setPage(i);
@@ -5636,8 +6293,8 @@ function exportPDFLista(){
     doc.text(`Pág. ${i}/${pages}`,PW-MR,PH-5,{align:'right'});
   }
 
-  doc.save(`relatorio-projetos-ead-${td()}.pdf`);
-  showToast('📋 PDF completo exportado!');
+  doc.save(`dashboard-executivo-ead-${td()}.pdf`);
+  showToast('📊 Dashboard exportado!');
 }
 
 function exportPDFHomologacoes(){
