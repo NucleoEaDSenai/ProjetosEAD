@@ -229,6 +229,191 @@ tr:hover td{background:#FAFAF9}
 .sit-ov{background:#FEE2E2;color:#991B1B}
 .sit-done{background:#DCFCE7;color:#15803D}
 .sit-wait{background:#FFF3CD;color:#856404}
+/* ═══════════════════════════════════════════════════════
+   KPI DASHBOARD — REPAGINADO PREMIUM
+   ═══════════════════════════════════════════════════════ */
+/* Header hero */
+.kpi-hero{position:relative;background:linear-gradient(135deg,#003DA5 0%,#0050C8 45%,#0066D4 100%);color:#fff;border-radius:18px;padding:28px 32px;margin-bottom:18px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:20px;overflow:hidden;box-shadow:0 8px 28px rgba(0,61,165,.18)}
+.kpi-hero::before{content:'';position:absolute;top:-50%;right:-20%;width:60%;height:200%;background:radial-gradient(ellipse,rgba(255,255,255,.12) 0%,transparent 60%);pointer-events:none}
+.kpi-hero::after{content:'';position:absolute;bottom:-30%;left:-10%;width:40%;height:160%;background:radial-gradient(ellipse,rgba(232,0,45,.15) 0%,transparent 60%);pointer-events:none}
+.kpi-hero-content{position:relative;z-index:1}
+.kpi-hero-eyebrow{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;opacity:.85;margin-bottom:8px}
+.kpi-hero-title{font-family:'Plus Jakarta Sans',sans-serif;font-size:26px;font-weight:800;line-height:1.15;margin-bottom:6px;letter-spacing:-.3px}
+.kpi-hero-sub{font-size:13px;opacity:.85;font-weight:400}
+.kpi-hero-controls{position:relative;z-index:1;display:flex;align-items:center;gap:14px}
+.kpi-period-group{display:flex;flex-direction:column;gap:6px}
+.kpi-period-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;opacity:.7}
+.kpi-seg{display:inline-flex;background:rgba(255,255,255,.12);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.18);border-radius:10px;padding:3px;gap:1px}
+.kpi-seg-btn{background:transparent;border:none;color:#fff;padding:6px 12px;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;transition:all .15s;min-width:42px}
+.kpi-seg-btn:hover{background:rgba(255,255,255,.12)}
+.kpi-seg-btn.active{background:#fff;color:#003DA5}
+body.dark .kpi-hero{background:linear-gradient(135deg,#001A4A 0%,#003DA5 100%)}
+
+/* Tabs */
+.kpi-tabs{display:flex;gap:4px;background:var(--surface);border:1px solid var(--bdr);border-radius:12px;padding:5px;margin-bottom:18px;overflow-x:auto;scrollbar-width:none}
+.kpi-tabs::-webkit-scrollbar{display:none}
+.kpi-tab{background:transparent;border:none;padding:10px 16px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;color:var(--mu);font-family:'Plus Jakarta Sans',sans-serif;white-space:nowrap;transition:all .15s;display:inline-flex;align-items:center;gap:6px;flex-shrink:0}
+.kpi-tab:hover{background:var(--s2);color:var(--txt)}
+.kpi-tab.active{background:linear-gradient(135deg,#003DA5,#0050C8);color:#fff;box-shadow:0 2px 10px rgba(0,61,165,.25)}
+
+.kpi-tab-content{display:none;animation:kpiFadeIn .35s ease}
+.kpi-tab-content.active{display:block}
+@keyframes kpiFadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+/* Grid rows */
+.kpi-row{display:grid;gap:14px;margin-bottom:14px;grid-template-columns:1fr}
+
+/* Hero cards (resumo) */
+.kpi-hero-cards{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin-bottom:16px}
+.kpi-hcard{background:var(--surface);border:1px solid var(--bdr);border-radius:14px;padding:16px 16px 14px;position:relative;overflow:hidden;transition:all .25s;cursor:default}
+.kpi-hcard:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.08);border-color:transparent}
+.kpi-hcard::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--blue);opacity:.9}
+.kpi-hcard-icon{position:absolute;top:14px;right:14px;width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;opacity:.9}
+.kpi-hcard-lbl{font-size:10.5px;color:var(--mu);text-transform:uppercase;letter-spacing:.6px;font-weight:700;margin-bottom:8px;max-width:75%}
+.kpi-hcard-val{font-family:'Plus Jakarta Sans',sans-serif;font-size:30px;font-weight:800;line-height:1;margin-bottom:6px;letter-spacing:-.5px}
+.kpi-hcard-sub{font-size:11px;color:var(--mu);font-weight:500;display:flex;align-items:center;gap:4px}
+.kpi-hcard-trend{display:inline-flex;align-items:center;gap:2px;padding:2px 6px;border-radius:6px;font-size:10px;font-weight:700}
+.kpi-hcard-trend.up{background:#DCFCE7;color:#15803D}
+.kpi-hcard-trend.down{background:#FEE2E2;color:#991B1B}
+.kpi-hcard-trend.neutral{background:var(--s2);color:var(--mu)}
+.kpi-hcard.tone-blue::before{background:linear-gradient(90deg,#003DA5,#0066D4)}
+.kpi-hcard.tone-blue .kpi-hcard-icon{background:#EFF6FF;color:#1D4ED8}
+.kpi-hcard.tone-blue .kpi-hcard-val{color:#003DA5}
+.kpi-hcard.tone-green::before{background:linear-gradient(90deg,#15803D,#22C55E)}
+.kpi-hcard.tone-green .kpi-hcard-icon{background:#DCFCE7;color:#15803D}
+.kpi-hcard.tone-green .kpi-hcard-val{color:#15803D}
+.kpi-hcard.tone-red::before{background:linear-gradient(90deg,#991B1B,#E8002D)}
+.kpi-hcard.tone-red .kpi-hcard-icon{background:#FEE2E2;color:#991B1B}
+.kpi-hcard.tone-red .kpi-hcard-val{color:#E8002D}
+.kpi-hcard.tone-amber::before{background:linear-gradient(90deg,#B45309,#F59E0B)}
+.kpi-hcard.tone-amber .kpi-hcard-icon{background:#FEF3C7;color:#92400E}
+.kpi-hcard.tone-amber .kpi-hcard-val{color:#D97706}
+.kpi-hcard.tone-pur::before{background:linear-gradient(90deg,#6D28D9,#A855F7)}
+.kpi-hcard.tone-pur .kpi-hcard-icon{background:#F3E8FF;color:#6D28D9}
+.kpi-hcard.tone-pur .kpi-hcard-val{color:#7C3AED}
+.kpi-hcard.tone-gray::before{background:linear-gradient(90deg,#374151,#6B7280)}
+.kpi-hcard.tone-gray .kpi-hcard-icon{background:var(--s2);color:var(--mu)}
+.kpi-hcard.tone-gray .kpi-hcard-val{color:var(--txt)}
+/* Sparkline */
+.kpi-hcard-spark{margin-top:8px;height:24px;position:relative}
+.kpi-hcard-spark svg{width:100%;height:100%}
+
+/* Cards content */
+.kpi-card{background:var(--surface);border:1px solid var(--bdr);border-radius:14px;padding:20px 22px;transition:all .2s}
+.kpi-card.kpi-card-elev{box-shadow:0 1px 3px rgba(0,0,0,.04)}
+.kpi-card:hover{box-shadow:0 4px 16px rgba(0,0,0,.06)}
+.kpi-card-head{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-bottom:16px;flex-wrap:wrap}
+.kpi-card-title{font-family:'Plus Jakarta Sans',sans-serif;font-size:14.5px;font-weight:700;color:var(--txt);letter-spacing:-.1px}
+.kpi-card-sub{font-size:11px;color:var(--mu);font-weight:500}
+.kpi-card-badge{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:14px;background:var(--s2);font-size:11px;font-weight:700;color:var(--txt)}
+
+/* Donut + Legenda */
+.kpi-donut-wrap{display:flex;align-items:center;gap:20px;flex-wrap:wrap}
+.kpi-donut{position:relative;flex-shrink:0}
+.kpi-donut svg{display:block;filter:drop-shadow(0 2px 6px rgba(0,0,0,.06))}
+.kpi-donut svg circle.arc{cursor:pointer;transition:stroke-width .2s,opacity .2s}
+.kpi-donut svg circle.arc:hover{stroke-width:14;opacity:.85}
+.kpi-donut-center{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;pointer-events:none}
+.kpi-donut-center-val{font-family:'Plus Jakarta Sans',sans-serif;font-size:22px;font-weight:800;color:var(--txt);line-height:1}
+.kpi-donut-center-lbl{font-size:10px;color:var(--mu);text-transform:uppercase;letter-spacing:.6px;font-weight:600;margin-top:2px}
+.kpi-donut-legend{flex:1;min-width:160px;display:flex;flex-direction:column;gap:8px}
+.kpi-legend-item{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:8px;cursor:pointer;transition:background .15s;font-size:12.5px}
+.kpi-legend-item:hover{background:var(--s2)}
+.kpi-legend-dot{width:10px;height:10px;border-radius:3px;flex-shrink:0}
+.kpi-legend-lbl{flex:1;color:var(--txt);font-weight:500}
+.kpi-legend-val{font-weight:800;font-family:'Plus Jakarta Sans',sans-serif;color:var(--txt)}
+.kpi-legend-pct{font-size:10.5px;color:var(--mu);font-weight:600;margin-left:4px}
+
+/* Insights */
+.kpi-insights-list{display:flex;flex-direction:column;gap:8px}
+.kpi-insight{display:flex;align-items:flex-start;gap:10px;padding:11px 13px;border-radius:10px;background:var(--s2);font-size:12.5px;line-height:1.4;color:var(--txt);transition:all .15s;border-left:3px solid var(--blue)}
+.kpi-insight:hover{transform:translateX(2px)}
+.kpi-insight.warn{background:#FFF7ED;border-left-color:#EA580C;color:#7C2D12}
+.kpi-insight.danger{background:#FEE2E2;border-left-color:#DC2626;color:#7F1D1D}
+.kpi-insight.ok{background:#DCFCE7;border-left-color:#16A34A;color:#14532D}
+.kpi-insight-icon{font-size:16px;flex-shrink:0;margin-top:-1px}
+.kpi-insight-text{flex:1}
+.kpi-insight-text strong{font-weight:800}
+body.dark .kpi-insight.warn{background:rgba(234,88,12,.18);color:#FED7AA}
+body.dark .kpi-insight.danger{background:rgba(220,38,38,.18);color:#FCA5A5}
+body.dark .kpi-insight.ok{background:rgba(22,163,74,.18);color:#86EFAC}
+
+/* Pipeline melhorado */
+.kpi-pipeline-list{display:flex;flex-direction:column;gap:10px}
+.kpi-pipe-row{display:flex;align-items:center;gap:10px;padding:6px 0;font-size:12px}
+.kpi-pipe-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;box-shadow:0 0 0 3px rgba(255,255,255,.5)}
+.kpi-pipe-name{flex:1;font-weight:600;color:var(--txt);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.kpi-pipe-bar{flex:2;height:8px;background:var(--s2);border-radius:5px;overflow:hidden}
+.kpi-pipe-fill{height:100%;border-radius:5px;transition:width .6s cubic-bezier(.16,1,.3,1)}
+.kpi-pipe-count{font-family:'Plus Jakarta Sans',sans-serif;font-weight:800;font-size:13px;color:var(--txt);min-width:28px;text-align:right}
+
+/* Throughput / barras mensais */
+.kpi-throughput-wrap{display:flex;flex-direction:column;gap:10px}
+.kpi-throughput-stats{display:flex;gap:14px;flex-wrap:wrap;padding-bottom:6px;border-bottom:1px dashed var(--bdr)}
+.kpi-throughput-stat{display:flex;flex-direction:column;gap:1px}
+.kpi-throughput-stat-num{font-family:'Plus Jakarta Sans',sans-serif;font-weight:800;font-size:18px;color:var(--txt);line-height:1}
+.kpi-throughput-stat-lbl{font-size:10px;color:var(--mu);text-transform:uppercase;letter-spacing:.5px;font-weight:600}
+.kpi-throughput-bars{display:flex;align-items:stretch;gap:5px;padding-top:18px}
+.kpi-throughput-bars.kpi-throughput-big{gap:8px}
+.kpi-tcol{flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer;height:130px}
+.kpi-throughput-bars.kpi-throughput-big .kpi-tcol{height:200px}
+.kpi-tcol-bar-wrap{width:100%;display:flex;align-items:flex-end;justify-content:center;flex:1;position:relative;min-height:0}
+.kpi-tcol-bar{width:80%;border-radius:5px 5px 0 0;background:linear-gradient(180deg,#0066D4,#003DA5);transition:all .35s cubic-bezier(.16,1,.3,1);min-height:4px;position:relative}
+.kpi-tcol-bar:hover{background:linear-gradient(180deg,#0080FF,#0050C8);transform:scaleY(1.04);transform-origin:bottom}
+.kpi-tcol-bar.empty{background:var(--bdr);min-height:3px}
+.kpi-tcol-val{font-size:11px;font-weight:700;color:var(--txt);font-family:'Plus Jakarta Sans',sans-serif;flex-shrink:0}
+.kpi-tcol-val.empty{color:var(--mu);font-weight:500}
+.kpi-tcol-lbl{font-size:10px;color:var(--mu);text-transform:uppercase;letter-spacing:.4px;font-weight:600;flex-shrink:0}
+.kpi-tcol-bar::after{content:attr(data-val);position:absolute;top:-22px;left:50%;transform:translateX(-50%);background:var(--dark);color:#fff;padding:3px 8px;border-radius:5px;font-size:10.5px;font-weight:700;white-space:nowrap;opacity:0;pointer-events:none;transition:opacity .15s;z-index:10}
+.kpi-tcol-bar:hover::after{opacity:1}
+
+/* Barras horizontais — versão premium */
+.kpi-bar2{display:flex;flex-direction:column;gap:10px}
+.kpi-bar2-row{position:relative}
+.kpi-bar2-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;font-size:12px}
+.kpi-bar2-name{color:var(--txt);font-weight:600;display:flex;align-items:center;gap:6px}
+.kpi-bar2-val{font-family:'Plus Jakarta Sans',sans-serif;font-weight:800;color:var(--txt)}
+.kpi-bar2-track{height:9px;background:var(--s2);border-radius:5px;overflow:hidden;position:relative}
+.kpi-bar2-fill{height:100%;border-radius:5px;transition:width .7s cubic-bezier(.16,1,.3,1);position:relative}
+.kpi-bar2-fill::after{content:'';position:absolute;top:0;left:0;right:0;bottom:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.3),transparent);animation:kpiShine 2s infinite}
+@keyframes kpiShine{from{transform:translateX(-100%)}to{transform:translateX(100%)}}
+.kpi-bar2-resp-tag{font-size:9px;padding:1px 6px;border-radius:4px;font-weight:700;letter-spacing:.4px}
+.kpi-bar2-resp-tag.eq{background:#EFF6FF;color:#1D4ED8}
+.kpi-bar2-resp-tag.cl{background:#FEF3C7;color:#92400E}
+.kpi-bar2-resp-tag.muted{color:var(--mu);font-size:10px;background:transparent;padding:0;font-weight:500}
+body.dark .kpi-bar2-resp-tag.eq{background:rgba(59,130,246,.18);color:#93C5FD}
+body.dark .kpi-bar2-resp-tag.cl{background:rgba(245,158,11,.18);color:#FDE68A}
+
+/* Estado vazio elegante */
+.kpi-empty{text-align:center;padding:32px 14px;color:var(--mu);font-size:12.5px}
+.kpi-empty-icon{font-size:32px;opacity:.4;margin-bottom:6px}
+
+body.dark .kpi-card{background:var(--surface);border-color:var(--bdr)}
+body.dark .kpi-hcard{background:var(--surface);border-color:var(--bdr)}
+body.dark .kpi-tabs{background:var(--surface);border-color:var(--bdr)}
+
+/* Animação de entrada nos cards (stagger) */
+.kpi-tab-content.active .kpi-hcard,
+.kpi-tab-content.active .kpi-card{animation:kpiCardIn .45s cubic-bezier(.16,1,.3,1) backwards}
+.kpi-tab-content.active .kpi-hcard:nth-child(1){animation-delay:.02s}
+.kpi-tab-content.active .kpi-hcard:nth-child(2){animation-delay:.06s}
+.kpi-tab-content.active .kpi-hcard:nth-child(3){animation-delay:.10s}
+.kpi-tab-content.active .kpi-hcard:nth-child(4){animation-delay:.14s}
+.kpi-tab-content.active .kpi-hcard:nth-child(5){animation-delay:.18s}
+.kpi-tab-content.active .kpi-hcard:nth-child(6){animation-delay:.22s}
+@keyframes kpiCardIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+
+/* Responsive */
+@media (max-width:1100px){
+  .kpi-hero-cards{grid-template-columns:repeat(3,1fr)}
+  .kpi-row{grid-template-columns:1fr !important}
+}
+@media (max-width:700px){
+  .kpi-hero-cards{grid-template-columns:repeat(2,1fr)}
+  .kpi-hero{padding:20px;flex-direction:column;align-items:flex-start}
+  .kpi-hero-title{font-size:20px}
+}
+
 /* KPI */
 .kg{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:20px}
 .kk{background:#fff;border-radius:var(--r);border:1px solid var(--bdr);padding:18px}
@@ -976,40 +1161,156 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
 
     <!-- KPIs -->
     <div class="view" id="view-kpis">
-      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:20px">
-        <div class="st" style="margin-bottom:0">📊 KPIs &amp; Indicadores de Produção EAD</div>
-        <div style="display:flex;gap:8px;align-items:center">
-          <label style="font-size:12px;color:var(--mu);font-weight:600">Período:</label>
-          <select id="kpiFiltPeriodo" class="fi-sm" onchange="rKPIs()" style="width:160px">
-            <option value="0">Todo o histórico</option>
-            <option value="30">Últimos 30 dias</option>
-            <option value="60">Últimos 60 dias</option>
-            <option value="90">Últimos 90 dias</option>
-            <option value="180">Últimos 6 meses</option>
-            <option value="365">Último ano</option>
-          </select>
+      <!-- Header executivo -->
+      <div class="kpi-hero">
+        <div class="kpi-hero-content">
+          <div class="kpi-hero-eyebrow">📊 Dashboard Executivo</div>
+          <div class="kpi-hero-title">KPIs &amp; Indicadores de Produção EAD</div>
+          <div class="kpi-hero-sub">Análise em tempo real do desempenho da equipe e dos projetos</div>
+        </div>
+        <div class="kpi-hero-controls">
+          <div class="kpi-period-group">
+            <span class="kpi-period-label">Período</span>
+            <div class="kpi-seg" id="kpiSegPeriodo">
+              <button class="kpi-seg-btn active" data-val="0" onclick="setKpiPeriodo('0',this)">Todos</button>
+              <button class="kpi-seg-btn" data-val="30" onclick="setKpiPeriodo('30',this)">30d</button>
+              <button class="kpi-seg-btn" data-val="60" onclick="setKpiPeriodo('60',this)">60d</button>
+              <button class="kpi-seg-btn" data-val="90" onclick="setKpiPeriodo('90',this)">90d</button>
+              <button class="kpi-seg-btn" data-val="180" onclick="setKpiPeriodo('180',this)">6m</button>
+              <button class="kpi-seg-btn" data-val="365" onclick="setKpiPeriodo('365',this)">1a</button>
+            </div>
+            <select id="kpiFiltPeriodo" onchange="rKPIs()" style="display:none">
+              <option value="0">Todo o histórico</option>
+              <option value="30">Últimos 30 dias</option>
+              <option value="60">Últimos 60 dias</option>
+              <option value="90">Últimos 90 dias</option>
+              <option value="180">Últimos 6 meses</option>
+              <option value="365">Último ano</option>
+            </select>
+          </div>
         </div>
       </div>
-      <div id="kpiResumo" style="display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin-bottom:20px"></div>
-      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:16px">
-        <div class="kk"><div class="kkt">📐 Distribuição por Situação</div><div id="kpiSituacao"></div></div>
-        <div class="kk"><div class="kkt">🏛️ Projetos por Academia</div><div id="kpiAcademia"></div></div>
-        <div class="kk"><div class="kkt">👤 Projetos por RP</div><div id="kpiRP"></div></div>
+
+      <!-- Tabs de navegação -->
+      <div class="kpi-tabs">
+        <button class="kpi-tab active" data-tab="visao"    onclick="setKpiTab('visao',this)">📈 Visão Geral</button>
+        <button class="kpi-tab"        data-tab="equipe"   onclick="setKpiTab('equipe',this)">👥 Pessoas &amp; Academias</button>
+        <button class="kpi-tab"        data-tab="pipeline" onclick="setKpiTab('pipeline',this)">🔄 Pipeline &amp; Throughput</button>
+        <button class="kpi-tab"        data-tab="tempos"   onclick="setKpiTab('tempos',this)">⏱️ Tempos &amp; Eficiência</button>
       </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
-        <div class="kk"><div class="kkt">🔄 Pipeline por Fase</div><div id="kpiPipeline"></div></div>
-        <div class="kk"><div class="kkt">📋 Conclusões por Mês (últimos 12 meses)</div><div id="kpiThroughput"></div></div>
+
+      <!-- TAB 1: VISÃO GERAL -->
+      <div class="kpi-tab-content active" id="kpiTab-visao">
+        <div class="kpi-hero-cards" id="kpiResumo"></div>
+        <div class="kpi-row" style="grid-template-columns:1.2fr .8fr">
+          <div class="kpi-card kpi-card-elev">
+            <div class="kpi-card-head">
+              <span class="kpi-card-title">📐 Distribuição por Situação</span>
+              <span class="kpi-card-badge" id="kpiSitTotal">—</span>
+            </div>
+            <div id="kpiSituacao"></div>
+          </div>
+          <div class="kpi-card kpi-card-elev">
+            <div class="kpi-card-head">
+              <span class="kpi-card-title">⚡ Insights Rápidos</span>
+            </div>
+            <div id="kpiInsights"></div>
+          </div>
+        </div>
+        <div class="kpi-row" style="grid-template-columns:1fr 1fr">
+          <div class="kpi-card">
+            <div class="kpi-card-head">
+              <span class="kpi-card-title">📋 Conclusões por Mês</span>
+              <span class="kpi-card-sub">últimos 12 meses</span>
+            </div>
+            <div id="kpiThroughput"></div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-card-head">
+              <span class="kpi-card-title">🔄 Pipeline por Fase</span>
+              <span class="kpi-card-sub">projetos ativos</span>
+            </div>
+            <div id="kpiPipeline"></div>
+          </div>
+        </div>
       </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
-        <div class="kk"><div class="kkt">📦 Conclusões por Tipo de Recurso</div><div id="kpiThroughputRec"></div></div>
-        <div class="kk"><div class="kkt">⏱️ Tempo Médio por Etapa (dias)</div><div id="etapaBars"></div></div>
+
+      <!-- TAB 2: PESSOAS & ACADEMIAS -->
+      <div class="kpi-tab-content" id="kpiTab-equipe">
+        <div class="kpi-row" style="grid-template-columns:1fr 1fr">
+          <div class="kpi-card">
+            <div class="kpi-card-head">
+              <span class="kpi-card-title">🏛️ Projetos por Academia</span>
+              <span class="kpi-card-sub">distribuição atual</span>
+            </div>
+            <div id="kpiAcademia"></div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-card-head">
+              <span class="kpi-card-title">👤 Projetos por RP</span>
+              <span class="kpi-card-sub">distribuição atual</span>
+            </div>
+            <div id="kpiRP"></div>
+          </div>
+        </div>
+        <div class="kpi-row" style="grid-template-columns:1fr">
+          <div class="kpi-card">
+            <div class="kpi-card-head">
+              <span class="kpi-card-title">🛠️ Projetos por Recurso</span>
+              <span class="kpi-card-sub">tipo de produção</span>
+            </div>
+            <div id="tipoBars"></div>
+          </div>
+        </div>
       </div>
-      <div style="display:grid;grid-template-columns:1fr;gap:16px;margin-bottom:16px">
-        <div class="kk"><div class="kkt">🛠️ Projetos por Recurso</div><div id="tipoBars"></div></div>
+
+      <!-- TAB 3: PIPELINE & THROUGHPUT -->
+      <div class="kpi-tab-content" id="kpiTab-pipeline">
+        <div class="kpi-row" style="grid-template-columns:1fr">
+          <div class="kpi-card">
+            <div class="kpi-card-head">
+              <span class="kpi-card-title">📋 Conclusões por Mês — visão ampliada</span>
+              <span class="kpi-card-sub">throughput dos últimos 12 meses</span>
+            </div>
+            <div id="kpiThroughputBig"></div>
+          </div>
+        </div>
+        <div class="kpi-row" style="grid-template-columns:1fr 1fr">
+          <div class="kpi-card">
+            <div class="kpi-card-head">
+              <span class="kpi-card-title">📦 Conclusões por Tipo de Recurso</span>
+            </div>
+            <div id="kpiThroughputRec"></div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-card-head">
+              <span class="kpi-card-title">🔄 Projetos com Mudança de Escopo</span>
+            </div>
+            <div id="kpiEscopo"></div>
+          </div>
+        </div>
       </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
-        <div class="kk"><div class="kkt">⏳ Espera por Cliente (por etapa)</div><div id="kpiEsperaCl"></div></div>
-        <div class="kk"><div class="kkt">🔄 Projetos com Mudança de Escopo</div><div id="kpiEscopo"></div></div>
+
+      <!-- TAB 4: TEMPOS & EFICIÊNCIA -->
+      <div class="kpi-tab-content" id="kpiTab-tempos">
+        <div class="kpi-row" style="grid-template-columns:1fr">
+          <div class="kpi-card">
+            <div class="kpi-card-head">
+              <span class="kpi-card-title">⏱️ Tempo Médio por Etapa</span>
+              <span class="kpi-card-sub">dias médios para conclusão · cor relativa à média do dataset</span>
+            </div>
+            <div id="etapaBars"></div>
+          </div>
+        </div>
+        <div class="kpi-row" style="grid-template-columns:1fr">
+          <div class="kpi-card">
+            <div class="kpi-card-head">
+              <span class="kpi-card-title">⏳ Espera por Cliente (por etapa)</span>
+              <span class="kpi-card-sub">dias médios aguardando retorno do cliente</span>
+            </div>
+            <div id="kpiEsperaCl"></div>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -2311,6 +2612,64 @@ function rTimeline(){
 }
 
 // ── KPIs ──
+// ═════════════════════════════════════════════════════
+// KPI DASHBOARD — REPAGINADO
+// ═════════════════════════════════════════════════════
+
+function setKpiTab(tabName, btn){
+  document.querySelectorAll('.kpi-tab').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.kpi-tab-content').forEach(c => c.classList.remove('active'));
+  const target = document.getElementById('kpiTab-'+tabName);
+  if(target) target.classList.add('active');
+  // Re-renderizar para garantir animação stagger
+  rKPIs();
+}
+
+function setKpiPeriodo(val, btn){
+  document.querySelectorAll('#kpiSegPeriodo .kpi-seg-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  const hidden = document.getElementById('kpiFiltPeriodo');
+  if(hidden){ hidden.value = val; rKPIs(); }
+}
+
+// Anima contador subindo do 0 ao valor final
+function _kpiAnimNum(el, target, suffix='', dur=900){
+  if(!el || target === '—' || target === null) return;
+  const isNum = typeof target === 'number' || /^[0-9]+$/.test(String(target).replace(suffix,''));
+  if(!isNum){ el.textContent = target; return; }
+  const num = parseInt(String(target).replace(suffix,''));
+  if(isNaN(num)){ el.textContent = target; return; }
+  const start = performance.now();
+  const step = now => {
+    const t = Math.min(1, (now - start) / dur);
+    const eased = 1 - Math.pow(1 - t, 3); // ease-out cubic
+    el.textContent = Math.round(num * eased) + suffix;
+    if(t < 1) requestAnimationFrame(step);
+  };
+  requestAnimationFrame(step);
+}
+
+// Sparkline mini (12 valores) — retorna SVG
+function _kpiSparkline(values, cor){
+  if(!values || !values.length) return '';
+  const w = 100, h = 24;
+  const mx = Math.max(...values, 1);
+  const step = values.length > 1 ? w / (values.length - 1) : 0;
+  const pts = values.map((v,i) => `${(i*step).toFixed(1)},${(h - v/mx*(h-4) - 2).toFixed(1)}`).join(' ');
+  const last = values[values.length-1];
+  const lastY = (h - last/mx*(h-4) - 2);
+  return `<svg viewBox="0 0 ${w} ${h}" preserveAspectRatio="none">
+    <defs><linearGradient id="sp_${cor.replace(/[^a-z0-9]/gi,'')}" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="${cor}" stop-opacity=".35"/>
+      <stop offset="100%" stop-color="${cor}" stop-opacity="0"/>
+    </linearGradient></defs>
+    <polygon fill="url(#sp_${cor.replace(/[^a-z0-9]/gi,'')})" points="0,${h} ${pts} ${w},${h}"/>
+    <polyline fill="none" stroke="${cor}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" points="${pts}"/>
+    <circle cx="${w}" cy="${lastY}" r="2.4" fill="${cor}"/>
+  </svg>`;
+}
+
 function rKPIs(){
   const diasFiltro = parseInt(document.getElementById('kpiFiltPeriodo')?.value||'0');
   const corte = diasFiltro > 0 ? new Date(Date.now() - diasFiltro*864e5) : null;
@@ -2338,174 +2697,285 @@ function rKPIs(){
     .map(p=>Math.round((new Date(p.termino)-new Date(p.criado))/864e5));
   const tmCiclo = ciclos.length ? Math.round(ciclos.reduce((a,b)=>a+b,0)/ciclos.length) : null;
 
-  // ── 1. Cards resumo executivo ──
-  const resumoEl = document.getElementById('kpiResumo');
-  if(resumoEl) resumoEl.innerHTML = `
-    <div class="kk" style="border-top:3px solid var(--blue)">
-      <div class="kpi-stat-lbl">Total Ativos</div>
-      <div class="kpi-stat-num">${total}</div>
-      <div class="kpi-stat-sub">${andando} em andamento</div>
-    </div>
-    <div class="kk" style="border-top:3px solid var(--green)">
-      <div class="kpi-stat-lbl">Taxa de Conclusão</div>
-      <div class="kpi-stat-num" style="color:var(--green)">${txConc}%</div>
-      <div class="kpi-stat-sub">${conc} concluído${conc!==1?'s':''}</div>
-    </div>
-    <div class="kk" style="border-top:3px solid var(--red)">
-      <div class="kpi-stat-lbl">Taxa de Atraso</div>
-      <div class="kpi-stat-num" style="color:${txAtras>20?'var(--red)':txAtras>10?'var(--org)':'var(--green)'}">${txAtras}%</div>
-      <div class="kpi-stat-sub">${atras} atrasado${atras!==1?'s':''}</div>
-    </div>
-    <div class="kk" style="border-top:3px solid var(--blue)">
-      <div class="kpi-stat-lbl">Progresso Médio</div>
-      <div class="kpi-stat-num">${avg}%</div>
-      <div class="kpi-stat-sub">média geral</div>
-    </div>
-    <div class="kk" style="border-top:3px solid ${homolPend>0?'#F59E0B':'var(--green)'}">
-      <div class="kpi-stat-lbl">Homolog. Pendentes</div>
-      <div class="kpi-stat-num" style="color:${homolPend>0?'#D97706':'var(--green)'}">${homolPend}</div>
-      <div class="kpi-stat-sub">${medicPend} aguard. medição</div>
-    </div>
-    <div class="kk" style="border-top:3px solid var(--mu)">
-      <div class="kpi-stat-lbl">Tempo Médio Ciclo</div>
-      <div class="kpi-stat-num">${tmCiclo!==null?tmCiclo+'d':'—'}</div>
-      <div class="kpi-stat-sub">${ciclos.length} proj. concluídos</div>
-    </div>`;
-
-  // ── 2. Situação + alertas ──
-  const sitEl = document.getElementById('kpiSituacao');
-  if(sitEl){
-    const sits={andamento:andando,atrasadoEq:atrasEq,atrasadoCl:atrasCl,concluido:conc,aguardando:aguard};
-    const sitCols={andamento:'#2563EB',atrasadoEq:'#E8002D',atrasadoCl:'#F59E0B',concluido:'#16A34A',aguardando:'#94A3B8'};
-    const sitLbl={andamento:'Em Andamento',atrasadoEq:'Atrasado — Equipe',atrasadoCl:'Atrasado — Cliente',concluido:'Concluído',aguardando:'Aguardando'};
-    const r=40,c2=2*Math.PI*r;
-    let off=0,arcs='';
-    const tot2=total||1;
-    Object.entries(sits).forEach(([k,n])=>{
-      const pv=n/tot2;
-      arcs+=`<circle cx="50" cy="50" r="${r}" fill="none" stroke="${sitCols[k]}" stroke-width="10" stroke-dasharray="${pv*c2} ${c2}" stroke-dashoffset="${-off}" stroke-linecap="round" transform="rotate(-90 50 50)"/>`;
-      off+=pv*c2;
-    });
-    const leg=Object.entries(sits).map(([k,n])=>`<div class="leg"><div class="ld" style="background:${sitCols[k]}"></div>${sitLbl[k]}: <strong>${n}</strong></div>`).join('');
-    sitEl.innerHTML = total===0
-      ? '<div style="color:var(--mu);font-size:12px">Sem dados</div>'
-      : `<div style="display:flex;align-items:center;gap:12px;margin-bottom:10px">
-           <svg viewBox="0 0 100 100" width="90" height="90">
-             <circle cx="50" cy="50" r="${r}" fill="none" stroke="var(--bdr)" stroke-width="10"/>${arcs}
-           </svg>
-           <div>${leg}</div>
-         </div>`;
-    // Alertas
-    if(atrasEq>0) sitEl.innerHTML+=`<div class="kpi-alerta">⚠️ ${atrasEq} projeto${atrasEq>1?'s':''} atrasado${atrasEq>1?'s':''} — Equipe</div>`;
-    if(atrasCl>0) sitEl.innerHTML+=`<div class="kpi-alerta" style="background:#FFF7ED;border-color:#FED7AA;color:#9A3412">⏳ ${atrasCl} projeto${atrasCl>1?'s':''} atrasado${atrasCl>1?'s':''} — Cliente</div>`;
-    const venc7=act.filter(p=>{ if(calcSit(p)==='concluido'||!p.prazo) return false; const d=Math.round((new Date(p.prazo)-new Date())/864e5); return d>=0&&d<=7; }).length;
-    if(venc7>0) sitEl.innerHTML+=`<div class="kpi-alerta" style="background:#FFF7ED;border-color:#FED7AA;color:#9A3412">⏰ ${venc7} projeto${venc7>1?'s':''} vencem em até 7 dias</div>`;
+  // Sparkline data: 12 meses de conclusões
+  const agoraSp = new Date();
+  const sparkVals = [];
+  for(let i=11;i>=0;i--){
+    const d = new Date(agoraSp.getFullYear(), agoraSp.getMonth()-i, 1);
+    const n = todos.filter(p => {
+      if(!p.termino) return false;
+      const dt = new Date(p.termino);
+      return dt.getFullYear()===d.getFullYear() && dt.getMonth()===d.getMonth();
+    }).length;
+    sparkVals.push(n);
   }
 
-  // ── 3. Por Academia ──
+  // ── 1. Cards resumo hero ──
+  const resumoEl = document.getElementById('kpiResumo');
+  if(resumoEl){
+    resumoEl.innerHTML = `
+      <div class="kpi-hcard tone-blue">
+        <div class="kpi-hcard-icon">📁</div>
+        <div class="kpi-hcard-lbl">Total Ativos</div>
+        <div class="kpi-hcard-val" data-target="${total}">0</div>
+        <div class="kpi-hcard-sub">${andando} em andamento</div>
+      </div>
+      <div class="kpi-hcard tone-green">
+        <div class="kpi-hcard-icon">✅</div>
+        <div class="kpi-hcard-lbl">Taxa de Conclusão</div>
+        <div class="kpi-hcard-val" data-target="${txConc}" data-suffix="%">0%</div>
+        <div class="kpi-hcard-sub">${conc} concluído${conc!==1?'s':''}</div>
+      </div>
+      <div class="kpi-hcard tone-${txAtras>20?'red':txAtras>10?'amber':'green'}">
+        <div class="kpi-hcard-icon">⚠️</div>
+        <div class="kpi-hcard-lbl">Taxa de Atraso</div>
+        <div class="kpi-hcard-val" data-target="${txAtras}" data-suffix="%">0%</div>
+        <div class="kpi-hcard-sub">${atras} atrasado${atras!==1?'s':''}</div>
+      </div>
+      <div class="kpi-hcard tone-pur">
+        <div class="kpi-hcard-icon">📊</div>
+        <div class="kpi-hcard-lbl">Progresso Médio</div>
+        <div class="kpi-hcard-val" data-target="${avg}" data-suffix="%">0%</div>
+        <div class="kpi-hcard-sub">média geral</div>
+      </div>
+      <div class="kpi-hcard tone-${homolPend>0?'amber':'green'}">
+        <div class="kpi-hcard-icon">🔧</div>
+        <div class="kpi-hcard-lbl">Homolog. Pendentes</div>
+        <div class="kpi-hcard-val" data-target="${homolPend}">0</div>
+        <div class="kpi-hcard-sub">${medicPend} aguard. medição</div>
+      </div>
+      <div class="kpi-hcard tone-gray">
+        <div class="kpi-hcard-icon">⏱️</div>
+        <div class="kpi-hcard-lbl">Tempo Médio Ciclo</div>
+        <div class="kpi-hcard-val">${tmCiclo!==null?tmCiclo+'d':'—'}</div>
+        <div class="kpi-hcard-sub">${ciclos.length} proj. concluído${ciclos.length!==1?'s':''}</div>
+        <div class="kpi-hcard-spark">${_kpiSparkline(sparkVals, '#6B7280')}</div>
+      </div>`;
+    // Animar contadores
+    resumoEl.querySelectorAll('.kpi-hcard-val[data-target]').forEach(el => {
+      const target = parseInt(el.dataset.target);
+      const suffix = el.dataset.suffix || '';
+      _kpiAnimNum(el, target, suffix, 850);
+    });
+  }
+
+  // ── 2. Situação (Donut interativo) ──
+  const sitEl = document.getElementById('kpiSituacao');
+  if(sitEl){
+    const sits  = {andamento:andando, atrasadoEq:atrasEq, atrasadoCl:atrasCl, concluido:conc, aguardando:aguard};
+    const cores = {andamento:'#2563EB', atrasadoEq:'#E8002D', atrasadoCl:'#F59E0B', concluido:'#16A34A', aguardando:'#94A3B8'};
+    const labs  = {andamento:'Em Andamento', atrasadoEq:'Atrasado — Equipe', atrasadoCl:'Atrasado — Cliente', concluido:'Concluído', aguardando:'Aguardando'};
+    const r = 42, c2 = 2*Math.PI*r;
+    let off = 0, arcs = '';
+    const tot2 = total || 1;
+    Object.entries(sits).forEach(([k,n]) => {
+      if(n === 0) return;
+      const pv = n/tot2;
+      arcs += `<circle class="arc" cx="60" cy="60" r="${r}" fill="none" stroke="${cores[k]}" stroke-width="12" stroke-dasharray="${pv*c2} ${c2}" stroke-dashoffset="${-off}" stroke-linecap="butt" transform="rotate(-90 60 60)"/>`;
+      off += pv*c2;
+    });
+    const legenda = Object.entries(sits).map(([k,n]) => {
+      const pct = total>0 ? Math.round(n/total*100) : 0;
+      return `<div class="kpi-legend-item">
+        <span class="kpi-legend-dot" style="background:${cores[k]}"></span>
+        <span class="kpi-legend-lbl">${labs[k]}</span>
+        <span class="kpi-legend-val">${n}<span class="kpi-legend-pct">${pct}%</span></span>
+      </div>`;
+    }).join('');
+    sitEl.innerHTML = total === 0
+      ? '<div class="kpi-empty"><div class="kpi-empty-icon">📭</div>Sem projetos no período</div>'
+      : `<div class="kpi-donut-wrap">
+           <div class="kpi-donut">
+             <svg viewBox="0 0 120 120" width="140" height="140">
+               <circle cx="60" cy="60" r="${r}" fill="none" stroke="var(--bdr)" stroke-width="12" opacity=".3"/>
+               ${arcs}
+             </svg>
+             <div class="kpi-donut-center">
+               <div class="kpi-donut-center-val">${total}</div>
+               <div class="kpi-donut-center-lbl">projetos</div>
+             </div>
+           </div>
+           <div class="kpi-donut-legend">${legenda}</div>
+         </div>`;
+    document.getElementById('kpiSitTotal').textContent = `${total} ativo${total!==1?'s':''}`;
+  }
+
+  // ── 2b. Insights inteligentes ──
+  const insEl = document.getElementById('kpiInsights');
+  if(insEl){
+    const insights = [];
+    if(atrasEq > 0){
+      insights.push({tipo:'danger', ico:'⚠️', txt:`<strong>${atrasEq}</strong> projeto${atrasEq>1?'s':''} atrasado${atrasEq>1?'s':''} com a equipe — requer ação imediata`});
+    }
+    if(atrasCl > 0){
+      insights.push({tipo:'warn', ico:'⏳', txt:`<strong>${atrasCl}</strong> projeto${atrasCl>1?'s':''} atrasado${atrasCl>1?'s':''} aguardando o cliente`});
+    }
+    const venc7 = act.filter(p => {
+      if(calcSit(p)==='concluido' || !p.prazo) return false;
+      const d = Math.round((new Date(p.prazo) - new Date()) / 864e5);
+      return d >= 0 && d <= 7;
+    }).length;
+    if(venc7 > 0){
+      insights.push({tipo:'warn', ico:'⏰', txt:`<strong>${venc7}</strong> projeto${venc7>1?'s':''} vence${venc7>1?'m':''} em até 7 dias`});
+    }
+    if(homolPend > 0){
+      insights.push({tipo:'', ico:'🔧', txt:`<strong>${homolPend}</strong> homologa${homolPend>1?'ções':'ção'} pendente${homolPend>1?'s':''}`});
+    }
+    if(medicPend > 0){
+      insights.push({tipo:'', ico:'📐', txt:`<strong>${medicPend}</strong> aguardando medição`});
+    }
+    if(tmCiclo !== null){
+      insights.push({tipo:'', ico:'⏱️', txt:`Tempo médio de ciclo: <strong>${tmCiclo} dias</strong> (${ciclos.length} projeto${ciclos.length!==1?'s':''} concluído${ciclos.length!==1?'s':''})`});
+    }
+    if(txConc >= 70){
+      insights.push({tipo:'ok', ico:'🎯', txt:`Excelente taxa de conclusão: <strong>${txConc}%</strong>`});
+    } else if(txConc >= 50){
+      insights.push({tipo:'', ico:'📈', txt:`Taxa de conclusão: <strong>${txConc}%</strong> — bom desempenho`});
+    }
+    if(atrasEq===0 && atrasCl===0 && total>0){
+      insights.push({tipo:'ok', ico:'✨', txt:'Nenhum projeto em atraso — equipe em dia!'});
+    }
+    insEl.innerHTML = insights.length === 0
+      ? '<div class="kpi-empty"><div class="kpi-empty-icon">💡</div>Sem alertas no momento</div>'
+      : `<div class="kpi-insights-list">
+           ${insights.map(i => `
+             <div class="kpi-insight ${i.tipo}">
+               <span class="kpi-insight-icon">${i.ico}</span>
+               <span class="kpi-insight-text">${i.txt}</span>
+             </div>`).join('')}
+         </div>`;
+  }
+
+  // ── 3. Por Academia (barras premium) ──
   const acadEl = document.getElementById('kpiAcademia');
   if(acadEl){
-    const map={};
-    act.forEach(p=>{ const a=p.academia||'Não definida'; map[a]=(map[a]||0)+1; });
-    const arr=Object.entries(map).sort((a,b)=>b[1]-a[1]);
-    const mx=arr.length?arr[0][1]:1;
-    const ACAD_COLS=['#003DA5','#0891B2','#7C3AED','#D97706','#1A8A4A','#E8002D','#EC4899','#F97316','#14B8A6','#6366F1','#84CC16','#be185d'];
-    acadEl.innerHTML=arr.length===0
-      ?'<div style="color:var(--mu);font-size:12px">Sem dados</div>'
-      :arr.map(([nome,n],i)=>`
-        <div class="kpi-bar-row">
-          <div class="kpi-bar-row-head"><span>${nome}</span><strong>${n}</strong></div>
-          <div class="kpi-bar-track"><div class="kpi-bar-fill" style="width:${n/mx*100}%;background:${ACAD_COLS[i%ACAD_COLS.length]}"></div></div>
-        </div>`).join('');
+    const map = {};
+    act.forEach(p => { const a = p.academia || 'Não definida'; map[a] = (map[a]||0)+1; });
+    const arr = Object.entries(map).sort((a,b) => b[1]-a[1]);
+    const mx = arr.length ? arr[0][1] : 1;
+    const ACAD_COLS = ['#003DA5','#0891B2','#7C3AED','#D97706','#1A8A4A','#E8002D','#EC4899','#F97316','#14B8A6','#6366F1','#84CC16','#be185d'];
+    acadEl.innerHTML = arr.length === 0
+      ? '<div class="kpi-empty"><div class="kpi-empty-icon">🏛️</div>Sem academias cadastradas</div>'
+      : `<div class="kpi-bar2">${arr.map(([nome,n],i) => `
+          <div class="kpi-bar2-row">
+            <div class="kpi-bar2-head">
+              <span class="kpi-bar2-name">${nome}</span>
+              <span class="kpi-bar2-val">${n}</span>
+            </div>
+            <div class="kpi-bar2-track"><div class="kpi-bar2-fill" style="width:${n/mx*100}%;background:${ACAD_COLS[i%ACAD_COLS.length]}"></div></div>
+          </div>`).join('')}</div>`;
   }
 
   // ── 4. Por RP ──
   const rpEl = document.getElementById('kpiRP');
   if(rpEl){
-    const map={};
-    act.forEach(p=>{ const r=p.rp||'Não definido'; map[r]=(map[r]||0)+1; });
-    const arr=Object.entries(map).sort((a,b)=>b[1]-a[1]);
-    const mx=arr.length?arr[0][1]:1;
-    rpEl.innerHTML=arr.length===0
-      ?'<div style="color:var(--mu);font-size:12px">Sem dados</div>'
-      :arr.map(([nome,n])=>`
-        <div class="kpi-bar-row">
-          <div class="kpi-bar-row-head"><span>${nome}</span><strong>${n}</strong></div>
-          <div class="kpi-bar-track"><div class="kpi-bar-fill" style="width:${n/mx*100}%;background:${NOME_CORES[nome]||'var(--blue)'}"></div></div>
-        </div>`).join('');
+    const map = {};
+    act.forEach(p => { const r = p.rp || 'Não definido'; map[r] = (map[r]||0)+1; });
+    const arr = Object.entries(map).sort((a,b) => b[1]-a[1]);
+    const mx = arr.length ? arr[0][1] : 1;
+    rpEl.innerHTML = arr.length === 0
+      ? '<div class="kpi-empty"><div class="kpi-empty-icon">👤</div>Sem RPs cadastrados</div>'
+      : `<div class="kpi-bar2">${arr.map(([nome,n]) => `
+          <div class="kpi-bar2-row">
+            <div class="kpi-bar2-head">
+              <span class="kpi-bar2-name">${nome}</span>
+              <span class="kpi-bar2-val">${n}</span>
+            </div>
+            <div class="kpi-bar2-track"><div class="kpi-bar2-fill" style="width:${n/mx*100}%;background:${NOME_CORES[nome]||'var(--blue)'}"></div></div>
+          </div>`).join('')}</div>`;
   }
 
   // ── 5. Pipeline por fase ──
   const pipeEl = document.getElementById('kpiPipeline');
   if(pipeEl){
-    const colCount={};
-    act.forEach(p=>{ colCount[p.col]=(colCount[p.col]||0)+1; });
-    const colArr=COLUNAS.map(c=>({...c,n:colCount[c.k]||0})).filter(c=>c.n>0);
-    const mx=colArr.length?Math.max(...colArr.map(c=>c.n)):1;
-    pipeEl.innerHTML=colArr.length===0
-      ?'<div style="color:var(--mu);font-size:12px">Sem projetos ativos</div>'
-      :colArr.map(c=>`
-        <div class="kpi-phase-row">
-          <div class="kpi-phase-dot" style="background:${c.dot}"></div>
-          <div class="kpi-phase-name" title="${c.l}">${c.l}</div>
-          <div class="kpi-phase-bar"><div style="height:100%;width:${c.n/mx*100}%;background:${c.dot};border-radius:3px"></div></div>
-          <div class="kpi-phase-count">${c.n}</div>
-        </div>`).join('');
+    const colCount = {};
+    act.forEach(p => { colCount[p.col] = (colCount[p.col]||0)+1; });
+    const colArr = COLUNAS.map(c => ({...c, n: colCount[c.k]||0})).filter(c => c.n > 0);
+    const mx = colArr.length ? Math.max(...colArr.map(c => c.n)) : 1;
+    pipeEl.innerHTML = colArr.length === 0
+      ? '<div class="kpi-empty"><div class="kpi-empty-icon">🔄</div>Sem projetos ativos</div>'
+      : `<div class="kpi-pipeline-list">${colArr.map(c => `
+          <div class="kpi-pipe-row">
+            <span class="kpi-pipe-dot" style="background:${c.dot}"></span>
+            <span class="kpi-pipe-name" title="${c.l}">${c.l}</span>
+            <div class="kpi-pipe-bar"><div class="kpi-pipe-fill" style="width:${c.n/mx*100}%;background:${c.dot}"></div></div>
+            <span class="kpi-pipe-count">${c.n}</span>
+          </div>`).join('')}</div>`;
   }
 
-  // ── 6. Throughput mensal (últimos 12 meses) ──
-  const thrEl = document.getElementById('kpiThroughput');
-  if(thrEl){
-    const agora=new Date();
-    const meses=[];
-    for(let i=11;i>=0;i--){
-      const d=new Date(agora.getFullYear(),agora.getMonth()-i,1);
-      meses.push({y:d.getFullYear(),m:d.getMonth(),lbl:d.toLocaleString('pt-BR',{month:'short'}).replace('.',''),n:0});
+  // ── 6. Throughput mensal (compacto + ampliado) ──
+  const renderThroughput = (elId, big=false) => {
+    const el = document.getElementById(elId);
+    if(!el) return;
+    const agora = new Date();
+    const meses = [];
+    for(let i=11; i>=0; i--){
+      const d = new Date(agora.getFullYear(), agora.getMonth()-i, 1);
+      meses.push({y:d.getFullYear(), m:d.getMonth(), lbl:d.toLocaleString('pt-BR',{month:'short'}).replace('.',''), n:0});
     }
-    todos.forEach(p=>{
+    todos.forEach(p => {
       if(!p.termino) return;
-      const d=new Date(p.termino);
-      const mes=meses.find(m=>m.y===d.getFullYear()&&m.m===d.getMonth());
+      const d = new Date(p.termino);
+      const mes = meses.find(m => m.y === d.getFullYear() && m.m === d.getMonth());
       if(mes) mes.n++;
     });
-    const mx=Math.max(...meses.map(m=>m.n),1);
-    const total12=meses.reduce((a,m)=>a+m.n,0);
-    thrEl.innerHTML=`
-      <div style="font-size:11px;color:var(--mu);margin-bottom:10px">${total12} concluído${total12!==1?'s':''} nos últimos 12 meses</div>
-      <div style="display:flex;align-items:flex-end;gap:4px;height:80px">
-        ${meses.map(m=>`
-          <div class="kpi-month-col">
-            <div class="kpi-month-bar-wrap">
-              <div class="kpi-month-bar" style="height:${m.n>0?Math.max(m.n/mx*100,8):2}%;background:${m.n>0?'var(--blue)':'var(--bdr)'}" title="${m.n} concluído${m.n!==1?'s':''}"></div>
-            </div>
-            <div class="kpi-month-val">${m.n||''}</div>
-            <div class="kpi-month-label">${m.lbl}</div>
-          </div>`).join('')}
+    const mx = Math.max(...meses.map(m=>m.n), 1);
+    const total12 = meses.reduce((a,m) => a+m.n, 0);
+    const medMes = total12 ? Math.round(total12/12 * 10)/10 : 0;
+    const melhorMes = [...meses].sort((a,b) => b.n-a.n)[0];
+    el.innerHTML = `
+      <div class="kpi-throughput-wrap">
+        <div class="kpi-throughput-stats">
+          <div class="kpi-throughput-stat">
+            <div class="kpi-throughput-stat-num">${total12}</div>
+            <div class="kpi-throughput-stat-lbl">total 12 meses</div>
+          </div>
+          <div class="kpi-throughput-stat">
+            <div class="kpi-throughput-stat-num">${medMes}</div>
+            <div class="kpi-throughput-stat-lbl">média/mês</div>
+          </div>
+          <div class="kpi-throughput-stat">
+            <div class="kpi-throughput-stat-num">${melhorMes && melhorMes.n>0 ? melhorMes.n : 0}</div>
+            <div class="kpi-throughput-stat-lbl">melhor mês${melhorMes && melhorMes.n>0 ? ' ('+melhorMes.lbl+')' : ''}</div>
+          </div>
+        </div>
+        <div class="kpi-throughput-bars ${big?'kpi-throughput-big':''}">
+          ${meses.map(m => `
+            <div class="kpi-tcol">
+              <div class="kpi-tcol-bar-wrap">
+                <div class="kpi-tcol-bar ${m.n===0?'empty':''}" style="height:${m.n>0?Math.max(m.n/mx*100,6):3}%" data-val="${m.n} concluído${m.n!==1?'s':''}"></div>
+              </div>
+              <div class="kpi-tcol-val ${m.n===0?'empty':''}">${m.n||'—'}</div>
+              <div class="kpi-tcol-lbl">${m.lbl}</div>
+            </div>`).join('')}
+        </div>
       </div>`;
-  }
+  };
+  renderThroughput('kpiThroughput');
+  renderThroughput('kpiThroughputBig', true);
 
   // ── 6b. Throughput por recurso ──
   const thrRecEl = document.getElementById('kpiThroughputRec');
   if(thrRecEl){
     const recCount = {};
-    todos.filter(p=>p.termino).forEach(p=>{
-      (p.recursos||['(sem recurso)']).forEach(r=>{
-        recCount[r] = (recCount[r]||0)+1;
-      });
+    todos.filter(p => p.termino).forEach(p => {
+      (p.recursos||['(sem recurso)']).forEach(r => { recCount[r] = (recCount[r]||0)+1; });
     });
-    const arr = Object.entries(recCount).sort((a,b)=>b[1]-a[1]);
+    const arr = Object.entries(recCount).sort((a,b) => b[1]-a[1]);
     const mx = arr.length ? arr[0][1] : 1;
-    thrRecEl.innerHTML = arr.length===0
-      ? '<div style="color:var(--mu);font-size:12px">Nenhum projeto concluído ainda</div>'
-      : arr.map(([rec,n],i)=>`
-        <div class="kpi-bar-row">
-          <div class="kpi-bar-row-head"><span>${rec}</span><strong>${n}</strong></div>
-          <div class="kpi-bar-track"><div class="kpi-bar-fill" style="width:${n/mx*100}%;background:${COLS_AV[i%COLS_AV.length]}"></div></div>
-        </div>`).join('');
+    thrRecEl.innerHTML = arr.length === 0
+      ? '<div class="kpi-empty"><div class="kpi-empty-icon">📦</div>Nenhum projeto concluído ainda</div>'
+      : `<div class="kpi-bar2">${arr.map(([rec,n],i) => `
+          <div class="kpi-bar2-row">
+            <div class="kpi-bar2-head">
+              <span class="kpi-bar2-name">${rec}</span>
+              <span class="kpi-bar2-val">${n}</span>
+            </div>
+            <div class="kpi-bar2-track"><div class="kpi-bar2-fill" style="width:${n/mx*100}%;background:${COLS_AV[i%COLS_AV.length]}"></div></div>
+          </div>`).join('')}</div>`;
   }
 
-  // ── 7. Tempo médio por etapa — busca por nome (suporta etapas novas e antigas) ──
-  // Lista de etapas para medir (nome de exibição, nomes de busca, responsável)
+  // ── 7. Tempo médio por etapa ──
   const ETAPAS_MEDIR = [
     {n:'Reunião Inicial',           busca:['Reunião Inicial'],                                   r:'eq'},
     {n:'Mat. Base Recebido',        busca:['Material Base Recebido'],                             r:'cl'},
@@ -2543,96 +3013,110 @@ function rKPIs(){
     const media = amostras.length ? Math.round(amostras.reduce((a,b)=>a+b,0)/amostras.length) : null;
     return {n:def.n, d:media, r:def.r, amostras:amostras.length};
   });
-  const comDados=etapaMedArr.filter(e=>e.d!==null);
-  const mx3=comDados.length?Math.max(...comDados.map(e=>e.d),1):1;
-  const mn3=comDados.length?Math.min(...comDados.map(e=>e.d),mx3):0;
-  // Cor relativa por responsável: eq=tons azul→roxo, cl=tons amarelo→laranja→vermelho
-  const _etCor=(e)=>{
+  const comDados = etapaMedArr.filter(e => e.d !== null);
+  const mx3 = comDados.length ? Math.max(...comDados.map(e => e.d), 1) : 1;
+  const mn3 = comDados.length ? Math.min(...comDados.map(e => e.d), mx3) : 0;
+  const _etCor = (e) => {
     if(e.d===null) return 'var(--bdr)';
-    const t=mx3===mn3?0.5:(e.d-mn3)/(mx3-mn3); // 0=rápido, 1=lento
-    if(e.r==='cl'){
-      // Cliente: verde claro → âmbar → laranja → vermelho
-      const h=Math.round(120-t*120); // 120(verde)→0(vermelho)
-      const s=Math.round(65+t*20);
-      const l=Math.round(42-t*8);
+    const t = mx3===mn3 ? 0.5 : (e.d-mn3)/(mx3-mn3);
+    if(e.r === 'cl'){
+      const h = Math.round(120-t*120);
+      const s = Math.round(65+t*20);
+      const l = Math.round(42-t*8);
       return `hsl(${h},${s}%,${l}%)`;
     } else {
-      // Equipe: azul claro → azul SENAI → azul escuro → índigo
-      const h=Math.round(215+t*30); // 215→245
-      const s=Math.round(70+t*20);
-      const l=Math.round(52-t*22);
+      const h = Math.round(215+t*30);
+      const s = Math.round(70+t*20);
+      const l = Math.round(52-t*22);
       return `hsl(${h},${s}%,${l}%)`;
     }
   };
-  document.getElementById('etapaBars').innerHTML=etapaMedArr.map(e=>{
-    const cor=_etCor(e);
-    const lblResp=e.r==='cl'
-      ?`<span style="font-size:9px;padding:1px 5px;border-radius:3px;background:#FEF3C7;color:#92400E;font-weight:700;margin-left:4px">CL</span>`
-      :`<span style="font-size:9px;padding:1px 5px;border-radius:3px;background:#EFF6FF;color:#1D4ED8;font-weight:700;margin-left:4px">EQ</span>`;
-    return `<div class="kpi-bar-row">
-      <div class="kpi-bar-row-head">
-        <span>${e.n}${lblResp}${e.amostras>0?`<span style="color:var(--mu);font-size:10px;margin-left:4px">(${e.amostras})</span>`:''}</span>
-        <strong style="color:${e.d!==null?cor:'var(--mu)'}">${e.d!==null?e.d+'d':'—'}</strong>
-      </div>
-      <div class="kpi-bar-track">
-        ${e.d!==null?`<div class="kpi-bar-fill" style="width:${e.d/mx3*100}%;background:${cor}"></div>`:''}
-      </div>
-      ${e.d===null?'<div style="font-size:10px;color:var(--mu)">Sem dados ainda</div>':''}
-    </div>`;}).join('');
+  const etapaBarsEl = document.getElementById('etapaBars');
+  if(etapaBarsEl){
+    etapaBarsEl.innerHTML = comDados.length === 0
+      ? '<div class="kpi-empty"><div class="kpi-empty-icon">⏱️</div>Nenhuma etapa concluída ainda</div>'
+      : `<div class="kpi-bar2">${etapaMedArr.map(e => {
+          const cor = _etCor(e);
+          const tag = e.r === 'cl'
+            ? '<span class="kpi-bar2-resp-tag cl">CL</span>'
+            : '<span class="kpi-bar2-resp-tag eq">EQ</span>';
+          const amostras = e.amostras > 0 ? `<span class="kpi-bar2-resp-tag muted">${e.amostras}x</span>` : '';
+          return `<div class="kpi-bar2-row">
+            <div class="kpi-bar2-head">
+              <span class="kpi-bar2-name">${e.n} ${tag} ${amostras}</span>
+              <span class="kpi-bar2-val" style="color:${e.d!==null?cor:'var(--mu)'}">${e.d!==null?e.d+'d':'—'}</span>
+            </div>
+            <div class="kpi-bar2-track">
+              ${e.d!==null?`<div class="kpi-bar2-fill" style="width:${e.d/mx3*100}%;background:${cor}"></div>`:''}
+            </div>
+          </div>`;
+        }).join('')}</div>`;
+  }
 
-  // ── 8. Por recurso ──
-  const recCount={};
-  act.forEach(p=>(p.recursos||[]).forEach(r=>{recCount[r]=(recCount[r]||0)+1;}));
-  const tps=Object.entries(recCount).sort((a,b)=>b[1]-a[1]);
-  const mx4=tps.length?Math.max(...tps.map(([,n])=>n),1):1;
-  document.getElementById('tipoBars').innerHTML=tps.length===0
-    ?'<div style="color:var(--mu);font-size:12px">Sem dados</div>'
-    :tps.map(([rec,n],i)=>`
-      <div class="kpi-bar-row">
-        <div class="kpi-bar-row-head"><span>${rec}</span><strong>${n}</strong></div>
-        <div class="kpi-bar-track"><div class="kpi-bar-fill" style="width:${n/mx4*100}%;background:${COLS_AV[i%COLS_AV.length]}"></div></div>
-      </div>`).join('');
+  // ── 8. Por recurso (geral) ──
+  const recCount = {};
+  act.forEach(p => (p.recursos||[]).forEach(r => { recCount[r] = (recCount[r]||0)+1; }));
+  const tps = Object.entries(recCount).sort((a,b) => b[1]-a[1]);
+  const mx4 = tps.length ? Math.max(...tps.map(([,n]) => n), 1) : 1;
+  const tipoBarsEl = document.getElementById('tipoBars');
+  if(tipoBarsEl){
+    tipoBarsEl.innerHTML = tps.length === 0
+      ? '<div class="kpi-empty"><div class="kpi-empty-icon">🛠️</div>Sem recursos cadastrados</div>'
+      : `<div class="kpi-bar2">${tps.map(([rec,n],i) => `
+          <div class="kpi-bar2-row">
+            <div class="kpi-bar2-head">
+              <span class="kpi-bar2-name">${rec}</span>
+              <span class="kpi-bar2-val">${n}</span>
+            </div>
+            <div class="kpi-bar2-track"><div class="kpi-bar2-fill" style="width:${n/mx4*100}%;background:${COLS_AV[i%COLS_AV.length]}"></div></div>
+          </div>`).join('')}</div>`;
+  }
 
   // ── 9. Espera por cliente ──
   const espEl = document.getElementById('kpiEsperaCl');
   if(espEl){
-    const etCl={};
-    todos.forEach(p=>{
-      (p.etapas||[]).forEach(e=>{
-        if(e.r==='cl'&&e.done&&e.diasCl!=null){
-          if(!etCl[e.lb]) etCl[e.lb]={total:0,n:0};
-          etCl[e.lb].total+=e.diasCl; etCl[e.lb].n++;
+    const etCl = {};
+    todos.forEach(p => {
+      (p.etapas||[]).forEach(e => {
+        if(e.r === 'cl' && e.done && e.diasCl != null){
+          if(!etCl[e.lb]) etCl[e.lb] = {total:0, n:0};
+          etCl[e.lb].total += e.diasCl;
+          etCl[e.lb].n++;
         }
       });
     });
-    const etArr=Object.entries(etCl).map(([lb,v])=>({lb,media:Math.round(v.total/v.n),n:v.n})).sort((a,b)=>b.media-a.media);
-    const mx5=etArr.length?etArr[0].media:1;
-    const mediaGeral=etArr.length?Math.round(etArr.reduce((a,e)=>a+e.media,0)/etArr.length):null;
-    // Escala de cor relativa: melhor (menor) = verde, pior (maior) = vermelho
-    const _espCor=(val,mn,mx)=>{
-      if(mx===mn) return '#E8002D';
-      const t=(val-mn)/(mx-mn); // 0=melhor, 1=pior
-      if(t<0.33) return `hsl(${Math.round(120-t*3*40)},72%,38%)`; // verde → amarelo-verde
-      if(t<0.66) return `hsl(${Math.round(40-(t-0.33)*3*20)},85%,44%)`; // amarelo → laranja
-      return `hsl(${Math.round(20-(t-0.66)*3*20)},90%,42%)`; // laranja → vermelho
+    const etArr = Object.entries(etCl).map(([lb,v]) => ({lb, media:Math.round(v.total/v.n), n:v.n})).sort((a,b) => b.media - a.media);
+    const mx5 = etArr.length ? etArr[0].media : 1;
+    const mediaGeral = etArr.length ? Math.round(etArr.reduce((a,e) => a+e.media, 0)/etArr.length) : null;
+    const _espCor = (val, mn, mx) => {
+      if(mx === mn) return '#E8002D';
+      const t = (val-mn)/(mx-mn);
+      if(t < 0.33) return `hsl(${Math.round(120-t*3*40)},72%,38%)`;
+      if(t < 0.66) return `hsl(${Math.round(40-(t-0.33)*3*20)},85%,44%)`;
+      return `hsl(${Math.round(20-(t-0.66)*3*20)},90%,42%)`;
     };
-    const _espMn=etArr.length?etArr[etArr.length-1].media:0;
-    espEl.innerHTML=etArr.length===0
-      ?'<div style="color:var(--mu);font-size:12px">Nenhuma etapa de cliente concluída ainda</div>'
-      :`<div style="font-size:11px;color:var(--mu);margin-bottom:10px">Média geral: <strong style="color:var(--txt)">${mediaGeral}d</strong></div>`
-        +etArr.slice(0,8).map(e=>{
-          const cor=_espCor(e.media,_espMn,mx5);
-          return `<div class="kpi-bar-row">
-            <div class="kpi-bar-row-head">
-              <span>${e.lb}<span style="color:var(--mu);font-size:10px;margin-left:4px">(${e.n}x)</span></span>
-              <strong style="color:${cor}">${e.media}d</strong>
-            </div>
-            <div class="kpi-bar-track"><div class="kpi-bar-fill" style="width:${e.media/mx5*100}%;background:${cor}"></div></div>
-          </div>`;}).join('');
+    const _espMn = etArr.length ? etArr[etArr.length-1].media : 0;
+    espEl.innerHTML = etArr.length === 0
+      ? '<div class="kpi-empty"><div class="kpi-empty-icon">⏳</div>Nenhuma etapa de cliente concluída ainda</div>'
+      : `<div style="display:flex;align-items:baseline;gap:10px;margin-bottom:14px;padding:12px 14px;background:linear-gradient(135deg,#FFF7ED 0%,#FFFBEB 100%);border:1px solid #FED7AA;border-radius:10px">
+           <span style="font-size:28px;font-weight:800;color:#9A3412;line-height:1;font-family:'Plus Jakarta Sans',sans-serif">${mediaGeral}d</span>
+           <div><div style="font-size:12px;font-weight:700;color:#7C2D12">média geral de espera</div>
+                <div style="font-size:10.5px;color:#A16207;margin-top:1px">considerando ${etArr.length} etapa${etArr.length>1?'s':''}</div>
+           </div>
+         </div>
+         <div class="kpi-bar2">${etArr.slice(0,8).map(e => {
+           const cor = _espCor(e.media, _espMn, mx5);
+           return `<div class="kpi-bar2-row">
+             <div class="kpi-bar2-head">
+               <span class="kpi-bar2-name">${e.lb} <span class="kpi-bar2-resp-tag muted">${e.n}x</span></span>
+               <span class="kpi-bar2-val" style="color:${cor}">${e.media}d</span>
+             </div>
+             <div class="kpi-bar2-track"><div class="kpi-bar2-fill" style="width:${e.media/mx5*100}%;background:${cor}"></div></div>
+           </div>`;
+         }).join('')}</div>`;
   }
 
-  // ── 10. Por prioridade ──
-  // ── 11. Taxa de cumprimento de prazo por etapa ──
+  // ── 10. Mudança de Escopo ──
   const escopoEl = document.getElementById('kpiEscopo');
   if(escopoEl){
     const comMudanca = todos.filter(p => p.mudouEscopo === 'sim');
@@ -2640,18 +3124,16 @@ function rKPIs(){
 
     if(sim === 0){
       escopoEl.innerHTML = `
-        <div style="text-align:center;padding:28px 16px;background:#F9FAFB;border-radius:10px;border:1px dashed var(--bdr)">
-          <div style="font-size:32px;margin-bottom:6px;opacity:.5">✅</div>
+        <div class="kpi-empty">
+          <div class="kpi-empty-icon">✅</div>
           <div style="font-size:13px;font-weight:600;color:var(--txt);margin-bottom:3px">Nenhuma mudança de escopo</div>
-          <div style="font-size:11px;color:var(--mu)">Nenhum projeto teve alteração de escopo registrada</div>
+          <div style="font-size:11px;color:var(--mu)">Nenhum projeto teve alteração registrada</div>
         </div>`;
     } else {
-      // Ordenar: cancelados ao final, depois por nome
       const ordenados = [...comMudanca].sort((a,b) => {
         if(a.cancelado !== b.cancelado) return a.cancelado ? 1 : -1;
         return (a.nome||'').localeCompare(b.nome||'', 'pt-BR');
       });
-
       const linhas = ordenados.map(p => {
         const ant = p.escopoAntigoRecurso || '<em style="color:var(--mu);font-weight:400">não informado</em>';
         const nov = p.escopoNovoRecurso   || '<em style="color:var(--mu);font-weight:400">não informado</em>';
@@ -2665,10 +3147,9 @@ function rKPIs(){
           </div>
         </div>`;
       }).join('');
-
       escopoEl.innerHTML = `
-        <div style="display:flex;align-items:baseline;gap:10px;margin-bottom:12px;padding:12px 14px;background:#FEF3C7;border:1px solid #FDE68A;border-radius:10px">
-          <span style="font-size:30px;font-weight:800;color:#B45309;line-height:1;font-family:'Plus Jakarta Sans',sans-serif">${sim}</span>
+        <div style="display:flex;align-items:baseline;gap:10px;margin-bottom:14px;padding:12px 14px;background:linear-gradient(135deg,#FEF3C7 0%,#FFFBEB 100%);border:1px solid #FDE68A;border-radius:10px">
+          <span style="font-size:28px;font-weight:800;color:#B45309;line-height:1;font-family:'Plus Jakarta Sans',sans-serif">${sim}</span>
           <div>
             <div style="font-size:12px;font-weight:700;color:#92400E">projeto${sim>1?'s':''} com mudança</div>
             <div style="font-size:10.5px;color:#A16207;margin-top:1px">${sim>1?'tiveram':'teve'} alteração de escopo</div>
