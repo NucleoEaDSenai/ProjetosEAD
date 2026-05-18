@@ -5480,12 +5480,12 @@ function exportPDFFicha(id){
 
 // ── PDF LISTA GERAL (Projetos + KPIs + Atrasos) ───────────────────────────────
 function exportPDFLista(){
-  if(typeof jspdf === 'undefined'){ showToast('⚠️ Biblioteca PDF não carregada ainda.'); return; }
+  if(typeof jspdf === 'undefined'){ showToast('Biblioteca PDF nao carregada ainda.'); return; }
   const { jsPDF } = jspdf;
   const doc = new jsPDF({ orientation:'landscape', unit:'mm', format:'a4' });
   const PW=297, PH=210, ML=12, MR=12, TW=PW-ML-MR;
 
-  // ── Paleta institucional (alinhada com o dashboard web) ──
+  // ── Paleta institucional ──
   const C = {
     blue:[0,61,165], blueDark:[0,28,80], blueLight:[59,130,246],
     red:[232,0,45], green:[26,138,74], amber:[217,119,6],
@@ -5498,11 +5498,26 @@ function exportPDFLista(){
     bgOrangeSoft:[255,247,237],
   };
 
-  // ── Helpers de desenho ──
+  // ── Helpers ──
+  // Sanitiza string: remove emojis e converte UTF-8 para Latin-1 (necessário para jsPDF helvetica)
+  function s(txt){
+    if(txt === null || txt === undefined) return '';
+    let str = String(txt);
+    // Remover emojis e símbolos não-latin-1 (mantém acentos como á é í ó ú ã õ ç)
+    str = str.replace(/[\u{1F000}-\u{1FFFF}]/gu, '')   // emojis
+             .replace(/[\u{2600}-\u{27BF}]/gu, '')      // misc symbols + dingbats
+             .replace(/[\u{2300}-\u{23FF}]/gu, '')      // misc technical
+             .replace(/[\u{2190}-\u{21FF}]/gu, '')      // arrows
+             .replace(/[\u{25A0}-\u{25FF}]/gu, '')      // geometric shapes
+             .replace(/[\u{1F300}-\u{1F5FF}]/gu, '')    // misc symbols and pictographs
+             .replace(/\u200B|\u200C|\u200D|\uFEFF/g,'');  // zero-width chars
+    // Normalizar e remover múltiplos espaços resultantes
+    str = str.replace(/\s+/g, ' ').trim();
+    return str;
+  }
   function setFill(c){ doc.setFillColor(c[0],c[1],c[2]); }
   function setStroke(c){ doc.setDrawColor(c[0],c[1],c[2]); }
   function setText(c){ doc.setTextColor(c[0],c[1],c[2]); }
-  // Retângulo arredondado com fill+stroke
   function roundRect(x,y,w,h,r,fillC,strokeC,lw){
     if(fillC){ setFill(fillC); }
     if(strokeC){ setStroke(strokeC); doc.setLineWidth(lw||0.2); }
@@ -5514,88 +5529,65 @@ function exportPDFLista(){
     doc.setFont('helvetica', opts.bold ? 'bold' : 'normal');
     doc.setFontSize(opts.size || 10);
     setText(opts.color || C.text);
-    doc.text(String(txt), x, y, {align: opts.align || 'left', baseline: opts.baseline || 'alphabetic'});
+    doc.text(s(txt), x, y, {align: opts.align || 'left', baseline: opts.baseline || 'alphabetic'});
+  }
+  // Trunca texto pelo número de caracteres
+  function trunc(t, n){
+    t = s(t);
+    return t.length > n ? t.slice(0, n-1)+'...' : t;
   }
 
-  // ── Cabeçalho hero (azul gradiente) ──
+  // ── Hero do dashboard ──
   function heroPagina(titulo, subtitulo){
-    // Faixa azul superior (simulação de gradiente com 2 retângulos)
+    // Gradiente simulado (azul escuro à esquerda, azul SENAI à direita)
     setFill(C.blueDark); doc.rect(0,0,PW*0.55,30,'F');
     setFill(C.blue); doc.rect(PW*0.55,0,PW*0.45,30,'F');
-    // Texto do hero
     setText(C.white);
     doc.setFont('helvetica','bold'); doc.setFontSize(8);
-    doc.text('📊 DASHBOARD EXECUTIVO  ·  FIRJAN SENAI EAD', ML, 9);
+    doc.text(s('DASHBOARD EXECUTIVO  -  FIRJAN SENAI EAD'), ML, 9);
     doc.setFontSize(16);
-    doc.text(titulo, ML, 18);
+    doc.text(s(titulo), ML, 18);
     if(subtitulo){
       doc.setFont('helvetica','normal'); doc.setFontSize(9);
-      doc.text(subtitulo, ML, 24);
+      doc.text(s(subtitulo), ML, 24);
     }
-    // Data à direita
     doc.setFontSize(8); doc.setFont('helvetica','normal');
-    doc.text(`Gerado em ${isoToBR(td())}`, PW-MR, 9, {align:'right'});
+    doc.text(s('Gerado em '+isoToBR(td())), PW-MR, 9, {align:'right'});
     doc.setFont('helvetica','bold'); doc.setFontSize(10);
-    doc.text(`Relatório Executivo`, PW-MR, 18, {align:'right'});
+    doc.text(s('Relatorio Executivo'), PW-MR, 18, {align:'right'});
   }
 
-  // ── Cabeçalho simples (páginas seguintes com tabelas) ──
-  function cabecalho(titulo){
-    setFill(C.blue); doc.rect(0,0,PW,22,'F');
-    setText(C.white);
-    doc.setFont('helvetica','bold'); doc.setFontSize(13);
-    doc.text('Firjan SENAI — Sistema de Gestão EAD', ML, 10);
-    doc.setFontSize(9); doc.setFont('helvetica','normal');
-    doc.text(titulo, ML, 17);
-    doc.text(`Gerado em ${isoToBR(td())}`, PW-MR, 17,{align:'right'});
-  }
-
-  // ── Card KPI (estilo do dashboard) ──
+  // ── KPI Card ──
   function kpiCard(x, y, w, h, opts){
-    // Fundo branco com borda arredondada
     roundRect(x, y, w, h, 3, C.white, C.grayLight, 0.3);
-    // Faixa colorida no topo (3mm)
     setFill(opts.barColor || C.blue);
     doc.rect(x, y, w, 1.2, 'F');
     // Label
     doc.setFont('helvetica','bold'); doc.setFontSize(7);
     setText(C.textMuted);
-    doc.text((opts.label||'').toUpperCase(), x+3, y+6);
-    // Ícone à direita
-    if(opts.icon){
-      const iconSize = 6;
-      const iconX = x + w - iconSize - 3;
-      const iconY = y + 3;
-      roundRect(iconX, iconY, iconSize, iconSize, 1.2, opts.iconBg || C.bgBlueSoft, null);
-      doc.setFont('helvetica','bold'); doc.setFontSize(7);
-      setText(opts.iconColor || C.blue);
-      doc.text(opts.icon, iconX + iconSize/2, iconY + iconSize/2 + 1, {align:'center'});
-    }
+    doc.text(s(opts.label||'').toUpperCase(), x+3, y+6);
     // Valor grande
     doc.setFont('helvetica','bold'); doc.setFontSize(18);
     setText(opts.valColor || C.text);
-    doc.text(String(opts.value), x+3, y+15);
+    doc.text(s(opts.value), x+3, y+15);
     // Subtítulo
     if(opts.sub){
       doc.setFont('helvetica','normal'); doc.setFontSize(7);
       setText(C.textMuted);
-      doc.text(opts.sub, x+3, y+h-3);
+      doc.text(s(opts.sub), x+3, y+h-3);
     }
   }
 
-  // ── Donut chart (situação) ──
+  // ── Donut ──
   function donut(cx, cy, rOuter, rInner, segments){
-    // segments = [{value, color}]
-    const total = segments.reduce((s,seg) => s + seg.value, 0) || 1;
-    let startAngle = -Math.PI/2;  // começa em cima
+    const total = segments.reduce((sum,seg) => sum + seg.value, 0) || 1;
+    let startAngle = -Math.PI/2;
     segments.forEach(seg => {
       if(seg.value <= 0) return;
       const sweep = (seg.value/total) * Math.PI * 2;
       const endAngle = startAngle + sweep;
-      // Desenhar setor com vários triângulos finos
       const steps = Math.max(2, Math.ceil(Math.abs(sweep)*30));
       setFill(seg.color);
-      // Triangle fan
       for(let i=0; i<steps; i++){
         const a1 = startAngle + (sweep * i/steps);
         const a2 = startAngle + (sweep * (i+1)/steps);
@@ -5609,42 +5601,49 @@ function exportPDFLista(){
     });
   }
 
-  // ── Barra horizontal ──
+  // ── Barra horizontal com layout correto ──
+  // Layout: [NOME ........... barra horizontal ........... VALOR]
+  // Onde:
+  //   - nome ocupa lblW à esquerda
+  //   - barra ocupa barW no meio
+  //   - valor ocupa valW à direita
   function barraH(x, y, totalW, value, max, color, label, valTxt){
-    const trackH = 4;
-    // Label e valor acima
+    const trackH = 4.5;
+    const lblW = totalW * 0.32;  // 32% pro nome
+    const valW = totalW * 0.08;  // 8% pro valor
+    const barW = totalW - lblW - valW - 4;  // resto pra barra, com gap de 4mm
+    // Label à esquerda
     doc.setFont('helvetica','bold'); doc.setFontSize(8);
     setText(C.text);
-    doc.text(label, x, y-1.5);
-    doc.text(valTxt || String(value), x+totalW, y-1.5, {align:'right'});
+    doc.text(trunc(label, 24), x, y+3);
     // Trilha cinza
-    roundRect(x, y, totalW, trackH, 2, C.bgGraySoft);
-    // Preenchimento colorido
-    const fw = max > 0 ? Math.max(0.5, (value/max)*totalW) : 0;
-    roundRect(x, y, fw, trackH, 2, color);
+    const barX = x + lblW + 2;
+    roundRect(barX, y, barW, trackH, 2, C.bgGraySoft);
+    // Preenchimento
+    const fw = max > 0 ? Math.max(0.5, (value/max)*barW) : 0;
+    roundRect(barX, y, fw, trackH, 2, color);
+    // Valor à direita (fora da barra)
+    doc.setFont('helvetica','bold'); doc.setFontSize(8);
+    setText(C.text);
+    doc.text(s(valTxt || String(value)), x+totalW, y+3, {align:'right'});
   }
 
-  // ── Barra vertical (throughput mensal) ──
+  // ── Barra vertical (throughput) ──
   function barraV(x, y, w, h, color, valor, label){
     if(valor > 0){
       roundRect(x, y, w, h, 1, color);
-    } else {
-      // Linha base discreta
-      setFill(C.grayLight); doc.rect(x, y+h-0.5, w, 0.5, 'F');
-    }
-    // Valor acima
-    if(valor > 0){
       doc.setFont('helvetica','bold'); doc.setFontSize(7);
       setText(C.text);
-      doc.text(String(valor), x+w/2, y-1, {align:'center'});
+      doc.text(s(String(valor)), x+w/2, y-1, {align:'center'});
+    } else {
+      setFill(C.grayLight); doc.rect(x, y+h-0.5, w, 0.5, 'F');
     }
-    // Label embaixo
     doc.setFont('helvetica','normal'); doc.setFontSize(6.5);
     setText(C.textMuted);
-    doc.text(label, x+w/2, y+h+3, {align:'center'});
+    doc.text(s(label), x+w/2, y+h+3, {align:'center'});
   }
 
-  // ── Cálculo dos dados de KPI ──
+  // ── Dados ──
   const todos = activeDB().concat(cancelDB());
   const act = activeDB();
   const total = act.length;
@@ -5664,98 +5663,89 @@ function exportPDFLista(){
   const tmCiclo = ciclos.length ? Math.round(ciclos.reduce((a,b)=>a+b,0)/ciclos.length) : null;
 
   // ═══════════════════════════════════════════════════════
-  // PÁGINA 1 — VISÃO GERAL EXECUTIVA
+  // PÁGINA 1 — VISÃO GERAL
   // ═══════════════════════════════════════════════════════
-  heroPagina('KPIs & Indicadores de Produção EAD', 'Análise consolidada do desempenho da equipe e dos projetos');
+  heroPagina('KPIs & Indicadores de Producao EAD', 'Analise consolidada do desempenho da equipe e dos projetos');
 
-  // Faixa de KPI cards (6 cards em uma linha)
+  // 6 KPI cards
   const cardY = 36, cardH = 22, cardGap = 3;
   const cardW = (TW - 5*cardGap) / 6;
   const kpis = [
-    {label:'Total de Proj. Ativos', value:total, sub:`${andando} em andamento`, icon:'P', barColor:C.blue, iconBg:C.bgBlueSoft, iconColor:C.blue, valColor:C.blue},
-    {label:'Taxa de Conclusão', value:txConc+'%', sub:`${conc} concluído${conc!==1?'s':''}`, icon:'✓', barColor:C.green, iconBg:C.bgGreenSoft, iconColor:C.green, valColor:C.green},
-    {label:'Taxa de Atraso', value:txAtras+'%', sub:`${atras} atrasado${atras!==1?'s':''}`,
-      icon:'!', barColor:(txAtras>20?C.red:txAtras>10?C.amber:C.green),
-      iconBg:(txAtras>20?C.bgRedSoft:txAtras>10?C.bgAmberSoft:C.bgGreenSoft),
-      iconColor:(txAtras>20?C.red:txAtras>10?C.amber:C.green),
+    {label:'Total de Proj. Ativos', value:total, sub:andando+' em andamento', barColor:C.blue, valColor:C.blue},
+    {label:'Taxa de Conclusao', value:txConc+'%', sub:conc+' concluido'+(conc!==1?'s':''), barColor:C.green, valColor:C.green},
+    {label:'Taxa de Atraso', value:txAtras+'%', sub:atras+' atrasado'+(atras!==1?'s':''),
+      barColor:(txAtras>20?C.red:txAtras>10?C.amber:C.green),
       valColor:(txAtras>20?C.red:txAtras>10?C.amber:C.green)},
-    {label:'Progresso Médio', value:avg+'%', sub:'média geral', icon:'~', barColor:C.purple, iconBg:C.bgPurpleSoft, iconColor:C.purple, valColor:C.purple},
-    {label:'Homolog. Pendentes', value:homolPendV, sub:`${medicPendV} aguard. medição`,
-      icon:'H', barColor:(homolPendV>0?C.amber:C.green),
-      iconBg:(homolPendV>0?C.bgAmberSoft:C.bgGreenSoft),
-      iconColor:(homolPendV>0?C.amber:C.green),
+    {label:'Progresso Medio', value:avg+'%', sub:'media geral', barColor:C.purple, valColor:C.purple},
+    {label:'Homolog. Pendentes', value:homolPendV, sub:medicPendV+' aguard. medicao',
+      barColor:(homolPendV>0?C.amber:C.green),
       valColor:(homolPendV>0?C.amber:C.green)},
-    {label:'Tempo Médio Ciclo', value:tmCiclo!==null?tmCiclo+'d':'—',
-      sub:`${ciclos.length} proj. concluído${ciclos.length!==1?'s':''}`,
-      icon:'T', barColor:C.gray, iconBg:C.bgGraySoft, iconColor:C.gray, valColor:C.text},
+    {label:'Tempo Medio Ciclo', value:tmCiclo!==null?tmCiclo+'d':'-',
+      sub:ciclos.length+' proj. concluido'+(ciclos.length!==1?'s':''),
+      barColor:C.gray, valColor:C.text},
   ];
   kpis.forEach((k,i) => kpiCard(ML + i*(cardW+cardGap), cardY, cardW, cardH, k));
 
-  // ── Donut + Legenda (situação) ──
+  // Donut + Legenda (esquerda)
   const sec2Y = cardY + cardH + 6;
   const sec2H = 60;
-  // Card grande à esquerda (Distribuição)
   const leftW = TW * 0.42;
   roundRect(ML, sec2Y, leftW, sec2H, 3, C.white, C.grayLight, 0.3);
-  drawText('Distribuição por Situação', ML+4, sec2Y+6, {size:11, bold:true, color:C.text});
-  drawText(`${total} projetos ativos`, ML+leftW-4, sec2Y+6, {size:8, color:C.textMuted, align:'right'});
+  drawText('Distribuicao por Situacao', ML+4, sec2Y+6, {size:11, bold:true, color:C.text});
+  drawText(total+' projetos ativos', ML+leftW-4, sec2Y+6, {size:8, color:C.textMuted, align:'right'});
 
-  // Donut
-  const sits = {
-    andamento: {value:andando, color:C.blueLight, label:'Em Andamento'},
-    atrasadoEq: {value:atrasEqV, color:C.red, label:'Atrasado — Equipe'},
-    atrasadoCl: {value:atrasClV, color:C.amber, label:'Atrasado — Cliente'},
-    concluido: {value:conc, color:C.green, label:'Concluído'},
-    aguardando: {value:aguard, color:C.gray, label:'Aguardando'},
-  };
-  const segs = Object.values(sits);
+  const sits = [
+    {value:andando, color:C.blueLight, label:'Em Andamento'},
+    {value:atrasEqV, color:C.red, label:'Atrasado - Equipe'},
+    {value:atrasClV, color:C.amber, label:'Atrasado - Cliente'},
+    {value:conc, color:C.green, label:'Concluido'},
+    {value:aguard, color:C.gray, label:'Aguardando'},
+  ];
   const donutCX = ML+22, donutCY = sec2Y+34;
   if(total > 0){
-    donut(donutCX, donutCY, 17, 11, segs);
-    // Total no centro
+    donut(donutCX, donutCY, 17, 11, sits);
     doc.setFont('helvetica','bold'); doc.setFontSize(13);
     setText(C.text);
-    doc.text(String(total), donutCX, donutCY+1, {align:'center'});
+    doc.text(s(String(total)), donutCX, donutCY+1, {align:'center'});
     doc.setFont('helvetica','normal'); doc.setFontSize(6);
     setText(C.textMuted);
-    doc.text('PROJETOS', donutCX, donutCY+5, {align:'center'});
+    doc.text(s('PROJETOS'), donutCX, donutCY+5, {align:'center'});
   } else {
     drawText('Sem dados', donutCX, donutCY, {size:8, color:C.textMuted, align:'center'});
   }
-  // Legenda à direita do donut
+  // Legenda
   const legX = ML + 46, legW = leftW - 50;
   let legY = sec2Y + 14;
-  segs.forEach(s => {
-    const pct = total>0 ? Math.round(s.value/total*100) : 0;
-    // Bolinha colorida
-    setFill(s.color); doc.rect(legX, legY-1.8, 2.5, 2.5, 'F');
-    drawText(s.label, legX+4, legY, {size:8.5, color:C.text});
-    drawText(`${s.value}`, legX+legW-12, legY, {size:8.5, bold:true, color:C.text, align:'right'});
-    drawText(`${pct}%`, legX+legW, legY, {size:7.5, color:C.textMuted, align:'right'});
+  sits.forEach(seg => {
+    const pct = total>0 ? Math.round(seg.value/total*100) : 0;
+    setFill(seg.color); doc.rect(legX, legY-1.8, 2.5, 2.5, 'F');
+    drawText(seg.label, legX+4, legY, {size:8.5, color:C.text});
+    drawText(String(seg.value), legX+legW-12, legY, {size:8.5, bold:true, color:C.text, align:'right'});
+    drawText(pct+'%', legX+legW, legY, {size:7.5, color:C.textMuted, align:'right'});
     legY += 6.5;
   });
 
-  // Card à direita: Insights Rápidos
+  // Insights (direita)
   const rightX = ML + leftW + 6;
   const rightW = TW - leftW - 6;
   roundRect(rightX, sec2Y, rightW, sec2H, 3, C.white, C.grayLight, 0.3);
-  drawText('Insights Rápidos', rightX+4, sec2Y+6, {size:11, bold:true, color:C.text});
+  drawText('Insights Rapidos', rightX+4, sec2Y+6, {size:11, bold:true, color:C.text});
 
   const insights = [];
-  if(atrasEqV>0) insights.push({tone:'danger', txt:`${atrasEqV} projeto${atrasEqV>1?'s':''} atrasado${atrasEqV>1?'s':''} com a equipe — requer ação imediata`});
-  if(atrasClV>0) insights.push({tone:'warn', txt:`${atrasClV} projeto${atrasClV>1?'s':''} atrasado${atrasClV>1?'s':''} aguardando o cliente`});
+  if(atrasEqV>0) insights.push({tone:'danger', txt:atrasEqV+' projeto'+(atrasEqV>1?'s':'')+' atrasado'+(atrasEqV>1?'s':'')+' com a equipe - requer acao imediata'});
+  if(atrasClV>0) insights.push({tone:'warn', txt:atrasClV+' projeto'+(atrasClV>1?'s':'')+' atrasado'+(atrasClV>1?'s':'')+' aguardando o cliente'});
   const venc7 = act.filter(p => {
     if(calcSit(p)==='concluido' || !p.prazo) return false;
     const d = Math.round((new Date(p.prazo) - new Date()) / 864e5);
     return d>=0 && d<=7;
   }).length;
-  if(venc7>0) insights.push({tone:'warn', txt:`${venc7} projeto${venc7>1?'s':''} vence${venc7>1?'m':''} em até 7 dias`});
-  if(homolPendV>0) insights.push({tone:'info', txt:`${homolPendV} homologa${homolPendV>1?'ções':'ção'} pendente${homolPendV>1?'s':''}`});
-  if(medicPendV>0) insights.push({tone:'info', txt:`${medicPendV} projeto${medicPendV>1?'s':''} aguardando medição`});
-  if(tmCiclo!==null) insights.push({tone:'info', txt:`Tempo médio de ciclo: ${tmCiclo} dias (${ciclos.length} projeto${ciclos.length!==1?'s':''} concluído${ciclos.length!==1?'s':''})`});
-  if(txConc>=70) insights.push({tone:'ok', txt:`Excelente taxa de conclusão: ${txConc}%`});
-  else if(txConc>=50) insights.push({tone:'info', txt:`Taxa de conclusão: ${txConc}% — bom desempenho`});
-  if(atrasEqV===0 && atrasClV===0 && total>0) insights.push({tone:'ok', txt:'Nenhum projeto em atraso — equipe em dia!'});
+  if(venc7>0) insights.push({tone:'warn', txt:venc7+' projeto'+(venc7>1?'s':'')+' vence'+(venc7>1?'m':'')+' em ate 7 dias'});
+  if(homolPendV>0) insights.push({tone:'info', txt:homolPendV+' homologa'+(homolPendV>1?'coes':'cao')+' pendente'+(homolPendV>1?'s':'')});
+  if(medicPendV>0) insights.push({tone:'info', txt:medicPendV+' projeto'+(medicPendV>1?'s':'')+' aguardando medicao'});
+  if(tmCiclo!==null) insights.push({tone:'info', txt:'Tempo medio de ciclo: '+tmCiclo+' dias ('+ciclos.length+' projeto'+(ciclos.length!==1?'s':'')+' concluido'+(ciclos.length!==1?'s':'')+')'});
+  if(txConc>=70) insights.push({tone:'ok', txt:'Excelente taxa de conclusao: '+txConc+'%'});
+  else if(txConc>=50) insights.push({tone:'info', txt:'Taxa de conclusao: '+txConc+'% - bom desempenho'});
+  if(atrasEqV===0 && atrasClV===0 && total>0) insights.push({tone:'ok', txt:'Nenhum projeto em atraso - equipe em dia!'});
 
   const tonePalette = {
     danger:{bg:C.bgRedSoft, border:C.red, text:[127,29,29]},
@@ -5765,22 +5755,18 @@ function exportPDFLista(){
   };
   let insY = sec2Y + 11;
   insights.slice(0, 6).forEach(ins => {
-    const p = tonePalette[ins.tone] || tonePalette.info;
+    const pal = tonePalette[ins.tone] || tonePalette.info;
     const insH = 6.8;
-    roundRect(rightX+3, insY, rightW-6, insH, 1.5, p.bg);
-    // Borda lateral esquerda
-    setFill(p.border); doc.rect(rightX+3, insY, 1, insH, 'F');
-    // Truncar texto se muito longo
-    const maxChars = 90;
-    const txt = ins.txt.length > maxChars ? ins.txt.slice(0, maxChars-1)+'…' : ins.txt;
-    drawText(txt, rightX+6, insY+4.5, {size:8, color:p.text});
+    roundRect(rightX+3, insY, rightW-6, insH, 1.5, pal.bg);
+    setFill(pal.border); doc.rect(rightX+3, insY, 1, insH, 'F');
+    drawText(trunc(ins.txt, 90), rightX+6, insY+4.5, {size:8, color:pal.text});
     insY += insH + 1.2;
   });
   if(insights.length === 0){
-    drawText('Sem alertas no momento — situação tranquila ✓', rightX+4, sec2Y+30, {size:9, color:C.textMuted});
+    drawText('Sem alertas no momento - situacao tranquila', rightX+4, sec2Y+30, {size:9, color:C.textMuted});
   }
 
-  // ── Rodapé da página 1 com info do banner se aplicável ──
+  // Rodapé info do banner
   let dataMaisAntiga = null;
   todos.forEach(p => { if(p.criado){ const d=new Date(p.criado); if(!isNaN(d) && (!dataMaisAntiga || d < dataMaisAntiga)) dataMaisAntiga = d; }});
   const linhaFinalY = sec2Y + sec2H + 6;
@@ -5788,20 +5774,20 @@ function exportPDFLista(){
     roundRect(ML, linhaFinalY, TW, 8, 2, C.bgBlueSoft, [191,219,254], 0.3);
     setText([30,64,175]);
     doc.setFont('helvetica','bold'); doc.setFontSize(8);
-    doc.text(`ℹ  Histórico do sistema:`, ML+3, linhaFinalY+5.2);
+    doc.text(s('Historico do sistema:'), ML+3, linhaFinalY+5.2);
     doc.setFont('helvetica','normal');
     const fmtData = dataMaisAntiga.toLocaleDateString('pt-BR',{day:'2-digit',month:'long',year:'numeric'});
-    doc.text(`primeiro projeto cadastrado em ${fmtData}  ·  ${todos.length} projetos no total  ·  ${act.length} ativos · ${cancelDB().length} cancelados`, ML+38, linhaFinalY+5.2);
+    doc.text(s('primeiro projeto cadastrado em '+fmtData+'  -  '+todos.length+' projetos no total  -  '+act.length+' ativos  -  '+cancelDB().length+' cancelados'), ML+38, linhaFinalY+5.2);
   }
 
   // ═══════════════════════════════════════════════════════
   // PÁGINA 2 — FLUXO & ENTREGAS
   // ═══════════════════════════════════════════════════════
   doc.addPage();
-  heroPagina('Fluxo & Entregas', 'Pipeline de produção, throughput mensal e mudanças de escopo');
+  heroPagina('Fluxo & Entregas', 'Pipeline de producao, throughput mensal e mudancas de escopo');
 
-  // Pipeline por fase (esquerda)
   const p2Y = 36;
+  // Pipeline (esquerda)
   const pipeW = TW * 0.50;
   roundRect(ML, p2Y, pipeW, 100, 3, C.white, C.grayLight, 0.3);
   drawText('Pipeline por Fase', ML+4, p2Y+6, {size:11, bold:true, color:C.text});
@@ -5811,7 +5797,6 @@ function exportPDFLista(){
   act.forEach(p => { colCount[p.col] = (colCount[p.col]||0)+1; });
   const colArr = COLUNAS.map(c => ({...c, n: colCount[c.k]||0})).filter(c => c.n > 0);
   const mxPipe = colArr.length ? Math.max(...colArr.map(c => c.n)) : 1;
-  // Converter hex do c.dot para RGB
   function hexToRgb(hex){
     if(!hex) return C.blue;
     const h = hex.replace('#','');
@@ -5823,16 +5808,18 @@ function exportPDFLista(){
   colArr.slice(0, 12).forEach(c => {
     const cor = hexToRgb(c.dot);
     // Bolinha
-    setFill(cor); doc.circle(ML+6, pY-1.5, 1.5, 'F');
-    // Nome
-    drawText(c.l.length>34?c.l.slice(0,33)+'…':c.l, ML+10, pY, {size:8, color:C.text, bold:true});
-    // Trilha
-    const barX = ML+pipeW*0.55, barW = pipeW*0.32;
-    roundRect(barX, pY-2.5, barW, 3, 1.5, C.bgGraySoft);
-    const fw = mxPipe>0 ? Math.max(0.5, (c.n/mxPipe)*barW) : 0;
-    roundRect(barX, pY-2.5, fw, 3, 1.5, cor);
-    // Valor
-    drawText(String(c.n), ML+pipeW-4, pY, {size:8, bold:true, align:'right', color:C.text});
+    setFill(cor); doc.circle(ML+6, pY+1, 1.5, 'F');
+    // Layout: bolinha (~4mm) | nome (até 50% da largura) | trilha | valor à direita
+    const innerW = pipeW - 16;
+    const nameW = innerW * 0.40;
+    const valW = 8;
+    const barW = innerW - nameW - valW - 4;
+    drawText(trunc(c.l, 28), ML+10, pY+3, {size:8, color:C.text, bold:true});
+    const barX = ML+10 + nameW + 2;
+    roundRect(barX, pY+0.5, barW, 3, 1.5, C.bgGraySoft);
+    const fw = Math.max(0.5, (c.n/mxPipe)*barW);
+    roundRect(barX, pY+0.5, fw, 3, 1.5, cor);
+    drawText(String(c.n), ML+pipeW-4, pY+3, {size:8, bold:true, align:'right', color:C.text});
     pY += pipeLineH;
   });
 
@@ -5840,10 +5827,9 @@ function exportPDFLista(){
   const thrX = ML + pipeW + 6;
   const thrW = TW - pipeW - 6;
   roundRect(thrX, p2Y, thrW, 100, 3, C.white, C.grayLight, 0.3);
-  drawText('Conclusões por Mês', thrX+4, p2Y+6, {size:11, bold:true, color:C.text});
-  drawText('últimos 12 meses', thrX+thrW-4, p2Y+6, {size:8, color:C.textMuted, align:'right'});
+  drawText('Conclusoes por Mes', thrX+4, p2Y+6, {size:11, bold:true, color:C.text});
+  drawText('ultimos 12 meses', thrX+thrW-4, p2Y+6, {size:8, color:C.textMuted, align:'right'});
 
-  // Calcular meses
   const agora = new Date();
   const meses = [];
   for(let i=11;i>=0;i--){
@@ -5861,14 +5847,14 @@ function exportPDFLista(){
   const medMes = total12 ? Math.round(total12/12 * 10)/10 : 0;
   const melhorMes = [...meses].sort((a,b)=>b.n-a.n)[0];
 
-  // 3 stats no topo
+  // Stats
   const statsY = p2Y + 16;
   drawText(String(total12), thrX+5, statsY+4, {size:16, bold:true, color:C.text});
   drawText('TOTAL 12 MESES', thrX+5, statsY+8, {size:6, color:C.textMuted});
   drawText(String(medMes), thrX+35, statsY+4, {size:16, bold:true, color:C.text});
-  drawText('MÉDIA/MÊS', thrX+35, statsY+8, {size:6, color:C.textMuted});
+  drawText('MEDIA/MES', thrX+35, statsY+8, {size:6, color:C.textMuted});
   drawText(melhorMes && melhorMes.n>0 ? String(melhorMes.n) : '0', thrX+65, statsY+4, {size:16, bold:true, color:C.text});
-  drawText(`MELHOR MÊS${melhorMes && melhorMes.n>0 ? ' ('+melhorMes.lbl.toUpperCase()+')' : ''}`, thrX+65, statsY+8, {size:6, color:C.textMuted});
+  drawText('MELHOR MES'+(melhorMes && melhorMes.n>0 ? ' ('+melhorMes.lbl.toUpperCase()+')' : ''), thrX+65, statsY+8, {size:6, color:C.textMuted});
 
   // Barras verticais
   const barsY = p2Y + 30;
@@ -5882,54 +5868,50 @@ function exportPDFLista(){
     barraV(x, barsY + barsH - barH, barColW, barH, C.blue, m.n, m.lbl);
   });
 
-  // Mudança de escopo (parte inferior — largura total)
+  // Mudança de escopo
   const escY = p2Y + 106;
   const escH = 50;
   roundRect(ML, escY, TW, escH, 3, C.white, C.grayLight, 0.3);
-  drawText('Projetos com Mudança de Escopo', ML+4, escY+6, {size:11, bold:true, color:C.text});
+  drawText('Projetos com Mudanca de Escopo', ML+4, escY+6, {size:11, bold:true, color:C.text});
 
   const comMudanca = todos.filter(p => p.mudouEscopo === 'sim');
   if(comMudanca.length === 0){
-    drawText('Nenhum projeto teve alteração de escopo registrada', ML+4, escY+25, {size:9, color:C.textMuted});
+    drawText('Nenhum projeto teve alteracao de escopo registrada', ML+4, escY+25, {size:9, color:C.textMuted});
   } else {
-    // Badge resumo à esquerda
     roundRect(ML+4, escY+10, 60, 14, 2, C.bgAmberSoft);
     drawText(String(comMudanca.length), ML+8, escY+20, {size:16, bold:true, color:[181,83,9]});
-    drawText(`projeto${comMudanca.length>1?'s':''} com mudança`, ML+24, escY+16, {size:8, bold:true, color:[146,64,14]});
-    drawText(comMudanca.length>1?'tiveram alteração de escopo':'teve alteração de escopo', ML+24, escY+21, {size:7, color:[161,98,7]});
+    drawText('projeto'+(comMudanca.length>1?'s':'')+' com mudanca', ML+24, escY+16, {size:8, bold:true, color:[146,64,14]});
+    drawText(comMudanca.length>1?'tiveram alteracao de escopo':'teve alteracao de escopo', ML+24, escY+21, {size:7, color:[161,98,7]});
 
-    // Lista (3 colunas para caber mais)
     const listX = ML + 70, listW = TW - 75;
     const ordenados = [...comMudanca].sort((a,b) => {
       if(a.cancelado !== b.cancelado) return a.cancelado ? 1 : -1;
       return (a.nome||'').localeCompare(b.nome||'', 'pt-BR');
-    }).slice(0, 6);
-    const colItemW = listW / Math.min(2, ordenados.length || 1);
-    ordenados.slice(0, 4).forEach((p, i) => {
+    }).slice(0, 4);
+    const colItemW = listW / 2;
+    ordenados.forEach((p, i) => {
       const col = i % 2;
       const row = Math.floor(i/2);
       const ix = listX + col * colItemW + 2;
       const iy = escY + 10 + row * 17;
-      // Card pequeno
       roundRect(ix, iy, colItemW - 4, 14, 1.5, [255,251,235], [254,243,199], 0.2);
       setFill([245,158,11]); doc.rect(ix, iy, 1, 14, 'F');
-      const nomeT = p.nome.length > 38 ? p.nome.slice(0,36)+'…' : p.nome;
-      drawText(nomeT, ix+3, iy+5, {size:8, bold:true, color:C.text});
-      const ant = p.escopoAntigoRecurso || 'não informado';
-      const nov = p.escopoNovoRecurso || 'não informado';
-      const antT = ant.length>16?ant.slice(0,14)+'…':ant;
-      const novT = nov.length>16?nov.slice(0,14)+'…':nov;
-      // Antigo (vermelho)
-      roundRect(ix+3, iy+7, doc.getTextWidth(antT)+3, 4, 1, C.bgRedSoft);
-      drawText(antT, ix+4.5, iy+10, {size:7, color:[153,27,27]});
-      const antW = doc.getTextWidth(antT)+3;
-      drawText('→', ix+5+antW, iy+10, {size:8, bold:true, color:C.amber});
-      // Novo (verde)
-      roundRect(ix+10+antW, iy+7, doc.getTextWidth(novT)+3, 4, 1, C.bgGreenSoft);
-      drawText(novT, ix+11.5+antW, iy+10, {size:7, color:[21,128,61]});
+      drawText(trunc(p.nome, 40), ix+3, iy+5, {size:8, bold:true, color:C.text});
+      const ant = trunc(p.escopoAntigoRecurso || 'nao informado', 16);
+      const nov = trunc(p.escopoNovoRecurso || 'nao informado', 16);
+      // Pílulas com bg
+      const antPad = 1.5;
+      doc.setFont('helvetica','normal'); doc.setFontSize(7);
+      const antW = doc.getTextWidth(s(ant)) + antPad*2;
+      roundRect(ix+3, iy+7, antW, 4, 1, C.bgRedSoft);
+      drawText(ant, ix+3+antPad, iy+10, {size:7, color:[153,27,27]});
+      drawText('->', ix+5+antW, iy+10, {size:8, bold:true, color:C.amber});
+      const novW = doc.getTextWidth(s(nov)) + antPad*2;
+      roundRect(ix+10+antW, iy+7, novW, 4, 1, C.bgGreenSoft);
+      drawText(nov, ix+10+antW+antPad, iy+10, {size:7, color:[21,128,61]});
     });
-    if(ordenados.length > 4){
-      drawText(`+ ${comMudanca.length-4} outros — ver tabela completa`, listX+3, escY+escH-3, {size:7, color:C.textMuted, bold:true});
+    if(comMudanca.length > 4){
+      drawText('+ '+(comMudanca.length-4)+' outros - ver tabela completa', listX+3, escY+escH-3, {size:7, color:C.textMuted, bold:true});
     }
   }
 
@@ -5937,16 +5919,15 @@ function exportPDFLista(){
   // PÁGINA 3 — PESSOAS & ACADEMIAS
   // ═══════════════════════════════════════════════════════
   doc.addPage();
-  heroPagina('Pessoas & Academias', 'Distribuição de projetos por academia, responsável e tipo de recurso');
+  heroPagina('Pessoas & Academias', 'Distribuicao de projetos por academia, responsavel e tipo de recurso');
 
   const p3Y = 36;
-  // Académia (esquerda)
   const acadW = TW * 0.48;
   roundRect(ML, p3Y, acadW, 100, 3, C.white, C.grayLight, 0.3);
   drawText('Projetos por Academia', ML+4, p3Y+6, {size:11, bold:true, color:C.text});
 
   const mapAcad = {};
-  act.forEach(p => { const a = p.academia || 'Não definida'; mapAcad[a] = (mapAcad[a]||0)+1; });
+  act.forEach(p => { const a = p.academia || 'Nao definida'; mapAcad[a] = (mapAcad[a]||0)+1; });
   const arrAcad = Object.entries(mapAcad).sort((a,b) => b[1]-a[1]).slice(0, 12);
   const mxAcad = arrAcad.length ? arrAcad[0][1] : 1;
   const ACAD_COLS = [
@@ -5960,14 +5941,14 @@ function exportPDFLista(){
     ay += 7;
   });
 
-  // RP (direita)
+  // RP
   const rpX = ML + acadW + 6;
   const rpW = TW - acadW - 6;
   roundRect(rpX, p3Y, rpW, 100, 3, C.white, C.grayLight, 0.3);
   drawText('Projetos por RP', rpX+4, p3Y+6, {size:11, bold:true, color:C.text});
 
   const mapRP = {};
-  act.forEach(p => { const r = p.rp || 'Não definido'; mapRP[r] = (mapRP[r]||0)+1; });
+  act.forEach(p => { const r = p.rp || 'Nao definido'; mapRP[r] = (mapRP[r]||0)+1; });
   const arrRP = Object.entries(mapRP).sort((a,b) => b[1]-a[1]).slice(0, 12);
   const mxRP = arrRP.length ? arrRP[0][1] : 1;
   let ry = p3Y + 14;
@@ -5976,7 +5957,7 @@ function exportPDFLista(){
     ry += 7;
   });
 
-  // Recursos (parte inferior — largura total)
+  // Recursos (parte inferior)
   const recY = p3Y + 106;
   roundRect(ML, recY, TW, 50, 3, C.white, C.grayLight, 0.3);
   drawText('Projetos por Recurso', ML+4, recY+6, {size:11, bold:true, color:C.text});
@@ -5995,39 +5976,38 @@ function exportPDFLista(){
   // PÁGINA 4 — TEMPOS & EFICIÊNCIA
   // ═══════════════════════════════════════════════════════
   doc.addPage();
-  heroPagina('Tempos & Eficiência', 'Tempo médio por etapa e espera por retorno do cliente');
+  heroPagina('Tempos & Eficiencia', 'Tempo medio por etapa e espera por retorno do cliente');
 
   const p4Y = 36;
   // Tempo médio por etapa (esquerda)
   const etW = TW * 0.55;
   roundRect(ML, p4Y, etW, 156, 3, C.white, C.grayLight, 0.3);
-  drawText('Tempo Médio por Etapa', ML+4, p4Y+6, {size:11, bold:true, color:C.text});
-  drawText('dias médios para conclusão', ML+etW-4, p4Y+6, {size:7.5, color:C.textMuted, align:'right'});
+  drawText('Tempo Medio por Etapa', ML+4, p4Y+6, {size:11, bold:true, color:C.text});
+  drawText('dias medios para conclusao', ML+etW-4, p4Y+6, {size:7.5, color:C.textMuted, align:'right'});
 
-  // Lista de etapas (compartilhada com a função rKPIs)
   const ETAPAS_MEDIR = [
-    {n:'Reunião Inicial', busca:['Reunião Inicial'], r:'eq'},
+    {n:'Reuniao Inicial', busca:['Reunião Inicial'], r:'eq'},
     {n:'Mat. Base Recebido', busca:['Material Base Recebido'], r:'cl'},
-    {n:'Análise Mat. Base', busca:['Análise do material base'], r:'eq'},
-    {n:'Elaboração PICV/PI', busca:['Elaboração do PICV','Elaboração do PI'], r:'eq'},
+    {n:'Analise Mat. Base', busca:['Análise do material base'], r:'eq'},
+    {n:'Elaboracao PICV/PI', busca:['Elaboração do PICV','Elaboração do PI'], r:'eq'},
     {n:'Valid. PICV DI/DM', busca:['Validação PICV DI/DM Referência','Validação do PI'], r:'cl'},
-    {n:'Validação LD', busca:['Validação LD'], r:'cl'},
+    {n:'Validacao LD', busca:['Validação LD'], r:'cl'},
     {n:'Rev. Textual PICV/PI', busca:['Revisão textual do PICV','Revisão Textual do PI'], r:'eq'},
     {n:'Entrega PICV/PI cliente', busca:['Entrega do PICV ao cliente','Entrega do PI ao cliente'], r:'eq'},
     {n:'Solic. Ajustes PICV', busca:['Solicitação de ajustes no PICV'], r:'cl'},
     {n:'Impl. Ajustes (PI)', busca:['Implementação de ajustes','Implementação de Ajustes'], r:'eq'},
     {n:'Valid. Final PICV', busca:['Validação final do PICV'], r:'cl'},
     {n:'Desenho/Rot. Onepage', busca:['Desenho/roteirização do onepage','Desenho/Roteirização'], r:'eq'},
-    {n:'Valid. DI Referência', busca:['Validação DI Referência'], r:'cl'},
-    {n:'Prod. Recursos Gráficos', busca:['Produção de recursos gráficos','Produção de Recursos Gráficos'], r:'eq'},
-    {n:'Valid. DM Referência', busca:['Validação DM Referência'], r:'cl'},
+    {n:'Valid. DI Referencia', busca:['Validação DI Referência'], r:'cl'},
+    {n:'Prod. Recursos Graficos', busca:['Produção de recursos gráficos','Produção de Recursos Gráficos'], r:'eq'},
+    {n:'Valid. DM Referencia', busca:['Validação DM Referência'], r:'cl'},
     {n:'Entrega Review cliente', busca:['Entrega do review ao cliente','Entrega do Review ao cliente'], r:'eq'},
     {n:'Solic. Ajustes Review', busca:['Solicitação de ajustes','Solicitação de Ajustes'], r:'cl'},
     {n:'Impl. Ajustes (Review)', busca:['Implementação de ajustes','Implementação de Ajustes'], r:'eq'},
     {n:'Valid. Final Review', busca:['Validação final do review','Validação Final'], r:'cl'},
     {n:'Rev. Textual Review', busca:['Revisão textual do review','Revisão Textual'], r:'eq'},
-    {n:'Homologação', busca:['Homologação'], r:'eq'},
-    {n:'Instalação SIRH', busca:['Instalação no SIRH'], r:'eq'},
+    {n:'Homologacao', busca:['Homologação'], r:'eq'},
+    {n:'Instalacao SIRH', busca:['Instalação no SIRH'], r:'eq'},
     {n:'Upload Arquivos Bdoc', busca:['Upload Arquivos Bdoc','Upload Arquivos'], r:'eq'},
   ];
   const etArrPdf = ETAPAS_MEDIR.map(def => {
@@ -6046,42 +6026,36 @@ function exportPDFLista(){
   const mnET = etArrPdf.length ? Math.min(...etArrPdf.map(e => e.d)) : 0;
 
   if(etArrPdf.length === 0){
-    drawText('Nenhuma etapa concluída ainda', ML+4, p4Y+30, {size:9, color:C.textMuted});
+    drawText('Nenhuma etapa concluida ainda', ML+4, p4Y+30, {size:9, color:C.textMuted});
   } else {
-    let ey = p4Y + 12;
+    let ey = p4Y + 14;
     const etColW = etW - 8;
     etArrPdf.slice(0, 20).forEach(e => {
-      // Cor relativa
       const t = mxET===mnET ? 0.5 : (e.d-mnET)/(mxET-mnET);
       let cor;
       if(e.r === 'cl'){
-        // Verde → Laranja → Vermelho
         const r2 = Math.round(40 + t*210);
         const g2 = Math.round(170 - t*120);
         const b2 = Math.round(70 - t*40);
         cor = [r2, g2, b2];
       } else {
-        // Azul claro → Azul escuro
         const r2 = Math.round(80 - t*70);
         const g2 = Math.round(140 - t*80);
         const b2 = Math.round(220 - t*60);
         cor = [r2, g2, b2];
       }
-      // Tag EQ/CL
+      // Layout: TAG | NOME | AMOSTRAS | --- BARRA --- | VALOR
       const tagX = ML+4, tagW = 8;
-      roundRect(tagX, ey-3, tagW, 3.5, 0.8, e.r==='cl'?C.bgAmberSoft:C.bgBlueSoft);
+      roundRect(tagX, ey-2.5, tagW, 4, 0.8, e.r==='cl'?C.bgAmberSoft:C.bgBlueSoft);
       drawText(e.r==='cl'?'CL':'EQ', tagX+tagW/2, ey, {size:6, bold:true, color:e.r==='cl'?[146,64,14]:[29,78,216], align:'center'});
-      // Nome
-      drawText(e.n, ML+14, ey, {size:7.5, color:C.text, bold:true});
-      // Amostras
-      drawText(`${e.amostras}x`, ML+62, ey, {size:6.5, color:C.textMuted});
-      // Trilha + valor
-      const barX = ML+72, barW = etColW-72;
-      roundRect(barX, ey-2.5, barW, 3, 1.5, C.bgGraySoft);
+      drawText(trunc(e.n, 22), ML+14, ey, {size:8, color:C.text, bold:true});
+      drawText(e.amostras+'x', ML+62, ey, {size:7, color:C.textMuted});
+      const barX = ML+72, barW = etColW-82;
+      roundRect(barX, ey-2, barW, 3, 1.5, C.bgGraySoft);
       const fw = Math.max(0.5, (e.d/mxET)*barW);
-      roundRect(barX, ey-2.5, fw, 3, 1.5, cor);
-      drawText(e.d+'d', ML+etW-4, ey, {size:7.5, bold:true, color:cor, align:'right'});
-      ey += 6.5;
+      roundRect(barX, ey-2, fw, 3, 1.5, cor);
+      drawText(e.d+'d', ML+etW-4, ey, {size:8, bold:true, color:cor, align:'right'});
+      ey += 7;
     });
   }
 
@@ -6090,7 +6064,7 @@ function exportPDFLista(){
   const espW = TW - etW - 6;
   roundRect(espX, p4Y, espW, 156, 3, C.white, C.grayLight, 0.3);
   drawText('Espera por Cliente', espX+4, p4Y+6, {size:11, bold:true, color:C.text});
-  drawText('dias médios aguardando retorno', espX+espW-4, p4Y+6, {size:7, color:C.textMuted, align:'right'});
+  drawText('dias medios aguardando retorno', espX+espW-4, p4Y+6, {size:7, color:C.textMuted, align:'right'});
 
   const etCl = {};
   todos.forEach(p => {
@@ -6108,193 +6082,47 @@ function exportPDFLista(){
   const mediaGeral = espArr.length ? Math.round(espArr.reduce((a,e) => a+e.media, 0)/espArr.length) : null;
 
   if(espArr.length === 0){
-    drawText('Nenhuma etapa de cliente concluída ainda', espX+4, p4Y+30, {size:9, color:C.textMuted});
+    drawText('Nenhuma etapa de cliente concluida ainda', espX+4, p4Y+30, {size:9, color:C.textMuted});
   } else {
-    // Card âmbar com média geral
     roundRect(espX+4, p4Y+11, espW-8, 16, 2, [255,247,237], [254,215,170], 0.3);
     drawText(mediaGeral+'d', espX+8, p4Y+21, {size:18, bold:true, color:[154,52,18]});
-    drawText('média geral de espera', espX+30, p4Y+18, {size:8, bold:true, color:[124,45,18]});
-    drawText(`considerando ${espArr.length} etapa${espArr.length>1?'s':''}`, espX+30, p4Y+24, {size:7, color:[161,98,7]});
+    drawText('media geral de espera', espX+30, p4Y+18, {size:8, bold:true, color:[124,45,18]});
+    drawText('considerando '+espArr.length+' etapa'+(espArr.length>1?'s':''), espX+30, p4Y+24, {size:7, color:[161,98,7]});
 
-    // Lista
-    let espY = p4Y + 32;
-    espArr.slice(0, 15).forEach(e => {
+    let espY = p4Y + 34;
+    espArr.slice(0, 14).forEach(e => {
       const t = mxEsp===mnEsp ? 0.5 : (e.media-mnEsp)/(mxEsp-mnEsp);
       let cor;
-      if(t < 0.33){ cor = [80, 160, 70]; }     // verde
-      else if(t < 0.66){ cor = [210, 130, 30]; } // laranja
-      else { cor = [200, 50, 40]; }              // vermelho
-      // Nome
-      const lblTrunc = e.lb.length > 30 ? e.lb.slice(0,28)+'…' : e.lb;
-      drawText(lblTrunc, espX+4, espY, {size:7.5, color:C.text, bold:true});
-      drawText(`${e.n}x`, espX+espW-25, espY, {size:6.5, color:C.textMuted});
-      drawText(e.media+'d', espX+espW-4, espY, {size:8, bold:true, color:cor, align:'right'});
-      // Trilha
-      const barW = espW - 8;
-      roundRect(espX+4, espY+1.5, barW, 2.5, 1, C.bgGraySoft);
+      if(t < 0.33){ cor = [80, 160, 70]; }
+      else if(t < 0.66){ cor = [210, 130, 30]; }
+      else { cor = [200, 50, 40]; }
+      // Layout: NOME | AMOSTRAS | -- BARRA -- | VALOR
+      const innerW = espW - 8;
+      const nameW = innerW * 0.55;
+      const valW = 12;
+      const barW = innerW - nameW - valW - 4;
+      drawText(trunc(e.lb, 28), espX+4, espY, {size:7.5, color:C.text, bold:true});
+      drawText(e.n+'x', espX+4+nameW-10, espY, {size:6.5, color:C.textMuted});
+      const barX = espX+4+nameW+2;
+      roundRect(barX, espY-1.5, barW, 2.5, 1, C.bgGraySoft);
       const fw = Math.max(0.5, (e.media/mxEsp)*barW);
-      roundRect(espX+4, espY+1.5, fw, 2.5, 1, cor);
-      espY += 7.5;
+      roundRect(barX, espY-1.5, fw, 2.5, 1, cor);
+      drawText(e.media+'d', espX+espW-4, espY, {size:8, bold:true, color:cor, align:'right'});
+      espY += 7;
     });
   }
 
-  // ═══════════════════════════════════════════════════════
-  // PÁGINA 5+: TABELAS DETALHADAS (mantém o conteúdo original)
-  // ═══════════════════════════════════════════════════════
-  doc.addPage();
-  cabecalho('Lista Geral de Projetos'); let y = 30;
-  const hdrL=[['ID','Nome','Recursos','Responsáveis','Situação','Coluna','Início','Prazo','Término','%']];
-  const rowsL=todos.map(p=>[
-    p.id, p.nome, (p.recursos||[]).join(', '),
-    (p.resps||[]).join(', '), sitLabel(p),
-    colLabel(p.col), isoToBR(p.inicio), isoToBR(p.prazo), isoToBR(p.termino), p.pct+'%'
-  ]);
-  doc.autoTable({
-    head:hdrL, body:rowsL, startY:y,
-    margin:{left:ML,right:MR},
-    styles:{fontSize:8,cellPadding:2,overflow:'linebreak'},
-    headStyles:{fillColor:[0,61,165],textColor:255,fontStyle:'bold'},
-    alternateRowStyles:{fillColor:[245,247,250]},
-    columnStyles:{
-      0:{cellWidth:8},1:{cellWidth:58},2:{cellWidth:42},3:{cellWidth:35},
-      4:{cellWidth:22},5:{cellWidth:46},6:{cellWidth:18},7:{cellWidth:18},8:{cellWidth:18},9:{cellWidth:8}
-    },
-    didParseCell(data){
-      if(data.section==='body'&&data.column.index===4){
-        const cores={
-          'Atrasado':[220,38,38],'Atrasado — Equipe':[220,38,38],'Atrasado — Cliente':[249,115,22],
-          'Em Andamento':[37,99,235],
-          'Concluído':[26,138,74],'Aguardando':[107,114,128],'Cancelado':[107,114,128]
-        };
-        const c=cores[data.cell.raw];
-        if(c){data.cell.styles.textColor=c;data.cell.styles.fontStyle='bold';}
-      }
-    }
-  });
-
-  // ── NOVA PÁGINA: Atrasos ──
-  doc.addPage(); cabecalho('Relatório de Atrasos'); y=30;
-  const hdrA=[['Projeto','Situação Proj.','Etapa','Resp.','Prazo Etapa','Dias Atraso','Status','Motivo']];
-  const rowsA=[];
-  todos.forEach(p=>{
-    const proximaIdxPdf = (p.etapas||[]).findIndex(e => !e.done && !ETAPAS_SEM_PRAZO_AUTO.has(e.lb));
-    (p.etapas||[]).forEach((e,ei)=>{
-      if(!e.prazo&&!e.fim) return;
-      let diasAt=0,statusEt='';
-      if(e.done&&e.fim&&e.prazo&&e.fim>e.prazo){
-        diasAt=Math.round((new Date(e.fim)-new Date(e.prazo))/864e5);
-        statusEt='Concluída c/ atraso';
-      } else if(!e.done&&e.prazo&&new Date(e.prazo)<new Date()){
-        if(ei !== proximaIdxPdf) return;
-        diasAt=Math.round((new Date()-new Date(e.prazo))/864e5);
-        statusEt='Em aberto — atrasada';
-      } else return;
-      rowsA.push([p.nome,sitLabel(p),e.lb,e.r==='cl'?'Cliente':(e.r==='eq'?'Equipe':e.r),isoToBR(e.prazo),diasAt+'d',statusEt,e.atrasoMotivo||'—']);
-    });
-  });
-  rowsA.sort((a,b)=>parseInt(b[5])-parseInt(a[5]));
-  if(rowsA.length===0) rowsA.push(['Nenhum atraso registrado','','','','','','','']);
-  doc.autoTable({
-    head:hdrA,body:rowsA,startY:y,
-    margin:{left:ML,right:MR},
-    styles:{fontSize:8,cellPadding:2,overflow:'linebreak'},
-    headStyles:{fillColor:[220,38,38],textColor:255,fontStyle:'bold'},
-    alternateRowStyles:{fillColor:[255,247,247]},
-    columnStyles:{
-      0:{cellWidth:55},1:{cellWidth:20},2:{cellWidth:55},3:{cellWidth:16},
-      4:{cellWidth:20},5:{cellWidth:14,halign:'center'},6:{cellWidth:34},7:{cellWidth:59}
-    },
-    didParseCell(data){
-      if(data.section==='body'&&data.column.index===5){
-        const d=parseInt(data.cell.raw);
-        if(d>10) data.cell.styles.textColor=[220,38,38];
-        else if(d>5) data.cell.styles.textColor=[217,119,6];
-        data.cell.styles.fontStyle='bold';
-      }
-    }
-  });
-
-  // ── NOVA PÁGINA: Homologações ──
-  doc.addPage(); cabecalho('Homologações'); y=30;
-  const homList = todos.filter(p => p.col === 11 || p.homologPassou || p.homolog?.preenchido)
-    .sort((a,b) => {
-      const ai = !!(a.homolog?.dtInstalacao), bi = !!(b.homolog?.dtInstalacao);
-      if(ai !== bi) return ai ? 1 : -1;
-      return a.nome.localeCompare(b.nome);
-    });
-  const hdrHpdf = [['Projeto','RP','Academia','Solicitante','Serviço','Tipo','Conclusão','Dt. Homolog.','Dt. Autor.','Dt. Instal.','Status']];
-  const rowsHpdf = homList.map(p => {
-    const h = p.homolog || {};
-    return [
-      p.nome, p.rp||'—', p.academia||'—',
-      h.solicitante||'—', h.servico||'—', h.novoManut||'—', h.conclusao||'—',
-      isoToBR(h.dtHomolog)||'—', isoToBR(h.dtAutorizacao)||'—', isoToBR(h.dtInstalacao)||'—',
-      h.dtInstalacao ? 'Instalado' : 'Pendente'
-    ];
-  });
-  if(rowsHpdf.length === 0) rowsHpdf.push(['Nenhuma homologação registrada','','','','','','','','','','']);
-  doc.autoTable({
-    head:hdrHpdf, body:rowsHpdf, startY:y,
-    margin:{left:ML,right:MR},
-    styles:{fontSize:7.5,cellPadding:2,overflow:'linebreak'},
-    headStyles:{fillColor:[0,61,165],textColor:255,fontStyle:'bold'},
-    alternateRowStyles:{fillColor:[240,244,255]},
-    columnStyles:{
-      0:{cellWidth:68},1:{cellWidth:16},2:{cellWidth:26},3:{cellWidth:22},
-      4:{cellWidth:26},5:{cellWidth:16},6:{cellWidth:16},
-      7:{cellWidth:22},8:{cellWidth:22},9:{cellWidth:22},10:{cellWidth:17}
-    },
-    didParseCell(data){
-      if(data.section==='body'&&data.column.index===10){
-        if(data.cell.raw==='Instalado') data.cell.styles.textColor=[26,138,74];
-        else data.cell.styles.textColor=[217,119,6];
-        data.cell.styles.fontStyle='bold';
-      }
-    }
-  });
-
-  // ── NOVA PÁGINA: Medição ──
-  doc.addPage(); cabecalho('Medição'); y=30;
-  const medicList = todos.filter(p => p.enviadoMedicao)
-    .sort((a,b) => (a.medicaoFeita===b.medicaoFeita) ? 0 : a.medicaoFeita ? 1 : -1);
-  const hdrMpdf = [['Projeto','Responsáveis','Recursos','Coluna Atual','Enviado em','Medição Feita?','Concluído em']];
-  const rowsMpdf = medicList.map(p => [
-    p.nome, (p.resps||[]).join(', '), (p.recursos||[]).join(', '),
-    colLabel(p.col), isoToBR(p.enviadoMedicao),
-    p.medicaoFeita ? 'Sim' : 'Não',
-    isoToBR(p.medicaoFeitaEm)||'—'
-  ]);
-  if(rowsMpdf.length === 0) rowsMpdf.push(['Nenhum projeto enviado para medição','','','','','','']);
-  doc.autoTable({
-    head:hdrMpdf, body:rowsMpdf, startY:y,
-    margin:{left:ML,right:MR},
-    styles:{fontSize:8,cellPadding:2,overflow:'linebreak'},
-    headStyles:{fillColor:[124,58,237],textColor:255,fontStyle:'bold'},
-    alternateRowStyles:{fillColor:[245,243,255]},
-    columnStyles:{
-      0:{cellWidth:75},1:{cellWidth:40},2:{cellWidth:45},
-      3:{cellWidth:53},4:{cellWidth:22},5:{cellWidth:18},6:{cellWidth:20}
-    },
-    didParseCell(data){
-      if(data.section==='body'&&data.column.index===5){
-        if(data.cell.raw==='Sim') data.cell.styles.textColor=[26,138,74];
-        else data.cell.styles.textColor=[217,119,6];
-        data.cell.styles.fontStyle='bold';
-      }
-    }
-  });
-
-  // ── Rodapé em todas as páginas ──
-  const pages=doc.internal.getNumberOfPages();
+  // ── Rodapé ──
+  const pages = doc.internal.getNumberOfPages();
   for(let i=1;i<=pages;i++){
     doc.setPage(i);
     doc.setFontSize(7.5); doc.setTextColor(150,150,150); doc.setFont('helvetica','normal');
-    doc.text(`© ${new Date().getFullYear()} Firjan SENAI — Uso interno exclusivo`,ML,PH-5);
-    doc.text(`Pág. ${i}/${pages}`,PW-MR,PH-5,{align:'right'});
+    doc.text(s('(c) '+new Date().getFullYear()+' Firjan SENAI - Uso interno exclusivo'), ML, PH-5);
+    doc.text(s('Pag. '+i+'/'+pages), PW-MR, PH-5, {align:'right'});
   }
 
-  doc.save(`dashboard-executivo-ead-${td()}.pdf`);
-  showToast('📊 Dashboard exportado!');
+  doc.save('dashboard-executivo-ead-'+td()+'.pdf');
+  showToast('Dashboard exportado!');
 }
 
 function exportPDFHomologacoes(){
