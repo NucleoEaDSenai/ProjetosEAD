@@ -457,112 +457,6 @@ body.dark .kpi-tabs{background:var(--surface);border-color:var(--bdr)}
   .kpi-hero-title{font-size:20px}
 }
 
-/* ═══════════════════════════════════════════════════════
-   RELATORIO DE MEDICOES
-   ═══════════════════════════════════════════════════════ */
-.rmed-hero{position:relative;background:linear-gradient(135deg,#7C3AED 0%,#9333EA 45%,#A855F7 100%);color:#fff;border-radius:18px;padding:28px 32px;margin-bottom:18px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:20px;overflow:hidden;box-shadow:0 8px 28px rgba(124,58,237,.18)}
-.rmed-hero::before{content:'';position:absolute;top:-50%;right:-20%;width:60%;height:200%;background:radial-gradient(ellipse,rgba(255,255,255,.12) 0%,transparent 60%);pointer-events:none}
-.rmed-hero::after{content:'';position:absolute;bottom:-30%;left:-10%;width:40%;height:160%;background:radial-gradient(ellipse,rgba(168,85,247,.18) 0%,transparent 60%);pointer-events:none}
-.rmed-hero-content{position:relative;z-index:1}
-.rmed-hero-eyebrow{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;opacity:.85;margin-bottom:8px}
-.rmed-hero-title{font-family:'Plus Jakarta Sans',sans-serif;font-size:26px;font-weight:800;line-height:1.15;margin-bottom:6px;letter-spacing:-.3px}
-.rmed-hero-sub{font-size:13px;opacity:.85;font-weight:400}
-.rmed-hero-controls{position:relative;z-index:1;display:flex;align-items:center;gap:14px}
-body.dark .rmed-hero{background:linear-gradient(135deg,#4C1D95 0%,#7C3AED 100%)}
-
-/* Cards resumo */
-.rmed-resumo-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:18px}
-.rmed-rcard{background:var(--surface);border:1px solid var(--bdr);border-radius:14px;padding:18px 18px 16px;position:relative;overflow:hidden;transition:all .25s}
-.rmed-rcard:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.08)}
-.rmed-rcard::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:#7C3AED}
-.rmed-rcard.tone-purple::before{background:linear-gradient(90deg,#7C3AED,#A855F7)}
-.rmed-rcard.tone-green::before{background:linear-gradient(90deg,#15803D,#22C55E)}
-.rmed-rcard.tone-blue::before{background:linear-gradient(90deg,#003DA5,#0066D4)}
-.rmed-rcard.tone-amber::before{background:linear-gradient(90deg,#B45309,#F59E0B)}
-.rmed-rcard-icon{position:absolute;top:14px;right:14px;width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;opacity:.9}
-.rmed-rcard.tone-purple .rmed-rcard-icon{background:#F3E8FF;color:#6D28D9}
-.rmed-rcard.tone-green  .rmed-rcard-icon{background:#DCFCE7;color:#15803D}
-.rmed-rcard.tone-blue   .rmed-rcard-icon{background:#EFF6FF;color:#1D4ED8}
-.rmed-rcard.tone-amber  .rmed-rcard-icon{background:#FEF3C7;color:#92400E}
-.rmed-rcard-lbl{font-size:10.5px;color:var(--mu);text-transform:uppercase;letter-spacing:.6px;font-weight:700;margin-bottom:8px;max-width:75%}
-.rmed-rcard-val{font-family:'Plus Jakarta Sans',sans-serif;font-size:30px;font-weight:800;line-height:1;margin-bottom:6px;letter-spacing:-.5px}
-.rmed-rcard.tone-purple .rmed-rcard-val{color:#7C3AED}
-.rmed-rcard.tone-green  .rmed-rcard-val{color:#15803D}
-.rmed-rcard.tone-blue   .rmed-rcard-val{color:#003DA5}
-.rmed-rcard.tone-amber  .rmed-rcard-val{color:#D97706}
-.rmed-rcard-sub{font-size:11px;color:var(--mu);font-weight:500}
-
-/* Cards container */
-.rmed-card{background:var(--surface);border:1px solid var(--bdr);border-radius:14px;padding:20px 22px}
-.rmed-card-head{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-bottom:16px;flex-wrap:wrap}
-.rmed-card-title{font-family:'Plus Jakarta Sans',sans-serif;font-size:14.5px;font-weight:700;color:var(--txt);letter-spacing:-.1px}
-.rmed-card-sub{font-size:11px;color:var(--mu);font-weight:500}
-
-/* Grafico de barras verticais */
-.rmed-bars{display:flex;align-items:stretch;gap:8px;padding-top:24px;height:240px;overflow-x:auto;padding-bottom:6px}
-.rmed-bcol{min-width:64px;flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;height:100%;cursor:pointer}
-.rmed-bcol-bar-wrap{width:100%;display:flex;align-items:flex-end;justify-content:center;flex:1;position:relative;min-height:0}
-.rmed-bcol-bar{width:75%;border-radius:6px 6px 0 0;background:linear-gradient(180deg,#A855F7,#7C3AED);transition:all .4s cubic-bezier(.16,1,.3,1);min-height:4px;position:relative;box-shadow:0 2px 8px rgba(124,58,237,.2)}
-.rmed-bcol-bar:hover{background:linear-gradient(180deg,#C084FC,#9333EA);transform:scaleY(1.04);transform-origin:bottom}
-.rmed-bcol-bar.empty{background:var(--bdr);min-height:3px;box-shadow:none}
-.rmed-bcol-bar.highlight{background:linear-gradient(180deg,#10B981,#059669);box-shadow:0 2px 12px rgba(16,185,129,.35)}
-.rmed-bcol-val{font-size:12.5px;font-weight:800;color:var(--txt);font-family:'Plus Jakarta Sans',sans-serif;flex-shrink:0}
-.rmed-bcol-val.empty{color:var(--mu);font-weight:500}
-.rmed-bcol-lbl{font-size:10px;color:var(--mu);text-transform:uppercase;letter-spacing:.3px;font-weight:700;flex-shrink:0;text-align:center;line-height:1.3;white-space:nowrap}
-.rmed-bcol-sub{font-size:9px;color:var(--mu);font-weight:500;text-align:center;line-height:1.2}
-.rmed-bcol-bar::after{content:attr(data-val);position:absolute;top:-28px;left:50%;transform:translateX(-50%);background:var(--dark);color:#fff;padding:4px 10px;border-radius:6px;font-size:11px;font-weight:700;white-space:nowrap;opacity:0;pointer-events:none;transition:opacity .15s;z-index:10}
-.rmed-bcol-bar:hover::after{opacity:1}
-
-/* Accordion por quinzena */
-.rmed-quinzena{margin-bottom:14px;border:1px solid var(--bdr);border-radius:12px;overflow:hidden;transition:all .2s}
-.rmed-quinzena:hover{box-shadow:0 4px 16px rgba(0,0,0,.06)}
-.rmed-quinzena-hd{padding:14px 18px;background:linear-gradient(135deg,#F3E8FF 0%,#FAF5FF 100%);display:flex;align-items:center;justify-content:space-between;cursor:pointer;user-select:none;gap:10px}
-.rmed-quinzena-hd:hover{background:linear-gradient(135deg,#E9D5FF 0%,#F3E8FF 100%)}
-.rmed-quinzena.atual .rmed-quinzena-hd{background:linear-gradient(135deg,#D1FAE5 0%,#ECFDF5 100%);border-left:3px solid #059669}
-.rmed-quinzena.atual .rmed-quinzena-hd:hover{background:linear-gradient(135deg,#A7F3D0 0%,#D1FAE5 100%)}
-body.dark .rmed-quinzena-hd{background:linear-gradient(135deg,rgba(124,58,237,.12) 0%,rgba(168,85,247,.06) 100%)}
-body.dark .rmed-quinzena.atual .rmed-quinzena-hd{background:linear-gradient(135deg,rgba(16,185,129,.15) 0%,rgba(34,197,94,.08) 100%)}
-.rmed-quinzena-titulo{display:flex;align-items:center;gap:10px;flex:1;min-width:0}
-.rmed-quinzena-icone{width:38px;height:38px;border-radius:10px;background:#7C3AED;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:10.5px;flex-shrink:0;line-height:1.05;text-align:center;flex-direction:column}
-.rmed-quinzena.atual .rmed-quinzena-icone{background:#059669}
-.rmed-quinzena-nome{font-family:'Plus Jakarta Sans',sans-serif;font-size:14px;font-weight:700;color:var(--txt)}
-.rmed-quinzena-data{font-size:11px;color:var(--mu);font-weight:500;margin-top:1px}
-.rmed-quinzena-meta{display:flex;align-items:center;gap:14px;flex-shrink:0}
-.rmed-quinzena-badge{display:inline-flex;align-items:center;gap:5px;padding:5px 12px;border-radius:14px;background:#7C3AED;color:#fff;font-size:12px;font-weight:800;font-family:'Plus Jakarta Sans',sans-serif}
-.rmed-quinzena.atual .rmed-quinzena-badge{background:#059669}
-.rmed-quinzena-chev{font-size:11px;color:var(--mu);transition:transform .25s}
-.rmed-quinzena.open .rmed-quinzena-chev{transform:rotate(180deg)}
-.rmed-quinzena-body{max-height:0;overflow:hidden;transition:max-height .3s ease,opacity .25s ease;opacity:0}
-.rmed-quinzena.open .rmed-quinzena-body{max-height:3000px;opacity:1}
-.rmed-quinzena-tabela{width:100%;border-collapse:collapse;font-size:12.5px}
-.rmed-quinzena-tabela thead{background:#FAFAF9}
-body.dark .rmed-quinzena-tabela thead{background:rgba(255,255,255,.04)}
-.rmed-quinzena-tabela th{padding:9px 14px;font-size:10px;font-weight:700;color:var(--mu);text-transform:uppercase;letter-spacing:.5px;text-align:left;border-bottom:1px solid var(--bdr)}
-.rmed-quinzena-tabela td{padding:10px 14px;border-bottom:1px solid var(--bdr);color:var(--txt);vertical-align:top}
-.rmed-quinzena-tabela tr:last-child td{border-bottom:none}
-.rmed-quinzena-tabela tbody tr{cursor:pointer;transition:background .15s}
-.rmed-quinzena-tabela tbody tr:hover{background:rgba(124,58,237,.04)}
-body.dark .rmed-quinzena-tabela tbody tr:hover{background:rgba(168,85,247,.08)}
-.rmed-pname{font-weight:600;color:var(--txt)}
-.rmed-prec{display:inline-block;font-size:10.5px;background:#EFF6FF;color:#1E40AF;padding:2px 7px;border-radius:7px;font-weight:600}
-body.dark .rmed-prec{background:rgba(59,130,246,.2);color:#93C5FD}
-.rmed-conf{display:inline-block;font-size:10.5px;background:#DCFCE7;color:#15803D;padding:2px 7px;border-radius:7px;font-weight:600}
-body.dark .rmed-conf{background:rgba(22,163,74,.2);color:#86EFAC}
-.rmed-resp-dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:5px;vertical-align:middle}
-.rmed-empty{text-align:center;padding:40px 20px;color:var(--mu);font-size:13px}
-.rmed-empty-ico{font-size:42px;opacity:.4;margin-bottom:8px}
-
-@media (max-width:1100px){
-  .rmed-resumo-grid{grid-template-columns:repeat(2,1fr)}
-}
-@media (max-width:700px){
-  .rmed-hero{padding:20px;flex-direction:column;align-items:flex-start}
-  .rmed-hero-title{font-size:20px}
-  .rmed-quinzena-meta{gap:8px}
-  .rmed-quinzena-tabela{font-size:11.5px}
-  .rmed-quinzena-tabela th,.rmed-quinzena-tabela td{padding:7px 10px}
-}
-
 /* KPI */
 .kg{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:20px}
 .kk{background:#fff;border-radius:var(--r);border:1px solid var(--bdr);padding:18px}
@@ -1076,7 +970,6 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
         <div class="si" role="menuitem" tabindex="0" aria-label="KPIs e Indicadores" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();nav('kpis')}" onclick="nav('kpis')"><span class="si-ic">📈</span><span>KPIs &amp; Indicadores</span></div>
         <div class="si" role="menuitem" tabindex="0" aria-label="Relatório de Atrasos" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();nav('atrasos')}" onclick="nav('atrasos')"><span class="si-ic">⚠️</span><span>Rel. de Atrasos</span><span class="si-badge" id="badgeAtrasos" style="display:none"></span></div>
         <div class="si" role="menuitem" tabindex="0" aria-label="Medição" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();nav('medicao')}" onclick="nav('medicao')"><span class="si-ic">📐</span><span>Medição</span><span class="si-badge" id="badgeMedicao" style="display:none"></span></div>
-        <div class="si" role="menuitem" tabindex="0" aria-label="Relatório de Medições" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();nav('relMedicao')}" onclick="nav('relMedicao')"><span class="si-ic">📊</span><span>Rel. de Medições</span></div>
         <div class="si" role="menuitem" tabindex="0" aria-label="Projetos Cancelados" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();nav('cancelados')}" onclick="nav('cancelados')"><span class="si-ic">🚫</span><span>Cancelados</span></div>
       </div>
     </div>
@@ -1116,6 +1009,8 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
           <div onclick="exportPDFLista();toggleExportMenu()" style="padding:11px 16px;cursor:pointer;font-size:13px;display:flex;align-items:center;gap:9px;transition:background .15s" onmouseover="this.style.background='var(--s2)'" onmouseout="this.style.background=''">📊 <span><strong>PDF — Dashboard Executivo</strong><br><small style="color:var(--mu)">KPIs visuais</small></span></div>
           <div style="border-top:1px solid var(--bdr);margin:0"></div>
           <div onclick="exportPDFHomologacoes();toggleExportMenu()" style="padding:11px 16px;cursor:pointer;font-size:13px;display:flex;align-items:center;gap:9px;transition:background .15s" onmouseover="this.style.background='var(--s2)'" onmouseout="this.style.background=''">🔖 <span><strong>PDF — Relatório de Homologações</strong><br><small style="color:var(--mu)">Todos os dados das Homologações</small></span></div>
+          <div style="border-top:1px solid var(--bdr);margin:0"></div>
+          <div onclick="exportPDFRelMedicao();toggleExportMenu()" style="padding:11px 16px;cursor:pointer;font-size:13px;display:flex;align-items:center;gap:9px;transition:background .15s" onmouseover="this.style.background='var(--s2)'" onmouseout="this.style.background=''">📐 <span><strong>PDF — Relatório de Medições</strong><br><small style="color:var(--mu)">Cursos medidos por quinzena, com gráfico</small></span></div>
           <div style="border-top:1px solid var(--bdr);margin:0"></div>
           <div onclick="exportBackupJSON();toggleExportMenu()" style="padding:11px 16px;cursor:pointer;font-size:13px;display:flex;align-items:center;gap:9px;transition:background .15s;background:#FFFBEB" onmouseover="this.style.background='#FEF3C7'" onmouseout="this.style.background='#FFFBEB'">💾 <span><strong>Backup Completo (JSON)</strong><br><small style="color:var(--mu)">Todos os projetos, etapas e configurações</small></span></div>
           <div style="border-top:1px solid var(--bdr);margin:0"></div>
@@ -1594,83 +1489,6 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
         </div>
       </div>
       <div id="medicaoGrupos"></div>
-    </div>
-
-    <!-- RELATORIO DE MEDICOES -->
-    <div class="view" id="view-relMedicao">
-      <!-- Hero -->
-      <div class="rmed-hero">
-        <div class="rmed-hero-content">
-          <div class="rmed-hero-eyebrow">Relatorio Executivo</div>
-          <div class="rmed-hero-title">Relatorio de Medicoes</div>
-          <div class="rmed-hero-sub">Cursos medidos por quinzena, com totalizacao e detalhamento</div>
-        </div>
-        <div class="rmed-hero-controls">
-          <div class="kpi-period-group">
-            <span class="kpi-period-label">Periodo</span>
-            <div class="kpi-seg" id="rmedSegPeriodo">
-              <button class="kpi-seg-btn active" data-val="0"   onclick="setRmedPeriodo('0',this)">Todos</button>
-              <button class="kpi-seg-btn"        data-val="30"  onclick="setRmedPeriodo('30',this)">30d</button>
-              <button class="kpi-seg-btn"        data-val="90"  onclick="setRmedPeriodo('90',this)">90d</button>
-              <button class="kpi-seg-btn"        data-val="180" onclick="setRmedPeriodo('180',this)">6m</button>
-              <button class="kpi-seg-btn"        data-val="365" onclick="setRmedPeriodo('365',this)">1a</button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Cards Resumo -->
-      <div id="rmedResumo" class="rmed-resumo-grid"></div>
-
-      <!-- Filtros -->
-      <div class="fbox" style="margin-bottom:18px">
-        <div class="fbox-row" style="flex-wrap:wrap;gap:10px;align-items:flex-end">
-          <div class="fg-sm"><label class="fl-sm">Confirmada Por</label>
-            <div class="ms-wrap" id="msWrap_rmedConf">
-              <button class="ms-btn" id="msBtn_rmedConf" onclick="_msToggle('rmedConf')">Todos</button>
-              <div class="ms-dropdown" id="msDd_rmedConf"></div>
-            </div>
-          </div>
-          <div class="fg-sm"><label class="fl-sm">Responsavel</label>
-            <div class="ms-wrap" id="msWrap_rmedResp">
-              <button class="ms-btn" id="msBtn_rmedResp" onclick="_msToggle('rmedResp')">Todos</button>
-              <div class="ms-dropdown" id="msDd_rmedResp"></div>
-            </div>
-          </div>
-          <div class="fg-sm"><label class="fl-sm">Recurso</label>
-            <div class="ms-wrap" id="msWrap_rmedRec">
-              <button class="ms-btn" id="msBtn_rmedRec" onclick="_msToggle('rmedRec')">Todos</button>
-              <div class="ms-dropdown" id="msDd_rmedRec"></div>
-            </div>
-          </div>
-          <div class="fg-sm"><label class="fl-sm">Academia</label>
-            <div class="ms-wrap" id="msWrap_rmedAcad">
-              <button class="ms-btn" id="msBtn_rmedAcad" onclick="_msToggle('rmedAcad')">Todos</button>
-              <div class="ms-dropdown" id="msDd_rmedAcad"></div>
-            </div>
-          </div>
-          <button class="btn-lim" onclick="limparRmedFilts()">Limpar</button>
-          <span id="rmedFiltroContador" style="font-size:11px;color:var(--mu);margin-left:auto;align-self:center"></span>
-        </div>
-      </div>
-
-      <!-- Grafico de barras por quinzena -->
-      <div class="rmed-card" style="margin-bottom:18px">
-        <div class="rmed-card-head">
-          <span class="rmed-card-title">Medicoes por Quinzena</span>
-          <span class="rmed-card-sub" id="rmedGraficoSub"></span>
-        </div>
-        <div id="rmedGrafico"></div>
-      </div>
-
-      <!-- Tabela detalhada por quinzena -->
-      <div class="rmed-card">
-        <div class="rmed-card-head">
-          <span class="rmed-card-title">Detalhamento por Quinzena</span>
-          <span class="rmed-card-sub">cursos medidos em cada quinzena (mais recente primeiro)</span>
-        </div>
-        <div id="rmedTabela"></div>
-      </div>
     </div>
 
     <!-- CARGA DA EQUIPE -->
@@ -2214,7 +2032,7 @@ let DB=[];
 let NXT=1, editId=null, cancId=null, dragId=null;
 
 // ── NAV ──
-const PT={kanban:'Quadro Kanban',homologacoes:'Homologações',projetos:'Lista de Projetos',timeline:'Cronograma',kpis:'KPIs & Indicadores',atrasos:'Relatório de Atrasos',cancelados:'Projetos Cancelados',medicao:'Medição',relMedicao:'Relatório de Medições',carga:'Carga da Equipe',historico:'Histórico de Edições'};
+const PT={kanban:'Quadro Kanban',homologacoes:'Homologações',projetos:'Lista de Projetos',timeline:'Cronograma',kpis:'KPIs & Indicadores',atrasos:'Relatório de Atrasos',cancelados:'Projetos Cancelados',medicao:'Medição',carga:'Carga da Equipe',historico:'Histórico de Edições'};
 function nav(id){
   document.querySelectorAll('.view').forEach(v=>v.classList.remove('on'));
   document.getElementById('view-'+id).classList.add('on');
@@ -2463,8 +2281,7 @@ function _msToggle(id){
 }
 function _msChange(id){
   // Roteia para a função de re-render correta baseada no prefixo do id
-  if(id.startsWith('rmed')) rRelMedicao();
-  else if(id.startsWith('med')) rMedicao();
+  if(id.startsWith('med')) rMedicao();
   else if(id.startsWith('carga')) rCarga();
   else if(id.startsWith('k') && id!=='kpiPer') rKanban();
   else if(id.startsWith('a')) rAtrasos();
@@ -2477,8 +2294,7 @@ function _msClear(id){
   if(dd) dd.querySelectorAll('input[type=checkbox]').forEach(cb=>cb.checked=false);
   _msUpdateBtn(id);
   // Reaplica o filtro do contexto correto
-  if(id.startsWith('rmed')) rRelMedicao();
-  else if(id.startsWith('med')) rMedicao();
+  if(id.startsWith('med')) rMedicao();
   else if(id.startsWith('carga')) rCarga();
   else if(id.startsWith('k') && id!=='kpiPer') rKanban();
   else if(id.startsWith('a')) rAtrasos();
@@ -2492,7 +2308,6 @@ function _msUpdateBtn(id){
   const labels={
     'lResp':'Todos','lSit':'Todas','lRec':'Todos','lPrio':'Todas','lAcad':'Todas','lCol':'Todas',
     'medConf':'Todos','medResp':'Todos','medRec':'Todos','medStat':'Todos',
-    'rmedConf':'Todos','rmedResp':'Todos','rmedRec':'Todos','rmedAcad':'Todos',
     'cargaResp':'Todos','cargaStat':'Todos','cargaRec':'Todos','cargaPrio':'Todas',
     'kResp':'Todos','kSit':'Todas','kAcad':'Todas','kCol':'Todas',
     'aTipo':'Todos','aRespGeral':'Todos','aRespEt':'Todos',
@@ -7172,49 +6987,24 @@ function rMedicao(){
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// RELATORIO DE MEDICOES
+// PDF — RELATORIO DE MEDICOES (exportação)
 // ─────────────────────────────────────────────────────────────────────────────
 
-// Estado dos accordions de quinzena (default: todos fechados)
-function _rmedToggleQuinzena(id){
-  const el = document.getElementById(id);
-  if(!el) return;
-  el.classList.toggle('open');
-  const st = JSON.parse(localStorage.getItem('firjan_rmed_open')||'{}');
-  st[id] = el.classList.contains('open');
-  localStorage.setItem('firjan_rmed_open', JSON.stringify(st));
-}
-
-function setRmedPeriodo(val, btn){
-  document.querySelectorAll('#rmedSegPeriodo .kpi-seg-btn').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  window._rmedFiltPeriodo = val;
-  rRelMedicao();
-}
-
-function limparRmedFilts(){
-  ['rmedConf','rmedResp','rmedRec','rmedAcad'].forEach(id => {
-    document.querySelectorAll(`#msDd_${id} input[type=checkbox]`).forEach(c => c.checked = false);
-    _msUpdateBtn(id);
-  });
-  rRelMedicao();
-}
-
 // Retorna a label da quinzena vigente HOJE (ex: 'Maio02')
-function _quinzenaAtual(){
+function _quinzenaAtualPDF(){
   return _labelMedicao(new Date().toISOString().slice(0,10));
 }
 
-// Formata label "Maio02" como "Maio - 2a Quinzena"
-function _fmtQuinzena(label){
+// Formata "Maio02" como "Maio - 2a Quinzena"
+function _fmtQuinzenaPDF(label){
   if(!label || label === 'Sem data') return 'Sem data de medicao';
   const mes = label.slice(0,-2);
   const q = label.slice(-2);
   return mes + (q === '01' ? ' - 1a Quinzena' : ' - 2a Quinzena');
 }
 
-// Retorna intervalo de datas (DD/MM - DD/MM) coberto por uma quinzena
-function _rangeQuinzena(label){
+// Retorna intervalo "DD/MM - DD/MM" da quinzena
+function _rangeQuinzenaPDF(label){
   if(!label || label === 'Sem data') return '';
   const mes = label.slice(0,-2);
   const q   = label.slice(-2);
@@ -7223,118 +7013,144 @@ function _rangeQuinzena(label){
   if(q === '01'){
     const mesAnt = idx === 0 ? 11 : idx-1;
     return `26/${String(mesAnt+1).padStart(2,'0')} - 09/${String(idx+1).padStart(2,'0')}`;
-  } else {
-    return `10/${String(idx+1).padStart(2,'0')} - 25/${String(idx+1).padStart(2,'0')}`;
   }
+  return `10/${String(idx+1).padStart(2,'0')} - 25/${String(idx+1).padStart(2,'0')}`;
 }
 
-// Gera lista das ultimas N quinzenas em ordem cronologica (mais antiga primeiro)
-function _gerarHistoricoQuinzenas(n){
+// Gera ultimas N quinzenas em ordem cronologica
+function _gerarHistoricoQuinzenasPDF(n){
   const labels = [];
   const hoje = new Date();
   let mes = hoje.getMonth();
-  let qAtual = parseInt(_quinzenaAtual().slice(-2));
-
+  let qAtual = parseInt(_quinzenaAtualPDF().slice(-2));
   for(let i = 0; i < n; i++){
     labels.unshift(_MESES_MEDICAO[mes] + (qAtual === 1 ? '01' : '02'));
-    if(qAtual === 1){
-      qAtual = 2;
-      mes--;
-      if(mes < 0){ mes = 11; }
-    } else {
-      qAtual = 1;
-    }
+    if(qAtual === 1){ qAtual = 2; mes--; if(mes < 0) mes = 11; }
+    else qAtual = 1;
   }
   return labels;
 }
 
-function _populateRmedFilts(medidos){
-  // Confirmada por
-  const ddConf = document.getElementById('msDd_rmedConf');
-  if(ddConf){
-    const confs = [...new Set(medidos.map(p => p.medicaoConfirmadaPor).filter(Boolean))].sort();
-    const sel = _msGetVals('rmedConf');
-    ddConf.innerHTML = confs.map(c =>
-      `<label class="ms-opt"><input type="checkbox" value="${c}" onchange="_msChange('rmedConf')"${sel.includes(c)?' checked':''}> ${c}</label>`
-    ).join('') + '<div class="ms-sep"></div><div class="ms-clear" data-ms-clear="rmedConf">Limpar</div>';
-    _msUpdateBtn('rmedConf');
-  }
-  // Responsavel
-  const ddResp = document.getElementById('msDd_rmedResp');
-  if(ddResp){
-    const resps = [...new Set(medidos.flatMap(p => p.resps||[]))].sort();
-    const sel = _msGetVals('rmedResp');
-    ddResp.innerHTML = resps.map(r =>
-      `<label class="ms-opt"><input type="checkbox" value="${r}" onchange="_msChange('rmedResp')"${sel.includes(r)?' checked':''}> ${r}</label>`
-    ).join('') + '<div class="ms-sep"></div><div class="ms-clear" data-ms-clear="rmedResp">Limpar</div>';
-    _msUpdateBtn('rmedResp');
-  }
-  // Recurso
-  const ddRec = document.getElementById('msDd_rmedRec');
-  if(ddRec){
-    const recs = [...new Set(medidos.flatMap(p => p.recursos||[]))].sort();
-    const sel = _msGetVals('rmedRec');
-    ddRec.innerHTML = recs.map(r =>
-      `<label class="ms-opt"><input type="checkbox" value="${r}" onchange="_msChange('rmedRec')"${sel.includes(r)?' checked':''}> ${r}</label>`
-    ).join('') + '<div class="ms-sep"></div><div class="ms-clear" data-ms-clear="rmedRec">Limpar</div>';
-    _msUpdateBtn('rmedRec');
-  }
-  // Academia
-  const ddAcad = document.getElementById('msDd_rmedAcad');
-  if(ddAcad){
-    const acads = [...new Set(medidos.map(p => p.academia).filter(Boolean))].sort();
-    const sel = _msGetVals('rmedAcad');
-    ddAcad.innerHTML = acads.map(a =>
-      `<label class="ms-opt"><input type="checkbox" value="${a}" onchange="_msChange('rmedAcad')"${sel.includes(a)?' checked':''}> ${a}</label>`
-    ).join('') + '<div class="ms-sep"></div><div class="ms-clear" data-ms-clear="rmedAcad">Limpar</div>';
-    _msUpdateBtn('rmedAcad');
-  }
-}
+function exportPDFRelMedicao(){
+  if(typeof jspdf === 'undefined'){ showToast('Biblioteca PDF nao carregada ainda.'); return; }
+  const { jsPDF } = jspdf;
+  const doc = new jsPDF({ orientation:'landscape', unit:'mm', format:'a4' });
+  const PW=297, PH=210, ML=12, MR=12, TW=PW-ML-MR;
 
-function rRelMedicao(){
-  const el = document.getElementById('view-relMedicao'); if(!el) return;
+  // Paleta (roxo, alinhada ao tema do relatorio)
+  const C = {
+    purple:[124,58,237], purpleDark:[76,29,149], purpleLight:[168,85,247],
+    green:[16,185,129], greenDark:[5,150,105],
+    blue:[0,61,165], amber:[217,119,6],
+    gray:[107,104,96], grayLight:[230,230,228], textMuted:[107,104,96],
+    white:[255,255,255], text:[26,26,26],
+    bgPurpleSoft:[243,232,255], bgGreenSoft:[220,252,231],
+    bgBlueSoft:[239,246,255], bgAmberSoft:[254,243,199],
+    bgGraySoft:[243,244,246],
+  };
 
-  // ── Coletar projetos medidos ──
+  // Sanitizar string (remove emojis, mantem acentos Latin-1)
+  function s(txt){
+    if(txt === null || txt === undefined) return '';
+    let str = String(txt);
+    str = str.replace(/[\u{1F000}-\u{1FFFF}]/gu, '')
+             .replace(/[\u{2600}-\u{27BF}]/gu, '')
+             .replace(/[\u{2300}-\u{23FF}]/gu, '')
+             .replace(/[\u{2190}-\u{21FF}]/gu, '')
+             .replace(/[\u{25A0}-\u{25FF}]/gu, '')
+             .replace(/[\u{1F300}-\u{1F5FF}]/gu, '')
+             .replace(/\u200B|\u200C|\u200D|\uFEFF/g,'');
+    return str.replace(/\s+/g,' ').trim();
+  }
+  function setFill(c){ doc.setFillColor(c[0],c[1],c[2]); }
+  function setStroke(c){ doc.setDrawColor(c[0],c[1],c[2]); }
+  function setText(c){ doc.setTextColor(c[0],c[1],c[2]); }
+  function roundRect(x,y,w,h,r,fillC,strokeC,lw){
+    if(fillC) setFill(fillC);
+    if(strokeC){ setStroke(strokeC); doc.setLineWidth(lw||0.2); }
+    const style = fillC && strokeC ? 'FD' : fillC ? 'F' : strokeC ? 'S' : null;
+    if(style) doc.roundedRect(x,y,w,h,r,r,style);
+  }
+  function drawText(txt,x,y,opts){
+    opts = opts||{};
+    doc.setFont('helvetica', opts.bold ? 'bold' : 'normal');
+    doc.setFontSize(opts.size || 10);
+    setText(opts.color || C.text);
+    doc.text(s(txt), x, y, {align: opts.align || 'left', baseline: opts.baseline || 'alphabetic'});
+  }
+  function trunc(t, n){
+    t = s(t);
+    return t.length > n ? t.slice(0, n-1)+'...' : t;
+  }
+
+  // Hero roxo
+  function heroPagina(){
+    setFill(C.purpleDark); doc.rect(0,0,PW*0.55,30,'F');
+    setFill(C.purple); doc.rect(PW*0.55,0,PW*0.45,30,'F');
+    setText(C.white);
+    doc.setFont('helvetica','bold'); doc.setFontSize(8);
+    doc.text(s('RELATORIO EXECUTIVO  -  FIRJAN SENAI EAD'), ML, 9);
+    doc.setFontSize(16);
+    doc.text(s('Relatorio de Medicoes'), ML, 18);
+    doc.setFont('helvetica','normal'); doc.setFontSize(9);
+    doc.text(s('Cursos medidos por quinzena, com totalizacao e detalhamento'), ML, 24);
+    doc.setFontSize(8);
+    doc.text(s('Gerado em '+isoToBR(td())), PW-MR, 9, {align:'right'});
+    doc.setFont('helvetica','bold'); doc.setFontSize(10);
+    doc.text(s('Documento de Gestao'), PW-MR, 18, {align:'right'});
+  }
+
+  // Card resumo
+  function rcard(x, y, w, h, label, value, sub, tone){
+    roundRect(x, y, w, h, 3, C.white, C.grayLight, 0.3);
+    let barColor = C.purple, valColor = C.purple;
+    if(tone === 'green'){ barColor = C.green; valColor = C.greenDark; }
+    else if(tone === 'blue'){ barColor = C.blue; valColor = C.blue; }
+    else if(tone === 'amber'){ barColor = C.amber; valColor = C.amber; }
+    setFill(barColor);
+    doc.rect(x, y, w, 1.2, 'F');
+    doc.setFont('helvetica','bold'); doc.setFontSize(7);
+    setText(C.textMuted);
+    doc.text(s(label).toUpperCase(), x+4, y+6);
+    doc.setFont('helvetica','bold'); doc.setFontSize(22);
+    setText(valColor);
+    doc.text(s(String(value)), x+4, y+17);
+    if(sub){
+      doc.setFont('helvetica','normal'); doc.setFontSize(8);
+      setText(C.textMuted);
+      doc.text(s(sub), x+4, y+h-3);
+    }
+  }
+
+  // Barra vertical
+  function barraV(x, y, w, h, color, valor, lbl1, lbl2, isAtual){
+    if(valor > 0){
+      roundRect(x, y, w, h, 1.5, isAtual ? C.green : color);
+      doc.setFont('helvetica','bold'); doc.setFontSize(8);
+      setText(C.text);
+      doc.text(s(String(valor)), x+w/2, y-1.5, {align:'center'});
+    } else {
+      setFill(C.grayLight);
+      doc.rect(x, y+h-0.6, w, 0.6, 'F');
+      doc.setFont('helvetica','normal'); doc.setFontSize(7);
+      setText(C.textMuted);
+      doc.text('-', x+w/2, y+h-3, {align:'center'});
+    }
+    doc.setFont('helvetica','bold'); doc.setFontSize(7);
+    setText(isAtual ? C.greenDark : C.textMuted);
+    doc.text(s(lbl1), x+w/2, y+h+4, {align:'center'});
+    doc.setFont('helvetica','normal'); doc.setFontSize(6.5);
+    setText(C.textMuted);
+    doc.text(s(lbl2), x+w/2, y+h+7.5, {align:'center'});
+  }
+
+  // ─── Coletar dados ───
   const todos = activeDB().concat(cancelDB());
   const medidos = todos.filter(p => p.medicaoFeita);
 
-  // ── Filtro de periodo ──
-  const dias = parseInt(window._rmedFiltPeriodo || '0');
-  let medidosF = medidos;
-  if(dias > 0){
-    const corte = new Date(Date.now() - dias*864e5);
-    medidosF = medidos.filter(p => {
-      const dt = p.medicaoFeitaEm ? new Date(p.medicaoFeitaEm) : null;
-      return dt && dt >= corte;
-    });
-  }
-
-  // ── Popular filtros ──
-  _populateRmedFilts(medidosF);
-  const fConf = _msGetVals('rmedConf');
-  const fResp = _msGetVals('rmedResp');
-  const fRec  = _msGetVals('rmedRec');
-  const fAcad = _msGetVals('rmedAcad');
-
-  // Aplicar filtros multi
-  const filtrados = medidosF.filter(p => {
-    if(fConf.length && !fConf.includes(p.medicaoConfirmadaPor)) return false;
-    if(fResp.length && !(p.resps||[]).some(r => fResp.includes(r))) return false;
-    if(fRec.length  && !(p.recursos||[]).some(r => fRec.includes(r))) return false;
-    if(fAcad.length && !fAcad.includes(p.academia)) return false;
-    return true;
-  });
-
-  // Contador
-  const ct = document.getElementById('rmedFiltroContador');
-  if(ct){
-    const ativo = fConf.length || fResp.length || fRec.length || fAcad.length;
-    ct.textContent = ativo ? `${filtrados.length} de ${medidosF.length} medicoes` : '';
-  }
-
-  // ── Agrupar por quinzena (usando medicaoFeitaEm) ──
+  // Agrupar por quinzena
   const quinzenas = {};
-  filtrados.forEach(p => {
+  medidos.forEach(p => {
     const label = p.medicaoQuinzena || _labelMedicao(p.medicaoFeitaEm) || 'Sem data';
     if(!quinzenas[label]) quinzenas[label] = [];
     quinzenas[label].push(p);
@@ -7348,170 +7164,217 @@ function rRelMedicao(){
     return mi(a) !== mi(b) ? mi(b) - mi(a) : qi(b) - qi(a);
   });
 
-  // ── Cards Resumo ──
-  const totalMedidos = filtrados.length;
-  const qtdQuinzenas = quinzenasOrd.filter(l => l !== 'Sem data').length;
-  const labelAtual = _quinzenaAtual();
+  const totalMedidos = medidos.length;
+  const labelAtual = _quinzenaAtualPDF();
   const medAtual = quinzenas[labelAtual]?.length || 0;
+  const qtdQuinzenas = quinzenasOrd.filter(l => l !== 'Sem data').length;
   const mediaPorQuinzena = qtdQuinzenas ? Math.round(totalMedidos / qtdQuinzenas * 10) / 10 : 0;
 
-  const resumoEl = document.getElementById('rmedResumo');
-  if(resumoEl){
-    resumoEl.innerHTML = `
-      <div class="rmed-rcard tone-purple">
-        <div class="rmed-rcard-icon">📐</div>
-        <div class="rmed-rcard-lbl">Total Medido</div>
-        <div class="rmed-rcard-val">${totalMedidos}</div>
-        <div class="rmed-rcard-sub">curso${totalMedidos!==1?'s':''} no periodo</div>
-      </div>
-      <div class="rmed-rcard tone-green">
-        <div class="rmed-rcard-icon">📅</div>
-        <div class="rmed-rcard-lbl">Quinzena Atual</div>
-        <div class="rmed-rcard-val">${medAtual}</div>
-        <div class="rmed-rcard-sub">${_fmtQuinzena(labelAtual)}</div>
-      </div>
-      <div class="rmed-rcard tone-blue">
-        <div class="rmed-rcard-icon">📊</div>
-        <div class="rmed-rcard-lbl">Quinzenas Ativas</div>
-        <div class="rmed-rcard-val">${qtdQuinzenas}</div>
-        <div class="rmed-rcard-sub">com medicoes registradas</div>
-      </div>
-      <div class="rmed-rcard tone-amber">
-        <div class="rmed-rcard-icon">⚡</div>
-        <div class="rmed-rcard-lbl">Media por Quinzena</div>
-        <div class="rmed-rcard-val">${mediaPorQuinzena}</div>
-        <div class="rmed-rcard-sub">cursos medidos em media</div>
-      </div>
-    `;
-  }
+  // ═══════════ PAGINA 1 — DASHBOARD ═══════════
+  heroPagina();
 
-  // ── Grafico: ultimas 8 quinzenas ──
-  const graficoLabels = _gerarHistoricoQuinzenas(8);
+  // 4 cards resumo
+  const cardY = 36, cardH = 26, cardGap = 4;
+  const cardW = (TW - 3*cardGap) / 4;
+  rcard(ML + 0*(cardW+cardGap), cardY, cardW, cardH, 'Total Medido',
+        totalMedidos, 'curso'+(totalMedidos!==1?'s':'')+' registrado'+(totalMedidos!==1?'s':''), 'purple');
+  rcard(ML + 1*(cardW+cardGap), cardY, cardW, cardH, 'Quinzena Atual',
+        medAtual, _fmtQuinzenaPDF(labelAtual), 'green');
+  rcard(ML + 2*(cardW+cardGap), cardY, cardW, cardH, 'Quinzenas Ativas',
+        qtdQuinzenas, 'com medicoes registradas', 'blue');
+  rcard(ML + 3*(cardW+cardGap), cardY, cardW, cardH, 'Media por Quinzena',
+        mediaPorQuinzena, 'cursos medidos em media', 'amber');
+
+  // Grafico de barras: ultimas 12 quinzenas
+  const graficoY = cardY + cardH + 8;
+  const graficoH = 75;
+  roundRect(ML, graficoY, TW, graficoH, 3, C.white, C.grayLight, 0.3);
+  drawText('Medicoes por Quinzena', ML+4, graficoY+6, {size:11, bold:true});
+  drawText('ultimas 12 quinzenas (mais antiga a esquerda) - quinzena atual destacada em verde', ML+TW-4, graficoY+6, {size:8, color:C.textMuted, align:'right'});
+
+  const graficoLabels = _gerarHistoricoQuinzenasPDF(12);
   const maxVal = Math.max(...graficoLabels.map(lbl => (quinzenas[lbl]?.length || 0)), 1);
+  const barsY = graficoY + 14;
+  const barsAreaH = 48;
+  const colW = (TW - 12) / 12;
+  const barColW = colW * 0.55;
 
-  const graficoSub = document.getElementById('rmedGraficoSub');
-  if(graficoSub){
-    graficoSub.textContent = `ultimas ${graficoLabels.length} quinzenas (mais antiga a esquerda)`;
+  graficoLabels.forEach((lbl, i) => {
+    const n = quinzenas[lbl]?.length || 0;
+    const ratio = n > 0 ? Math.max(n/maxVal, 0.08) : 0;
+    const barH = barsAreaH * ratio;
+    const x = ML + 6 + i*colW + (colW - barColW)/2;
+    const mes = lbl.slice(0,-2);
+    const q = lbl.slice(-2);
+    const mesAbrev = mes.slice(0,3);
+    const qLbl = q === '01' ? '1a Q' : '2a Q';
+    barraV(x, barsY + barsAreaH - barH, barColW, barH, C.purple, n, mesAbrev, qLbl, lbl === labelAtual);
+  });
+
+  // ═══════════ PAGINAS SEGUINTES — DETALHAMENTO ═══════════
+  // Cada quinzena vira uma "secao" no PDF, com tabela dos cursos medidos
+  let yCursor = graficoY + graficoH + 8;
+  const margemBottom = PH - 14;  // espaco para rodape
+
+  function novaPagina(){
+    doc.addPage();
+    setFill(C.purpleDark); doc.rect(0,0,PW,12,'F');
+    setText(C.white);
+    doc.setFont('helvetica','bold'); doc.setFontSize(10);
+    doc.text(s('Relatorio de Medicoes - Detalhamento por Quinzena'), ML, 8);
+    doc.setFontSize(8); doc.setFont('helvetica','normal');
+    doc.text(s('Gerado em '+isoToBR(td())), PW-MR, 8, {align:'right'});
+    yCursor = 18;
   }
 
-  const graficoEl = document.getElementById('rmedGrafico');
-  if(graficoEl){
-    if(totalMedidos === 0){
-      graficoEl.innerHTML = `
-        <div class="rmed-empty">
-          <div class="rmed-empty-ico">📐</div>
-          <div style="font-weight:600;color:var(--txt);margin-bottom:4px">Nenhuma medicao registrada</div>
-          <div>Quando as medicoes forem confirmadas, aparecerao aqui</div>
-        </div>`;
-    } else {
-      graficoEl.innerHTML = `<div class="rmed-bars">${
-        graficoLabels.map(lbl => {
-          const n = quinzenas[lbl]?.length || 0;
-          const eAtual = lbl === labelAtual;
-          const ratio = n > 0 ? Math.max(n/maxVal, 0.05) : 0;
-          const heightPct = ratio * 100;
-          const cls = n === 0 ? 'empty' : (eAtual ? 'highlight' : '');
-          const valLbl = n === 0 ? '—' : String(n);
-          const mes = lbl.slice(0,-2);
-          const q = lbl.slice(-2);
-          const mesAbrev = mes.slice(0,3);
-          const qLbl = q === '01' ? '1a Q' : '2a Q';
-          return `
-            <div class="rmed-bcol">
-              <div class="rmed-bcol-bar-wrap">
-                <div class="rmed-bcol-bar ${cls}" style="height:${heightPct}%" data-val="${n} curso${n!==1?'s':''} - ${_fmtQuinzena(lbl)}"></div>
-              </div>
-              <div class="rmed-bcol-val ${n===0?'empty':''}">${valLbl}</div>
-              <div class="rmed-bcol-lbl">${mesAbrev}</div>
-              <div class="rmed-bcol-sub">${qLbl}</div>
-            </div>
-          `;
-        }).join('')
-      }</div>`;
+  // Verificar se precisa ir para pagina 2
+  if(yCursor > 160){ novaPagina(); }
+
+  // Titulo da secao "Detalhamento"
+  drawText('Detalhamento por Quinzena', ML, yCursor+2, {size:13, bold:true});
+  drawText('cursos medidos em cada quinzena (mais recente primeiro)', ML, yCursor+7, {size:8, color:C.textMuted});
+  yCursor += 13;
+
+  quinzenasOrd.forEach((label, idx) => {
+    const projs = quinzenas[label];
+    const eAtual = label === labelAtual;
+    const range = _rangeQuinzenaPDF(label);
+
+    // Calcular altura estimada do bloco
+    const headerH = 14;
+    const tableHeaderH = 7;
+    const rowH = 7;
+    const blocoH = headerH + tableHeaderH + (projs.length * rowH) + 4;
+
+    // Se nao cabe na pagina, criar nova
+    if(yCursor + blocoH > margemBottom){
+      novaPagina();
     }
-  }
 
-  // ── Tabela detalhada (accordion por quinzena) ──
-  const stOpen = JSON.parse(localStorage.getItem('firjan_rmed_open')||'{}');
-  const tabelaEl = document.getElementById('rmedTabela');
-  if(tabelaEl){
-    if(quinzenasOrd.length === 0){
-      tabelaEl.innerHTML = `
-        <div class="rmed-empty">
-          <div class="rmed-empty-ico">📋</div>
-          <div style="font-weight:600;color:var(--txt);margin-bottom:4px">Nenhum dado com os filtros atuais</div>
-          <div>Tente ajustar os filtros ou o periodo</div>
-        </div>`;
-    } else {
-      tabelaEl.innerHTML = quinzenasOrd.map(label => {
-        const projs = quinzenas[label];
-        const eAtual = label === labelAtual;
-        const id = 'rmedq_' + label.replace(/[^a-zA-Z0-9]/g,'_');
-        const aberta = stOpen[id] === true;
-        const range = _rangeQuinzena(label);
-        const mesNum = label === 'Sem data' ? '—'
-                     : (_MESES_MEDICAO.indexOf(label.slice(0,-2))+1).toString().padStart(2,'0');
-        const qNum = label === 'Sem data' ? '' : label.slice(-2);
+    // Header da quinzena
+    const headerBg = eAtual ? C.bgGreenSoft : C.bgPurpleSoft;
+    const headerStroke = eAtual ? C.green : C.purple;
+    roundRect(ML, yCursor, TW, headerH, 2.5, headerBg, headerStroke, 0.4);
 
-        const linhas = projs.map(p => {
-          const resps = (p.resps||[]).map(r => {
-            const cor = (typeof NOME_CORES !== 'undefined' && NOME_CORES[r]) ? NOME_CORES[r] : '#6B7280';
-            return `<span class="rmed-resp-dot" style="background:${cor}"></span>${r}`;
-          }).join(' ');
-          const recs = (p.recursos||[]).map(r => `<span class="rmed-prec">${r}</span>`).join(' ');
-          const confTxt = p.medicaoConfirmadaPor
-            ? p.medicaoConfirmadaPor.replace('Liderança ','').replace('Lideranca ','')
-            : '';
-          const conf = confTxt
-            ? `<span class="rmed-conf">${confTxt}</span>`
-            : '<span style="color:var(--mu);font-style:italic;font-size:11px">—</span>';
-          return `
-            <tr onclick="openDet(${p.id})">
-              <td><div class="rmed-pname">${p.nome}</div></td>
-              <td>${recs || '<span style="color:var(--mu);font-size:11px">—</span>'}</td>
-              <td>${resps || '<span style="color:var(--mu);font-size:11px">—</span>'}</td>
-              <td>${p.academia || '<span style="color:var(--mu);font-size:11px">—</span>'}</td>
-              <td>${conf}</td>
-              <td style="text-align:center;color:var(--mu);font-size:11px">${isoToBR(p.medicaoFeitaEm) || '—'}</td>
-            </tr>
-          `;
-        }).join('');
+    // Icone redondo (quadrado arredondado) a esquerda
+    const iconX = ML + 4, iconY = yCursor + 2.5, iconW = 9;
+    roundRect(iconX, iconY, iconW, 9, 1.5, eAtual ? C.green : C.purple);
+    doc.setFont('helvetica','bold'); doc.setFontSize(7);
+    setText(C.white);
+    const q = label === 'Sem data' ? '-' : label.slice(-2);
+    doc.text(s(q === '01' ? '1a' : q === '02' ? '2a' : '-'), iconX+iconW/2, iconY+4, {align:'center'});
+    doc.text(s('Q'), iconX+iconW/2, iconY+7.5, {align:'center'});
 
-        return `
-          <div class="rmed-quinzena${eAtual?' atual':''}${aberta?' open':''}" id="${id}">
-            <div class="rmed-quinzena-hd" onclick="_rmedToggleQuinzena('${id}')">
-              <div class="rmed-quinzena-titulo">
-                <div class="rmed-quinzena-icone">${qNum?(qNum==='01'?'1a<br>Q':'2a<br>Q'):'—'}</div>
-                <div>
-                  <div class="rmed-quinzena-nome">${_fmtQuinzena(label)}${eAtual?' &middot; <span style="color:#059669;font-size:11px;font-weight:700">QUINZENA ATUAL</span>':''}</div>
-                  ${range?`<div class="rmed-quinzena-data">${range}</div>`:''}
-                </div>
-              </div>
-              <div class="rmed-quinzena-meta">
-                <span class="rmed-quinzena-badge">${projs.length} curso${projs.length!==1?'s':''}</span>
-                <span class="rmed-quinzena-chev">v</span>
-              </div>
-            </div>
-            <div class="rmed-quinzena-body">
-              <table class="rmed-quinzena-tabela">
-                <thead>
-                  <tr>
-                    <th>Projeto</th>
-                    <th>Recurso</th>
-                    <th>Responsavel(is)</th>
-                    <th>Academia</th>
-                    <th>Confirmada por</th>
-                    <th style="text-align:center">Data</th>
-                  </tr>
-                </thead>
-                <tbody>${linhas}</tbody>
-              </table>
-            </div>
-          </div>
-        `;
-      }).join('');
+    // Titulo + range
+    let tituloTxt = _fmtQuinzenaPDF(label);
+    drawText(tituloTxt, iconX+iconW+4, yCursor+5.5, {size:11, bold:true, color:C.text});
+    if(eAtual){
+      // Badge "QUINZENA ATUAL"
+      const lblTxt = 'QUINZENA ATUAL';
+      doc.setFont('helvetica','bold'); doc.setFontSize(7);
+      const lblW = doc.getTextWidth(s(lblTxt)) + 4;
+      const lblX = iconX+iconW+4+doc.getTextWidth(s(tituloTxt))+5;
+      roundRect(lblX, yCursor+2.5, lblW, 5, 1, C.green);
+      setText(C.white);
+      doc.text(s(lblTxt), lblX+lblW/2, yCursor+6, {align:'center'});
     }
+    if(range){
+      drawText(range, iconX+iconW+4, yCursor+10.5, {size:8, color:C.textMuted});
+    }
+
+    // Badge contagem a direita
+    const countTxt = projs.length + ' curso' + (projs.length!==1?'s':'');
+    doc.setFont('helvetica','bold'); doc.setFontSize(8.5);
+    const countW = doc.getTextWidth(s(countTxt)) + 8;
+    roundRect(ML+TW-countW-4, yCursor+4, countW, 6, 2.5, eAtual ? C.green : C.purple);
+    setText(C.white);
+    doc.text(s(countTxt), ML+TW-countW-4+countW/2, yCursor+8, {align:'center'});
+
+    yCursor += headerH + 1;
+
+    // Cabecalho da tabela
+    setFill([250,250,249]);
+    doc.rect(ML, yCursor, TW, tableHeaderH, 'F');
+    setText(C.textMuted);
+    doc.setFont('helvetica','bold'); doc.setFontSize(7.5);
+    const col1 = ML+3;                // Projeto (40%)
+    const col2 = ML+TW*0.38;          // Recurso (15%)
+    const col3 = ML+TW*0.55;          // Responsaveis (18%)
+    const col4 = ML+TW*0.73;          // Academia (10%)
+    const col5 = ML+TW*0.83;          // Confirmada por (10%)
+    const col6 = ML+TW-3;             // Data (alinhado direita)
+    doc.text(s('PROJETO'),         col1, yCursor+4.5);
+    doc.text(s('RECURSO'),         col2, yCursor+4.5);
+    doc.text(s('RESPONSAVEL(IS)'), col3, yCursor+4.5);
+    doc.text(s('ACADEMIA'),        col4, yCursor+4.5);
+    doc.text(s('CONFIRMADA POR'),  col5, yCursor+4.5);
+    doc.text(s('DATA'),            col6, yCursor+4.5, {align:'right'});
+
+    yCursor += tableHeaderH;
+
+    // Linhas
+    projs.forEach((p, ri) => {
+      // Quebra de pagina se necessario no meio da tabela
+      if(yCursor + rowH > margemBottom){
+        novaPagina();
+        // Repetir cabecalho da tabela na nova pagina
+        setFill([250,250,249]);
+        doc.rect(ML, yCursor, TW, tableHeaderH, 'F');
+        setText(C.textMuted);
+        doc.setFont('helvetica','bold'); doc.setFontSize(7.5);
+        doc.text(s('PROJETO'),         col1, yCursor+4.5);
+        doc.text(s('RECURSO'),         col2, yCursor+4.5);
+        doc.text(s('RESPONSAVEL(IS)'), col3, yCursor+4.5);
+        doc.text(s('ACADEMIA'),        col4, yCursor+4.5);
+        doc.text(s('CONFIRMADA POR'),  col5, yCursor+4.5);
+        doc.text(s('DATA'),            col6, yCursor+4.5, {align:'right'});
+        yCursor += tableHeaderH;
+      }
+      // Fundo alternado
+      if(ri % 2 === 1){
+        setFill([252,252,251]);
+        doc.rect(ML, yCursor, TW, rowH, 'F');
+      }
+      doc.setFont('helvetica','normal'); doc.setFontSize(8);
+      setText(C.text);
+      doc.text(s(trunc(p.nome, 50)), col1, yCursor+4.8);
+      doc.text(s(trunc((p.recursos||[]).join(', '), 22)), col2, yCursor+4.8);
+      doc.text(s(trunc((p.resps||[]).join(', '), 25)), col3, yCursor+4.8);
+      doc.text(s(trunc(p.academia || '-', 14)), col4, yCursor+4.8);
+      const conf = p.medicaoConfirmadaPor
+        ? p.medicaoConfirmadaPor.replace('Liderança ','').replace('Lideranca ','')
+        : '-';
+      doc.text(s(trunc(conf, 14)), col5, yCursor+4.8);
+      doc.text(s(isoToBR(p.medicaoFeitaEm) || '-'), col6, yCursor+4.8, {align:'right'});
+
+      // Linha separadora fina
+      setStroke(C.grayLight); doc.setLineWidth(0.1);
+      doc.line(ML, yCursor+rowH, ML+TW, yCursor+rowH);
+
+      yCursor += rowH;
+    });
+
+    yCursor += 6;  // espaco entre quinzenas
+  });
+
+  // Se nao houver medicoes
+  if(quinzenasOrd.length === 0){
+    doc.setFont('helvetica','italic'); doc.setFontSize(10);
+    setText(C.textMuted);
+    doc.text(s('Nenhuma medicao confirmada ate o momento.'), PW/2, yCursor+20, {align:'center'});
   }
+
+  // Rodape em todas as paginas
+  const pages = doc.internal.getNumberOfPages();
+  for(let i=1;i<=pages;i++){
+    doc.setPage(i);
+    doc.setFontSize(7.5); doc.setTextColor(150,150,150); doc.setFont('helvetica','normal');
+    doc.text(s('(c) '+new Date().getFullYear()+' Firjan SENAI - Uso interno exclusivo'), ML, PH-5);
+    doc.text(s('Pag. '+i+'/'+pages), PW-MR, PH-5, {align:'right'});
+  }
+
+  doc.save('relatorio-medicoes-'+td()+'.pdf');
+  showToast('Relatorio de Medicoes exportado!');
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -8047,7 +7910,7 @@ function renderAll(){
       }
     }
   });
-  rDash();rKanban();rList();rTimeline();rKPIs();rAtrasos();rCancelados();rMedicao();rRelMedicao();rHomologacoes();rCarga();rHistorico();limparNotifObsoletas();detectarNotificacoes();
+  rDash();rKanban();rList();rTimeline();rKPIs();rAtrasos();rCancelados();rMedicao();rHomologacoes();rCarga();rHistorico();limparNotifObsoletas();detectarNotificacoes();
 }
 
 // ══════════════════════════════════════════════
