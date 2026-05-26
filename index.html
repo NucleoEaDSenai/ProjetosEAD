@@ -457,6 +457,42 @@ body.dark .kpi-tabs{background:var(--surface);border-color:var(--bdr)}
   .kpi-hero-title{font-size:20px}
 }
 
+/* ═══════════════════════════════════════════════════════
+   MINI CALENDARIO (datepicker leve customizado)
+   ═══════════════════════════════════════════════════════ */
+.mcal-btn{display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;padding:0;border:1px solid var(--bdr);border-radius:7px;background:var(--surface);cursor:pointer;font-size:15px;line-height:1;transition:all .15s;color:var(--txt);flex-shrink:0;vertical-align:middle}
+.mcal-btn:hover{border-color:var(--blue);background:#EFF6FF;color:var(--blue);transform:translateY(-1px)}
+body.dark .mcal-btn:hover{background:rgba(59,130,246,.15)}
+.mcal-btn.sm{width:24px;height:24px;font-size:12px;border-radius:5px}
+
+/* Overlay e popup */
+.mcal-pop{position:absolute;z-index:9999;background:var(--surface);border:1px solid var(--bdr);border-radius:12px;box-shadow:0 12px 36px rgba(0,0,0,.15);padding:14px;width:268px;font-family:'Plus Jakarta Sans',sans-serif;animation:mcalFadeIn .15s ease}
+@keyframes mcalFadeIn{from{opacity:0;transform:translateY(-6px) scale(.97)}to{opacity:1;transform:translateY(0) scale(1)}}
+.mcal-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;gap:6px}
+.mcal-nav{background:transparent;border:none;width:28px;height:28px;border-radius:6px;cursor:pointer;color:var(--mu);font-size:14px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;transition:all .15s}
+.mcal-nav:hover{background:var(--s2);color:var(--blue)}
+.mcal-title{flex:1;display:flex;gap:5px;justify-content:center;align-items:center;font-size:13px;font-weight:700;color:var(--txt)}
+.mcal-title select{border:none;background:transparent;font-family:inherit;font-size:13px;font-weight:700;color:var(--txt);cursor:pointer;padding:3px 6px;border-radius:5px;transition:background .15s}
+.mcal-title select:hover{background:var(--s2)}
+.mcal-title select:focus{outline:none;background:var(--s2)}
+.mcal-week{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-bottom:4px}
+.mcal-dow{text-align:center;font-size:10px;font-weight:700;color:var(--mu);text-transform:uppercase;padding:4px 0;letter-spacing:.4px}
+.mcal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px}
+.mcal-day{aspect-ratio:1;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:var(--txt);background:transparent;border:1px solid transparent;border-radius:6px;cursor:pointer;transition:all .12s}
+.mcal-day:hover{background:#EFF6FF;color:var(--blue);border-color:var(--blue)}
+body.dark .mcal-day:hover{background:rgba(59,130,246,.18)}
+.mcal-day.empty{visibility:hidden;cursor:default}
+.mcal-day.other{color:var(--mu);opacity:.4}
+.mcal-day.today{background:#FEF3C7;color:#92400E;font-weight:800;border-color:#FDE68A}
+body.dark .mcal-day.today{background:rgba(245,158,11,.2);color:#FDE68A}
+.mcal-day.selected{background:var(--blue) !important;color:#fff !important;border-color:var(--blue) !important;box-shadow:0 2px 6px rgba(0,61,165,.3)}
+.mcal-day.weekend{color:#9CA3AF}
+.mcal-day.weekend.selected{color:#fff}
+.mcal-actions{display:flex;gap:6px;margin-top:10px;padding-top:10px;border-top:1px solid var(--bdr)}
+.mcal-action{flex:1;background:var(--s2);border:none;padding:6px 10px;border-radius:6px;cursor:pointer;font-size:11px;font-weight:600;color:var(--txt);transition:all .15s;font-family:inherit}
+.mcal-action:hover{background:var(--blue);color:#fff}
+.mcal-action.danger:hover{background:var(--red);color:#fff}
+
 /* KPI */
 .kg{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:20px}
 .kk{background:#fff;border-radius:var(--r);border:1px solid var(--bdr);padding:18px}
@@ -1666,7 +1702,7 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
     <!-- TAB 1 -->
     <div id="tab1" style="display:none">
       <div class="fg2">
-        <div class="fg"><label class="fl">Data de Criação do Card</label><div style="display:flex;gap:5px"><input class="fi" type="number" id="fcr_d" placeholder="DD" min="1" max="31" style="width:58px"><input class="fi" type="number" id="fcr_m" placeholder="MM" min="1" max="12" style="width:58px"><input class="fi" type="number" id="fcr_a" placeholder="AAAA" min="2020" max="2099" style="width:80px"></div></div>
+        <div class="fg"><label class="fl">Data de Criação do Card</label><div style="display:flex;gap:5px;align-items:center"><input class="fi" type="number" id="fcr_d" placeholder="DD" min="1" max="31" style="width:58px"><input class="fi" type="number" id="fcr_m" placeholder="MM" min="1" max="12" style="width:58px"><input class="fi" type="number" id="fcr_a" placeholder="AAAA" min="2020" max="2099" style="width:80px"><button type="button" class="mcal-btn" title="Abrir calendário" onclick="_abrirMcalTriplet('fcr')">📅</button></div></div>
         <div class="fg"><label class="fl">Coluna Inicial</label>
           <select class="fs" id="fcol">
             <option value="0">Aguardando Reunião Inicial</option>
@@ -1685,8 +1721,8 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
             <option value="14">Projetos Concluídos</option>
           </select>
         </div>
-        <div class="fg"><label class="fl">Data de Início Real</label><div style="display:flex;gap:5px"><input class="fi" type="number" id="fi_d" placeholder="DD" min="1" max="31" style="width:58px" onchange="onDataInicioChange()"><input class="fi" type="number" id="fi_m" placeholder="MM" min="1" max="12" style="width:58px" onchange="onDataInicioChange()"><input class="fi" type="number" id="fi_a" placeholder="AAAA" min="2020" max="2099" style="width:80px" onchange="onDataInicioChange()"></div></div>
-        <div class="fg"><label class="fl" id="lblPrazo">Prazo de Entrega</label><div style="display:flex;gap:5px"><input class="fi" type="number" id="fp_d" placeholder="DD" min="1" max="31" style="width:58px"><input class="fi" type="number" id="fp_m" placeholder="MM" min="1" max="12" style="width:58px"><input class="fi" type="number" id="fp_a" placeholder="AAAA" min="2020" max="2099" style="width:80px"></div></div>
+        <div class="fg"><label class="fl">Data de Início Real</label><div style="display:flex;gap:5px;align-items:center"><input class="fi" type="number" id="fi_d" placeholder="DD" min="1" max="31" style="width:58px" onchange="onDataInicioChange()"><input class="fi" type="number" id="fi_m" placeholder="MM" min="1" max="12" style="width:58px" onchange="onDataInicioChange()"><input class="fi" type="number" id="fi_a" placeholder="AAAA" min="2020" max="2099" style="width:80px" onchange="onDataInicioChange()"><button type="button" class="mcal-btn" title="Abrir calendário" onclick="_abrirMcalTriplet('fi')">📅</button></div></div>
+        <div class="fg"><label class="fl" id="lblPrazo">Prazo de Entrega</label><div style="display:flex;gap:5px;align-items:center"><input class="fi" type="number" id="fp_d" placeholder="DD" min="1" max="31" style="width:58px"><input class="fi" type="number" id="fp_m" placeholder="MM" min="1" max="12" style="width:58px"><input class="fi" type="number" id="fp_a" placeholder="AAAA" min="2020" max="2099" style="width:80px"><button type="button" class="mcal-btn" title="Abrir calendário" onclick="_abrirMcalTriplet('fp')">📅</button></div></div>
         <div class="fg ff"><label class="fl">Observação sobre Prazo</label><textarea class="fta" id="fpo" placeholder="Ex: cliente solicitou extensão..."></textarea></div>
       </div>
     </div>
@@ -1900,6 +1936,277 @@ function iso2dma(iso,prefix){
   const ed=document.getElementById(prefix+'_d'),em=document.getElementById(prefix+'_m'),ea=document.getElementById(prefix+'_a');
   if(ed)ed.value=parseInt(dy)||'';if(em)em.value=parseInt(mo)||'';if(ea)ea.value=parseInt(y)||'';
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// MINI-CALENDARIO (datepicker leve)
+// ─────────────────────────────────────────────────────────────────────────────
+const _MCAL_MESES = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+const _MCAL_DOW = ['D','S','T','Q','Q','S','S'];
+
+// Estado do calendário aberto
+let _mcalState = null;  // { popup, anoView, mesView, valorAtual, onSelect }
+
+// Fecha calendário aberto (se houver)
+function closeMcal(){
+  if(_mcalState && _mcalState.popup){
+    _mcalState.popup.remove();
+  }
+  _mcalState = null;
+  document.removeEventListener('mousedown', _mcalOutsideHandler, true);
+  document.removeEventListener('keydown', _mcalKeyHandler, true);
+}
+
+function _mcalOutsideHandler(e){
+  if(!_mcalState) return;
+  if(_mcalState.popup.contains(e.target)) return;
+  if(_mcalState.trigger && _mcalState.trigger.contains(e.target)) return;
+  closeMcal();
+}
+
+function _mcalKeyHandler(e){
+  if(e.key === 'Escape') closeMcal();
+}
+
+// Abre calendário ancorado a um elemento, com data inicial e callback
+// onSelect recebe string ISO 'YYYY-MM-DD' (ou '' se limpar)
+function openMcal(trigger, isoInicial, onSelect){
+  closeMcal();
+  const popup = document.createElement('div');
+  popup.className = 'mcal-pop';
+  document.body.appendChild(popup);
+
+  // Posicionar abaixo do trigger
+  const rect = trigger.getBoundingClientRect();
+  const scrollY = window.scrollY || document.documentElement.scrollTop;
+  const scrollX = window.scrollX || document.documentElement.scrollLeft;
+  let top = rect.bottom + scrollY + 6;
+  let left = rect.right + scrollX - 268;  // alinhar borda direita do popup com a do botão
+  if(left < 8) left = 8;
+  // Se o popup ficar abaixo do viewport, mostrar acima
+  const popH = 320;
+  if(rect.bottom + popH > window.innerHeight){
+    top = rect.top + scrollY - popH - 6;
+    if(top < scrollY + 8) top = scrollY + 8;
+  }
+  popup.style.top = top + 'px';
+  popup.style.left = left + 'px';
+
+  // Mês/ano de visualização — usa data inicial OU data de hoje
+  let anoV, mesV, diaSel = null;
+  if(isoInicial && isoInicial.includes('-')){
+    const [y,mo,dy] = isoInicial.split('-').map(Number);
+    anoV = y; mesV = mo - 1; diaSel = dy;
+  } else {
+    const hoje = new Date();
+    anoV = hoje.getFullYear(); mesV = hoje.getMonth();
+  }
+
+  _mcalState = { popup, anoView: anoV, mesView: mesV, valorAtual: isoInicial, onSelect, trigger };
+
+  _mcalRender();
+
+  // Listeners pra fechar
+  setTimeout(() => {
+    document.addEventListener('mousedown', _mcalOutsideHandler, true);
+    document.addEventListener('keydown', _mcalKeyHandler, true);
+  }, 0);
+}
+
+function _mcalRender(){
+  if(!_mcalState) return;
+  const { popup, anoView, mesView, valorAtual } = _mcalState;
+  const hoje = new Date();
+  const hojeISO = `${hoje.getFullYear()}-${String(hoje.getMonth()+1).padStart(2,'0')}-${String(hoje.getDate()).padStart(2,'0')}`;
+
+  // Calcular grade do mês
+  const primeiroDia = new Date(anoView, mesView, 1).getDay();  // 0=Dom
+  const diasNoMes = new Date(anoView, mesView+1, 0).getDate();
+  // Dias do mês anterior visíveis no início
+  const mesAnt = mesView === 0 ? 11 : mesView - 1;
+  const anoMesAnt = mesView === 0 ? anoView - 1 : anoView;
+  const diasMesAnt = new Date(anoMesAnt, mesAnt+1, 0).getDate();
+
+  // Construir HTML
+  const anosOpts = [];
+  for(let y = anoView - 10; y <= anoView + 10; y++){
+    anosOpts.push(`<option value="${y}"${y===anoView?' selected':''}>${y}</option>`);
+  }
+  const mesesOpts = _MCAL_MESES.map((m,i) => `<option value="${i}"${i===mesView?' selected':''}>${m}</option>`).join('');
+
+  let gridHtml = '';
+  // Dias do mês anterior (preenchimento)
+  for(let i = primeiroDia - 1; i >= 0; i--){
+    const d = diasMesAnt - i;
+    gridHtml += `<button type="button" class="mcal-day other" data-other="prev" data-d="${d}">${d}</button>`;
+  }
+  // Dias do mês atual
+  for(let d = 1; d <= diasNoMes; d++){
+    const iso = `${anoView}-${String(mesView+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const classes = ['mcal-day'];
+    if(iso === valorAtual) classes.push('selected');
+    if(iso === hojeISO) classes.push('today');
+    const dow = (primeiroDia + d - 1) % 7;
+    if(dow === 0 || dow === 6) classes.push('weekend');
+    gridHtml += `<button type="button" class="${classes.join(' ')}" data-d="${d}">${d}</button>`;
+  }
+  // Dias do mês seguinte (preenchimento)
+  const totalCels = primeiroDia + diasNoMes;
+  const restoCels = (7 - (totalCels % 7)) % 7;
+  for(let d = 1; d <= restoCels; d++){
+    gridHtml += `<button type="button" class="mcal-day other" data-other="next" data-d="${d}">${d}</button>`;
+  }
+
+  popup.innerHTML = `
+    <div class="mcal-hd">
+      <button type="button" class="mcal-nav" data-act="prev" title="Mês anterior">◀</button>
+      <div class="mcal-title">
+        <select data-act="mes">${mesesOpts}</select>
+        <select data-act="ano">${anosOpts.join('')}</select>
+      </div>
+      <button type="button" class="mcal-nav" data-act="next" title="Próximo mês">▶</button>
+    </div>
+    <div class="mcal-week">${_MCAL_DOW.map(d => `<div class="mcal-dow">${d}</div>`).join('')}</div>
+    <div class="mcal-grid">${gridHtml}</div>
+    <div class="mcal-actions">
+      <button type="button" class="mcal-action" data-act="today">Hoje</button>
+      <button type="button" class="mcal-action danger" data-act="clear">Limpar</button>
+    </div>
+  `;
+
+  // Listeners
+  popup.querySelectorAll('.mcal-day').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const d = parseInt(btn.dataset.d);
+      const other = btn.dataset.other;
+      let y = anoView, m = mesView;
+      if(other === 'prev'){
+        if(m === 0){ m = 11; y--; } else m--;
+      } else if(other === 'next'){
+        if(m === 11){ m = 0; y++; } else m++;
+      }
+      const iso = `${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+      if(_mcalState && _mcalState.onSelect) _mcalState.onSelect(iso);
+      closeMcal();
+    });
+  });
+  popup.querySelector('[data-act="prev"]').addEventListener('click', () => {
+    if(_mcalState.mesView === 0){ _mcalState.mesView = 11; _mcalState.anoView--; }
+    else _mcalState.mesView--;
+    _mcalRender();
+  });
+  popup.querySelector('[data-act="next"]').addEventListener('click', () => {
+    if(_mcalState.mesView === 11){ _mcalState.mesView = 0; _mcalState.anoView++; }
+    else _mcalState.mesView++;
+    _mcalRender();
+  });
+  popup.querySelector('[data-act="mes"]').addEventListener('change', e => {
+    _mcalState.mesView = parseInt(e.target.value);
+    _mcalRender();
+  });
+  popup.querySelector('[data-act="ano"]').addEventListener('change', e => {
+    _mcalState.anoView = parseInt(e.target.value);
+    _mcalRender();
+  });
+  popup.querySelector('[data-act="today"]').addEventListener('click', () => {
+    const h = new Date();
+    const iso = `${h.getFullYear()}-${String(h.getMonth()+1).padStart(2,'0')}-${String(h.getDate()).padStart(2,'0')}`;
+    if(_mcalState && _mcalState.onSelect) _mcalState.onSelect(iso);
+    closeMcal();
+  });
+  popup.querySelector('[data-act="clear"]').addEventListener('click', () => {
+    if(_mcalState && _mcalState.onSelect) _mcalState.onSelect('');
+    closeMcal();
+  });
+}
+
+// Cria botão de calendário para um triplet d/m/a
+// prefix = ex 'fcr', 'fi', 'fp', 'ep_d_${id}_${i}' (mas pra triplet precisa apenas 'ep_X_Y')
+// retorna HTML do botão pronto pra colocar ao lado dos 3 inputs
+function mcalBtnHTML(prefix){
+  return `<button type="button" class="mcal-btn" title="Abrir calendário" onclick="_abrirMcalTriplet('${prefix}')">📅</button>`;
+}
+
+// Abre calendário e ao selecionar, preenche os 3 campos do triplet
+// Suporta 3 padrões de ID:
+//   1) prefix_d, prefix_m, prefix_a  (ex: fcr_d, fcr_m, fcr_a)
+//   2) ep_<pid>_<idx>  →  ep_d_<pid>_<idx>, ep_m_<pid>_<idx>, ep_a_<pid>_<idx>
+//      (editor inline de etapa do card aberto)
+//   3) ep_<idx>  →  ep_d_<idx>, ep_m_<idx>, ep_a_<idx>
+//      (formulário de criação/edição de projeto - aba etapas)
+function _abrirMcalTriplet(prefix){
+  // Tenta padrão 1 primeiro
+  let elD = document.getElementById(prefix+'_d');
+  let elM = document.getElementById(prefix+'_m');
+  let elA = document.getElementById(prefix+'_a');
+  let etapaEditorMatch = null;     // padrão 2 (com pid)
+  let efIndexMatch = null;          // padrão 3 (formulário)
+
+  // Padrão 2: ep_<pid>_<idx>
+  if(!elD || !elM || !elA){
+    const m2 = prefix.match(/^ep_(\d+)_(\d+)$/);
+    if(m2){
+      const pid = m2[1], idx = m2[2];
+      elD = document.getElementById('ep_d_'+pid+'_'+idx);
+      elM = document.getElementById('ep_m_'+pid+'_'+idx);
+      elA = document.getElementById('ep_a_'+pid+'_'+idx);
+      etapaEditorMatch = m2;
+    }
+  }
+
+  // Padrão 3: ep_<idx>  (formulário - índice simples)
+  if(!elD || !elM || !elA){
+    const m3 = prefix.match(/^ep_(\d+)$/);
+    if(m3){
+      const idx = m3[1];
+      elD = document.getElementById('ep_d_'+idx);
+      elM = document.getElementById('ep_m_'+idx);
+      elA = document.getElementById('ep_a_'+idx);
+      efIndexMatch = m3;
+    }
+  }
+
+  if(!elD || !elM || !elA){ console.warn('Triplet não encontrado:', prefix); return; }
+  // Detectar trigger (o próprio botão clicado)
+  const trigger = event ? event.currentTarget : elD;
+  const isoAtual = dma2iso(elD.value, elM.value, elA.value);
+  openMcal(trigger, isoAtual, (iso) => {
+    if(iso){
+      const [y,mo,dy] = iso.split('-');
+      elD.value = parseInt(dy);
+      elM.value = parseInt(mo);
+      elA.value = parseInt(y);
+      // Disparar evento change (caso haja listeners — ex: onDataInicioChange, _efOnChangePrazo)
+      ['change','input'].forEach(ev => {
+        elD.dispatchEvent(new Event(ev,{bubbles:true}));
+        elM.dispatchEvent(new Event(ev,{bubbles:true}));
+        elA.dispatchEvent(new Event(ev,{bubbles:true}));
+      });
+      // Padrão 2: editor inline → chamar setEPdma
+      if(etapaEditorMatch && typeof setEPdma === 'function'){
+        setEPdma(parseInt(etapaEditorMatch[1]), parseInt(etapaEditorMatch[2]));
+      }
+      // Padrão 3: formulário → chamar _efOnChangePrazo
+      if(efIndexMatch && typeof _efOnChangePrazo === 'function'){
+        _efOnChangePrazo(parseInt(efIndexMatch[1]));
+      }
+    } else {
+      // Limpar
+      elD.value = ''; elM.value = ''; elA.value = '';
+    }
+  });
+}
+
+// Cria botão de calendário para um input type="date" nativo (filtros, etc)
+function _abrirMcalInput(inputId){
+  const el = document.getElementById(inputId);
+  if(!el) return;
+  const trigger = event ? event.currentTarget : el;
+  openMcal(trigger, el.value, (iso) => {
+    el.value = iso || '';
+    el.dispatchEvent(new Event('change',{bubbles:true}));
+  });
+}
+
 function getDateField(prefix){
   const d=document.getElementById(prefix+'_d')?.value;
   const m=document.getElementById(prefix+'_m')?.value;
@@ -3630,6 +3937,7 @@ function openDet(id){
               value="${e.prazo?parseInt(e.prazo.split('-')[0]):''}"
               style="width:58px;padding:4px 5px;font-size:11px"
               onkeydown="if(event.key==='Enter')setEPdma(${id},${i})">
+            <button type="button" class="mcal-btn sm" title="Abrir calendário" onclick="_abrirMcalTriplet('ep_${id}_${i}')">📅</button>
             <button type="button" onclick="setEPdma(${id},${i})"
               style="padding:3px 7px;font-size:11px;background:var(--blue);color:#fff;border:none;border-radius:5px;cursor:pointer">✓</button>
           </div>
@@ -4929,17 +5237,19 @@ function _renderEF(){
                     <input class="fi ii" type="number" id="ep_m_${i}" placeholder="MM" min="1" max="12"
                       value="${parseInt(e.prazo.split('-')[1])}" style="width:48px;padding:5px 4px;font-size:11.5px" onchange="_efOnChangePrazo(${i})">
                     <input class="fi ii" type="number" id="ep_a_${i}" placeholder="AAAA" min="2020" max="2099"
-                      value="${parseInt(e.prazo.split('-')[0])}" style="width:60px;padding:5px 4px;font-size:11.5px" onchange="_efOnChangePrazo(${i})">`
+                      value="${parseInt(e.prazo.split('-')[0])}" style="width:60px;padding:5px 4px;font-size:11.5px" onchange="_efOnChangePrazo(${i})">
+                    <button type="button" class="mcal-btn sm" title="Abrir calendário" onclick="_abrirMcalTriplet('ep_${i}')">📅</button>`
                   : `<span class="ef-a-definir" onclick="abrirInputPrazo(${i})"
                       style="font-size:11.5px;color:#94A3B8;font-style:italic;cursor:pointer;padding:5px 8px;border:1px dashed #CBD5E1;border-radius:6px;white-space:nowrap"
                       title="Clique para definir a data">a definir</span>
-                    <div id="ef_inp_prazo_${i}" style="display:none;gap:3px">
+                    <div id="ef_inp_prazo_${i}" style="display:none;gap:3px;align-items:center">
                       <input class="fi ii" type="number" id="ep_d_${i}" placeholder="DD" min="1" max="31"
                         style="width:48px;padding:5px 4px;font-size:11.5px" onblur="_efOnChangePrazo(${i})">
                       <input class="fi ii" type="number" id="ep_m_${i}" placeholder="MM" min="1" max="12"
                         style="width:48px;padding:5px 4px;font-size:11.5px" onblur="_efOnChangePrazo(${i})">
                       <input class="fi ii" type="number" id="ep_a_${i}" placeholder="AAAA" min="2020" max="2099"
                         style="width:60px;padding:5px 4px;font-size:11.5px" onblur="_efOnChangePrazo(${i})">
+                      <button type="button" class="mcal-btn sm" title="Abrir calendário" onclick="_abrirMcalTriplet('ep_${i}')">📅</button>
                     </div>`
               }
             </div>
