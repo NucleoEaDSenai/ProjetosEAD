@@ -2469,8 +2469,14 @@ function rKanban(){
               );
             }
 
-            if(gatilhoMedicaoDone && !p.enviadoMedicao)
+            if(gatilhoMedicaoDone && !p.enviadoMedicao){
+              // Se o projeto já avançou para Upload BDOC (col 13) ou Concluído (col 14)
+              // sem passar pela medição, é uma inconsistência: não mostrar o botão.
+              if(p.col >= 13){
+                return `<span class="badge-medicao-pend" style="background:#FEF3C7;color:#92400E;border:1px dashed #F59E0B" title="Este projeto avançou sem passar pela medição. Verifique com a liderança.">⚠️ Medição pendente</span>`;
+              }
               return `<button class="btn-medicao" onclick="event.stopPropagation();enviarMedicao(${p.id})">📐 Enviar para Medição</button>`;
+            }
             if(p.enviadoMedicao && !p.medicaoFeita)
               return `<span class="badge-medicao-pend">⏳ Aguardando Medição</span>`;
             if(p.medicaoFeita)
