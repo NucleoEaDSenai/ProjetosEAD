@@ -1031,7 +1031,7 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
     <div class="tp-title" id="pageTitle">Quadro Kanban</div>
     <div class="tp-r">
       <span class="tp-date" id="topDate"></span>
-      <span style="font-size:11px;color:var(--mu);margin-left:12px;opacity:.8">&middot; Sistema atualizado em 26/05/2026 às 07:56</span>
+      <span style="font-size:11px;color:var(--mu);margin-left:12px;opacity:.8">&middot; Sistema atualizado em 26/05/2026 às 13:16</span>
       <div class="search-box">
         <span class="search-icon">🔍</span>
         <input id="searchInp" placeholder="Buscar projeto..." oninput="buscarGlobal(this.value)" onblur="setTimeout(()=>fecharBusca(),180)">
@@ -5015,9 +5015,20 @@ function _efOnChangePrazo(i){
   // Aguardar foco sair dos 3 campos antes de re-renderizar
   // Usar setTimeout para verificar se o foco foi para outro campo do grupo
   setTimeout(()=>{
+    // Se o mini-calendário está aberto para esse triplet, NÃO re-renderizar.
+    // Senão o div some e o calendário fica órfão.
+    if(_mcalState && _mcalState.trigger){
+      const trig = _mcalState.trigger;
+      if(trig.getAttribute && trig.getAttribute('onclick')?.includes(`_abrirMcalTriplet('ep_${i}')`)){
+        return;
+      }
+    }
     const foco = document.activeElement;
     const aindaNosInputs = foco === dEl || foco === mEl || foco === aEl;
-    if(!aindaNosInputs){
+    // Se o foco foi para o botão de calendário do mesmo triplet, também não re-renderizar
+    const focoEhMcalBtn = foco && foco.getAttribute &&
+      foco.getAttribute('onclick')?.includes(`_abrirMcalTriplet('ep_${i}')`);
+    if(!aindaNosInputs && !focoEhMcalBtn){
       // Foco saiu do grupo: se todos vazios → mostrar "a definir"
       const tdv = dEl?.value?.trim();
       const tmv = mEl?.value?.trim();
