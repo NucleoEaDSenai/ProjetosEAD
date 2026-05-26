@@ -5016,7 +5016,11 @@ function _efOnChangePrazo(i){
   // Usar setTimeout para verificar se o foco foi para outro campo do grupo
   setTimeout(()=>{
     const foco = document.activeElement;
-    const aindaNosInputs = foco === dEl || foco === mEl || foco === aEl;
+    const container = document.getElementById(`ef_inp_prazo_${i}`);
+
+const aindaNosInputs =
+  container &&
+  container.contains(document.activeElement);
     if(!aindaNosInputs){
       // Foco saiu do grupo: se todos vazios → mostrar "a definir"
       const tdv = dEl?.value?.trim();
