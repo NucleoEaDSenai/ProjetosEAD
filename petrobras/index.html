@@ -5260,6 +5260,9 @@ function toggleRec(el, recurso){
   // Se etapas estão travadas (modo manual), nunca sobrescrever nomes/estrutura
   if(_efEtapasLockadas) return;
 
+  // Se o usuário CUSTOMIZOU etapas (add/del/mover), nunca sobrescrever com template
+  if(_efEtapasCustomizadas) return;
+
   // Só aplica template/padrão se não há etapas customizadas
   const temEtapasCustom = _efEtapas.length > 0 &&
     _efEtapas.some(e => e.lb && !ETPS_DEF.some(d => d.lb === e.lb) &&
@@ -5343,6 +5346,7 @@ function getSelectedResps(){
 let _efEtapas = [];
 let _efCascataAtiva = false;  // flag: cascateamento automático de datas (default: desligado)
 let _efEtapasLockadas = false; // flag: etapas bloqueadas contra regravação pelo template
+let _efEtapasCustomizadas = false; // flag: usuário modificou etapas manualmente (add/del/mover) — persiste no banco
 
 // Gera as <option> do select de responsável por etapa
 // com base nos responsáveis alocados no projeto (lidos dos chips selecionados)
@@ -5390,22 +5394,44 @@ function _renderEF(){
   const _lockBadge = _efEtapasLockadas
     ? '<span style="font-size:10px;background:#FEF9C3;color:#92400E;border:1px solid #FCD34D;border-radius:4px;padding:1px 6px;margin-left:6px">🔒 etapas travadas</span>'
     : '';
+  const _customBadge = _efEtapasCustomizadas
+    ? '<span style="font-size:10px;background:#E0E7FF;color:#3730A3;border:1px solid #A5B4FC;border-radius:4px;padding:1px 6px;margin-left:6px" title="Estas etapas foram personalizadas e não serão sobrescritas ao trocar o recurso">✏️ etapas personalizadas</span>'
+    : '';
 
   wrap.innerHTML = `
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;flex-wrap:wrap;gap:6px">
       <span style="font-size:11px;color:var(--mu)">
         ${_efCascataAtiva
           ? '🔗 Cronograma Automático <strong>ativado</strong> — ao editar uma data, as demais se ajustam automaticamente'
           : '✂️ Cronograma Automático <strong>desativado</strong> — edite cada data manualmente sem afetar as demais'}
         ${_lockBadge}
+        ${_customBadge}
       </span>
       <button type="button" onclick="_efToggleCascata()"
         style="padding:5px 13px;border-radius:7px;cursor:pointer;font-size:12px;font-weight:700;font-family:'Plus Jakarta Sans',sans-serif;transition:all .15s;${_btnCascStyle}">
         ${_btnCascLabel}
       </button>
     </div>
+
+    <!-- BARRA DE SELEÇÃO MÚLTIPLA (aparece quando ≥1 etapa selecionada) -->
+    <div id="efBulkBar" style="display:none;align-items:center;gap:12px;background:#FEF2F2;border:1.5px solid #FCA5A5;border-radius:8px;padding:8px 14px;margin-bottom:8px">
+      <span style="font-size:13px;font-weight:600;color:#991B1B;flex:1" id="efBulkCounter">0 etapas selecionadas</span>
+      <button type="button" onclick="_efDelSelecionadas()"
+        style="background:#DC2626;color:#fff;border:none;padding:6px 14px;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;display:inline-flex;align-items:center;gap:6px"
+        onmouseover="this.style.background='#B91C1C'" onmouseout="this.style.background='#DC2626'">
+        🗑️ Remover selecionadas
+      </button>
+      <button type="button" onclick="document.querySelectorAll('.ef-row-check').forEach(cb=>cb.checked=false);_efUpdateBulkBar()"
+        style="background:transparent;border:1px solid #CBD5E1;color:var(--mu);padding:6px 12px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif">
+        Cancelar
+      </button>
+    </div>
+
     <table class="et">
       <thead><tr>
+        <th style="width:28px;text-align:center">
+          <input type="checkbox" id="efCheckAll" onchange="_efToggleAllChecks(this)" title="Selecionar todas" style="cursor:pointer;width:14px;height:14px;accent-color:#DC2626">
+        </th>
         <th style="width:28px">#</th>
         <th>Etapa</th>
         <th style="width:110px">Responsável</th>
@@ -5415,6 +5441,9 @@ function _renderEF(){
       <tbody>
         ${_efEtapas.map((e,i) => `<tr class="ef-drag-row"
           ondragover="_efDragOver(event)" ondragleave="_efDragLeave(event)" ondrop="_efDrop(event,${i})">
+          <td style="text-align:center">
+            <input type="checkbox" class="ef-row-check" data-idx="${i}" onchange="_efUpdateBulkBar()" style="cursor:pointer;width:14px;height:14px;accent-color:#DC2626" title="Selecionar para remover">
+          </td>
           <td style="color:var(--mu);font-size:11px;text-align:center"><span class="ef-drag-handle" draggable="true" ondragstart="_efDragStart(event,${i})" title="Arraste para reordenar">⠿</span></td>
           <td>
             <input class="et-lb-input" id="ef_lb_${i}" value="${(e.lb||'').replace(/"/g,'&quot;')}"
@@ -5460,7 +5489,7 @@ function _renderEF(){
           </td>
         </tr>`).join('')}
         <tr class="et-add-row">
-          <td colspan="5">
+          <td colspan="6">
             <button type="button" onclick="_efAdd()"
               style="background:none;border:none;color:var(--blue);font-size:12px;font-family:'Plus Jakarta Sans',sans-serif;font-weight:600;cursor:pointer;padding:2px 4px;display:flex;align-items:center;gap:5px">
               ＋ Adicionar etapa
@@ -5495,6 +5524,7 @@ function _efDrop(e, toIdx){
   _efSync();
   const moved = _efEtapas.splice(_efDragIdx, 1)[0];
   _efEtapas.splice(toIdx, 0, moved);
+  _efEtapasCustomizadas = true;   // ← marca como customizado
   _efDragIdx = null;
   _renderEF();
 }
@@ -5586,6 +5616,7 @@ function _efDel(i){
   if(!confirm(`Remover a etapa "${_efEtapas[i].lb}"?`)) return;
   _efSync();
   _efEtapas.splice(i,1);
+  _efEtapasCustomizadas = true;   // ← marca como customizado
   _renderEF();
   // Só reaplicar cronograma se estiver LIGADO
   if(_efCascataAtiva) _efReaplicarCronograma();
@@ -5596,6 +5627,7 @@ function _efMover(i, dir){
   const j = i + dir;
   if(j < 0 || j >= _efEtapas.length) return;
   [_efEtapas[i], _efEtapas[j]] = [_efEtapas[j], _efEtapas[i]];
+  _efEtapasCustomizadas = true;   // ← marca como customizado
   _renderEF();
   // Manter foco no botão de mover correspondente
   setTimeout(()=>{
@@ -5607,6 +5639,7 @@ function _efMover(i, dir){
 function _efAdd(){
   _efSync();
   _efEtapas.push({lb:'Nova Etapa', r:'eq', prazo:null, inicio:null, fim:null, done:false, _prazoAntes:null});
+  _efEtapasCustomizadas = true;   // ← marca como customizado
   _renderEF();
   // Só reaplicar cronograma se estiver LIGADO
   if(_efCascataAtiva) _efReaplicarCronograma();
@@ -5614,6 +5647,55 @@ function _efAdd(){
     const inp = document.getElementById('ef_lb_'+(_efEtapas.length-1));
     if(inp){ inp.focus(); inp.select(); }
   },0);
+}
+
+// Remove múltiplas etapas selecionadas via checkbox
+function _efDelSelecionadas(){
+  const checkboxes = document.querySelectorAll('.ef-row-check:checked');
+  if(checkboxes.length === 0){
+    showToast('⚠️ Nenhuma etapa selecionada.');
+    return;
+  }
+  const indices = Array.from(checkboxes).map(cb => parseInt(cb.dataset.idx)).sort((a,b) => b-a);
+  if(_efEtapas.length - indices.length < 1){
+    showToast('⚠️ O projeto precisa ter ao menos uma etapa.');
+    return;
+  }
+  const nomes = indices.slice().reverse().map(i => '• ' + (_efEtapas[i].lb || '(sem nome)')).join('\n');
+  if(!confirm(`Remover ${indices.length} etapa${indices.length>1?'s':''}?\n\n${nomes}`)) return;
+  _efSync();
+  // Remove de trás pra frente pra não bagunçar índices
+  indices.forEach(i => _efEtapas.splice(i, 1));
+  _efEtapasCustomizadas = true;
+  _renderEF();
+  if(_efCascataAtiva) _efReaplicarCronograma();
+  showToast(`✅ ${indices.length} etapa${indices.length>1?'s removidas':' removida'}.`);
+}
+
+// Marca/desmarca todas as checkboxes de etapas
+function _efToggleAllChecks(masterEl){
+  const checked = masterEl.checked;
+  document.querySelectorAll('.ef-row-check').forEach(cb => cb.checked = checked);
+  _efUpdateBulkBar();
+}
+
+// Atualiza o contador e estado dos botões da barra de seleção
+function _efUpdateBulkBar(){
+  const checked = document.querySelectorAll('.ef-row-check:checked').length;
+  const total   = document.querySelectorAll('.ef-row-check').length;
+  const bar     = document.getElementById('efBulkBar');
+  const counter = document.getElementById('efBulkCounter');
+  const master  = document.getElementById('efCheckAll');
+  if(bar){
+    bar.style.display = checked > 0 ? 'flex' : 'none';
+  }
+  if(counter){
+    counter.textContent = checked + ' etapa' + (checked>1?'s':'') + ' selecionada' + (checked>1?'s':'');
+  }
+  if(master){
+    master.checked = total > 0 && checked === total;
+    master.indeterminate = checked > 0 && checked < total;
+  }
 }
 
 // Reaplica cronograma automaticamente se houver recurso + data início preenchidos
@@ -5681,6 +5763,7 @@ function openNew(){
   stab(0,document.querySelectorAll('.tab')[0]);
   buildRespChips([]);
   _efEtapasLockadas = false;
+  _efEtapasCustomizadas = false;  // ← projeto novo: nunca customizado ainda
   buildEF(ETPS_DEF.map(e=>({...e,prazo:null})));
   document.getElementById('ovNew').classList.add('on');
   setTimeout(()=>{const f=document.querySelector('#ovNew .fi');if(f)f.focus();},80);
@@ -5716,6 +5799,8 @@ function openEdit(id){
   buildRespChips(p.resps||[]);
   // Destrava após carregar os chips — buildEF vai carregar as etapas corretas do projeto
   _efEtapasLockadas = false;
+  // Carrega flag de customização do banco (true se o projeto já foi customizado antes)
+  _efEtapasCustomizadas = !!p.etapasCustomizadas;
   buildEF(p.etapas||ETPS_DEF.map(e=>({...e,prazo:null})));
   document.getElementById('ovNew').classList.add('on');
 }
@@ -5767,6 +5852,7 @@ function salvar(){
     medicaoQuinzena:projAnterior?.medicaoQuinzena||'',
     historico:projAnterior?.historico||[],
     etapas,
+    etapasCustomizadas: _efEtapasCustomizadas || projAnterior?.etapasCustomizadas || false,  // persiste flag
   };
 
   if(editId){DB=DB.map(p=>p.id===editId?proj:p);}else{DB.push(proj);}
