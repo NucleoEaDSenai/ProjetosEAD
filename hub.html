@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="author" content="Daniel David — Firjan SENAI">
+  <title>Firjan SENAI · Plataforma de Gestão EAD</title>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    /* ═══════════════════════════════════════════════════════
+       RESET & BASE
+       ═══════════════════════════════════════════════════════ */
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    html,body{height:100%}
+    body{
+      font-family:'Plus Jakarta Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+      background:#0F0F11;
+      color:#E5E7EB;
+      min-height:100vh;
+      display:flex;
+      flex-direction:column;
+      overflow-x:hidden;
+      position:relative;
+    }
+    /* Glow sutil de fundo */
+    body::before{
+      content:'';
+      position:fixed;
+      top:-20%;
+      left:50%;
+      transform:translateX(-50%);
+      width:1200px;
+      height:600px;
+      background:radial-gradient(ellipse at center, rgba(99,102,241,.08) 0%, transparent 60%);
+      pointer-events:none;
+      z-index:0;
+    }
+
+    /* ═══════════════════════════════════════════════════════
+       HEADER
+       ═══════════════════════════════════════════════════════ */
+    .hub-header{
+      flex-shrink:0;
+      position:relative;
+      z-index:1;
+      padding:60px 32px 32px;
+      text-align:center;
+    }
+    .hub-brand{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      background:rgba(255,255,255,.05);
+      backdrop-filter:blur(10px);
+      padding:7px 16px;
+      border-radius:22px;
+      font-size:11px;
+      font-weight:700;
+      letter-spacing:1.6px;
+      text-transform:uppercase;
+      color:#A5B4FC;
+      margin-bottom:24px;
+      border:1px solid rgba(255,255,255,.08);
+    }
+    .hub-brand::before{
+      content:'';
+      width:6px;
+      height:6px;
+      border-radius:50%;
+      background:#22C55E;
+      box-shadow:0 0 8px #22C55E;
+    }
+    .hub-title{
+      font-size:46px;
+      font-weight:800;
+      line-height:1.1;
+      margin-bottom:14px;
+      color:#FFFFFF;
+      letter-spacing:-1.2px;
+    }
+    .hub-title-highlight{
+      background:linear-gradient(135deg,#4F46E5 0%,#6366F1 100%);
+      color:#fff;
+      padding:4px 16px;
+      border-radius:10px;
+      display:inline-block;
+      box-shadow:0 4px 14px rgba(99,102,241,.3);
+    }
+    .hub-subtitle{
+      font-size:15px;
+      color:#9CA3AF;
+      font-weight:400;
+      max-width:580px;
+      margin:0 auto;
+      line-height:1.5;
+    }
+
+    /* ═══════════════════════════════════════════════════════
+       MAIN
+       ═══════════════════════════════════════════════════════ */
+    .hub-main{
+      flex:1;
+      max-width:1280px;
+      margin:24px auto 40px;
+      padding:0 32px;
+      width:100%;
+      position:relative;
+      z-index:1;
+    }
+
+    /* Container que agrupa os cards */
+    .hub-cards-wrapper{
+      background:rgba(255,255,255,.02);
+      border:1px solid rgba(255,255,255,.06);
+      border-radius:20px;
+      padding:20px;
+      margin-bottom:32px;
+    }
+
+    .hub-section-label{
+      font-size:11px;
+      font-weight:700;
+      text-transform:uppercase;
+      letter-spacing:1.8px;
+      color:#6B7280;
+      margin-bottom:14px;
+      padding-left:6px;
+    }
+
+    /* ═══════════════════════════════════════════════════════
+       CARDS DE CLIENTE
+       ═══════════════════════════════════════════════════════ */
+    .clients-grid{
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(340px,1fr));
+      gap:18px;
+    }
+
+    .client-card{
+      background:var(--card-bg);
+      border-radius:14px;
+      overflow:hidden;
+      position:relative;
+      display:flex;
+      flex-direction:column;
+      transition:all .35s cubic-bezier(.16,1,.3,1);
+      text-decoration:none;
+      color:#fff;
+      box-shadow:0 4px 24px rgba(0,0,0,.3);
+      cursor:pointer;
+    }
+    .client-card:hover{
+      transform:translateY(-6px);
+      box-shadow:0 18px 40px rgba(0,0,0,.45);
+    }
+
+    /* Ícone "i" no canto superior direito */
+    .card-info-btn{
+      position:absolute;
+      top:14px;
+      right:14px;
+      width:24px;
+      height:24px;
+      border-radius:50%;
+      background:rgba(255,255,255,.85);
+      color:#1F2937;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size:11px;
+      font-weight:800;
+      font-style:italic;
+      cursor:help;
+      z-index:2;
+      transition:all .2s;
+      border:none;
+      font-family:Georgia,serif;
+    }
+    .card-info-btn:hover{ transform:scale(1.1);background:#fff }
+    .card-info-tooltip{
+      position:absolute;
+      top:44px;
+      right:14px;
+      background:#1F1F23;
+      color:#E5E7EB;
+      padding:10px 14px;
+      border-radius:8px;
+      font-size:11.5px;
+      font-weight:500;
+      line-height:1.45;
+      max-width:220px;
+      box-shadow:0 8px 24px rgba(0,0,0,.5);
+      border:1px solid rgba(255,255,255,.1);
+      opacity:0;
+      visibility:hidden;
+      transition:all .2s;
+      z-index:3;
+      pointer-events:none;
+    }
+    .card-info-btn:hover + .card-info-tooltip{
+      opacity:1; visibility:visible; transform:translateY(2px);
+    }
+
+    .card-body{
+      padding:28px 26px 22px;
+      display:flex;
+      flex-direction:column;
+      min-height:280px;
+    }
+
+    /* Logo container — formato horizontal para acomodar logos institucionais */
+    .card-logo-wrapper{
+      width:auto;
+      max-width:180px;
+      height:50px;
+      border-radius:10px;
+      background:rgba(255,255,255,.95);
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      margin-bottom:22px;
+      overflow:hidden;
+      padding:8px 14px;
+      box-shadow:0 4px 12px rgba(0,0,0,.15);
+    }
+    .card-logo-wrapper img{
+      max-width:100%;
+      max-height:100%;
+      object-fit:contain;
+    }
+
+    .card-name{
+      font-size:24px;
+      font-weight:800;
+      color:#fff;
+      margin-bottom:12px;
+      letter-spacing:-.4px;
+    }
+    .card-desc{
+      font-size:13px;
+      font-weight:500;
+      color:rgba(255,255,255,.92);
+      line-height:1.55;
+      margin-bottom:18px;
+      flex:1;
+    }
+    .card-stats{
+      display:flex;
+      gap:18px;
+      margin-bottom:6px;
+    }
+    .card-stat{display:flex;flex-direction:column;gap:2px}
+    .card-stat-val{
+      font-size:18px;
+      font-weight:800;
+      color:#fff;
+      line-height:1;
+      letter-spacing:-.3px;
+    }
+    .card-stat-val.loading{ opacity:.55; font-size:14px }
+    .card-stat-lbl{
+      font-size:10px;
+      color:rgba(255,255,255,.7);
+      font-weight:700;
+      text-transform:uppercase;
+      letter-spacing:.6px;
+    }
+
+    /* Botão "Acessar" */
+    .card-cta{
+      background:linear-gradient(135deg,#4F46E5,#6366F1);
+      color:#fff;
+      padding:14px;
+      text-align:center;
+      font-size:14px;
+      font-weight:700;
+      transition:all .25s;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:8px;
+    }
+    .client-card:hover .card-cta{
+      background:linear-gradient(135deg,#4338CA,#4F46E5);
+    }
+    .card-cta-arrow{
+      font-size:16px;
+      transition:transform .25s;
+    }
+    .client-card:hover .card-cta-arrow{ transform:translateX(4px) }
+
+    /* ═══════════════════════════════════════════════════════
+       FERRAMENTAS INTEGRADAS
+       ═══════════════════════════════════════════════════════ */
+    .tools-section{margin-top:8px}
+    .tools-grid{
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(320px,1fr));
+      gap:16px;
+    }
+    .tool-card{
+      background:rgba(255,255,255,.03);
+      border:1px solid rgba(255,255,255,.08);
+      border-radius:12px;
+      padding:20px 22px;
+      display:flex;
+      align-items:center;
+      gap:14px;
+      cursor:pointer;
+      transition:all .25s;
+      text-decoration:none;
+      color:inherit;
+    }
+    .tool-card:hover{
+      border-color:rgba(99,102,241,.4);
+      background:rgba(255,255,255,.05);
+      box-shadow:0 4px 16px rgba(99,102,241,.15);
+    }
+    .tool-card.disabled{
+      opacity:.5;
+      cursor:not-allowed;
+      pointer-events:none;
+    }
+    .tool-icon{
+      width:42px;
+      height:42px;
+      border-radius:10px;
+      background:linear-gradient(135deg,#4F46E5,#6366F1);
+      color:#fff;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size:18px;
+      flex-shrink:0;
+    }
+    .tool-content{ flex:1 }
+    .tool-title{
+      font-size:14px;
+      font-weight:700;
+      color:#E5E7EB;
+      margin-bottom:3px;
+    }
+    .tool-desc{
+      font-size:12px;
+      color:#9CA3AF;
+      line-height:1.4;
+    }
+    .tool-badge{
+      font-size:9.5px;
+      font-weight:700;
+      text-transform:uppercase;
+      letter-spacing:.8px;
+      padding:4px 9px;
+      border-radius:5px;
+      background:rgba(245,158,11,.15);
+      color:#FCD34D;
+      border:1px solid rgba(245,158,11,.3);
+      flex-shrink:0;
+    }
+
+    /* ═══════════════════════════════════════════════════════
+       FOOTER
+       ═══════════════════════════════════════════════════════ */
+    .hub-footer{
+      text-align:center;
+      padding:24px;
+      font-size:11.5px;
+      color:#6B7280;
+      border-top:1px solid rgba(255,255,255,.05);
+      position:relative;
+      z-index:1;
+    }
+
+    /* ═══════════════════════════════════════════════════════
+       RESPONSIVO
+       ═══════════════════════════════════════════════════════ */
+    @media (max-width:640px){
+      .hub-header{ padding:40px 20px 24px }
+      .hub-title{ font-size:30px; line-height:1.2 }
+      .hub-title-highlight{ padding:2px 10px; border-radius:6px }
+      .hub-subtitle{ font-size:13.5px }
+      .hub-main{ padding:0 16px; margin:16px auto 24px }
+      .hub-cards-wrapper{ padding:14px; border-radius:16px }
+      .card-body{ padding:24px 22px 20px; min-height:0 }
+      .card-name{ font-size:21px }
+      .card-stats{ gap:14px }
+    }
+
+    /* Animações */
+    .fade-in{ animation:fadeInUp .55s cubic-bezier(.16,1,.3,1) backwards }
+    .fade-in:nth-child(1){ animation-delay:.08s }
+    .fade-in:nth-child(2){ animation-delay:.18s }
+    @keyframes fadeInUp{
+      from{ opacity:0; transform:translateY(20px) }
+      to{ opacity:1; transform:translateY(0) }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header class="hub-header">
+    <div class="hub-brand">Plataforma Institucional</div>
+    <h1 class="hub-title">
+      Gestão de Projetos <span class="hub-title-highlight">EAD</span>
+    </h1>
+    <p class="hub-subtitle">
+      Selecione o cliente para acessar o sistema correspondente
+      ou utilize as ferramentas integradas da plataforma.
+    </p>
+  </header>
+
+  <!-- MAIN -->
+  <main class="hub-main">
+
+    <!-- CARDS DE CLIENTES -->
+    <div class="hub-cards-wrapper">
+      <div class="hub-section-label">Clientes</div>
+      <div class="clients-grid">
+
+        <!-- PETROBRAS -->
+        <a href="petrobras/" class="client-card fade-in" data-cid="petrobras" style="--card-bg:linear-gradient(135deg,#005A30 0%,#007A40 100%)">
+          <button type="button" class="card-info-btn" aria-label="Informações">i</button>
+          <div class="card-info-tooltip">
+            Sistema completo com Kanban, KPIs, homologação, medição por quinzena e relatórios executivos. Em produção.
+          </div>
+          <div class="card-body">
+            <div class="card-logo-wrapper">
+              <img src="img/petrobras.png" alt="Petrobras">
+            </div>
+            <div class="card-name">Petrobras</div>
+            <p class="card-desc">
+              Gestão completa de projetos EAD com Kanban,
+              homologação, medição por quinzena e relatórios executivos.
+            </p>
+            <div class="card-stats">
+              <div class="card-stat">
+                <span class="card-stat-val loading" id="petr-ativos">—</span>
+                <span class="card-stat-lbl">Ativos</span>
+              </div>
+              <div class="card-stat">
+                <span class="card-stat-val loading" id="petr-conc">—</span>
+                <span class="card-stat-lbl">Concluídos</span>
+              </div>
+              <div class="card-stat">
+                <span class="card-stat-val loading" id="petr-equipe">—</span>
+                <span class="card-stat-lbl">Equipe</span>
+              </div>
+            </div>
+          </div>
+          <div class="card-cta">
+            <span>Acessar sistema</span>
+            <span class="card-cta-arrow">→</span>
+          </div>
+        </a>
+
+        <!-- SESI -->
+        <a href="sesi/" class="client-card fade-in" data-cid="sesi" style="--card-bg:linear-gradient(135deg,#D45D00 0%,#E87420 100%)">
+          <button type="button" class="card-info-btn" aria-label="Informações">i</button>
+          <div class="card-info-tooltip">
+            Sistema dedicado em fase de implantação. Fluxos e templates próprios da operação SESI.
+          </div>
+          <div class="card-body">
+            <div class="card-logo-wrapper">
+              <img src="img/sesi.png" alt="Firjan SESI">
+            </div>
+            <div class="card-name">SESI</div>
+            <p class="card-desc">
+              Sistema dedicado para gestão de projetos EAD
+              do SESI, com fluxos e templates próprios da operação.
+            </p>
+            <div class="card-stats">
+              <div class="card-stat">
+                <span class="card-stat-val loading" id="sesi-ativos">—</span>
+                <span class="card-stat-lbl">Ativos</span>
+              </div>
+              <div class="card-stat">
+                <span class="card-stat-val loading" id="sesi-conc">—</span>
+                <span class="card-stat-lbl">Concluídos</span>
+              </div>
+              <div class="card-stat">
+                <span class="card-stat-val loading" id="sesi-equipe">—</span>
+                <span class="card-stat-lbl">Equipe</span>
+              </div>
+            </div>
+          </div>
+          <div class="card-cta">
+            <span>Acessar sistema</span>
+            <span class="card-cta-arrow">→</span>
+          </div>
+        </a>
+
+      </div>
+    </div>
+
+    <!-- FERRAMENTAS INTEGRADAS -->
+    <section class="tools-section">
+      <div class="hub-section-label">Ferramentas Integradas</div>
+      <div class="tools-grid">
+        <a href="#" class="tool-card disabled" title="Disponível na próxima entrega">
+          <div class="tool-icon">⚡</div>
+          <div class="tool-content">
+            <div class="tool-title">Carga Consolidada da Equipe</div>
+            <div class="tool-desc">Visão unificada das horas e projetos por pessoa, somando todos os clientes</div>
+          </div>
+          <span class="tool-badge">Em breve</span>
+        </a>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="hub-footer">
+    © 2026 Firjan SENAI · Plataforma de Gestão EAD · Uso interno exclusivo
+  </footer>
+
+</body>
+</html>
