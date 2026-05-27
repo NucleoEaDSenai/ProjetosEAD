@@ -1,12 +1,12 @@
 # Sistema de Gestão de Projetos EAD — Firjan SENAI
 
-> **Aplicação web de uso interno** para gerenciamento de projetos de educação a distância (Petrobras).
+> **Aplicação web de uso interno** para gerenciamento de projetos dos clientes da área de educação a distância.
 
 ---
 
 ## Visão Geral
 
-Sistema **Single-Page Application (SPA)** desenvolvido em HTML5/CSS3/JavaScript puro, sem frameworks, com backend em tempo real via **Firebase Realtime Database** e autenticação via **Firebase Authentication**. Cobre o ciclo de vida completo dos projetos EAD: do cadastro até a conclusão, com rastreabilidade de etapas, cronogramas automáticos, responsáveis, prazos e histórico.
+Sistema desenvolvido em HTML5/CSS3/JavaScript puro, sem frameworks, com backend em tempo real via **Firebase Realtime Database** e autenticação via **Firebase Authentication**. Cobre o ciclo de vida completo dos projetos EAD: do cadastro até a conclusão, com rastreabilidade de etapas, cronogramas automáticos, responsáveis, prazos e histórico.
 
 ---
 
@@ -16,8 +16,8 @@ Sistema **Single-Page Application (SPA)** desenvolvido em HTML5/CSS3/JavaScript 
 |---|---|
 | **Autor** | Daniel David |
 | **Instituição** | Firjan SENAI |
-| **Finalidade** | Uso interno corporativo — gestão de projetos EAD (Petrobras) |
-| **Versão atual** | 2.0 |
+| **Finalidade** | Uso interno corporativo — gestão de projetos EAD |
+| **Versão atual** | 3.0 |
 | **Ano de criação** | 2026 |
 | **Copyright** | © 2026 Firjan SENAI. Todos os direitos reservados. |
 
