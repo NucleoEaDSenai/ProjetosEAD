@@ -639,6 +639,145 @@ tr.canc-row td{opacity:.55}
 .spin{animation:spin 1s linear infinite;display:inline-block}
 @keyframes spin{to{transform:rotate(360deg)}}
 .login-err{color:var(--red);font-size:12px;margin-top:6px;min-height:16px}
+/* ═══════════════════════════════════════════════════════
+   TENANT SWITCHER (seletor de cliente)
+   ═══════════════════════════════════════════════════════ */
+.tenant-switcher{position:relative;display:inline-flex;align-items:center;margin-left:14px;flex-shrink:0}
+.tenant-btn{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:7px 12px 7px 10px;
+  background:linear-gradient(135deg,#005A30 0%,#007A40 100%);
+  color:#fff;
+  border:none;
+  border-radius:9px;
+  font-family:'Plus Jakarta Sans',sans-serif;
+  font-size:13px;
+  font-weight:700;
+  cursor:pointer;
+  transition:all .2s;
+  box-shadow:0 2px 8px rgba(0,90,48,.25);
+  line-height:1;
+}
+.tenant-btn:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,90,48,.4)}
+.tenant-btn[aria-expanded="true"]{box-shadow:0 4px 12px rgba(0,90,48,.4)}
+.tenant-dot{
+  width:8px;height:8px;border-radius:50%;
+  background:#22C55E;
+  box-shadow:0 0 6px #22C55E;
+  flex-shrink:0;
+}
+.tenant-name{letter-spacing:-.2px}
+.tenant-chev{font-size:9px;opacity:.85;transition:transform .25s;margin-left:2px}
+.tenant-btn[aria-expanded="true"] .tenant-chev{transform:rotate(180deg)}
+
+/* Dropdown */
+.tenant-menu{
+  position:absolute;
+  top:calc(100% + 8px);
+  left:0;
+  min-width:260px;
+  background:var(--surface);
+  border:1px solid var(--bdr);
+  border-radius:12px;
+  box-shadow:0 12px 36px rgba(0,0,0,.15);
+  padding:8px;
+  z-index:1000;
+  opacity:0;
+  visibility:hidden;
+  transform:translateY(-6px);
+  transition:all .18s;
+  pointer-events:none;
+}
+.tenant-menu.open{
+  opacity:1;
+  visibility:visible;
+  transform:translateY(0);
+  pointer-events:auto;
+}
+.tenant-menu-label{
+  font-size:10px;
+  font-weight:700;
+  color:var(--mu);
+  text-transform:uppercase;
+  letter-spacing:1px;
+  padding:8px 10px 4px;
+}
+.tenant-menu-sep{
+  height:1px;
+  background:var(--bdr);
+  margin:6px 4px;
+}
+
+/* Item da lista */
+.tenant-item{
+  display:flex;
+  align-items:center;
+  gap:11px;
+  padding:9px 10px;
+  border-radius:8px;
+  cursor:pointer;
+  transition:background .12s;
+  text-decoration:none;
+  color:var(--txt);
+}
+.tenant-item:not(.current):hover{background:var(--s2)}
+.tenant-item.current{background:rgba(34,197,94,.08);cursor:default}
+body.dark .tenant-item.current{background:rgba(34,197,94,.12)}
+
+.tenant-item-logo{
+  width:34px;height:34px;
+  border-radius:9px;
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Plus Jakarta Sans',sans-serif;
+  font-weight:800;
+  font-size:14px;
+  color:#fff;
+  flex-shrink:0;
+  letter-spacing:-.5px;
+}
+.tlogo-petrobras{background:linear-gradient(135deg,#005A30,#007A40)}
+.tlogo-sesi{background:linear-gradient(135deg,#D45D00,#E87420)}
+.tlogo-metrorio{background:linear-gradient(135deg,#0B5394,#1E88E5)}
+.tlogo-hub{background:linear-gradient(135deg,#4F46E5,#6366F1);font-size:16px}
+
+.tenant-item-info{flex:1;min-width:0}
+.tenant-item-name{
+  font-size:13.5px;
+  font-weight:700;
+  color:var(--txt);
+  line-height:1.2;
+  margin-bottom:2px;
+}
+.tenant-item-sub{
+  font-size:11px;
+  color:var(--mu);
+  font-weight:500;
+}
+.tenant-item-check{
+  color:#15803D;
+  font-size:14px;
+  font-weight:800;
+  flex-shrink:0;
+}
+.tenant-item-arrow{
+  font-size:13px;
+  color:var(--mu);
+  flex-shrink:0;
+  transition:transform .15s;
+}
+.tenant-item:not(.current):hover .tenant-item-arrow{
+  transform:translateX(3px);
+  color:var(--txt);
+}
+.tenant-item.tenant-hub:hover{background:rgba(99,102,241,.08)}
+
+@media (max-width:760px){
+  .tenant-switcher{margin-left:8px}
+  .tenant-btn{padding:6px 10px 6px 9px;font-size:12px}
+  .tenant-name{display:none}
+  .tenant-menu{min-width:240px}
+}
+
 /* USER BADGE no topbar */
 .user-badge{display:flex;align-items:center;gap:7px;background:var(--s2);border-radius:20px;padding:5px 12px 5px 6px;font-size:12.5px;font-weight:500;cursor:pointer;border:1px solid var(--bdr)}
 .user-av{width:26px;height:26px;border-radius:50%;background:var(--blue);color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
@@ -1029,6 +1168,54 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
 <div class="main" role="main" id="main-content" tabindex="-1">
   <div class="tp" role="banner">
     <div class="tp-title" id="pageTitle">Quadro Kanban</div>
+
+    <!-- SELETOR DE CLIENTE (TENANT SWITCHER) -->
+    <div class="tenant-switcher" id="tenantSwitcher">
+      <button class="tenant-btn" onclick="toggleTenantMenu()" id="tenantBtn" aria-haspopup="true" aria-expanded="false" title="Alterar cliente">
+        <span class="tenant-dot"></span>
+        <span class="tenant-name">Petrobras</span>
+        <span class="tenant-chev">▾</span>
+      </button>
+      <div class="tenant-menu" id="tenantMenu" role="menu">
+        <div class="tenant-menu-label">CLIENTE ATIVO</div>
+        <div class="tenant-item current" role="menuitem">
+          <span class="tenant-item-logo tlogo-petrobras">P</span>
+          <div class="tenant-item-info">
+            <div class="tenant-item-name">Petrobras</div>
+            <div class="tenant-item-sub">Você está aqui</div>
+          </div>
+          <span class="tenant-item-check">✓</span>
+        </div>
+        <div class="tenant-menu-sep"></div>
+        <div class="tenant-menu-label">TROCAR PARA</div>
+        <a href="../sesi/" class="tenant-item" role="menuitem">
+          <span class="tenant-item-logo tlogo-sesi">S</span>
+          <div class="tenant-item-info">
+            <div class="tenant-item-name">SESI</div>
+            <div class="tenant-item-sub">Sistema dedicado</div>
+          </div>
+          <span class="tenant-item-arrow">→</span>
+        </a>
+        <a href="../metrorio/" class="tenant-item" role="menuitem">
+          <span class="tenant-item-logo tlogo-metrorio">M</span>
+          <div class="tenant-item-info">
+            <div class="tenant-item-name">Metrô Rio</div>
+            <div class="tenant-item-sub">Sistema dedicado</div>
+          </div>
+          <span class="tenant-item-arrow">→</span>
+        </a>
+        <div class="tenant-menu-sep"></div>
+        <a href="../hub.html" class="tenant-item tenant-hub" role="menuitem">
+          <span class="tenant-item-logo tlogo-hub">⌂</span>
+          <div class="tenant-item-info">
+            <div class="tenant-item-name">Voltar ao Hub</div>
+            <div class="tenant-item-sub">Tela de seleção</div>
+          </div>
+          <span class="tenant-item-arrow">→</span>
+        </a>
+      </div>
+    </div>
+
     <div class="tp-r">
       <span class="tp-date" id="topDate"></span>
       <span style="font-size:11px;color:var(--mu);margin-left:12px;opacity:.8">&middot; Sistema atualizado em 26/05/2026 às 08:33</span>
@@ -5680,6 +5867,29 @@ function toggleExportMenu(){
   if(!open){
     const close = (e)=>{ if(!document.getElementById('exportMenuWrap').contains(e.target)){ m.style.display='none'; document.removeEventListener('click',close); } };
     setTimeout(()=>document.addEventListener('click',close),0);
+  }
+}
+
+// Tenant switcher (seletor de cliente)
+function toggleTenantMenu(){
+  const menu = document.getElementById('tenantMenu');
+  const btn  = document.getElementById('tenantBtn');
+  const open = menu.classList.contains('open');
+  if(open){
+    menu.classList.remove('open');
+    btn.setAttribute('aria-expanded','false');
+  } else {
+    menu.classList.add('open');
+    btn.setAttribute('aria-expanded','true');
+    const close = (e)=>{
+      const wrap = document.getElementById('tenantSwitcher');
+      if(!wrap.contains(e.target)){
+        menu.classList.remove('open');
+        btn.setAttribute('aria-expanded','false');
+        document.removeEventListener('click', close);
+      }
+    };
+    setTimeout(()=>document.addEventListener('click', close), 0);
   }
 }
 
