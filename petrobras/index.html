@@ -1219,7 +1219,7 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
 
     <div class="tp-r">
       <span class="tp-date" id="topDate"></span>
-      <span style="font-size:11px;color:var(--mu);margin-left:12px;opacity:.8">&middot; Sistema atualizado em 28/05/2026 às 14:27</span>
+      <span style="font-size:11px;color:var(--mu);margin-left:12px;opacity:.8">&middot; Sistema atualizado em 28/05/2026 às 14:30</span>
       <div class="search-box">
         <span class="search-icon">🔍</span>
         <input id="searchInp" placeholder="Buscar projeto..." oninput="buscarGlobal(this.value)" onblur="setTimeout(()=>fecharBusca(),180)">
@@ -1673,8 +1673,8 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
 
     <!-- HISTÓRICO DE PROJETOS DELETADOS -->
     <div class="view" id="view-lixeira">
-      <div class="st" style="margin-bottom:6px">🗑️ Projetos Deletados</div>
-      <div style="font-size:12.5px;color:var(--mu);margin-bottom:20px">Histórico de projetos deletados. Apenas usuários com <strong>Liderança</strong> no nome podem deletar projetos.</div>
+      <div class="st" style="margin-bottom:6px">🗑️ Cards Deletados</div>
+      <div style="font-size:12.5px;color:var(--mu);margin-bottom:20px">Histórico de cards deletados. Apenas usuários com <strong>Liderança</strong> no nome podem deletar projetos.</div>
       <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:22px" id="lixeiraStats"></div>
       <div class="fbox" style="margin-bottom:14px">
         <div class="fbox-row" style="flex-wrap:wrap;gap:10px;align-items:flex-end">
@@ -5864,8 +5864,10 @@ function openEdit(id){
   buildRespChips(p.resps||[]);
   // Destrava após carregar os chips — buildEF vai carregar as etapas corretas do projeto
   _efEtapasLockadas = false;
-  // Carrega flag de customização do banco (true se o projeto já foi customizado antes)
-  _efEtapasCustomizadas = !!p.etapasCustomizadas;
+  // Projeto já existente COM etapas salvas: tratar como personalizado por padrão.
+  // As etapas salvas são a fonte de verdade e não devem ser sobrescritas por template,
+  // mesmo em projetos antigos que nunca tiveram a flag etapasCustomizadas gravada.
+  _efEtapasCustomizadas = !!p.etapasCustomizadas || !!(p.etapas && p.etapas.length > 0);
   buildEF(p.etapas||ETPS_DEF.map(e=>({...e,prazo:null})));
   document.getElementById('ovNew').classList.add('on');
 }
