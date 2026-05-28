@@ -1,0 +1,1034 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="author" content="Daniel David — Firjan SENAI">
+  <title>Carga Consolidada · Firjan SENAI</title>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Firebase (SDK v8 compat — mesmo padrão do sistema Petrobras) -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+
+  <style>
+    /* ═══════════════════════════════════════════════════════
+       RESET & BASE (alinhado com hub.html — dark premium)
+       ═══════════════════════════════════════════════════════ */
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    html,body{height:100%}
+    body{
+      font-family:'Plus Jakarta Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+      background:#0F0F11;
+      color:#E5E7EB;
+      min-height:100vh;
+      display:flex;
+      flex-direction:column;
+      overflow-x:hidden;
+      position:relative;
+    }
+    body::before{
+      content:'';
+      position:fixed;
+      top:-20%;
+      left:50%;
+      transform:translateX(-50%);
+      width:1200px;
+      height:600px;
+      background:radial-gradient(ellipse at center, rgba(99,102,241,.08) 0%, transparent 60%);
+      pointer-events:none;
+      z-index:0;
+    }
+
+    /* ═══════════════════════════════════════════════════════
+       HEADER
+       ═══════════════════════════════════════════════════════ */
+    .hub-header{
+      flex-shrink:0;
+      position:relative;
+      z-index:1;
+      padding:32px 32px 24px;
+    }
+    .header-top{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      max-width:1280px;
+      margin:0 auto 24px;
+      gap:14px;
+    }
+    .back-btn,.refresh-btn{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      background:rgba(255,255,255,.05);
+      backdrop-filter:blur(10px);
+      color:#E5E7EB;
+      border:1px solid rgba(255,255,255,.1);
+      padding:9px 16px;
+      border-radius:10px;
+      font-family:'Plus Jakarta Sans',sans-serif;
+      font-size:13px;
+      font-weight:600;
+      cursor:pointer;
+      text-decoration:none;
+      transition:all .2s;
+    }
+    .back-btn:hover,.refresh-btn:hover{
+      background:rgba(255,255,255,.08);
+      border-color:rgba(99,102,241,.4);
+      color:#fff;
+      transform:translateY(-1px);
+    }
+    .refresh-btn .icon{font-size:14px;display:inline-block;transition:transform .35s}
+    .refresh-btn.spinning .icon{animation:spin .8s linear infinite}
+    @keyframes spin{from{transform:rotate(0)}to{transform:rotate(360deg)}}
+
+    .header-content{
+      max-width:1280px;
+      margin:0 auto;
+      text-align:center;
+    }
+    .hub-brand{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      background:rgba(255,255,255,.05);
+      backdrop-filter:blur(10px);
+      padding:7px 16px;
+      border-radius:22px;
+      font-size:11px;
+      font-weight:700;
+      letter-spacing:1.6px;
+      text-transform:uppercase;
+      color:#A5B4FC;
+      margin-bottom:16px;
+      border:1px solid rgba(255,255,255,.08);
+    }
+    .hub-brand::before{
+      content:'';
+      width:6px;
+      height:6px;
+      border-radius:50%;
+      background:#22C55E;
+      box-shadow:0 0 8px #22C55E;
+    }
+    .hub-title{
+      font-size:38px;
+      font-weight:800;
+      line-height:1.1;
+      margin-bottom:10px;
+      color:#FFFFFF;
+      letter-spacing:-1px;
+    }
+    .hub-title-highlight{
+      background:linear-gradient(135deg,#4F46E5 0%,#6366F1 100%);
+      color:#fff;
+      padding:3px 14px;
+      border-radius:9px;
+      display:inline-block;
+      box-shadow:0 4px 14px rgba(99,102,241,.3);
+    }
+    .hub-subtitle{
+      font-size:14px;
+      color:#9CA3AF;
+      font-weight:400;
+      max-width:580px;
+      margin:0 auto;
+      line-height:1.5;
+    }
+
+    /* ═══════════════════════════════════════════════════════
+       MAIN
+       ═══════════════════════════════════════════════════════ */
+    .main-content{
+      flex:1;
+      max-width:1280px;
+      margin:0 auto 40px;
+      padding:0 32px;
+      width:100%;
+      position:relative;
+      z-index:1;
+    }
+
+    /* ═══════════════════════════════════════════════════════
+       FILTROS DE CLIENTE
+       ═══════════════════════════════════════════════════════ */
+    .filter-section{
+      background:rgba(255,255,255,.02);
+      border:1px solid rgba(255,255,255,.06);
+      border-radius:14px;
+      padding:14px 18px;
+      margin-bottom:22px;
+    }
+    .filter-row{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+    .filter-label{
+      font-size:11px;
+      font-weight:700;
+      text-transform:uppercase;
+      letter-spacing:1.4px;
+      color:#6B7280;
+      margin-right:6px;
+    }
+    .filter-chip{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:8px 14px;
+      background:rgba(255,255,255,.04);
+      border:1px solid rgba(255,255,255,.08);
+      border-radius:9px;
+      font-size:12.5px;
+      font-weight:600;
+      color:#D1D5DB;
+      cursor:pointer;
+      transition:all .15s;
+      user-select:none;
+    }
+    .filter-chip:hover:not(.disabled){
+      background:rgba(255,255,255,.07);
+      border-color:rgba(99,102,241,.4);
+      color:#fff;
+    }
+    .filter-chip.active{
+      background:linear-gradient(135deg,#4F46E5,#6366F1);
+      border-color:transparent;
+      color:#fff;
+      box-shadow:0 2px 10px rgba(99,102,241,.35);
+    }
+    .filter-chip.disabled{
+      opacity:.4;
+      cursor:not-allowed;
+      position:relative;
+    }
+    .filter-chip-dot{
+      width:8px;height:8px;border-radius:50%;
+      flex-shrink:0;
+    }
+    .filter-chip-dot.petrobras{background:#00A859;box-shadow:0 0 6px #00A859}
+    .filter-chip-dot.sesi{background:#E87420}
+    .filter-chip-dot.metrorio{background:#1E88E5}
+    .filter-chip-dot.all{background:linear-gradient(90deg,#00A859,#E87420,#1E88E5)}
+    .filter-chip-pending{
+      font-size:10px;
+      background:rgba(245,158,11,.15);
+      color:#FCD34D;
+      border:1px solid rgba(245,158,11,.3);
+      padding:2px 6px;
+      border-radius:4px;
+      font-weight:700;
+      letter-spacing:.5px;
+      text-transform:uppercase;
+    }
+
+    /* ═══════════════════════════════════════════════════════
+       KPI CARDS (topo)
+       ═══════════════════════════════════════════════════════ */
+    .kpi-grid{
+      display:grid;
+      grid-template-columns:repeat(4,1fr);
+      gap:14px;
+      margin-bottom:24px;
+    }
+    .kpi-card{
+      background:rgba(255,255,255,.03);
+      border:1px solid rgba(255,255,255,.08);
+      border-radius:14px;
+      padding:18px 20px;
+      position:relative;
+      overflow:hidden;
+      transition:all .25s;
+    }
+    .kpi-card:hover{
+      transform:translateY(-2px);
+      border-color:rgba(99,102,241,.3);
+      background:rgba(255,255,255,.05);
+    }
+    .kpi-card::before{
+      content:'';
+      position:absolute;
+      top:0;left:0;right:0;height:3px;
+      background:var(--kpi-color,#6366F1);
+    }
+    .kpi-icon{
+      position:absolute;
+      top:14px;right:14px;
+      width:34px;height:34px;
+      border-radius:9px;
+      background:var(--kpi-bg,rgba(99,102,241,.15));
+      color:var(--kpi-color,#A5B4FC);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size:15px;
+    }
+    .kpi-label{
+      font-size:10.5px;
+      color:#6B7280;
+      text-transform:uppercase;
+      letter-spacing:.7px;
+      font-weight:700;
+      margin-bottom:8px;
+      max-width:75%;
+    }
+    .kpi-value{
+      font-family:'Plus Jakarta Sans',sans-serif;
+      font-size:28px;
+      font-weight:800;
+      line-height:1;
+      letter-spacing:-.5px;
+      color:#fff;
+      margin-bottom:4px;
+    }
+    .kpi-sub{
+      font-size:11px;
+      color:#9CA3AF;
+      font-weight:500;
+    }
+
+    /* ═══════════════════════════════════════════════════════
+       LISTA DE PESSOAS (cards)
+       ═══════════════════════════════════════════════════════ */
+    .people-section-title{
+      font-size:11px;
+      font-weight:700;
+      text-transform:uppercase;
+      letter-spacing:1.6px;
+      color:#6B7280;
+      margin-bottom:14px;
+      padding-left:4px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+    }
+    .people-section-title .legend{
+      display:flex;gap:14px;font-weight:600;letter-spacing:.3px;text-transform:none;font-size:11px;color:#9CA3AF;
+    }
+    .legend-item{display:inline-flex;align-items:center;gap:5px}
+    .legend-dot{width:8px;height:8px;border-radius:50%}
+
+    .people-grid{
+      display:grid;
+      grid-template-columns:repeat(auto-fill,minmax(420px,1fr));
+      gap:14px;
+    }
+    .person-card{
+      background:rgba(255,255,255,.03);
+      border:1px solid rgba(255,255,255,.08);
+      border-radius:14px;
+      padding:18px 20px;
+      transition:all .25s;
+      position:relative;
+      overflow:hidden;
+    }
+    .person-card:hover{
+      transform:translateY(-2px);
+      border-color:rgba(99,102,241,.3);
+      background:rgba(255,255,255,.05);
+    }
+    .person-card.status-atenção::before,
+    .person-card.status-sobrecarga::before{
+      content:'';
+      position:absolute;
+      top:0;left:0;bottom:0;
+      width:3px;
+      background:var(--status-color);
+    }
+    .person-card.status-atenção{ --status-color:#EF4444; }
+    .person-card.status-sobrecarga{ --status-color:#F59E0B; }
+    .person-card.status-regular{ --status-color:#10B981; }
+    .person-card.status-leve{ --status-color:#3B82F6; }
+
+    .person-head{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      margin-bottom:14px;
+    }
+    .person-avatar{
+      width:38px;height:38px;
+      border-radius:50%;
+      background:var(--person-color,#6B7280);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      color:#fff;
+      font-weight:800;
+      font-size:14px;
+      flex-shrink:0;
+      border:2px solid rgba(255,255,255,.1);
+    }
+    .person-info{flex:1;min-width:0}
+    .person-name{
+      font-size:15px;
+      font-weight:700;
+      color:#fff;
+      line-height:1.2;
+      margin-bottom:3px;
+    }
+    .person-status{
+      display:inline-flex;
+      align-items:center;
+      gap:5px;
+      font-size:10.5px;
+      font-weight:700;
+      text-transform:uppercase;
+      letter-spacing:.5px;
+      padding:3px 8px;
+      border-radius:5px;
+    }
+    .person-status.status-atenção{background:rgba(239,68,68,.18);color:#FCA5A5}
+    .person-status.status-sobrecarga{background:rgba(245,158,11,.18);color:#FCD34D}
+    .person-status.status-regular{background:rgba(16,185,129,.18);color:#6EE7B7}
+    .person-status.status-leve{background:rgba(59,130,246,.18);color:#93C5FD}
+
+    .person-hours{
+      text-align:right;
+      flex-shrink:0;
+    }
+    .person-hours-val{
+      font-family:'Plus Jakarta Sans',sans-serif;
+      font-size:22px;
+      font-weight:800;
+      color:#fff;
+      line-height:1;
+      letter-spacing:-.5px;
+    }
+    .person-hours-max{font-size:13px;color:#6B7280;font-weight:600}
+    .person-hours-lbl{
+      font-size:10px;
+      color:#9CA3AF;
+      text-transform:uppercase;
+      letter-spacing:.5px;
+      font-weight:700;
+      margin-top:2px;
+    }
+
+    /* Bar gauge */
+    .gauge-wrap{
+      height:8px;
+      background:rgba(255,255,255,.06);
+      border-radius:4px;
+      overflow:hidden;
+      margin-bottom:14px;
+      position:relative;
+    }
+    .gauge-fill{
+      height:100%;
+      background:linear-gradient(90deg,#10B981,#34D399);
+      border-radius:4px;
+      transition:width .6s cubic-bezier(.16,1,.3,1);
+    }
+    .gauge-fill.sobrecarga{background:linear-gradient(90deg,#F59E0B,#FBBF24)}
+    .gauge-fill.atenção{background:linear-gradient(90deg,#EF4444,#F87171)}
+    .gauge-fill.leve{background:linear-gradient(90deg,#3B82F6,#60A5FA)}
+
+    /* Linha 100% (marcador) */
+    .gauge-marker{
+      position:absolute;
+      top:-2px;
+      right:0;
+      width:1px;height:12px;
+      background:rgba(255,255,255,.3);
+    }
+
+    /* Badges de cliente */
+    .client-badges{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+    }
+    .client-badge{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      padding:5px 10px;
+      border-radius:7px;
+      font-size:11.5px;
+      font-weight:700;
+      background:var(--badge-bg);
+      color:var(--badge-color);
+      border:1px solid var(--badge-border);
+    }
+    .client-badge-dot{
+      width:7px;height:7px;border-radius:50%;
+      background:var(--badge-color);
+    }
+
+    /* Empty state */
+    .empty-state{
+      text-align:center;
+      padding:60px 20px;
+      color:#6B7280;
+    }
+    .empty-state-icon{font-size:48px;opacity:.4;margin-bottom:12px}
+    .empty-state-title{font-size:15px;font-weight:700;color:#9CA3AF;margin-bottom:6px}
+    .empty-state-sub{font-size:13px}
+
+    /* Skeleton loader */
+    .skeleton-card{
+      background:rgba(255,255,255,.03);
+      border:1px solid rgba(255,255,255,.08);
+      border-radius:14px;
+      padding:18px 20px;
+      animation:pulse 1.4s ease-in-out infinite;
+    }
+    .skeleton-line{
+      background:rgba(255,255,255,.08);
+      border-radius:4px;
+      height:14px;
+      margin-bottom:10px;
+    }
+    @keyframes pulse{
+      0%,100%{opacity:1}
+      50%{opacity:.5}
+    }
+
+    .error-state{
+      background:rgba(239,68,68,.08);
+      border:1px solid rgba(239,68,68,.3);
+      border-radius:12px;
+      padding:20px;
+      color:#FCA5A5;
+      font-size:13px;
+      margin-bottom:20px;
+    }
+    .error-state strong{color:#fff}
+
+    /* ═══════════════════════════════════════════════════════
+       FOOTER
+       ═══════════════════════════════════════════════════════ */
+    .hub-footer{
+      text-align:center;
+      padding:24px;
+      font-size:11.5px;
+      color:#6B7280;
+      border-top:1px solid rgba(255,255,255,.05);
+      position:relative;
+      z-index:1;
+    }
+    .hub-footer-note{
+      margin-top:6px;
+      font-size:10.5px;
+      color:#4B5563;
+      max-width:680px;
+      margin-left:auto;
+      margin-right:auto;
+      line-height:1.5;
+    }
+
+    /* RESPONSIVO */
+    @media (max-width:900px){
+      .kpi-grid{grid-template-columns:repeat(2,1fr)}
+      .people-grid{grid-template-columns:1fr}
+    }
+    @media (max-width:640px){
+      .hub-header{padding:24px 16px 16px}
+      .header-top{margin-bottom:18px}
+      .hub-title{font-size:26px}
+      .hub-subtitle{font-size:13px}
+      .main-content{padding:0 16px}
+      .kpi-card{padding:14px 16px}
+      .kpi-value{font-size:22px}
+      .filter-row{gap:6px}
+      .filter-chip{padding:6px 10px;font-size:11.5px}
+    }
+
+    /* Animação fade-in */
+    .fade-in{ animation:fadeInUp .5s cubic-bezier(.16,1,.3,1) backwards }
+    @keyframes fadeInUp{
+      from{opacity:0;transform:translateY(10px)}
+      to{opacity:1;transform:translateY(0)}
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header class="hub-header">
+    <div class="header-top">
+      <a href="hub.html" class="back-btn">
+        <span>←</span>
+        <span>Voltar ao Hub</span>
+      </a>
+      <button class="refresh-btn" id="refreshBtn" onclick="recarregarDados()">
+        <span class="icon">⟳</span>
+        <span>Atualizar</span>
+      </button>
+    </div>
+    <div class="header-content">
+      <div class="hub-brand">Ferramenta Integrada</div>
+      <h1 class="hub-title">
+        Carga Consolidada da <span class="hub-title-highlight">Equipe</span>
+      </h1>
+      <p class="hub-subtitle">
+        Visão unificada das horas estimadas e projetos por pessoa,
+        somando todos os clientes.
+      </p>
+    </div>
+  </header>
+
+  <!-- MAIN -->
+  <main class="main-content">
+
+    <!-- Filtros -->
+    <div class="filter-section">
+      <div class="filter-row">
+        <span class="filter-label">Visualizar:</span>
+        <button class="filter-chip active" data-tenant="all" onclick="setFiltroTenant('all',this)">
+          <span class="filter-chip-dot all"></span>
+          <span>Todos os clientes</span>
+        </button>
+        <button class="filter-chip" data-tenant="petrobras" onclick="setFiltroTenant('petrobras',this)">
+          <span class="filter-chip-dot petrobras"></span>
+          <span>Petrobras</span>
+        </button>
+        <button class="filter-chip disabled" data-tenant="sesi" title="Em implantação">
+          <span class="filter-chip-dot sesi"></span>
+          <span>SESI</span>
+          <span class="filter-chip-pending">Em breve</span>
+        </button>
+        <button class="filter-chip disabled" data-tenant="metrorio" title="Em implantação">
+          <span class="filter-chip-dot metrorio"></span>
+          <span>Metrô Rio</span>
+          <span class="filter-chip-pending">Em breve</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- KPIs -->
+    <div class="kpi-grid">
+      <div class="kpi-card" style="--kpi-color:#6366F1;--kpi-bg:rgba(99,102,241,.15)">
+        <div class="kpi-icon">👥</div>
+        <div class="kpi-label">Pessoas Ativas</div>
+        <div class="kpi-value" id="kpiPessoas">—</div>
+        <div class="kpi-sub" id="kpiPessoasSub">aguardando dados</div>
+      </div>
+      <div class="kpi-card" style="--kpi-color:#10B981;--kpi-bg:rgba(16,185,129,.15)">
+        <div class="kpi-icon">📋</div>
+        <div class="kpi-label">Projetos Consolidados</div>
+        <div class="kpi-value" id="kpiProjetos">—</div>
+        <div class="kpi-sub" id="kpiProjetosSub">em todos os clientes</div>
+      </div>
+      <div class="kpi-card" style="--kpi-color:#EF4444;--kpi-bg:rgba(239,68,68,.15)">
+        <div class="kpi-icon">⚠️</div>
+        <div class="kpi-label">Projetos Atrasados</div>
+        <div class="kpi-value" id="kpiAtrasados">—</div>
+        <div class="kpi-sub" id="kpiAtrasadosSub">consolidado</div>
+      </div>
+      <div class="kpi-card" style="--kpi-color:#F59E0B;--kpi-bg:rgba(245,158,11,.15)">
+        <div class="kpi-icon">⚡</div>
+        <div class="kpi-label">Carga Média</div>
+        <div class="kpi-value" id="kpiMedia">—</div>
+        <div class="kpi-sub" id="kpiMediaSub">horas/pessoa estimadas</div>
+      </div>
+    </div>
+
+    <!-- Lista de pessoas -->
+    <div class="people-section-title">
+      <span>Pessoas · ordenadas por carga (maior carga primeiro)</span>
+      <div class="legend">
+        <span class="legend-item"><span class="legend-dot" style="background:#EF4444"></span>Atenção</span>
+        <span class="legend-item"><span class="legend-dot" style="background:#F59E0B"></span>Sobrecarga</span>
+        <span class="legend-item"><span class="legend-dot" style="background:#10B981"></span>Regular</span>
+        <span class="legend-item"><span class="legend-dot" style="background:#3B82F6"></span>Leve</span>
+      </div>
+    </div>
+
+    <div id="errorBox"></div>
+    <div id="peopleList" class="people-grid"></div>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="hub-footer">
+    © 2026 Firjan SENAI · Plataforma de Gestão EAD · Uso interno exclusivo
+    <div class="hub-footer-note">
+      ⓘ As horas exibidas são <strong>estimativas baseadas em valores genéricos por etapa</strong>.
+      Quando a equipe definir os tempos reais de cada etapa, os valores serão atualizados automaticamente.
+    </div>
+  </footer>
+
+  <!-- ═══════════════════════════════════════════════════════
+       JAVASCRIPT
+       ═══════════════════════════════════════════════════════ -->
+  <script>
+    // ═══ CONFIGURAÇÃO DE TENANTS ═══
+    // Pra adicionar SESI ou Metrô Rio depois: trocar `ativo` para true e preencher firebaseUrl
+    const TENANTS = [
+      {
+        id:'petrobras',
+        nome:'Petrobras',
+        cor:'#00A859',
+        corBadgeBg:'rgba(0,168,89,.12)',
+        corBadgeBorder:'rgba(0,168,89,.3)',
+        firebaseUrl:'https://petrobras-firjan-senai-default-rtdb.firebaseio.com',
+        firebaseAppName:'app-petrobras',
+        ativo:true,
+      },
+      {
+        id:'sesi',
+        nome:'SESI',
+        cor:'#E87420',
+        corBadgeBg:'rgba(232,116,32,.12)',
+        corBadgeBorder:'rgba(232,116,32,.3)',
+        firebaseUrl:'',  // ← preencher quando criar
+        firebaseAppName:'app-sesi',
+        ativo:false,
+      },
+      {
+        id:'metrorio',
+        nome:'Metrô Rio',
+        cor:'#1E88E5',
+        corBadgeBg:'rgba(30,136,229,.12)',
+        corBadgeBorder:'rgba(30,136,229,.3)',
+        firebaseUrl:'',  // ← preencher quando criar
+        firebaseAppName:'app-metrorio',
+        ativo:false,
+      },
+    ];
+
+    // ═══ TABELA DE HORAS POR ETAPA ═══
+    // Padrão: 8h por etapa (≈ 1 dia útil)
+    // Limite mensal: 132h
+    // Quando a equipe definir os valores reais por etapa, ir adicionando aqui.
+    // Etapas não listadas usam o padrão.
+    const HORAS_POR_ETAPA_PADRAO = 8;
+    const HORAS_MAX_MES = 132;
+    const HORAS_POR_ETAPA = {
+      // EXEMPLO (ajustar valores reais com a equipe):
+      'Homologação':                    1,
+      'Homologação no SIRH':            1,
+      'Instalação no SIRH':             1,
+      'Upload Arquivos':                1,
+      'Upload Arquivos Bdoc':           1,
+      'Reunião Inicial':                1,
+      'Material Base Recebido':         0,
+      // Etapas de cliente (revisão/validação) — geralmente sem tempo da equipe
+      // mas continuam mostradas se atribuídas
+    };
+
+    // ═══ CORES POR PESSOA (alinhado com sistema Petrobras) ═══
+    const NOME_CORES = {
+      'Tatiana':'#b45309','Thiago':'#7C3AED','Simone':'#4169E1','Mariana':'#0891B2',
+      'Mateus':'#7e22ce','Liderança Julia':'#D97706','Liderança Maria Emilia':'#EC4899',
+      'Liderança Marise':'#0f766e','Fatima':'#E8002D','Liderança Fabiana':'#1A8A4A',
+      'Daniel':'#003DA5','Claudio':'#6D28D9','Ana Paula':'#c2410c','Patricia':'#0d9488',
+    };
+
+    // ═══ ESTADO GLOBAL ═══
+    let dadosTenants = {};  // { petrobras: [projetos...], sesi: [...] }
+    let filtroAtual = 'all';
+
+    // ═══ INICIALIZAÇÃO ═══
+    function gerarSkeleton(){
+      const lista = document.getElementById('peopleList');
+      lista.innerHTML = Array.from({length:6}).map(() => `
+        <div class="skeleton-card">
+          <div class="skeleton-line" style="width:40%"></div>
+          <div class="skeleton-line" style="width:90%;height:8px"></div>
+          <div class="skeleton-line" style="width:70%"></div>
+        </div>
+      `).join('');
+    }
+
+    // ═══ LÓGICA DE CÁLCULO ═══
+
+    // Retorna a etapa atual em aberto de um projeto (mesma lógica do sistema)
+    function etapaAtual(projeto){
+      const etapas = projeto.etapas || [];
+      // Etapas sem prazo (Reunião Inicial / Material Base Recebido) ainda contam
+      for(const e of etapas){
+        if(!e.done) return e;
+      }
+      return null;
+    }
+
+    // Retorna horas estimadas pra uma etapa
+    function horasEtapa(labelEtapa){
+      if(!labelEtapa) return HORAS_POR_ETAPA_PADRAO;
+      if(labelEtapa in HORAS_POR_ETAPA) return HORAS_POR_ETAPA[labelEtapa];
+      return HORAS_POR_ETAPA_PADRAO;
+    }
+
+    // Verifica se um projeto está ativo (não cancelado, não concluído)
+    function isProjetoAtivo(p){
+      if(p.cancelado) return false;
+      if((p.col || 0) >= 14) return false;
+      if((p.pct || 0) >= 100) return false;
+      return true;
+    }
+
+    // Verifica se está atrasado (prazo passado e não concluído)
+    function isProjetoAtrasado(p){
+      if(!isProjetoAtivo(p)) return false;
+      if(!p.prazo) return false;
+      const hoje = new Date().toISOString().slice(0,10);
+      return p.prazo < hoje;
+    }
+
+    // Verifica se a etapa atual está com a pessoa (não com cliente)
+    function etapaAtualEhDaPessoa(etapa, nomePessoa){
+      if(!etapa) return false;
+      const r = etapa.r || '';
+      if(r === 'cl') return false; // cliente
+      if(r === 'eq') return true;  // equipe genérica = qualquer membro
+      return r === nomePessoa;
+    }
+
+    // Calcula carga consolidada por pessoa
+    function calcularCargas(tenantsAtivos){
+      // pessoa → { totalHoras, projetos: [{tenant, projeto, etapa, horas}] }
+      const pessoas = {};
+
+      tenantsAtivos.forEach(tenantId => {
+        const projetos = dadosTenants[tenantId] || [];
+        projetos.forEach(p => {
+          if(!isProjetoAtivo(p)) return;
+          const etapa = etapaAtual(p);
+          if(!etapa) return;
+
+          // Resolver quem responde pela etapa atual
+          let responsaveis = [];
+          if(etapa.r === 'cl') return; // etapa de cliente — não conta
+          if(etapa.r === 'eq' || !etapa.r){
+            // "equipe" genérica → todos os resps do projeto
+            responsaveis = p.resps || [];
+          } else {
+            // pessoa específica
+            responsaveis = [etapa.r];
+          }
+
+          const h = horasEtapa(etapa.lb);
+          if(h <= 0) return; // etapa sem horas (ex: Material Base Recebido)
+
+          responsaveis.forEach(nome => {
+            if(!nome) return;
+            if(!pessoas[nome]){
+              pessoas[nome] = {
+                nome,
+                totalHoras:0,
+                porTenant:{},  // { petrobras: 24, sesi: 8 }
+                projetos:[],
+                atrasados:0,
+              };
+            }
+            pessoas[nome].totalHoras += h;
+            pessoas[nome].porTenant[tenantId] = (pessoas[nome].porTenant[tenantId]||0) + h;
+            pessoas[nome].projetos.push({
+              tenant:tenantId,
+              nome:p.nome,
+              etapaLabel:etapa.lb,
+              horas:h,
+            });
+            if(isProjetoAtrasado(p)){
+              pessoas[nome].atrasados++;
+            }
+          });
+        });
+      });
+
+      return Object.values(pessoas);
+    }
+
+    // Determina status baseado em horas + atrasos
+    function statusPessoa(p){
+      // Ordem: Atenção > Sobrecarga > Regular > Leve
+      if(p.atrasados > 0) return 'atenção';
+      if(p.totalHoras > HORAS_MAX_MES) return 'sobrecarga';
+      if(p.totalHoras >= HORAS_MAX_MES * 0.6) return 'regular';
+      return 'leve';
+    }
+
+    function statusLabel(s){
+      return {'atenção':'Atenção','sobrecarga':'Sobrecarga','regular':'Regular','leve':'Carga Leve'}[s] || s;
+    }
+
+    // ═══ RENDERIZAÇÃO ═══
+
+    function tenantsAtivosFiltro(){
+      if(filtroAtual === 'all') return TENANTS.filter(t => t.ativo).map(t => t.id);
+      return [filtroAtual];
+    }
+
+    function renderizar(){
+      const tenantsIds = tenantsAtivosFiltro();
+      const pessoas = calcularCargas(tenantsIds);
+
+      // Ordenar: maior carga primeiro
+      pessoas.sort((a,b) => b.totalHoras - a.totalHoras);
+
+      // ═══ KPIs ═══
+      const totalPessoas = pessoas.length;
+      const totalProjetos = tenantsIds.reduce((sum, tid) => {
+        const projs = (dadosTenants[tid] || []).filter(isProjetoAtivo);
+        return sum + projs.length;
+      }, 0);
+      const totalAtrasados = tenantsIds.reduce((sum, tid) => {
+        const projs = (dadosTenants[tid] || []).filter(isProjetoAtrasado);
+        return sum + projs.length;
+      }, 0);
+      const cargaMedia = totalPessoas > 0
+        ? Math.round(pessoas.reduce((s,p) => s+p.totalHoras, 0) / totalPessoas)
+        : 0;
+
+      document.getElementById('kpiPessoas').textContent = totalPessoas;
+      document.getElementById('kpiPessoasSub').textContent = totalPessoas === 1 ? 'pessoa com etapa atual' : 'pessoas com etapa atual';
+      document.getElementById('kpiProjetos').textContent = totalProjetos;
+      document.getElementById('kpiAtrasados').textContent = totalAtrasados;
+      document.getElementById('kpiMedia').textContent = cargaMedia + 'h';
+      document.getElementById('kpiMediaSub').textContent = `de ${HORAS_MAX_MES}h máx mensais`;
+
+      // ═══ LISTA DE PESSOAS ═══
+      const lista = document.getElementById('peopleList');
+      if(pessoas.length === 0){
+        lista.innerHTML = `
+          <div class="empty-state" style="grid-column:1/-1">
+            <div class="empty-state-icon">👥</div>
+            <div class="empty-state-title">Nenhuma pessoa com etapas em aberto</div>
+            <div class="empty-state-sub">Quando houver projetos ativos com etapas atribuídas, eles aparecerão aqui.</div>
+          </div>`;
+        return;
+      }
+
+      // Máximo de horas pra dimensionar a barra
+      const maxHoras = Math.max(...pessoas.map(p => p.totalHoras), HORAS_MAX_MES);
+
+      lista.innerHTML = pessoas.map((p, idx) => {
+        const status = statusPessoa(p);
+        const iniciais = p.nome.split(/\s+/).map(s => s[0]).join('').slice(0,2).toUpperCase();
+        const cor = NOME_CORES[p.nome] || '#6B7280';
+        const pctBarra = Math.min(100, Math.round((p.totalHoras / HORAS_MAX_MES) * 100));
+
+        const badges = TENANTS.filter(t => p.porTenant[t.id] > 0).map(t => `
+          <span class="client-badge" style="--badge-bg:${t.corBadgeBg};--badge-color:${t.cor};--badge-border:${t.corBadgeBorder}">
+            <span class="client-badge-dot"></span>
+            <span>${p.porTenant[t.id]}h ${t.nome}</span>
+          </span>
+        `).join('');
+
+        return `
+          <div class="person-card status-${status} fade-in" style="animation-delay:${idx*0.04}s">
+            <div class="person-head">
+              <div class="person-avatar" style="--person-color:${cor}">${iniciais}</div>
+              <div class="person-info">
+                <div class="person-name">${escapeHtml(p.nome)}</div>
+                <span class="person-status status-${status}">${statusLabel(status)}</span>
+              </div>
+              <div class="person-hours">
+                <div>
+                  <span class="person-hours-val">${p.totalHoras}h</span>
+                  <span class="person-hours-max"> / ${HORAS_MAX_MES}h</span>
+                </div>
+                <div class="person-hours-lbl">${pctBarra}% do limite</div>
+              </div>
+            </div>
+            <div class="gauge-wrap">
+              <div class="gauge-fill ${status}" style="width:${pctBarra}%"></div>
+              <div class="gauge-marker" style="right:0"></div>
+            </div>
+            <div class="client-badges">
+              ${badges}
+              ${p.atrasados > 0 ? `
+                <span class="client-badge" style="--badge-bg:rgba(239,68,68,.15);--badge-color:#FCA5A5;--badge-border:rgba(239,68,68,.3)">
+                  <span class="client-badge-dot"></span>
+                  <span>${p.atrasados} atrasado${p.atrasados>1?'s':''}</span>
+                </span>
+              ` : ''}
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function escapeHtml(s){
+      return String(s||'').replace(/[&<>"']/g, c => ({
+        '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+      }[c]));
+    }
+
+    // ═══ FIREBASE ═══
+
+    function inicializarFirebase(tenant){
+      try {
+        const config = {databaseURL: tenant.firebaseUrl};
+        return firebase.initializeApp(config, tenant.firebaseAppName);
+      } catch(e){
+        console.error('Erro inicializando Firebase para', tenant.id, e);
+        return null;
+      }
+    }
+
+    function lerTenant(tenant){
+      return new Promise(resolve => {
+        const app = inicializarFirebase(tenant);
+        if(!app){ resolve([]); return; }
+        const db = app.database();
+        db.ref('projetos').once('value')
+          .then(snap => {
+            const val = snap.val() || {};
+            const projetos = Object.entries(val).map(([id, p]) => ({...p, _id:id}));
+            resolve(projetos);
+          })
+          .catch(err => {
+            console.error('Erro lendo', tenant.id, err);
+            mostrarErro(`Não foi possível ler dados de ${tenant.nome}. Verifique permissões.`);
+            resolve([]);
+          });
+      });
+    }
+
+    function mostrarErro(msg){
+      const box = document.getElementById('errorBox');
+      box.innerHTML = `<div class="error-state"><strong>⚠️ Atenção</strong><br>${msg}</div>`;
+    }
+
+    function limparErro(){
+      document.getElementById('errorBox').innerHTML = '';
+    }
+
+    async function carregarTodos(){
+      limparErro();
+      gerarSkeleton();
+      const ativos = TENANTS.filter(t => t.ativo && t.firebaseUrl);
+      const promessas = ativos.map(t =>
+        lerTenant(t).then(projetos => {
+          dadosTenants[t.id] = projetos;
+        })
+      );
+      await Promise.all(promessas);
+      renderizar();
+    }
+
+    function setFiltroTenant(tenantId, btn){
+      filtroAtual = tenantId;
+      document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+      btn.classList.add('active');
+      renderizar();
+    }
+
+    async function recarregarDados(){
+      const btn = document.getElementById('refreshBtn');
+      btn.classList.add('spinning');
+      btn.disabled = true;
+      try {
+        await carregarTodos();
+      } finally {
+        setTimeout(() => {
+          btn.classList.remove('spinning');
+          btn.disabled = false;
+        }, 600);
+      }
+    }
+
+    // Inicializa ao carregar a página
+    document.addEventListener('DOMContentLoaded', carregarTodos);
+
+  </script>
+</body>
+</html>
