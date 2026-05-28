@@ -9149,7 +9149,9 @@ function rHistorico(){
   // populate user filter
   const uSel = document.getElementById('histFiltUser');
   if(uSel){
-    const allUsers = [...new Set(todos.flatMap(p => (p.historico||[]).map(h => h.usuario)))].sort();
+    const usersHist = todos.flatMap(p => (p.historico||[]).map(h => h.usuario));
+    const usersDel  = LIXEIRA.map(l => l.usuario);
+    const allUsers = [...new Set([...usersHist, ...usersDel].filter(Boolean))].sort();
     const cur = uSel.value;
     uSel.innerHTML = '<option value="">Todos</option>' + allUsers.map(u =>
       `<option value="${u}" ${u===cur?'selected':''}>${u}</option>`).join('');
@@ -9164,34 +9166,19 @@ function rHistorico(){
     });
   });
 
-  // Buscar log_delecoes do Firebase e re-renderizar após
-  if(fbLogRef && (!filtAcao || filtAcao === 'deletou projeto')){
-    fbLogRef.once('value', snap => {
-      const delRows = [];
-      snap.forEach(child => {
-        const l = child.val();
-        if(filtUser && l.usuario !== filtUser) return;
-        delRows.push({
-          usuario:  l.usuario||'desconhecido',
-          acao:     'deletou projeto',
-          dt:       l.ts||'',
-          desc:     l.desc||'',
-          projId:   null,
-          projNome: l.nome||'(projeto removido)',
-        });
+  // Projetos deletados: ler de LIXEIRA (já sincronizada pelo listener do log_delecoes).
+  // Leitura SÍNCRONA — evita condição de corrida que fazia os deletados sumirem.
+  if(!filtAcao || filtAcao === 'deletou projeto'){
+    LIXEIRA.forEach(l => {
+      if(filtUser && l.usuario !== filtUser) return;
+      rows.push({
+        usuario:  l.usuario||'desconhecido',
+        acao:     'deletou projeto',
+        dt:       l.ts||'',
+        desc:     l.desc||'',
+        projId:   null,
+        projNome: l.nome||'(projeto removido)',
       });
-      if(delRows.length){
-        // Mesclar e re-renderizar
-        const toMs = dt => {
-          if(!dt) return 0;
-          if(dt.includes('T') || (dt.includes('-') && !dt.includes('/'))) return new Date(dt).getTime();
-          const [datePart, timePart=''] = dt.split(', ');
-          const [d,m,y] = datePart.split('/');
-          return new Date(`${y}-${m}-${d}T${timePart||'00:00'}:00`).getTime();
-        };
-        const allRows = [...rows, ...delRows].sort((a,b)=>toMs(b.dt)-toMs(a.dt));
-        _renderHistRows(el, allRows);
-      }
     });
   }
   rows.sort((a,b) => {
