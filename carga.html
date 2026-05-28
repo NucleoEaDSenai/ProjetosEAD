@@ -672,7 +672,22 @@
       </div>
     </div>
 
-    <!-- KPIs -->
+    <!-- Controles de estimativa -->
+    <div class="filter-section" style="margin-top:-8px">
+      <div class="filter-row" style="justify-content:space-between">
+        <div class="filter-row" style="gap:10px">
+          <span class="filter-label">Dedicação:</span>
+          <span style="font-size:12.5px;color:#9CA3AF">horas efetivas por dia útil de etapa</span>
+        </div>
+        <div class="filter-row" style="gap:14px">
+          <input type="range" id="dedicSlider" min="2" max="8" step="0.5" value="6"
+                 style="width:200px;accent-color:#6366F1;cursor:pointer"
+                 oninput="setDedicacao(this.value)">
+          <span id="dedicValor"
+                style="font-size:14px;font-weight:700;color:#A5B4FC;min-width:42px;text-align:right">6h</span>
+        </div>
+      </div>
+    </div>
     <div class="kpi-grid">
       <div class="kpi-card" style="--kpi-color:#6366F1;--kpi-bg:rgba(99,102,241,.15)">
         <div class="kpi-icon">👥</div>
@@ -719,8 +734,8 @@
   <footer class="hub-footer">
     © 2026 Firjan SENAI · Plataforma de Gestão EAD · Uso interno exclusivo
     <div class="hub-footer-note">
-      ⓘ As horas exibidas são <strong>estimativas baseadas em valores genéricos por etapa</strong>.
-      Quando a equipe definir os tempos reais de cada etapa, os valores serão atualizados automaticamente.
+      ⓘ As horas exibidas são <strong>estimativas baseadas nos dias úteis por etapa do template de métricas</strong>,
+      ajustadas pela dedicação diária e pela complexidade de cada projeto. Etapas sob responsabilidade do cliente não contam como carga da equipe.
     </div>
   </footer>
 
@@ -763,25 +778,125 @@
       },
     ];
 
-    // ═══ TABELA DE HORAS POR ETAPA ═══
-    // Padrão: 8h por etapa (≈ 1 dia útil)
-    // Limite mensal: 132h
-    // Quando a equipe definir os valores reais por etapa, ir adicionando aqui.
-    // Etapas não listadas usam o padrão.
-    const HORAS_POR_ETAPA_PADRAO = 8;
-    const HORAS_MAX_MES = 132;
-    const HORAS_POR_ETAPA = {
-      // EXEMPLO (ajustar valores reais com a equipe):
-      'Homologação':                    1,
-      'Homologação no SIRH':            1,
-      'Instalação no SIRH':             1,
-      'Upload Arquivos':                1,
-      'Upload Arquivos Bdoc':           1,
-      'Reunião Inicial':                1,
-      'Material Base Recebido':         0,
-      // Etapas de cliente (revisão/validação) — geralmente sem tempo da equipe
-      // mas continuam mostradas se atribuídas
+    // ═══════════════════════════════════════════════════════════════
+    //  MODELO DE CARGA — baseado no Petrobras_Métricas_Planner.xlsx
+    //  A planilha define DIAS ÚTEIS por etapa, e esses valores MUDAM
+    //  conforme o TIPO DE PRODUTO. A carga em horas é calculada como:
+    //
+    //     horas = dias_úteis[tipo][etapa] × HORAS_POR_DIA × fatorProjeto
+    //
+    //  - HORAS_POR_DIA: dedicação ajustável (controle na tela).
+    //  - fatorProjeto:  multiplicador por projeto (1.0 = igual ao template;
+    //                   <1 projeto mais simples, >1 mais complexo).
+    //  Etapas de cliente (validação/entrega) = 0h para a equipe.
+    // ═══════════════════════════════════════════════════════════════
+
+    // Controles ajustáveis (persistidos em memória; default sensato)
+    let HORAS_POR_DIA = 6;      // horas efetivas por dia útil de etapa
+    const HORAS_MAX_MES = 132;  // teto de referência (~22 dias úteis × 6h)
+
+    // Tipos de produto reconhecidos
+    const TIPO_ENCAP = 'Encapsulamento';
+    const TIPO_BASICO = 'Web Básico';
+    const TIPO_INTER  = 'Web Intermediário';
+    const TIPO_AVANC  = 'Web Avançado';
+    const TIPO_PADRAO = TIPO_BASICO; // fallback se não detectar
+
+    // Etapas de cliente → 0h para a equipe (resposta: "tempo do cliente")
+    const ETAPAS_CLIENTE = new Set([
+      'Validação PICV DI/DM Referência',
+      'Validação LD',
+      'Validação final do PICV',
+      'Validação DI Referência',
+      'Validação DM Referência',
+      'Validação final do review',
+      'Entrega do PICV ao cliente',
+      'Entrega do review ao cliente',
+    ]);
+
+    // ═══ MATRIZ DIAS ÚTEIS POR ETAPA × TIPO DE PRODUTO ═══
+    // Transcrita da aba "Métricas" da planilha. Etapas de cliente
+    // ficam zeradas via ETAPAS_CLIENTE acima, mesmo que tenham dias na planilha.
+    const DIAS_POR_ETAPA = {
+      [TIPO_ENCAP]: {
+        'Entrega do review ao cliente': 5,
+        'Solicitação de ajustes': 3,
+        'Implementação de ajustes': 3,
+        'Validação final do review': 1,
+        'Homologação': 3,
+        'Instalação no SIRH': 2,
+        'Upload Arquivos Bdoc': 7,
+      },
+      [TIPO_BASICO]: {
+        'Análise do material base': 2,
+        'Elaboração do PICV': 7,
+        'Validação PICV DI/DM Referência': 3,
+        'Validação LD': 2,
+        'Revisão textual do PICV': 1,
+        'Entrega do PICV ao cliente': 1,
+        'Solicitação de ajustes no PICV': 2,
+        'Implementação de ajustes': 2,
+        'Validação final do PICV': 1,
+        'Desenho/roteirização do onepage': 5,
+        'Validação DI Referência': 3,
+        'Produção de recursos gráficos': 2,
+        'Validação DM Referência': 2,
+        'Entrega do review ao cliente': 1,
+        'Solicitação de ajustes': 3,
+        'Validação final do review': 1,
+        'Revisão textual do review': 2,
+        'Homologação': 3,
+        'Instalação no SIRH': 2,
+        'Upload Arquivos Bdoc': 7,
+      },
+      [TIPO_INTER]: {
+        'Análise do material base': 5,
+        'Elaboração do PICV': 7,
+        'Validação PICV DI/DM Referência': 3,
+        'Validação LD': 2,
+        'Revisão textual do PICV': 1,
+        'Entrega do PICV ao cliente': 1,
+        'Solicitação de ajustes no PICV': 2,
+        'Implementação de ajustes': 2,
+        'Validação final do PICV': 1,
+        'Desenho/roteirização do onepage': 10,
+        'Validação DI Referência': 3,
+        'Produção de recursos gráficos': 8,
+        'Validação DM Referência': 3,
+        'Entrega do review ao cliente': 1,
+        'Solicitação de ajustes': 3,
+        'Validação final do review': 1,
+        'Revisão textual do review': 3,
+        'Homologação': 3,
+        'Instalação no SIRH': 2,
+        'Upload Arquivos Bdoc': 7,
+      },
+      [TIPO_AVANC]: {
+        'Análise do material base': 7,
+        'Elaboração do PICV': 7,
+        'Validação PICV DI/DM Referência': 3,
+        'Validação LD': 2,
+        'Revisão textual do PICV': 1,
+        'Entrega do PICV ao cliente': 1,
+        'Solicitação de ajustes no PICV': 2,
+        'Implementação de ajustes': 2,
+        'Validação final do PICV': 1,
+        'Desenho/roteirização do onepage': 15,
+        'Validação DI Referência': 3,
+        'Produção de recursos gráficos': 16,
+        'Validação DM Referência': 3,
+        'Entrega do review ao cliente': 1,
+        'Solicitação de ajustes': 3,
+        'Validação final do review': 1,
+        'Revisão textual do review': 4,
+        'Homologação': 3,
+        'Instalação no SIRH': 2,
+        'Upload Arquivos Bdoc': 7,
+      },
     };
+
+    // Dias padrão p/ etapa não mapeada (raro): mediana conservadora
+    const DIAS_PADRAO = 2;
 
     // ═══ CORES POR PESSOA (alinhado com sistema Petrobras) ═══
     const NOME_CORES = {
@@ -819,11 +934,46 @@
       return null;
     }
 
-    // Retorna horas estimadas pra uma etapa
-    function horasEtapa(labelEtapa){
-      if(!labelEtapa) return HORAS_POR_ETAPA_PADRAO;
-      if(labelEtapa in HORAS_POR_ETAPA) return HORAS_POR_ETAPA[labelEtapa];
-      return HORAS_POR_ETAPA_PADRAO;
+    // Detecta o tipo de produto de um projeto.
+    // 1º tenta campos prováveis gravados no Firebase;
+    // 2º infere pelo nº de etapas (Encapsulamento ~8; Web 20+) e
+    //    pela presença de etapas exclusivas (ex.: "Elaboração do PICV").
+    function tipoProduto(p){
+      const candidatos = [p.tipo, p.tipoProduto, p.produto, p.trilha, p.categoria, p.complexidade];
+      const bruto = (candidatos.find(v => typeof v === 'string' && v.trim()) || '').toLowerCase();
+      if(bruto){
+        if(bruto.includes('encap'))                       return TIPO_ENCAP;
+        if(bruto.includes('avanç') || bruto.includes('avanc')) return TIPO_AVANC;
+        if(bruto.includes('inter'))                        return TIPO_INTER;
+        if(bruto.includes('básic') || bruto.includes('basic')) return TIPO_BASICO;
+      }
+      // Inferência por estrutura de etapas
+      const etapas = (p.etapas || []).map(e => (e.lb || '').trim());
+      const ehWeb = etapas.some(l => l === 'Elaboração do PICV' || l === 'Desenho/roteirização do onepage');
+      if(!ehWeb) return TIPO_ENCAP;
+      // distingue B/I/A pelo peso de "Produção de recursos gráficos" (2/8/16)
+      // — sem dado salvo, assume Básico (mais conservador)
+      return TIPO_PADRAO;
+    }
+
+    // Fator de complexidade por projeto (singularidade).
+    // Lê p.fatorCarga se existir; senão 1.0. Aceita 0.5–2.0.
+    function fatorProjeto(p){
+      const f = Number(p.fatorCarga ?? p.fator ?? 1);
+      if(!isFinite(f) || f <= 0) return 1;
+      return Math.min(2, Math.max(0.5, f));
+    }
+
+    // Retorna horas estimadas pra uma etapa, considerando o projeto inteiro
+    function horasEtapa(labelEtapa, projeto){
+      const lb = (labelEtapa || '').trim();
+      if(!lb) return 0;
+      if(ETAPAS_CLIENTE.has(lb)) return 0;            // tempo do cliente → 0h equipe
+      const tipo = tipoProduto(projeto);
+      const tabela = DIAS_POR_ETAPA[tipo] || DIAS_POR_ETAPA[TIPO_PADRAO];
+      const dias = (lb in tabela) ? tabela[lb] : DIAS_PADRAO;
+      const horas = dias * HORAS_POR_DIA * fatorProjeto(projeto);
+      return Math.round(horas);
     }
 
     // Verifica se um projeto está ativo (não cancelado, não concluído)
@@ -874,7 +1024,7 @@
             responsaveis = [etapa.r];
           }
 
-          const h = horasEtapa(etapa.lb);
+          const h = horasEtapa(etapa.lb, p);
           if(h <= 0) return; // etapa sem horas (ex: Material Base Recebido)
 
           responsaveis.forEach(nome => {
@@ -1078,6 +1228,12 @@
       filtroAtual = tenantId;
       document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
       btn.classList.add('active');
+      renderizar();
+    }
+
+    function setDedicacao(valor){
+      HORAS_POR_DIA = Number(valor);
+      document.getElementById('dedicValor').textContent = valor + 'h';
       renderizar();
     }
 
