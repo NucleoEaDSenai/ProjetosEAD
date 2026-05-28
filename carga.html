@@ -530,9 +530,95 @@
       from{opacity:0;transform:translateY(10px)}
       to{opacity:1;transform:translateY(0)}
     }
+
+    /* ═══════════════════════════════════════════════════════
+       MODAL DE AVISO (estimativas)
+       ═══════════════════════════════════════════════════════ */
+    .modal-overlay{
+      position:fixed;
+      inset:0;
+      background:rgba(10,10,12,.75);
+      backdrop-filter:blur(6px);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      z-index:9999;
+      padding:20px;
+      opacity:0;
+      visibility:hidden;
+      transition:opacity .25s, visibility .25s;
+    }
+    .modal-overlay.open{opacity:1;visibility:visible}
+    .modal-box{
+      background:linear-gradient(160deg,#1A1A1F 0%,#141417 100%);
+      border:1px solid rgba(255,255,255,.1);
+      border-radius:18px;
+      max-width:460px;
+      width:100%;
+      padding:32px 30px 26px;
+      text-align:center;
+      box-shadow:0 24px 60px rgba(0,0,0,.5);
+      transform:translateY(16px) scale(.97);
+      transition:transform .3s cubic-bezier(.16,1,.3,1);
+    }
+    .modal-overlay.open .modal-box{transform:translateY(0) scale(1)}
+    .modal-icon{
+      width:60px;height:60px;
+      border-radius:16px;
+      background:linear-gradient(135deg,rgba(99,102,241,.2),rgba(79,70,229,.15));
+      border:1px solid rgba(99,102,241,.3);
+      display:flex;align-items:center;justify-content:center;
+      font-size:28px;
+      margin:0 auto 18px;
+    }
+    .modal-title{
+      font-size:19px;
+      font-weight:800;
+      color:#fff;
+      margin-bottom:12px;
+      letter-spacing:-.3px;
+    }
+    .modal-text{
+      font-size:14px;
+      color:#B8BCC8;
+      line-height:1.6;
+      margin-bottom:24px;
+    }
+    .modal-text strong{color:#E5E7EB;font-weight:700}
+    .modal-btn{
+      background:linear-gradient(135deg,#4F46E5,#6366F1);
+      color:#fff;
+      border:none;
+      padding:12px 32px;
+      border-radius:10px;
+      font-family:'Plus Jakarta Sans',sans-serif;
+      font-size:14px;
+      font-weight:700;
+      cursor:pointer;
+      transition:all .2s;
+      width:100%;
+    }
+    .modal-btn:hover{
+      background:linear-gradient(135deg,#4338CA,#4F46E5);
+      transform:translateY(-1px);
+      box-shadow:0 6px 18px rgba(99,102,241,.4);
+    }
   </style>
 </head>
 <body>
+
+  <!-- MODAL DE AVISO (aparece ao carregar a página) -->
+  <div class="modal-overlay" id="avisoModal">
+    <div class="modal-box">
+      <div class="modal-icon">⏱️</div>
+      <div class="modal-title">Sobre os valores de carga horária</div>
+      <div class="modal-text">
+        As horas exibidas são <strong>estimativas baseadas em valores genéricos por etapa</strong>.
+        Quando a equipe definir os tempos reais de cada etapa, os valores serão atualizados automaticamente.
+      </div>
+      <button class="modal-btn" onclick="fecharAviso()">Entendi</button>
+    </div>
+  </div>
 
   <!-- HEADER -->
   <header class="hub-header">
@@ -1009,8 +1095,26 @@
       }
     }
 
+    // ═══ MODAL DE AVISO ═══
+    function abrirAviso(){
+      document.getElementById('avisoModal').classList.add('open');
+    }
+    function fecharAviso(){
+      document.getElementById('avisoModal').classList.remove('open');
+    }
+    // Fecha ao clicar fora da caixa ou apertar ESC
+    document.addEventListener('click', e => {
+      if(e.target.id === 'avisoModal') fecharAviso();
+    });
+    document.addEventListener('keydown', e => {
+      if(e.key === 'Escape') fecharAviso();
+    });
+
     // Inicializa ao carregar a página
-    document.addEventListener('DOMContentLoaded', carregarTodos);
+    document.addEventListener('DOMContentLoaded', () => {
+      abrirAviso();      // mostra o aviso toda vez que abre a página
+      carregarTodos();
+    });
 
   </script>
 </body>
