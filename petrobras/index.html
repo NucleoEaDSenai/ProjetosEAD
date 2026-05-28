@@ -1146,6 +1146,7 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
         <div class="si" role="menuitem" tabindex="0" aria-label="Relatório de Atrasos" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();nav('atrasos')}" onclick="nav('atrasos')"><span class="si-ic">⚠️</span><span>Rel. de Atrasos</span><span class="si-badge" id="badgeAtrasos" style="display:none"></span></div>
         <div class="si" role="menuitem" tabindex="0" aria-label="Medição" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();nav('medicao')}" onclick="nav('medicao')"><span class="si-ic">📐</span><span>Medição</span><span class="si-badge" id="badgeMedicao" style="display:none"></span></div>
         <div class="si" role="menuitem" tabindex="0" aria-label="Projetos Cancelados" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();nav('cancelados')}" onclick="nav('cancelados')"><span class="si-ic">🚫</span><span>Cancelados</span></div>
+        <div class="si" role="menuitem" tabindex="0" aria-label="Histórico de Projetos Deletados" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();nav('lixeira')}" onclick="nav('lixeira')"><span class="si-ic">🗑️</span><span>Deletados</span></div>
       </div>
     </div>
 
@@ -1670,6 +1671,17 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
       </table></div>
     </div>
 
+    <!-- HISTÓRICO DE PROJETOS DELETADOS -->
+    <div class="view" id="view-lixeira">
+      <div class="st" style="margin-bottom:6px">🗑️ Projetos Deletados</div>
+      <div style="font-size:12.5px;color:var(--mu);margin-bottom:20px">Histórico de projetos deletados. Apenas usuários com <strong>Liderança</strong> no nome podem deletar projetos.</div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:22px" id="lixeiraStats"></div>
+      <div class="tw"><table>
+        <thead><tr><th>Projeto</th><th>Deletado em</th><th>Deletado por</th><th>Motivo da exclusão</th></tr></thead>
+        <tbody id="lixeiraTbl"></tbody>
+      </table></div>
+    </div>
+
     <!-- MEDIÇÃO -->
     <div class="view" id="view-medicao">
       <div class="st" style="margin-bottom:6px">📐 Medição</div>
@@ -1961,6 +1973,21 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
   <div class="mft">
     <button class="btn bg2" onclick="cm('ovCanc')">Voltar</button>
     <button class="btn bgray" onclick="confirmarCanc()">🚫 Confirmar Cancelamento</button>
+  </div>
+</div>
+</div>
+
+<!-- MODAL: motivo de exclusão (lixeira) -->
+<div class="ov2" id="ovDelMotivo" role="dialog" aria-modal="true" aria-label="Deletar projeto">
+<div class="modal" style="width:440px">
+  <div class="mhd"><div class="mt">🗑️ Deletar Projeto</div><button class="mcl" onclick="cm('ovDelMotivo')">✕</button></div>
+  <div class="mbody">
+    <p style="margin-bottom:14px;color:var(--mu);font-size:13px">O projeto será removido do quadro e enviado para a <strong>Lixeira</strong>, onde poderá ser consultado ou restaurado.</p>
+    <div class="fg"><label class="fl">Motivo da exclusão <span style="color:var(--red)">*</span></label><textarea class="fta" id="fDelMotivo" placeholder="Descreva por que este projeto está sendo deletado..." style="min-height:90px"></textarea></div>
+  </div>
+  <div class="mft">
+    <button class="btn bg2" onclick="cm('ovDelMotivo')">Voltar</button>
+    <button class="btn bd" onclick="confirmarDelMotivo()">🗑️ Confirmar Exclusão</button>
   </div>
 </div>
 </div>
@@ -2526,7 +2553,7 @@ let DB=[];
 let NXT=1, editId=null, cancId=null, dragId=null;
 
 // ── NAV ──
-const PT={kanban:'Quadro Kanban',homologacoes:'Homologações',projetos:'Lista de Projetos',timeline:'Cronograma',kpis:'KPIs & Indicadores',atrasos:'Relatório de Atrasos',cancelados:'Projetos Cancelados',medicao:'Medição',carga:'Carga da Equipe',historico:'Histórico de Edições'};
+const PT={kanban:'Quadro Kanban',homologacoes:'Homologações',projetos:'Lista de Projetos',timeline:'Cronograma',kpis:'KPIs & Indicadores',atrasos:'Relatório de Atrasos',cancelados:'Projetos Cancelados',medicao:'Medição',carga:'Carga da Equipe',historico:'Histórico de Edições',lixeira:'Projetos Deletados'};
 function nav(id){
   document.querySelectorAll('.view').forEach(v=>v.classList.remove('on'));
   document.getElementById('view-'+id).classList.add('on');
@@ -4060,7 +4087,7 @@ function rCancelados(){
       <td style="font-size:12px;color:var(--mu);max-width:220px">${p.cancelMotivo||'—'}</td>
       <td>
         <button class="btn bg2 bsm" onclick="reativarP(${p.id})">↩️ Reativar</button>
-        <button class="btn bd bsm" style="margin-top:4px" onclick="delP(${p.id})">🗑️ Remover Projeto</button>
+        ${podeApagarProjeto()?`<button class="btn bd bsm" style="margin-top:4px" onclick="delP(${p.id})">🗑️ Remover Projeto</button>`:''}
       </td>
     </tr>`).join('');
 }
@@ -4223,7 +4250,7 @@ function openDet(id){
     <button class="btn bg2" onclick="cm('ovDet');duplicarProjeto(${p.id})" title="Criar cópia deste projeto">📋 Duplicar</button>
     <button class="btn bb" onclick="cm('ovDet');openEdit(${p.id})">✏️ Editar</button>
     <button class="btn" style="background:var(--red);color:#fff" onclick="exportPDFFicha(${p.id})">📄 Exportar PDF</button>
-    <button class="btn bd" onclick="cm('ovDet');delP(${p.id})">🗑️ Deletar Projeto</button>
+    ${podeApagarProjeto()?`<button class="btn bd" onclick="cm('ovDet');delP(${p.id})">🗑️ Deletar Projeto</button>`:''}
      ${!p.cancelado?`<button class="btn bgray" onclick="abrirCanc(${p.id})">🚫 Projeto Cancelado</button>`:''}
   `;
   document.getElementById('ovDet').classList.add('on');
@@ -5715,17 +5742,27 @@ function _efReaplicarCronograma(){
 // Lê as etapas do formulário para o salvar() — substitui a leitura via ETPS_DEF
 function getEtapasDoForm(projAnterior){
   _efSync();
+  // Índice das etapas anteriores por nome, para reconectar dados de progresso
+  // mesmo quando o usuário adiciona, remove ou reordena etapas.
+  const antPorNome = {};
+  (projAnterior?.etapas||[]).forEach(e => {
+    if(e && e.lb != null) antPorNome[e.lb] = e;
+  });
+
   return _efEtapas.map((e,i)=>{
-    const old = projAnterior?.etapas?.find((_,oi)=>oi===i) || {};
+    // Dados de progresso vêm primeiro da própria etapa em _efEtapas (preservados
+    // por buildEF/_efSync via spread); como fallback, casa pelo nome da etapa no
+    // projeto anterior. NÃO usamos índice, pois remover/adicionar/reordenar muda o índice.
+    const ant = antPorNome[e.lb] || {};
     return {
       lb:    e.lb || `Etapa ${i+1}`,
       r:     e.r  || 'eq',
       prazo: e.prazo || null,
-      inicio:e.prazo || null,
-      fim:   old.fim  || null,
-      done:  old.done || false,
-      atrasoMotivo: old.atrasoMotivo || null,
-      diasCl: old.diasCl || null,
+      inicio:e.inicio || e.prazo || null,
+      fim:   (e.fim !== undefined ? e.fim : ant.fim) || null,
+      done:  (e.done !== undefined ? e.done : ant.done) || false,
+      atrasoMotivo: (e.atrasoMotivo !== undefined ? e.atrasoMotivo : ant.atrasoMotivo) || null,
+      diasCl: (e.diasCl !== undefined ? e.diasCl : ant.diasCl) || null,
     };
   });
 }
@@ -5910,13 +5947,69 @@ function salvar(){
 }
 
 function delP(id){
-  if(!confirm('Remover permanentemente?'))return;
-  // Salvar referência ANTES de remover do DB
-  const projParaDeletar = DB.find(p=>p.id===id);
-  DB=DB.filter(p=>p.id!==id);
-  fbExcluirProjeto(id, projParaDeletar);
+  if(!podeApagarProjeto()){
+    showToast('🔒 Apenas usuários com "Liderança" no nome podem deletar projetos');
+    return;
+  }
+  delMotivoId = id;
+  const ta = document.getElementById('fDelMotivo');
+  if(ta) ta.value = '';
+  document.getElementById('ovDelMotivo').classList.add('on');
+  setTimeout(()=>{ if(ta) ta.focus(); }, 80);
+}
+
+// ID do projeto aguardando confirmação de exclusão com motivo
+let delMotivoId = null;
+
+// Confirma a exclusão: remove o projeto e registra no histórico (log_delecoes) com o motivo
+function confirmarDelMotivo(){
+  if(!podeApagarProjeto()){
+    showToast('🔒 Sem permissão para deletar projetos');
+    cm('ovDelMotivo'); return;
+  }
+  const id = delMotivoId;
+  const motivo = (document.getElementById('fDelMotivo').value||'').trim();
+  if(!motivo){
+    showToast('⚠️ Informe o motivo da exclusão');
+    return;
+  }
+  const proj = DB.find(p=>p.id===id);
+  if(!proj){ cm('ovDelMotivo'); return; }
+
+  // Remove do quadro; o motivo é gravado no log_delecoes dentro de fbExcluirProjeto
+  DB = DB.filter(p=>p.id!==id);
+  fbExcluirProjeto(id, proj, motivo);
+
+  delMotivoId = null;
+  cm('ovDelMotivo');
   renderAll();
-  showToast('🗑️ Projeto removido');
+  showToast('🗑️ Projeto deletado e registrado no histórico');
+}
+
+// ── Render da aba Histórico de Projetos Deletados (lê o log_delecoes) ──
+function rLixeira(){
+  const stEl = document.getElementById('lixeiraStats');
+  if(stEl){
+    stEl.innerHTML = `
+      <div class="sc cgr"><div class="sc-l">Total Deletados</div><div class="sc-v">${LIXEIRA.length}</div><div class="sc-i">🗑️</div></div>
+      <div class="sc cb"><div class="sc-l">Total Ativos</div><div class="sc-v">${activeDB().length}</div><div class="sc-i">🗂️</div></div>
+      <div class="sc cy"><div class="sc-l">Concluídos</div><div class="sc-v">${activeDB().filter(p=>calcSit(p)==='concluido').length}</div><div class="sc-i">✅</div></div>
+    `;
+  }
+  const tbl = document.getElementById('lixeiraTbl');
+  if(!tbl) return;
+  const ordenada = [...LIXEIRA].sort((a,b)=>(b.ts||'').localeCompare(a.ts||''));
+  tbl.innerHTML = ordenada.length===0 ?
+    '<tr><td colspan="4" style="text-align:center;padding:20px;color:var(--mu)">Nenhum projeto deletado</td></tr>' :
+    ordenada.map(r=>{
+      const data = r.ts ? new Date(r.ts).toLocaleDateString('pt-BR') : '—';
+      return `<tr>
+        <td><strong>${r.nome||'—'}</strong>${r.idProjeto?` <span style="font-size:10px;color:var(--mu)">(${r.idProjeto})</span>`:''}</td>
+        <td style="color:var(--red)">${data}</td>
+        <td style="font-size:12px">${r.usuario||'—'}</td>
+        <td style="font-size:12px;color:var(--mu);max-width:300px">${r.motivo||'—'}</td>
+      </tr>`;
+    }).join('');
 }
 function cm(id){document.getElementById(id).classList.remove('on')}
 
@@ -8459,7 +8552,7 @@ function renderAll(){
       }
     }
   });
-  rDash();rKanban();rList();rTimeline();rKPIs();rAtrasos();rCancelados();rMedicao();rHomologacoes();rCarga();rHistorico();limparNotifObsoletas();detectarNotificacoes();
+  rDash();rKanban();rList();rTimeline();rKPIs();rAtrasos();rCancelados();rMedicao();rHomologacoes();rCarga();rHistorico();rLixeira();limparNotifObsoletas();detectarNotificacoes();
 }
 
 // ══════════════════════════════════════════════
@@ -8470,6 +8563,7 @@ let fbProjetos = null;   // db.ref('projetos')
 let fbNxtRef   = null;   // db.ref('nxt')
 let fbLogRef   = null;   // db.ref('log_delecoes')
 let fbListening = false; // listener ativo?
+let LIXEIRA = [];        // histórico de projetos deletados (lido de log_delecoes)
 
 // ── STATUS UI ──
 function setStatus(state, msg){
@@ -8627,7 +8721,7 @@ function fbSalvarProjeto(proj){
 }
 
 // ── EXCLUIR UM PROJETO ──
-function fbExcluirProjeto(id, projRef){
+function fbExcluirProjeto(id, projRef, motivo){
   if(!fbProjetos) return;
   setStatus('sync','Removendo...');
 
@@ -8643,7 +8737,8 @@ function fbExcluirProjeto(id, projRef){
       nome:      p.nome||'',
       col:       p.col||0,
       pct:       p.pct||0,
-      desc:      `Projeto "${p.nome}" (${p.idProjeto||'sem ID'}) deletado — coluna ${p.col}, ${p.pct||0}% concluido`,
+      motivo:    motivo||'',
+      desc:      `Projeto "${p.nome}" (${p.idProjeto||'sem ID'}) deletado — coluna ${p.col}, ${p.pct||0}% concluido${motivo?` — Motivo: ${motivo}`:''}`,
     };
     fbLogRef.push(logEntry);
   }
@@ -8665,6 +8760,13 @@ function escutarFirebase(db){
   fbProjetos = db.ref('projetos');
   fbNxtRef   = db.ref('nxt');
   fbLogRef   = db.ref('log_delecoes');
+
+  // Listener do histórico de projetos deletados — lê o log_delecoes existente
+  fbLogRef.on('value', snap => {
+    const v = snap.val();
+    LIXEIRA = v ? Object.values(v).filter(r => r && r.acao === 'deletou projeto') : [];
+    renderAll();
+  });
 
   let primeiraVez = true;
 
@@ -9676,6 +9778,11 @@ function nomeUsuarioAtual(){
   return localStorage.getItem('firjan_user') || 'Desconhecido';
 }
 
+// ── PERMISSÃO: só usuários com "Liderança" no nome podem apagar projetos ──
+function podeApagarProjeto(){
+  return /liderança|lideranca/i.test(nomeUsuarioAtual()||'');
+}
+
 // ══════════════════════════════════════════════════════════════════════════════
 //  SISTEMA DE NOTIFICAÇÕES — por usuário, independente, com persistência local
 // ══════════════════════════════════════════════════════════════════════════════
@@ -10074,7 +10181,7 @@ function mostrarLogin(){
 // ── ACESSIBILIDADE: fechar modal com Escape ──
 document.addEventListener('keydown', function(e){
   if(e.key !== 'Escape') return;
-  ['ovNew','ovDet','ovCanc','ovMotivo'].forEach(id => {
+  ['ovNew','ovDet','ovCanc','ovMotivo','ovDelMotivo'].forEach(id => {
     const el = document.getElementById(id);
     if(el && el.classList.contains('on')) { el.classList.remove('on'); }
     if(el && el.style.display === 'flex') { el.style.display = 'none'; }
