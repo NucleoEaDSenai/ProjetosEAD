@@ -331,7 +331,6 @@
       border-color:rgba(99,102,241,.3);
       background:rgba(255,255,255,.05);
     }
-    .person-card.status-atenção::before,
     .person-card.status-sobrecarga::before{
       content:'';
       position:absolute;
@@ -339,10 +338,7 @@
       width:3px;
       background:var(--status-color);
     }
-    .person-card.status-atenção{ --status-color:#EF4444; }
-    .person-card.status-sobrecarga{ --status-color:#F59E0B; }
-    .person-card.status-regular{ --status-color:#10B981; }
-    .person-card.status-leve{ --status-color:#3B82F6; }
+    .person-card.status-sobrecarga{ --status-color:#EF4444; }
 
     .person-head{
       display:flex;
@@ -382,10 +378,9 @@
       padding:3px 8px;
       border-radius:5px;
     }
-    .person-status.status-atenção{background:rgba(239,68,68,.18);color:#FCA5A5}
-    .person-status.status-sobrecarga{background:rgba(245,158,11,.18);color:#FCD34D}
-    .person-status.status-regular{background:rgba(16,185,129,.18);color:#6EE7B7}
-    .person-status.status-leve{background:rgba(59,130,246,.18);color:#93C5FD}
+    .person-status.status-sobrecarga{background:rgba(239,68,68,.18);color:#FCA5A5}
+    .person-status.status-media{background:rgba(16,185,129,.18);color:#6EE7B7}
+    .person-status.status-baixa{background:rgba(59,130,246,.18);color:#93C5FD}
 
     .person-hours{
       text-align:right;
@@ -409,7 +404,7 @@
       margin-top:2px;
     }
 
-    /* Bar gauge */
+    /* Bar gauge — segmentada por cliente */
     .gauge-wrap{
       height:8px;
       background:rgba(255,255,255,.06);
@@ -417,25 +412,15 @@
       overflow:hidden;
       margin-bottom:14px;
       position:relative;
+      display:flex;
     }
-    .gauge-fill{
+    .gauge-seg{
       height:100%;
-      background:linear-gradient(90deg,#10B981,#34D399);
-      border-radius:4px;
       transition:width .6s cubic-bezier(.16,1,.3,1);
     }
-    .gauge-fill.sobrecarga{background:linear-gradient(90deg,#F59E0B,#FBBF24)}
-    .gauge-fill.atenção{background:linear-gradient(90deg,#EF4444,#F87171)}
-    .gauge-fill.leve{background:linear-gradient(90deg,#3B82F6,#60A5FA)}
-
-    /* Linha 100% (marcador) */
-    .gauge-marker{
-      position:absolute;
-      top:-2px;
-      right:0;
-      width:1px;height:12px;
-      background:rgba(255,255,255,.3);
-    }
+    .gauge-seg:first-child{border-radius:4px 0 0 4px}
+    .gauge-seg:last-child{border-radius:0 4px 4px 0}
+    .gauge-seg:only-child{border-radius:4px}
 
     /* Badges de cliente */
     .client-badges{
@@ -616,10 +601,10 @@
         <div class="kpi-sub" id="kpiProjetosSub">em todos os clientes</div>
       </div>
       <div class="kpi-card" style="--kpi-color:#EF4444;--kpi-bg:rgba(239,68,68,.15)">
-        <div class="kpi-icon">⚠️</div>
-        <div class="kpi-label">Projetos Atrasados</div>
-        <div class="kpi-value" id="kpiAtrasados">—</div>
-        <div class="kpi-sub" id="kpiAtrasadosSub">consolidado</div>
+        <div class="kpi-icon">🔴</div>
+        <div class="kpi-label">Pessoas Sobrecarregadas</div>
+        <div class="kpi-value" id="kpiSobrecarga">—</div>
+        <div class="kpi-sub" id="kpiSobrecargaSub">acima do limite</div>
       </div>
       <div class="kpi-card" style="--kpi-color:#F59E0B;--kpi-bg:rgba(245,158,11,.15)">
         <div class="kpi-icon">⚡</div>
@@ -633,10 +618,9 @@
     <div class="people-section-title">
       <span>Pessoas · ordenadas por carga (maior carga primeiro)</span>
       <div class="legend">
-        <span class="legend-item"><span class="legend-dot" style="background:#EF4444"></span>Atenção</span>
-        <span class="legend-item"><span class="legend-dot" style="background:#F59E0B"></span>Sobrecarga</span>
-        <span class="legend-item"><span class="legend-dot" style="background:#10B981"></span>Regular</span>
-        <span class="legend-item"><span class="legend-dot" style="background:#3B82F6"></span>Leve</span>
+        <span class="legend-item"><span class="legend-dot" style="background:#EF4444"></span>Sobrecarregado (+120h)</span>
+        <span class="legend-item"><span class="legend-dot" style="background:#10B981"></span>Carga Média (67–120h)</span>
+        <span class="legend-item"><span class="legend-dot" style="background:#3B82F6"></span>Carga Baixa (≤66h)</span>
       </div>
     </div>
 
@@ -837,16 +821,18 @@
     }
 
     // Determina status baseado em horas + atrasos
+    // Limites de carga (horas/mês). Teto invisível = HORAS_MAX_MES (132h).
+    const LIMITE_SOBRECARGA = 120;  // acima disso: sobrecarregado
+    const LIMITE_MEDIA      = 66;   // acima disso: carga média; abaixo: carga baixa
+
     function statusPessoa(p){
-      // Ordem: Atenção > Sobrecarga > Regular > Leve
-      if(p.atrasados > 0) return 'atenção';
-      if(p.totalHoras > HORAS_MAX_MES) return 'sobrecarga';
-      if(p.totalHoras >= HORAS_MAX_MES * 0.6) return 'regular';
-      return 'leve';
+      if(p.totalHoras > LIMITE_SOBRECARGA) return 'sobrecarga';
+      if(p.totalHoras > LIMITE_MEDIA)      return 'media';
+      return 'baixa';
     }
 
     function statusLabel(s){
-      return {'atenção':'Atenção','sobrecarga':'Sobrecarga','regular':'Regular','leve':'Carga Leve'}[s] || s;
+      return {'sobrecarga':'Sobrecarregado','media':'Carga Média','baixa':'Carga Baixa'}[s] || s;
     }
 
     // ═══ RENDERIZAÇÃO ═══
@@ -869,10 +855,7 @@
         const projs = (dadosTenants[tid] || []).filter(isProjetoAtivo);
         return sum + projs.length;
       }, 0);
-      const totalAtrasados = tenantsIds.reduce((sum, tid) => {
-        const projs = (dadosTenants[tid] || []).filter(isProjetoAtrasado);
-        return sum + projs.length;
-      }, 0);
+      const totalSobrecarregados = pessoas.filter(p => statusPessoa(p) === 'sobrecarga').length;
       const cargaMedia = totalPessoas > 0
         ? Math.round(pessoas.reduce((s,p) => s+p.totalHoras, 0) / totalPessoas)
         : 0;
@@ -880,9 +863,10 @@
       document.getElementById('kpiPessoas').textContent = totalPessoas;
       document.getElementById('kpiPessoasSub').textContent = totalPessoas === 1 ? 'pessoa com etapa atual' : 'pessoas com etapa atual';
       document.getElementById('kpiProjetos').textContent = totalProjetos;
-      document.getElementById('kpiAtrasados').textContent = totalAtrasados;
+      document.getElementById('kpiSobrecarga').textContent = totalSobrecarregados;
+      document.getElementById('kpiSobrecargaSub').textContent = `acima de ${LIMITE_SOBRECARGA}h`;
       document.getElementById('kpiMedia').textContent = cargaMedia + 'h';
-      document.getElementById('kpiMediaSub').textContent = `de ${HORAS_MAX_MES}h máx mensais`;
+      document.getElementById('kpiMediaSub').textContent = 'horas/pessoa estimadas';
 
       // ═══ LISTA DE PESSOAS ═══
       const lista = document.getElementById('peopleList');
@@ -896,16 +880,22 @@
         return;
       }
 
-      // Máximo de horas pra dimensionar a barra
-      const maxHoras = Math.max(...pessoas.map(p => p.totalHoras), HORAS_MAX_MES);
-
       lista.innerHTML = pessoas.map((p, idx) => {
         const status = statusPessoa(p);
         const iniciais = p.nome.split(/\s+/).map(s => s[0]).join('').slice(0,2).toUpperCase();
         const cor = NOME_CORES[p.nome] || '#6B7280';
+        // Largura total da barra: proporcional ao teto invisível (132h)
         const pctBarra = Math.min(100, Math.round((p.totalHoras / HORAS_MAX_MES) * 100));
 
-        const badges = TENANTS.filter(t => p.porTenant[t.id] > 0).map(t => `
+        // Segmentos da barra coloridos por cliente (proporcional às horas de cada um)
+        const tenantsComHoras = TENANTS.filter(t => p.porTenant[t.id] > 0);
+        const segmentos = tenantsComHoras.map(t => {
+          const fracao = p.porTenant[t.id] / p.totalHoras; // proporção dentro da carga da pessoa
+          const larguraSegmento = pctBarra * fracao;        // proporção dentro da barra total
+          return `<div class="gauge-seg" style="width:${larguraSegmento}%;background:${t.cor}"></div>`;
+        }).join('');
+
+        const badges = tenantsComHoras.map(t => `
           <span class="client-badge" style="--badge-bg:${t.corBadgeBg};--badge-color:${t.cor};--badge-border:${t.corBadgeBorder}">
             <span class="client-badge-dot"></span>
             <span>${p.porTenant[t.id]}h ${t.nome}</span>
@@ -921,25 +911,15 @@
                 <span class="person-status status-${status}">${statusLabel(status)}</span>
               </div>
               <div class="person-hours">
-                <div>
-                  <span class="person-hours-val">${p.totalHoras}h</span>
-                  <span class="person-hours-max"> / ${HORAS_MAX_MES}h</span>
-                </div>
-                <div class="person-hours-lbl">${pctBarra}% do limite</div>
+                <div><span class="person-hours-val">${p.totalHoras}h</span></div>
+                <div class="person-hours-lbl">estimadas</div>
               </div>
             </div>
             <div class="gauge-wrap">
-              <div class="gauge-fill ${status}" style="width:${pctBarra}%"></div>
-              <div class="gauge-marker" style="right:0"></div>
+              ${segmentos}
             </div>
             <div class="client-badges">
               ${badges}
-              ${p.atrasados > 0 ? `
-                <span class="client-badge" style="--badge-bg:rgba(239,68,68,.15);--badge-color:#FCA5A5;--badge-border:rgba(239,68,68,.3)">
-                  <span class="client-badge-dot"></span>
-                  <span>${p.atrasados} atrasado${p.atrasados>1?'s':''}</span>
-                </span>
-              ` : ''}
             </div>
           </div>
         `;
@@ -956,6 +936,9 @@
 
     function inicializarFirebase(tenant){
       try {
+        // Reutiliza o app se já foi criado (evita erro "app already exists" no Atualizar)
+        const existente = firebase.apps.find(a => a.name === tenant.firebaseAppName);
+        if(existente) return existente;
         const config = {databaseURL: tenant.firebaseUrl};
         return firebase.initializeApp(config, tenant.firebaseAppName);
       } catch(e){
