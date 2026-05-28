@@ -1676,8 +1676,36 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
       <div class="st" style="margin-bottom:6px">🗑️ Projetos Deletados</div>
       <div style="font-size:12.5px;color:var(--mu);margin-bottom:20px">Histórico de projetos deletados. Apenas usuários com <strong>Liderança</strong> no nome podem deletar projetos.</div>
       <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:22px" id="lixeiraStats"></div>
+      <div class="fbox" style="margin-bottom:14px">
+        <div class="fbox-row" style="flex-wrap:wrap;gap:10px;align-items:flex-end">
+          <div class="fg" style="flex:1;min-width:200px">
+            <label class="fl">Buscar</label>
+            <input class="fi" id="lixBusca" type="text" placeholder="Nome do projeto ou motivo..." oninput="rLixeira()">
+          </div>
+          <div class="fg" style="min-width:170px">
+            <label class="fl">Deletado por</label>
+            <select class="fi" id="lixFiltPor" onchange="rLixeira()"><option value="">Todos</option></select>
+          </div>
+          <div class="fg" style="min-width:140px">
+            <label class="fl">Período</label>
+            <select class="fi" id="lixFiltPeriodo" onchange="rLixeira()">
+              <option value="">Qualquer data</option>
+              <option value="7">Últimos 7 dias</option>
+              <option value="30">Últimos 30 dias</option>
+              <option value="90">Últimos 90 dias</option>
+              <option value="365">Último ano</option>
+            </select>
+          </div>
+          <button class="btn bg2" onclick="limparFiltLix()" title="Limpar filtros">Limpar</button>
+        </div>
+      </div>
       <div class="tw"><table>
-        <thead><tr><th>Projeto</th><th>Deletado em</th><th>Deletado por</th><th>Motivo da exclusão</th></tr></thead>
+        <thead><tr>
+          <th style="cursor:pointer;white-space:nowrap" onclick="toggleLixSort('nome')">Projeto <span id="lixSI_nome" style="font-size:10px;color:var(--mu)"></span></th>
+          <th style="cursor:pointer;white-space:nowrap" onclick="toggleLixSort('data')">Deletado em <span id="lixSI_data" style="font-size:10px;color:var(--mu)"></span></th>
+          <th style="cursor:pointer;white-space:nowrap" onclick="toggleLixSort('por')">Deletado por <span id="lixSI_por" style="font-size:10px;color:var(--mu)"></span></th>
+          <th style="cursor:pointer;white-space:nowrap" onclick="toggleLixSort('motivo')">Motivo da exclusão <span id="lixSI_motivo" style="font-size:10px;color:var(--mu)"></span></th>
+        </tr></thead>
         <tbody id="lixeiraTbl"></tbody>
       </table></div>
     </div>
@@ -5986,6 +6014,21 @@ function confirmarDelMotivo(){
   showToast('🗑️ Projeto deletado e registrado no histórico');
 }
 
+// ── Estado de ordenação da aba Deletados ──
+let _lixSortCol = 'data';
+let _lixSortDir = -1; // -1 = mais recente primeiro (padrão)
+function toggleLixSort(col){
+  if(_lixSortCol === col){ _lixSortDir *= -1; }
+  else { _lixSortCol = col; _lixSortDir = (col === 'data' ? -1 : 1); }
+  rLixeira();
+}
+function limparFiltLix(){
+  const b = document.getElementById('lixBusca');       if(b) b.value = '';
+  const p = document.getElementById('lixFiltPor');     if(p) p.value = '';
+  const d = document.getElementById('lixFiltPeriodo'); if(d) d.value = '';
+  rLixeira();
+}
+
 // ── Render da aba Histórico de Projetos Deletados (lê o log_delecoes) ──
 function rLixeira(){
   const stEl = document.getElementById('lixeiraStats');
@@ -5998,10 +6041,61 @@ function rLixeira(){
   }
   const tbl = document.getElementById('lixeiraTbl');
   if(!tbl) return;
-  const ordenada = [...LIXEIRA].sort((a,b)=>(b.ts||'').localeCompare(a.ts||''));
-  tbl.innerHTML = ordenada.length===0 ?
-    '<tr><td colspan="4" style="text-align:center;padding:20px;color:var(--mu)">Nenhum projeto deletado</td></tr>' :
-    ordenada.map(r=>{
+
+  // Popular o select "Deletado por" com os usuários presentes no histórico
+  const selPor = document.getElementById('lixFiltPor');
+  if(selPor){
+    const atual = selPor.value;
+    const usuarios = [...new Set(LIXEIRA.map(r=>r.usuario).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'pt-BR'));
+    selPor.innerHTML = '<option value="">Todos</option>' +
+      usuarios.map(u=>`<option value="${u.replace(/"/g,'&quot;')}">${u}</option>`).join('');
+    if(usuarios.includes(atual)) selPor.value = atual;
+  }
+
+  // Ler filtros
+  const busca   = (document.getElementById('lixBusca')?.value||'').trim().toLowerCase();
+  const filtPor = document.getElementById('lixFiltPor')?.value||'';
+  const periodo = parseInt(document.getElementById('lixFiltPeriodo')?.value||'0');
+  const limiteData = periodo ? Date.now() - periodo*24*60*60*1000 : null;
+
+  // Aplicar filtros
+  let lista = LIXEIRA.filter(r=>{
+    if(filtPor && r.usuario !== filtPor) return false;
+    if(limiteData && r.ts && new Date(r.ts).getTime() < limiteData) return false;
+    if(busca){
+      const alvo = `${r.nome||''} ${r.idProjeto||''} ${r.motivo||''} ${r.usuario||''}`.toLowerCase();
+      if(!alvo.includes(busca)) return false;
+    }
+    return true;
+  });
+
+  // Ordenação
+  const d = _lixSortDir;
+  lista = [...lista].sort((a,b)=>{
+    switch(_lixSortCol){
+      case 'nome':   return (a.nome||'').localeCompare(b.nome||'','pt-BR')*d;
+      case 'por':    return (a.usuario||'').localeCompare(b.usuario||'','pt-BR')*d;
+      case 'motivo': return (a.motivo||'').localeCompare(b.motivo||'','pt-BR')*d;
+      case 'data':
+      default:       return (a.ts||'').localeCompare(b.ts||'')*d;
+    }
+  });
+
+  // Atualizar setas dos cabeçalhos
+  ['nome','data','por','motivo'].forEach(col=>{
+    const el = document.getElementById('lixSI_'+col);
+    if(el) el.textContent = _lixSortCol===col ? (_lixSortDir===1?'↑':'↓') : '⇅';
+  });
+
+  const totalFiltrado = lista.length;
+  const totalGeral = LIXEIRA.length;
+  const aviso = (busca||filtPor||periodo)
+    ? `<tr><td colspan="4" style="padding:6px 13px;font-size:11px;color:var(--mu);background:var(--s2)">${totalFiltrado} de ${totalGeral} registro(s)</td></tr>`
+    : '';
+
+  tbl.innerHTML = totalFiltrado===0 ?
+    '<tr><td colspan="4" style="text-align:center;padding:20px;color:var(--mu)">Nenhum projeto deletado encontrado</td></tr>' :
+    aviso + lista.map(r=>{
       const data = r.ts ? new Date(r.ts).toLocaleDateString('pt-BR') : '—';
       return `<tr>
         <td><strong>${r.nome||'—'}</strong>${r.idProjeto?` <span style="font-size:10px;color:var(--mu)">(${r.idProjeto})</span>`:''}</td>
