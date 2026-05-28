@@ -268,8 +268,8 @@
 
     /* Botão "Acessar" */
     .card-cta{
-      background:linear-gradient(135deg,#4F46E5,#6366F1);
-      color:#fff;
+      background:var(--cta-bg,linear-gradient(135deg,#4F46E5,#6366F1));
+      color:var(--cta-color,#fff);
       padding:14px;
       text-align:center;
       font-size:14px;
@@ -281,7 +281,7 @@
       gap:8px;
     }
     .client-card:hover .card-cta{
-      background:linear-gradient(135deg,#4338CA,#4F46E5);
+      background:var(--cta-bg-hover,linear-gradient(135deg,#4338CA,#4F46E5));
     }
     .card-cta-arrow{
       font-size:16px;
@@ -471,12 +471,34 @@
           </div>
           <div class="card-body">
             <div class="card-logo-wrapper">
-              <img src="img/metrorio.png" alt="Metrô Rio">
+              <img src="img/metrorio.png" alt="MetrôRio">
             </div>
-            <div class="card-name">Metrô Rio</div>
+            <div class="card-name">MetrôRio</div>
             <p class="card-desc">
               Sistema dedicado para gestão de projetos EAD
-              do Metrô Rio, com fluxos e templates próprios da operação.
+              do MetrôRio, com fluxos e templates próprios da operação.
+            </p>
+          </div>
+          <div class="card-cta">
+            <span>Acessar sistema</span>
+            <span class="card-cta-arrow">→</span>
+          </div>
+        </a>
+
+        <!-- TRANSPETRO -->
+        <a href="transpetro/" class="client-card fade-in" data-cid="transpetro" style="--card-bg:linear-gradient(135deg,#C8920A 0%,#F0B429 100%);--cta-bg:linear-gradient(135deg,#7A5A06,#9A7208);--cta-bg-hover:linear-gradient(135deg,#5E4505,#7A5A06);--cta-color:#FFF8E1">
+          <button type="button" class="card-info-btn" aria-label="Informações">i</button>
+          <div class="card-info-tooltip">
+            Sistema em fase de implantação.
+          </div>
+          <div class="card-body">
+            <div class="card-logo-wrapper">
+              <img src="img/transpetro.png" alt="Transpetro">
+            </div>
+            <div class="card-name">Transpetro</div>
+            <p class="card-desc">
+              Sistema dedicado para gestão de projetos EAD
+              da Transpetro, com fluxos e templates próprios da operação.
             </p>
           </div>
           <div class="card-cta">

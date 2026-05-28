@@ -213,6 +213,7 @@
     .filter-chip-dot.petrobras{background:#00A859;box-shadow:0 0 6px #00A859}
     .filter-chip-dot.sesi{background:#E87420}
     .filter-chip-dot.metrorio{background:#1E88E5}
+    .filter-chip-dot.transpetro{background:#F0B429;box-shadow:0 0 6px #F0B429}
     .filter-chip-dot.all{background:linear-gradient(90deg,#00A859,#E87420,#1E88E5)}
     .filter-chip-pending{
       font-size:10px;
@@ -603,6 +604,42 @@
       transform:translateY(-1px);
       box-shadow:0 6px 18px rgba(99,102,241,.4);
     }
+
+    /* Editor de horas reais */
+    .editor-row{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:14px;
+      padding:11px 4px;
+      border-bottom:1px solid rgba(255,255,255,.06);
+    }
+    .editor-row:last-child{border-bottom:none}
+    .editor-row-info{flex:1;min-width:0}
+    .editor-row-nome{
+      font-size:13.5px;font-weight:600;color:#E5E7EB;
+      display:flex;align-items:center;gap:8px;flex-wrap:wrap;
+    }
+    .editor-row-meta{font-size:11.5px;color:#6B7280;margin-top:3px}
+    .editor-row-input{display:flex;align-items:center;gap:6px;flex-shrink:0}
+    .hora-input{
+      width:74px;
+      background:rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.12);
+      border-radius:8px;
+      color:#fff;
+      font-family:'Plus Jakarta Sans',sans-serif;
+      font-size:14px;font-weight:600;
+      padding:8px 10px;
+      text-align:right;
+    }
+    .hora-input:focus{outline:none;border-color:#6366F1;background:rgba(99,102,241,.1)}
+    .fonte-tag{
+      font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;
+      padding:2px 7px;border-radius:5px;
+    }
+    .fonte-tag.real{background:rgba(16,185,129,.15);color:#34D399;border:1px solid rgba(16,185,129,.3)}
+    .fonte-tag.estimado{background:rgba(245,158,11,.13);color:#FCD34D;border:1px solid rgba(245,158,11,.28)}
   </style>
 </head>
 <body>
@@ -613,10 +650,32 @@
       <div class="modal-icon">⏱️</div>
       <div class="modal-title">Sobre os valores de carga horária</div>
       <div class="modal-text">
-        As horas exibidas são <strong>estimativas baseadas em valores genéricos por etapa</strong>.
-        Quando a equipe definir os tempos reais de cada etapa, os valores serão atualizados automaticamente.
+        As horas começam como <strong>estimativas genéricas por etapa</strong>. Conforme a coordenação
+        cadastra o <strong>esforço real</strong> de cada etapa, esses valores passam a valer e a tela
+        deixa de "chutar". Cada etapa mostra se está <em>estimada</em> ou <em>real</em>.
       </div>
       <button class="modal-btn" onclick="fecharAviso()">Entendi</button>
+    </div>
+  </div>
+
+  <!-- MODAL EDITOR DE HORAS REAIS (restrito) -->
+  <div class="modal-overlay" id="editorModal">
+    <div class="modal-box" style="max-width:560px;text-align:left">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">
+        <div class="modal-icon" style="margin:0">⚙️</div>
+        <div class="modal-title" style="margin:0">Alocar horas reais por etapa</div>
+      </div>
+      <div class="modal-text" style="text-align:left;margin-bottom:16px">
+        Estas são as etapas de equipe em aberto agora. Informe o <strong>esforço real em horas</strong>
+        de cada uma. Deixe em branco para manter a estimativa genérica (mostrada como placeholder).
+        O valor vale para todos os projetos com a mesma etapa.
+      </div>
+      <div id="editorCorpo" style="max-height:46vh;overflow-y:auto;margin-bottom:18px"></div>
+      <div style="display:flex;gap:10px;justify-content:flex-end">
+        <button class="modal-btn" onclick="fecharEditor()"
+                style="background:rgba(255,255,255,.06);color:#D1D5DB">Cancelar</button>
+        <button class="modal-btn" id="btnSalvarHoras" onclick="salvarHoras()">Salvar horas</button>
+      </div>
     </div>
   </div>
 
@@ -666,28 +725,33 @@
         </button>
         <button class="filter-chip disabled" data-tenant="metrorio" title="Em implantação">
           <span class="filter-chip-dot metrorio"></span>
-          <span>Metrô Rio</span>
+          <span>MetrôRio</span>
+          <span class="filter-chip-pending">Em breve</span>
+        </button>
+        <button class="filter-chip disabled" data-tenant="transpetro" title="Em implantação">
+          <span class="filter-chip-dot transpetro"></span>
+          <span>Transpetro</span>
           <span class="filter-chip-pending">Em breve</span>
         </button>
       </div>
     </div>
 
-    <!-- Controles de estimativa -->
-    <div class="filter-section" style="margin-top:-8px">
+    <!-- Painel de ajuste de horas reais (restrito a Daniel e Fátima) -->
+    <div class="filter-section" id="ajustePanel" style="margin-top:-8px;display:none">
       <div class="filter-row" style="justify-content:space-between">
         <div class="filter-row" style="gap:10px">
-          <span class="filter-label">Dedicação:</span>
-          <span style="font-size:12.5px;color:#9CA3AF">horas efetivas por dia útil de etapa</span>
+          <span class="filter-label">Calibração:</span>
+          <span style="font-size:12.5px;color:#9CA3AF">
+            <span id="ajusteContagem">0</span> etapa(s) com horas reais cadastradas · o restante usa estimativa genérica
+          </span>
         </div>
-        <div class="filter-row" style="gap:14px">
-          <input type="range" id="dedicSlider" min="2" max="8" step="0.5" value="6"
-                 style="width:200px;accent-color:#6366F1;cursor:pointer"
-                 oninput="setDedicacao(this.value)">
-          <span id="dedicValor"
-                style="font-size:14px;font-weight:700;color:#A5B4FC;min-width:42px;text-align:right">6h</span>
-        </div>
+        <button class="refresh-btn" onclick="abrirEditorHoras()" style="background:linear-gradient(135deg,#4F46E5,#6366F1);border-color:transparent">
+          <span>⚙️</span>
+          <span>Alocar horas reais</span>
+        </button>
       </div>
     </div>
+
     <div class="kpi-grid">
       <div class="kpi-card" style="--kpi-color:#6366F1;--kpi-bg:rgba(99,102,241,.15)">
         <div class="kpi-icon">👥</div>
@@ -734,8 +798,9 @@
   <footer class="hub-footer">
     © 2026 Firjan SENAI · Plataforma de Gestão EAD · Uso interno exclusivo
     <div class="hub-footer-note">
-      ⓘ As horas exibidas são <strong>estimativas baseadas nos dias úteis por etapa do template de métricas</strong>,
-      ajustadas pela dedicação diária e pela complexidade de cada projeto. Etapas sob responsabilidade do cliente não contam como carga da equipe.
+      ⓘ Cada etapa usa uma <strong>estimativa genérica</strong> até que a coordenação cadastre o
+      <strong>esforço real em horas</strong> (botão "Alocar horas reais", restrito a Daniel e Fátima).
+      Etapas sob responsabilidade do cliente não contam como carga da equipe.
     </div>
   </footer>
 
@@ -744,7 +809,7 @@
        ═══════════════════════════════════════════════════════ -->
   <script>
     // ═══ CONFIGURAÇÃO DE TENANTS ═══
-    // Pra adicionar SESI ou Metrô Rio depois: trocar `ativo` para true e preencher firebaseUrl
+    // Pra adicionar SESI ou MetrôRio depois: trocar `ativo` para true e preencher firebaseUrl
     const TENANTS = [
       {
         id:'petrobras',
@@ -768,7 +833,7 @@
       },
       {
         id:'metrorio',
-        nome:'Metrô Rio',
+        nome:'MetrôRio',
         cor:'#1E88E5',
         corBadgeBg:'rgba(30,136,229,.12)',
         corBadgeBorder:'rgba(30,136,229,.3)',
@@ -776,33 +841,41 @@
         firebaseAppName:'app-metrorio',
         ativo:false,
       },
+      {
+        id:'transpetro',
+        nome:'Transpetro',
+        cor:'#F0B429',
+        corBadgeBg:'rgba(240,180,41,.12)',
+        corBadgeBorder:'rgba(240,180,41,.35)',
+        firebaseUrl:'',  // ← preencher quando criar
+        firebaseAppName:'app-transpetro',
+        ativo:false,
+      },
     ];
 
     // ═══════════════════════════════════════════════════════════════
-    //  MODELO DE CARGA — baseado no Petrobras_Métricas_Planner.xlsx
-    //  A planilha define DIAS ÚTEIS por etapa, e esses valores MUDAM
-    //  conforme o TIPO DE PRODUTO. A carga em horas é calculada como:
+    //  MODELO DE CARGA — horas de ESFORÇO por etapa
     //
-    //     horas = dias_úteis[tipo][etapa] × HORAS_POR_DIA × fatorProjeto
+    //  Premissa honesta: ainda NÃO temos os tempos reais por etapa.
+    //  Então a carga de cada etapa é resolvida em 2 níveis:
     //
-    //  - HORAS_POR_DIA: dedicação ajustável (controle na tela).
-    //  - fatorProjeto:  multiplicador por projeto (1.0 = igual ao template;
-    //                   <1 projeto mais simples, >1 mais complexo).
+    //   1) HORAS REAIS (override): se Daniel ou Fátima já cadastraram o
+    //      esforço real daquela etapa, esse valor é usado. Fonte da verdade.
+    //   2) ESTIMATIVA GENÉRICA: enquanto não há valor real, usa-se um
+    //      esforço-padrão por etapa (HORAS_GENERICAS). Marcado como "estimado".
+    //
+    //  Não multiplicamos dias-de-calendário por dedicação — isso media
+    //  lead time, não esforço. Aqui só existem horas de trabalho da pessoa.
     //  Etapas de cliente (validação/entrega) = 0h para a equipe.
     // ═══════════════════════════════════════════════════════════════
 
-    // Controles ajustáveis (persistidos em memória; default sensato)
-    let HORAS_POR_DIA = 6;      // horas efetivas por dia útil de etapa
-    const HORAS_MAX_MES = 132;  // teto de referência (~22 dias úteis × 6h)
+    const HORAS_MAX_MES = 132;        // teto de referência para a barra/limites
+    const HORAS_GENERICA_PADRAO = 8;  // esforço-padrão p/ etapa sem valor real
 
-    // Tipos de produto reconhecidos
-    const TIPO_ENCAP = 'Encapsulamento';
-    const TIPO_BASICO = 'Web Básico';
-    const TIPO_INTER  = 'Web Intermediário';
-    const TIPO_AVANC  = 'Web Avançado';
-    const TIPO_PADRAO = TIPO_BASICO; // fallback se não detectar
+    // Quem pode alocar horas reais (compara início do nome, sem acento/caixa)
+    const EDITORES_HORAS = ['daniel', 'fatima'];
 
-    // Etapas de cliente → 0h para a equipe (resposta: "tempo do cliente")
+    // Etapas sob responsabilidade do cliente → 0h para a equipe
     const ETAPAS_CLIENTE = new Set([
       'Validação PICV DI/DM Referência',
       'Validação LD',
@@ -814,89 +887,35 @@
       'Entrega do review ao cliente',
     ]);
 
-    // ═══ MATRIZ DIAS ÚTEIS POR ETAPA × TIPO DE PRODUTO ═══
-    // Transcrita da aba "Métricas" da planilha. Etapas de cliente
-    // ficam zeradas via ETAPAS_CLIENTE acima, mesmo que tenham dias na planilha.
-    const DIAS_POR_ETAPA = {
-      [TIPO_ENCAP]: {
-        'Entrega do review ao cliente': 5,
-        'Solicitação de ajustes': 3,
-        'Implementação de ajustes': 3,
-        'Validação final do review': 1,
-        'Homologação': 3,
-        'Instalação no SIRH': 2,
-        'Upload Arquivos Bdoc': 7,
-      },
-      [TIPO_BASICO]: {
-        'Análise do material base': 2,
-        'Elaboração do PICV': 7,
-        'Validação PICV DI/DM Referência': 3,
-        'Validação LD': 2,
-        'Revisão textual do PICV': 1,
-        'Entrega do PICV ao cliente': 1,
-        'Solicitação de ajustes no PICV': 2,
-        'Implementação de ajustes': 2,
-        'Validação final do PICV': 1,
-        'Desenho/roteirização do onepage': 5,
-        'Validação DI Referência': 3,
-        'Produção de recursos gráficos': 2,
-        'Validação DM Referência': 2,
-        'Entrega do review ao cliente': 1,
-        'Solicitação de ajustes': 3,
-        'Validação final do review': 1,
-        'Revisão textual do review': 2,
-        'Homologação': 3,
-        'Instalação no SIRH': 2,
-        'Upload Arquivos Bdoc': 7,
-      },
-      [TIPO_INTER]: {
-        'Análise do material base': 5,
-        'Elaboração do PICV': 7,
-        'Validação PICV DI/DM Referência': 3,
-        'Validação LD': 2,
-        'Revisão textual do PICV': 1,
-        'Entrega do PICV ao cliente': 1,
-        'Solicitação de ajustes no PICV': 2,
-        'Implementação de ajustes': 2,
-        'Validação final do PICV': 1,
-        'Desenho/roteirização do onepage': 10,
-        'Validação DI Referência': 3,
-        'Produção de recursos gráficos': 8,
-        'Validação DM Referência': 3,
-        'Entrega do review ao cliente': 1,
-        'Solicitação de ajustes': 3,
-        'Validação final do review': 1,
-        'Revisão textual do review': 3,
-        'Homologação': 3,
-        'Instalação no SIRH': 2,
-        'Upload Arquivos Bdoc': 7,
-      },
-      [TIPO_AVANC]: {
-        'Análise do material base': 7,
-        'Elaboração do PICV': 7,
-        'Validação PICV DI/DM Referência': 3,
-        'Validação LD': 2,
-        'Revisão textual do PICV': 1,
-        'Entrega do PICV ao cliente': 1,
-        'Solicitação de ajustes no PICV': 2,
-        'Implementação de ajustes': 2,
-        'Validação final do PICV': 1,
-        'Desenho/roteirização do onepage': 15,
-        'Validação DI Referência': 3,
-        'Produção de recursos gráficos': 16,
-        'Validação DM Referência': 3,
-        'Entrega do review ao cliente': 1,
-        'Solicitação de ajustes': 3,
-        'Validação final do review': 1,
-        'Revisão textual do review': 4,
-        'Homologação': 3,
-        'Instalação no SIRH': 2,
-        'Upload Arquivos Bdoc': 7,
-      },
+    // ═══ ESTIMATIVA GENÉRICA POR ETAPA (horas de esforço) ═══
+    // Valores de partida razoáveis, usados SOMENTE enquanto não há hora real.
+    // NÃO vêm da coluna "dias úteis" da planilha (aquilo é prazo, não esforço).
+    // São só um chute consistente p/ a tela não ficar vazia. O correto é
+    // cadastrar as horas reais pelo editor (botão "Alocar horas reais").
+    const HORAS_GENERICAS = {
+      'Análise do material base':        4,
+      'Elaboração do PICV':              16,
+      'Revisão textual do PICV':         3,
+      'Solicitação de ajustes no PICV':  2,
+      'Implementação de ajustes':        6,
+      'Desenho/roteirização do onepage': 12,
+      'Produção de recursos gráficos':   16,
+      'Solicitação de ajustes':          2,
+      'Revisão textual do review':       4,
+      'Homologação':                     4,
+      'Instalação no SIRH':              3,
+      'Upload Arquivos Bdoc':            6,
+      'Reunião Inicial':                 2,
+      'Material Base Recebido':          0,
     };
 
-    // Dias padrão p/ etapa não mapeada (raro): mediana conservadora
-    const DIAS_PADRAO = 2;
+    // ═══ HORAS REAIS cadastradas (override) ═══
+    // Estrutura: { "<etapa>": horas } — por NOME de etapa, vale p/ todos os
+    // projetos. Carregada do Firebase (nó 'calibracaoHoras'), editável só
+    // por Daniel/Fátima. Quando uma etapa tem esforço conhecido, ele prevalece.
+    let HORAS_REAIS = {};       // { 'Homologação': 5, ... }
+    let usuarioAtual = '';      // nome de quem abriu
+    let podeEditar = false;     // true se usuarioAtual ∈ EDITORES_HORAS
 
     // ═══ CORES POR PESSOA (alinhado com sistema Petrobras) ═══
     const NOME_CORES = {
@@ -934,46 +953,30 @@
       return null;
     }
 
-    // Detecta o tipo de produto de um projeto.
-    // 1º tenta campos prováveis gravados no Firebase;
-    // 2º infere pelo nº de etapas (Encapsulamento ~8; Web 20+) e
-    //    pela presença de etapas exclusivas (ex.: "Elaboração do PICV").
-    function tipoProduto(p){
-      const candidatos = [p.tipo, p.tipoProduto, p.produto, p.trilha, p.categoria, p.complexidade];
-      const bruto = (candidatos.find(v => typeof v === 'string' && v.trim()) || '').toLowerCase();
-      if(bruto){
-        if(bruto.includes('encap'))                       return TIPO_ENCAP;
-        if(bruto.includes('avanç') || bruto.includes('avanc')) return TIPO_AVANC;
-        if(bruto.includes('inter'))                        return TIPO_INTER;
-        if(bruto.includes('básic') || bruto.includes('basic')) return TIPO_BASICO;
+    // Normaliza nome de etapa para usar como chave de horas reais
+    function chaveEtapa(lb){
+      return (lb || '').trim();
+    }
+
+    // Retorna { horas, fonte } para uma etapa.
+    //   fonte: 'real'      → valor cadastrado por Daniel/Fátima
+    //          'estimado'  → estimativa genérica (ainda sem valor real)
+    //          'cliente'   → etapa do cliente (0h para a equipe)
+    function horasEtapaDetalhe(labelEtapa){
+      const lb = chaveEtapa(labelEtapa);
+      if(!lb) return { horas: 0, fonte: 'estimado' };
+      if(ETAPAS_CLIENTE.has(lb)) return { horas: 0, fonte: 'cliente' };
+      if(lb in HORAS_REAIS){
+        const v = Number(HORAS_REAIS[lb]);
+        if(isFinite(v) && v >= 0) return { horas: v, fonte: 'real' };
       }
-      // Inferência por estrutura de etapas
-      const etapas = (p.etapas || []).map(e => (e.lb || '').trim());
-      const ehWeb = etapas.some(l => l === 'Elaboração do PICV' || l === 'Desenho/roteirização do onepage');
-      if(!ehWeb) return TIPO_ENCAP;
-      // distingue B/I/A pelo peso de "Produção de recursos gráficos" (2/8/16)
-      // — sem dado salvo, assume Básico (mais conservador)
-      return TIPO_PADRAO;
+      const g = (lb in HORAS_GENERICAS) ? HORAS_GENERICAS[lb] : HORAS_GENERICA_PADRAO;
+      return { horas: g, fonte: 'estimado' };
     }
 
-    // Fator de complexidade por projeto (singularidade).
-    // Lê p.fatorCarga se existir; senão 1.0. Aceita 0.5–2.0.
-    function fatorProjeto(p){
-      const f = Number(p.fatorCarga ?? p.fator ?? 1);
-      if(!isFinite(f) || f <= 0) return 1;
-      return Math.min(2, Math.max(0.5, f));
-    }
-
-    // Retorna horas estimadas pra uma etapa, considerando o projeto inteiro
-    function horasEtapa(labelEtapa, projeto){
-      const lb = (labelEtapa || '').trim();
-      if(!lb) return 0;
-      if(ETAPAS_CLIENTE.has(lb)) return 0;            // tempo do cliente → 0h equipe
-      const tipo = tipoProduto(projeto);
-      const tabela = DIAS_POR_ETAPA[tipo] || DIAS_POR_ETAPA[TIPO_PADRAO];
-      const dias = (lb in tabela) ? tabela[lb] : DIAS_PADRAO;
-      const horas = dias * HORAS_POR_DIA * fatorProjeto(projeto);
-      return Math.round(horas);
+    // Atalho: só as horas (usado no cálculo de carga)
+    function horasEtapa(labelEtapa){
+      return horasEtapaDetalhe(labelEtapa).horas;
     }
 
     // Verifica se um projeto está ativo (não cancelado, não concluído)
@@ -1024,7 +1027,7 @@
             responsaveis = [etapa.r];
           }
 
-          const h = horasEtapa(etapa.lb, p);
+          const h = horasEtapa(etapa.lb);
           if(h <= 0) return; // etapa sem horas (ex: Material Base Recebido)
 
           responsaveis.forEach(nome => {
@@ -1211,6 +1214,16 @@
       document.getElementById('errorBox').innerHTML = '';
     }
 
+    function lerCalibracao(tenant){
+      return new Promise(resolve => {
+        const app = inicializarFirebase(tenant);
+        if(!app){ resolve({}); return; }
+        app.database().ref('calibracaoHoras').once('value')
+          .then(snap => resolve(snap.val() || {}))
+          .catch(() => resolve({}));  // silencioso: calibração é opcional
+      });
+    }
+
     async function carregarTodos(){
       limparErro();
       gerarSkeleton();
@@ -1221,6 +1234,13 @@
         })
       );
       await Promise.all(promessas);
+
+      // Carrega horas reais (mescla de todos os tenants ativos; último vence)
+      HORAS_REAIS = {};
+      const calibs = await Promise.all(ativos.map(lerCalibracao));
+      calibs.forEach(c => Object.assign(HORAS_REAIS, c || {}));
+
+      atualizarPainelAjuste();
       renderizar();
     }
 
@@ -1228,12 +1248,6 @@
       filtroAtual = tenantId;
       document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
       btn.classList.add('active');
-      renderizar();
-    }
-
-    function setDedicacao(valor){
-      HORAS_POR_DIA = Number(valor);
-      document.getElementById('dedicValor').textContent = valor + 'h';
       renderizar();
     }
 
@@ -1251,6 +1265,146 @@
       }
     }
 
+    // ═══════════════════════════════════════════════════════════════
+    //  EDITOR DE HORAS REAIS — restrito a Daniel e Fátima
+    // ═══════════════════════════════════════════════════════════════
+
+    function normalizarNome(s){
+      return String(s||'').toLowerCase()
+        .normalize('NFD').replace(/[\u0300-\u036f]/g,'')  // tira acentos
+        .trim();
+    }
+
+    // Identifica o usuário (sem login real: guarda no navegador via variável
+    // de sessão simples; pergunta uma vez). Define se pode editar.
+    function identificarUsuario(){
+      // tenta recuperar de uma marca anterior nesta aba
+      let nome = window.name && window.name.startsWith('user:')
+        ? window.name.slice(5) : '';
+      if(!nome){
+        nome = prompt('Identifique-se para acessar a calibração de horas (ex.: Daniel):', '') || '';
+        if(nome) window.name = 'user:' + nome;
+      }
+      usuarioAtual = nome.trim();
+      const n = normalizarNome(usuarioAtual);
+      podeEditar = EDITORES_HORAS.some(e => n.startsWith(e));
+    }
+
+    // Mostra/oculta o painel de calibração conforme permissão e atualiza contagem
+    function atualizarPainelAjuste(){
+      const painel = document.getElementById('ajustePanel');
+      if(!painel) return;
+      painel.style.display = podeEditar ? '' : 'none';
+      const n = Object.keys(HORAS_REAIS).filter(k => HORAS_REAIS[k] !== '' && HORAS_REAIS[k] != null).length;
+      const el = document.getElementById('ajusteContagem');
+      if(el) el.textContent = n;
+    }
+
+    // Reúne todas as etapas DISTINTAS atualmente em aberto (em qualquer projeto
+    // ativo), com quem responde e em quantos projetos aparece. É o que o
+    // editor mostra: "as etapas que cada um está".
+    function etapasEmAberto(){
+      const mapa = {}; // label → { label, projetos:Set, responsaveis:Set, fonte, horas }
+      const tenantsIds = TENANTS.filter(t => t.ativo).map(t => t.id);
+      tenantsIds.forEach(tid => {
+        (dadosTenants[tid] || []).forEach(p => {
+          if(!isProjetoAtivo(p)) return;
+          const etapa = etapaAtual(p);
+          if(!etapa) return;
+          const lb = chaveEtapa(etapa.lb);
+          if(!lb) return;
+          if(ETAPAS_CLIENTE.has(lb)) return; // cliente não entra no editor
+          if(!mapa[lb]){
+            const d = horasEtapaDetalhe(lb);
+            mapa[lb] = { label:lb, projetos:new Set(), responsaveis:new Set(),
+                         fonte:d.fonte, horas:d.horas };
+          }
+          mapa[lb].projetos.add(p.nome || p._id);
+          const r = etapa.r;
+          if(r === 'eq' || !r){ (p.resps||[]).forEach(x => x && mapa[lb].responsaveis.add(x)); }
+          else if(r !== 'cl'){ mapa[lb].responsaveis.add(r); }
+        });
+      });
+      return Object.values(mapa).sort((a,b) => a.label.localeCompare(b.label));
+    }
+
+    function abrirEditorHoras(){
+      if(!podeEditar){
+        alert('Apenas Daniel e Fátima podem alocar horas reais.');
+        return;
+      }
+      const etapas = etapasEmAberto();
+      const modal = document.getElementById('editorModal');
+      const corpo = document.getElementById('editorCorpo');
+
+      if(etapas.length === 0){
+        corpo.innerHTML = `<p style="color:#9CA3AF;font-size:13.5px">
+          Nenhuma etapa de equipe em aberto no momento.</p>`;
+      } else {
+        corpo.innerHTML = etapas.map(e => {
+          const valorReal = (e.label in HORAS_REAIS) ? HORAS_REAIS[e.label] : '';
+          const resp = [...e.responsaveis].join(', ') || '—';
+          const nProj = e.projetos.size;
+          const tag = e.fonte === 'real'
+            ? `<span class="fonte-tag real">real</span>`
+            : `<span class="fonte-tag estimado">estimado ${e.horas}h</span>`;
+          return `
+            <div class="editor-row">
+              <div class="editor-row-info">
+                <div class="editor-row-nome">${escapeHtml(e.label)} ${tag}</div>
+                <div class="editor-row-meta">${escapeHtml(resp)} · ${nProj} projeto${nProj>1?'s':''}</div>
+              </div>
+              <div class="editor-row-input">
+                <input type="number" min="0" step="0.5" placeholder="${e.fonte==='estimado'?e.horas:''}"
+                       value="${valorReal}" data-etapa="${escapeHtml(e.label)}"
+                       class="hora-input">
+                <span style="font-size:12px;color:#6B7280">h</span>
+              </div>
+            </div>`;
+        }).join('');
+      }
+      modal.classList.add('open');
+    }
+
+    function fecharEditor(){
+      document.getElementById('editorModal').classList.remove('open');
+    }
+
+    async function salvarHoras(){
+      const inputs = document.querySelectorAll('#editorCorpo .hora-input');
+      const novo = {...HORAS_REAIS};
+      inputs.forEach(inp => {
+        const etapa = inp.dataset.etapa;
+        const v = inp.value.trim();
+        if(v === ''){ delete novo[etapa]; }       // vazio = volta a estimado
+        else {
+          const n = Number(v);
+          if(isFinite(n) && n >= 0) novo[etapa] = n;
+        }
+      });
+
+      // Grava no Firebase de cada tenant ativo (mantém a calibração junto dos dados)
+      const ativos = TENANTS.filter(t => t.ativo && t.firebaseUrl);
+      const btn = document.getElementById('btnSalvarHoras');
+      btn.disabled = true; btn.textContent = 'Salvando…';
+      try {
+        await Promise.all(ativos.map(t => {
+          const app = inicializarFirebase(t);
+          if(!app) return Promise.resolve();
+          return app.database().ref('calibracaoHoras').set(novo);
+        }));
+        HORAS_REAIS = novo;
+        atualizarPainelAjuste();
+        renderizar();
+        fecharEditor();
+      } catch(e){
+        alert('Não foi possível salvar. Verifique as permissões do banco.');
+        console.error(e);
+      } finally {
+        btn.disabled = false; btn.textContent = 'Salvar horas';
+      }
+    }
+
     // ═══ MODAL DE AVISO ═══
     function abrirAviso(){
       document.getElementById('avisoModal').classList.add('open');
@@ -1261,14 +1415,16 @@
     // Fecha ao clicar fora da caixa ou apertar ESC
     document.addEventListener('click', e => {
       if(e.target.id === 'avisoModal') fecharAviso();
+      if(e.target.id === 'editorModal') fecharEditor();
     });
     document.addEventListener('keydown', e => {
-      if(e.key === 'Escape') fecharAviso();
+      if(e.key === 'Escape'){ fecharAviso(); fecharEditor(); }
     });
 
     // Inicializa ao carregar a página
     document.addEventListener('DOMContentLoaded', () => {
-      abrirAviso();      // mostra o aviso toda vez que abre a página
+      identificarUsuario();
+      abrirAviso();
       carregarTodos();
     });
 
