@@ -1146,7 +1146,7 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
         <div class="si" role="menuitem" tabindex="0" aria-label="Relatório de Atrasos" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();nav('atrasos')}" onclick="nav('atrasos')"><span class="si-ic">⚠️</span><span>Rel. de Atrasos</span><span class="si-badge" id="badgeAtrasos" style="display:none"></span></div>
         <div class="si" role="menuitem" tabindex="0" aria-label="Medição" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();nav('medicao')}" onclick="nav('medicao')"><span class="si-ic">📐</span><span>Medição</span><span class="si-badge" id="badgeMedicao" style="display:none"></span></div>
         <div class="si" role="menuitem" tabindex="0" aria-label="Projetos Cancelados" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();nav('cancelados')}" onclick="nav('cancelados')"><span class="si-ic">🚫</span><span>Cancelados</span></div>
-        <div class="si" role="menuitem" tabindex="0" aria-label="Histórico de Projetos Deletados" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();nav('lixeira')}" onclick="nav('lixeira')"><span class="si-ic">🗑️</span><span>Deletados</span></div>
+        <div class="si" role="menuitem" tabindex="0" aria-label="Histórico de Cards Deletados" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();nav('lixeira')}" onclick="nav('lixeira')"><span class="si-ic">🗑️</span><span>Deletados</span></div>
       </div>
     </div>
 
@@ -2581,7 +2581,7 @@ let DB=[];
 let NXT=1, editId=null, cancId=null, dragId=null;
 
 // ── NAV ──
-const PT={kanban:'Quadro Kanban',homologacoes:'Homologações',projetos:'Lista de Projetos',timeline:'Cronograma',kpis:'KPIs & Indicadores',atrasos:'Relatório de Atrasos',cancelados:'Projetos Cancelados',medicao:'Medição',carga:'Carga da Equipe',historico:'Histórico de Edições',lixeira:'Projetos Deletados'};
+const PT={kanban:'Quadro Kanban',homologacoes:'Homologações',projetos:'Lista de Projetos',timeline:'Cronograma',kpis:'KPIs & Indicadores',atrasos:'Relatório de Atrasos',cancelados:'Projetos Cancelados',medicao:'Medição',carga:'Carga da Equipe',historico:'Histórico de Edições',lixeira:'Cards Deletados'};
 function nav(id){
   document.querySelectorAll('.view').forEach(v=>v.classList.remove('on'));
   document.getElementById('view-'+id).classList.add('on');
