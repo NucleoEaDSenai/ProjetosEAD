@@ -8762,12 +8762,20 @@ function normalizar(p){
   p.medicaoFeitaEm = p.medicaoFeitaEm || null;
   p.homolog        = p.homolog || {};
 
-  // Migração de etapas Web Rise: roda se ainda tem etapas antigas ou faltam novas
+  // Migração de etapas Web Rise: roda APENAS em projetos não personalizados pelo usuário.
+  // Se o usuário renomeou, removeu ou reordenou etapas (etapasCustomizadas), a migração
+  // NÃO deve rodar — caso contrário ela reconstrói o template e desfaz a personalização
+  // a cada sync do Firebase (era a causa de "renomear/remover não salva e volta ao original").
   const ehWebRise = (p.recursos||[]).some(r => _RECURSOS_WEB_RISE.includes(r));
-  if(ehWebRise && p.etapas.length > 0){
+  if(ehWebRise && p.etapas.length > 0 && !p.etapasCustomizadas){
     const temAntiga = p.etapas.some(e => _ETAPAS_RENOMEAR[e.lb]);
+    // 'faltaNova' sozinho não é confiável (remover uma etapa dispararia migração).
+    // Só migramos por 'faltaNova' se o projeto NÃO mostra sinais de personalização,
+    // ou seja, se TODAS as etapas atuais ainda batem com o template padrão Web Rise.
+    const nomesPadrao = new Set(_SEQUENCIA_WEB_RISE.map(t => t.lb));
+    const todasNoPadrao = p.etapas.every(e => nomesPadrao.has(e.lb) || _ETAPAS_RENOMEAR[e.lb]);
     const faltaNova = !p.etapas.some(e => _ETAPAS_NOVAS.has(e.lb));
-    if(temAntiga || faltaNova) p.etapas = _migrarEtapasWebRise(p.etapas);
+    if(temAntiga || (faltaNova && todasNoPadrao)) p.etapas = _migrarEtapasWebRise(p.etapas);
 
     // Preencher prazos em cascata nas etapas sem prazo (se há data de início)
     const recursoWR = (p.recursos||[]).find(r => _RECURSOS_WEB_RISE.includes(r));
