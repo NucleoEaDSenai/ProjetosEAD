@@ -895,7 +895,7 @@
 
     // E-mails autorizados a cadastrar horas (camada de UI; a segurança REAL
     // está nas Regras do banco acima). Use minúsculas.
-    const EDITORES_EMAILS = ['daniel@firjan.com.br', 'fatima@firjan.com.br'];
+    const EDITORES_EMAILS = ['dandasilva@firjan.com.br', 'daniel@firjan.com.br', 'fatima@firjan.com.br'];
 
     // ═══ CONFIGURAÇÃO DE TENANTS ═══
     // Pra adicionar SESI ou MetrôRio depois: trocar `ativo` para true e preencher firebaseUrl
@@ -974,6 +974,35 @@
       'Entrega do PICV ao cliente',
       'Entrega do review ao cliente',
     ]);
+
+    // ═══ ETAPAS DE EQUIPE DOS TEMPLATES (lista-mestra fixa) ═══
+    // Todas as etapas de equipe dos 7 templates do sistema. Aparecem SEMPRE
+    // no editor de horas, mesmo sem projeto ativo usando-as. Duplicatas por
+    // maiúscula/acento são unificadas no editor (uma linha cada).
+    const ETAPAS_TEMPLATE = [
+      'Análise do material base',
+      'Desenho/roteirização do onepage',
+      'Diagramação',
+      'Elaboração do PICV',
+      'Homologação',
+      'Implementação ajustes > diagramação',
+      'Implementação ajustes > projeto gráfico',
+      'Implementação ajustes > revisão textual',
+      'Implementação de Ajustes',
+      'Instalação no SIRH',
+      'Produção de recursos gráficos',
+      'Projeto gráfico',
+      'Realizar Cronograma',
+      'Reunião Inicial',
+      'Revisão textual',
+      'Revisão textual do PICV',
+      'Revisão textual do review',
+      'Upload Arquivos',
+      'Upload Arquivos Bdoc',
+      'Upload BDOC',
+      'Validação técnica/ajustes > PG',
+      'Validação técnica/ajustes > diagramação',
+    ];
 
     // ═══ ESTIMATIVA GENÉRICA POR ETAPA (horas de esforço) ═══
     // Valores de partida razoáveis, usados SOMENTE enquanto não há hora real.
@@ -1172,6 +1201,32 @@
       return Object.values(pessoas);
     }
 
+    // Elenco da equipe: todo mundo que é responsável em algum projeto (resps)
+    // ou dono de etapa nominal — independente de carga atual. Ignora 'cl'/'eq'.
+    function rosterEquipe(tenantsAtivos){
+      const nomes = new Set();
+      tenantsAtivos.forEach(tid => {
+        (dadosTenants[tid] || []).forEach(p => {
+          (p.resps || []).forEach(n => { if(n) nomes.add(n); });
+          (p.etapas || []).forEach(e => {
+            if(e.r && e.r !== 'cl' && e.r !== 'eq') nomes.add(e.r);
+          });
+        });
+      });
+      return nomes;
+    }
+
+    // Garante que TODA a equipe apareça, mesmo quem está com 0h agora.
+    function incluirCargaZero(pessoas, tenantsAtivos){
+      const existentes = new Set(pessoas.map(p => p.nome));
+      rosterEquipe(tenantsAtivos).forEach(nome => {
+        if(!existentes.has(nome)){
+          pessoas.push({ nome, totalHoras:0, porTenant:{}, projetos:[], atrasados:0 });
+        }
+      });
+      return pessoas;
+    }
+
     // ═══════════════════════════════════════════════════════════════
     //  CONSOLIDADO MENSAL — soma as horas das etapas CONCLUÍDAS no mês.
     //  Regra acordada:
@@ -1258,7 +1313,7 @@
       const mensal = (modoVisao === 'mensal');
       const pessoas = mensal
         ? calcularCargasMensal(tenantsIds, mesSelecionado)
-        : calcularCargas(tenantsIds);
+        : incluirCargaZero(calcularCargas(tenantsIds), tenantsIds);
 
       // Ordenar: maior carga primeiro
       pessoas.sort((a,b) => b.totalHoras - a.totalHoras);
@@ -1284,7 +1339,7 @@
         document.getElementById('kpiMedia').textContent = totalHorasGeral + 'h';
         document.getElementById('kpiMediaSub').textContent = `total em ${nomeMes(mesSelecionado)}`;
       } else {
-        document.getElementById('kpiPessoasSub').textContent = totalPessoas === 1 ? 'pessoa com etapa atual' : 'pessoas com etapa atual';
+        document.getElementById('kpiPessoasSub').textContent = totalPessoas === 1 ? 'pessoa na equipe' : 'pessoas na equipe';
         document.getElementById('kpiMedia').textContent = cargaMedia + 'h';
         document.getElementById('kpiMediaSub').textContent = 'horas/pessoa com carga';
       }
@@ -1586,28 +1641,34 @@
     // aberto agora e os responsáveis. Inclui também etapas que já têm hora
     // cadastrada em HORAS_REAIS (ex.: personalizadas), mesmo sem projeto.
     function etapasMestras(){
-      const mapa = {}; // label → { label, projetos:Set, responsaveis:Set, abertas:int, fonte, horas }
+      const mapa = {}; // CANON → { label, projetos:Set, responsaveis:Set, abertas:int, fonte, horas }
       const tenantsIds = TENANTS.filter(t => t.ativo).map(t => t.id);
 
+      // registra por forma CANÔNICA (une "Ajustes"/"ajustes"); mantém 1º rótulo
       function registrar(lb, p, etapa, aberta){
         lb = chaveEtapa(lb);
         if(!lb) return;
-        if(ETAPAS_CLIENTE.has(lb)) return;        // cliente nunca entra
+        const c = canon(lb);
+        if(ETAPAS_CLIENTE.has(lb) || _CLIENTE_CANON.has(c)) return; // cliente nunca entra
         if(etapa && etapa.r === 'cl') return;     // etapa marcada cliente
-        if(!mapa[lb]){
+        if(!mapa[c]){
           const d = horasEtapaDetalhe(lb);
-          mapa[lb] = { label:lb, projetos:new Set(), responsaveis:new Set(),
-                       abertas:0, fonte:d.fonte, horas:d.horas };
+          mapa[c] = { label:lb, projetos:new Set(), responsaveis:new Set(),
+                      abertas:0, fonte:d.fonte, horas:d.horas };
         }
-        if(p) mapa[lb].projetos.add(p.nome || p._id);
-        if(aberta) mapa[lb].abertas++;
+        if(p) mapa[c].projetos.add(p.nome || p._id);
+        if(aberta) mapa[c].abertas++;
         if(etapa){
           const r = etapa.r;
-          if(r === 'eq' || !r){ (p?.resps||[]).forEach(x => x && mapa[lb].responsaveis.add(x)); }
-          else if(r !== 'cl'){ mapa[lb].responsaveis.add(r); }
+          if(r === 'eq' || !r){ (p?.resps||[]).forEach(x => x && mapa[c].responsaveis.add(x)); }
+          else if(r !== 'cl'){ mapa[c].responsaveis.add(r); }
         }
       }
 
+      // 1) Semeia com TODAS as etapas de equipe dos templates (sempre presentes)
+      ETAPAS_TEMPLATE.forEach(lb => registrar(lb, null, null, false));
+
+      // 2) Acrescenta o que aparece nos projetos reais (inclui personalizadas)
       tenantsIds.forEach(tid => {
         (dadosTenants[tid] || []).forEach(p => {
           const atual = etapaAtual(p);
@@ -1618,12 +1679,12 @@
         });
       });
 
-      // Etapas com hora cadastrada que não apareceram em nenhum projeto
+      // 3) Etapas com hora cadastrada que não apareceram em nenhum projeto
       Object.keys(HORAS_REAIS).forEach(lb => {
-        const k = chaveEtapa(lb);
-        if(k && !mapa[k] && !ETAPAS_CLIENTE.has(k)){
+        const k = chaveEtapa(lb); const c = canon(k);
+        if(k && !mapa[c] && !ETAPAS_CLIENTE.has(k) && !_CLIENTE_CANON.has(c)){
           const d = horasEtapaDetalhe(k);
-          mapa[k] = { label:k, projetos:new Set(), responsaveis:new Set(),
+          mapa[c] = { label:k, projetos:new Set(), responsaveis:new Set(),
                       abertas:0, fonte:d.fonte, horas:d.horas };
         }
       });
@@ -1660,7 +1721,8 @@
         return;
       }
       corpo.innerHTML = etapas.map(e => {
-        const valorReal = (e.label in HORAS_REAIS) ? HORAS_REAIS[e.label] : '';
+        const _real = horaRealCanon(e.label);
+        const valorReal = (_real !== null) ? _real : '';
         const resp = [...e.responsaveis].join(', ') || '—';
         const nProj = e.projetos.size;
         const abertaTag = e.abertas > 0
