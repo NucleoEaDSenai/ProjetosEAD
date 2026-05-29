@@ -10,6 +10,7 @@
   <!-- Firebase (SDK v8 compat — mesmo padrão do sistema Petrobras) -->
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
 
   <style>
     /* ═══════════════════════════════════════════════════════
@@ -658,6 +659,30 @@
     </div>
   </div>
 
+  <!-- MODAL DE LOGIN (Firebase Auth) -->
+  <div class="modal-overlay" id="loginModal">
+    <div class="modal-box" style="max-width:420px;text-align:left">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">
+        <div class="modal-icon" style="margin:0">🔐</div>
+        <div class="modal-title" style="margin:0">Acesso da coordenação</div>
+      </div>
+      <div class="modal-text" style="text-align:left;margin-bottom:16px">
+        Entre com e-mail e senha para <strong>cadastrar as horas reais</strong> das etapas.
+        Sem login, a página funciona normalmente em modo leitura.
+      </div>
+      <input id="loginEmail" type="email" placeholder="e-mail" autocomplete="username"
+             style="width:100%;padding:11px 14px;margin-bottom:10px;border-radius:10px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.05);color:#E5E7EB;font-family:inherit;font-size:14px">
+      <input id="loginSenha" type="password" placeholder="senha" autocomplete="current-password"
+             style="width:100%;padding:11px 14px;margin-bottom:6px;border-radius:10px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.05);color:#E5E7EB;font-family:inherit;font-size:14px">
+      <div id="loginErro" style="color:#F87171;font-size:12.5px;min-height:18px;margin-bottom:10px"></div>
+      <div style="display:flex;gap:10px;justify-content:flex-end">
+        <button class="modal-btn" onclick="fecharLogin()"
+                style="background:rgba(255,255,255,.06);color:#D1D5DB">Cancelar</button>
+        <button class="modal-btn" id="btnLogin" onclick="fazerLogin()">Entrar</button>
+      </div>
+    </div>
+  </div>
+
   <!-- MODAL EDITOR DE HORAS REAIS (restrito) -->
   <div class="modal-overlay" id="editorModal">
     <div class="modal-box" style="max-width:560px;text-align:left">
@@ -666,11 +691,19 @@
         <div class="modal-title" style="margin:0">Alocar horas reais por etapa</div>
       </div>
       <div class="modal-text" style="text-align:left;margin-bottom:16px">
-        Estas são as etapas de equipe em aberto agora. Informe o <strong>esforço real em horas</strong>
-        de cada uma. Deixe em branco para manter a estimativa genérica (mostrada como placeholder).
-        O valor vale para todos os projetos com a mesma etapa.
+        Lista-mestra de <strong>todas as etapas de equipe</strong> já usadas nos projetos.
+        Informe o <strong>esforço real em horas</strong> de cada uma — vale para todos os
+        projetos com a mesma etapa. Em branco = mantém a estimativa genérica (placeholder).
       </div>
-      <div id="editorCorpo" style="max-height:46vh;overflow-y:auto;margin-bottom:18px"></div>
+      <div style="display:flex;gap:8px;margin-bottom:14px">
+        <input id="novaEtapaNome" type="text" placeholder="+ etapa personalizada (ex.: Locução)"
+               style="flex:1;padding:9px 12px;border-radius:9px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.05);color:#E5E7EB;font-family:inherit;font-size:13px">
+        <input id="novaEtapaHoras" type="number" min="0" step="0.5" placeholder="h"
+               style="width:70px;padding:9px 12px;border-radius:9px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.05);color:#E5E7EB;font-family:inherit;font-size:13px">
+        <button class="modal-btn" onclick="adicionarEtapaPersonalizada()"
+                style="padding:9px 14px">Adicionar</button>
+      </div>
+      <div id="editorCorpo" style="max-height:42vh;overflow-y:auto;margin-bottom:18px"></div>
       <div style="display:flex;gap:10px;justify-content:flex-end">
         <button class="modal-btn" onclick="fecharEditor()"
                 style="background:rgba(255,255,255,.06);color:#D1D5DB">Cancelar</button>
@@ -686,10 +719,16 @@
         <span>←</span>
         <span>Voltar ao Hub</span>
       </a>
-      <button class="refresh-btn" id="refreshBtn" onclick="recarregarDados()">
-        <span class="icon">⟳</span>
-        <span>Atualizar</span>
-      </button>
+      <div style="display:flex;gap:10px">
+        <button class="refresh-btn" id="authBtn" onclick="toggleAuth()">
+          <span>🔐</span>
+          <span id="authBtnLabel">Entrar</span>
+        </button>
+        <button class="refresh-btn" id="refreshBtn" onclick="recarregarDados()">
+          <span class="icon">⟳</span>
+          <span>Atualizar</span>
+        </button>
+      </div>
     </div>
     <div class="header-content">
       <div class="hub-brand">Ferramenta Integrada</div>
@@ -808,6 +847,37 @@
        JAVASCRIPT
        ═══════════════════════════════════════════════════════ -->
   <script>
+    // ═══════════════════════════════════════════════════════════════
+    //  CONFIGURAÇÃO DE AUTENTICAÇÃO (Firebase Auth)
+    //  ───────────────────────────────────────────────────────────────
+    //  O login real usa UM projeto Firebase com Authentication ativado.
+    //  PASSOS no console.firebase.google.com (projeto Petrobras ou um
+    //  projeto dedicado de "acesso"):
+    //    1. Authentication → Sign-in method → ativar "E-mail/senha".
+    //    2. Authentication → Users → adicionar Daniel e Fátima (e-mail+senha).
+    //    3. Copiar apiKey / authDomain / projectId em Configurações do projeto
+    //       e colar abaixo. (Esses dados são públicos por design — a segurança
+    //       vem das Regras do Realtime Database, não de esconder a apiKey.)
+    //    4. Nas REGRAS do Realtime Database de cada tenant, restringir escrita
+    //       de 'calibracaoHoras' aos UIDs autorizados, ex.:
+    //         "calibracaoHoras": {
+    //           ".read": true,
+    //           ".write": "auth != null && (auth.uid === 'UID_DANIEL' || auth.uid === 'UID_FATIMA')"
+    //         }
+    //  Sem isso preenchido, a página roda 100% em modo leitura.
+    // ═══════════════════════════════════════════════════════════════
+    const AUTH_CONFIG = {
+      apiKey:     'COLE_AQUI_A_API_KEY',
+      authDomain: 'COLE_AQUI.firebaseapp.com',
+      projectId:  'COLE_AQUI_O_PROJECT_ID',
+      // databaseURL não é necessário aqui — Auth usa só o projeto.
+    };
+    const AUTH_APP_NAME = 'app-auth';
+
+    // E-mails autorizados a cadastrar horas (camada de UI; a segurança REAL
+    // está nas Regras do banco acima). Use minúsculas.
+    const EDITORES_EMAILS = ['daniel@firjan.com.br', 'fatima@firjan.com.br'];
+
     // ═══ CONFIGURAÇÃO DE TENANTS ═══
     // Pra adicionar SESI ou MetrôRio depois: trocar `ativo` para true e preencher firebaseUrl
     const TENANTS = [
@@ -872,8 +942,7 @@
     const HORAS_MAX_MES = 132;        // teto de referência para a barra/limites
     const HORAS_GENERICA_PADRAO = 8;  // esforço-padrão p/ etapa sem valor real
 
-    // Quem pode alocar horas reais (compara início do nome, sem acento/caixa)
-    const EDITORES_HORAS = ['daniel', 'fatima'];
+    // (A autorização agora vem do Firebase Auth — ver EDITORES_EMAILS no topo.)
 
     // Etapas sob responsabilidade do cliente → 0h para a equipe
     const ETAPAS_CLIENTE = new Set([
@@ -915,7 +984,7 @@
     // por Daniel/Fátima. Quando uma etapa tem esforço conhecido, ele prevalece.
     let HORAS_REAIS = {};       // { 'Homologação': 5, ... }
     let usuarioAtual = '';      // nome de quem abriu
-    let podeEditar = false;     // true se usuarioAtual ∈ EDITORES_HORAS
+    let podeEditar = false;     // true se o usuário logado está em EDITORES_EMAILS
 
     // ═══ CORES POR PESSOA (alinhado com sistema Petrobras) ═══
     const NOME_CORES = {
@@ -953,24 +1022,47 @@
       return null;
     }
 
-    // Normaliza nome de etapa para usar como chave de horas reais
+    // Normaliza nome de etapa para EXIBIÇÃO/chave de gravação (preserva texto)
     function chaveEtapa(lb){
       return (lb || '').trim();
     }
 
+    // Forma canônica p/ COMPARAÇÃO: minúsculo, sem acento. Usada para unir
+    // duplicatas tipo "Implementação de Ajustes" e "Implementação de ajustes".
+    function canon(lb){
+      return String(lb||'').toLowerCase()
+        .normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim();
+    }
+
+    // Índices canônicos das tabelas fixas (montados uma vez)
+    const _CLIENTE_CANON = new Set([...ETAPAS_CLIENTE].map(canon));
+    const _GENERICAS_CANON = {};
+    Object.keys(HORAS_GENERICAS).forEach(k => { _GENERICAS_CANON[canon(k)] = HORAS_GENERICAS[k]; });
+
+    // Procura uma hora real cadastrada por forma canônica (case/acento-insensível)
+    function horaRealCanon(lb){
+      const c = canon(lb);
+      for(const k in HORAS_REAIS){
+        if(canon(k) === c){
+          const v = Number(HORAS_REAIS[k]);
+          if(isFinite(v) && v >= 0) return v;
+        }
+      }
+      return null;
+    }
+
     // Retorna { horas, fonte } para uma etapa.
-    //   fonte: 'real'      → valor cadastrado por Daniel/Fátima
+    //   fonte: 'real'      → valor cadastrado pela coordenação
     //          'estimado'  → estimativa genérica (ainda sem valor real)
     //          'cliente'   → etapa do cliente (0h para a equipe)
     function horasEtapaDetalhe(labelEtapa){
       const lb = chaveEtapa(labelEtapa);
       if(!lb) return { horas: 0, fonte: 'estimado' };
-      if(ETAPAS_CLIENTE.has(lb)) return { horas: 0, fonte: 'cliente' };
-      if(lb in HORAS_REAIS){
-        const v = Number(HORAS_REAIS[lb]);
-        if(isFinite(v) && v >= 0) return { horas: v, fonte: 'real' };
-      }
-      const g = (lb in HORAS_GENERICAS) ? HORAS_GENERICAS[lb] : HORAS_GENERICA_PADRAO;
+      const c = canon(lb);
+      if(ETAPAS_CLIENTE.has(lb) || _CLIENTE_CANON.has(c)) return { horas: 0, fonte: 'cliente' };
+      const real = horaRealCanon(lb);
+      if(real !== null) return { horas: real, fonte: 'real' };
+      const g = (c in _GENERICAS_CANON) ? _GENERICAS_CANON[c] : HORAS_GENERICA_PADRAO;
       return { horas: g, fonte: 'estimado' };
     }
 
@@ -1269,25 +1361,90 @@
     //  EDITOR DE HORAS REAIS — restrito a Daniel e Fátima
     // ═══════════════════════════════════════════════════════════════
 
-    function normalizarNome(s){
-      return String(s||'').toLowerCase()
-        .normalize('NFD').replace(/[\u0300-\u036f]/g,'')  // tira acentos
-        .trim();
+    // ═══════════════════════════════════════════════════════════════
+    //  AUTENTICAÇÃO REAL — Firebase Auth (e-mail/senha). Sem pop-up.
+    // ═══════════════════════════════════════════════════════════════
+    let authApp = null;
+
+    function inicializarAuth(){
+      if(authApp) return authApp;
+      if(!AUTH_CONFIG.apiKey || AUTH_CONFIG.apiKey.startsWith('COLE_AQUI')){
+        // Config de Auth ainda não preenchida → página fica só-leitura.
+        return null;
+      }
+      try {
+        const existente = firebase.apps.find(a => a.name === AUTH_APP_NAME);
+        authApp = existente || firebase.initializeApp(AUTH_CONFIG, AUTH_APP_NAME);
+        return authApp;
+      } catch(e){
+        console.error('Erro inicializando Auth', e);
+        return null;
+      }
     }
 
-    // Identifica o usuário (sem login real: guarda no navegador via variável
-    // de sessão simples; pergunta uma vez). Define se pode editar.
-    function identificarUsuario(){
-      // tenta recuperar de uma marca anterior nesta aba
-      let nome = window.name && window.name.startsWith('user:')
-        ? window.name.slice(5) : '';
-      if(!nome){
-        nome = prompt('Identifique-se para acessar a calibração de horas (ex.: Daniel):', '') || '';
-        if(nome) window.name = 'user:' + nome;
+    // Observa o estado de login e atualiza permissão + interface.
+    function observarAuth(){
+      const app = inicializarAuth();
+      if(!app){
+        // Sem Auth configurado: modo leitura, botão some
+        usuarioAtual = ''; podeEditar = false;
+        const b = document.getElementById('authBtn');
+        if(b) b.style.display = 'none';
+        atualizarPainelAjuste();
+        return;
       }
-      usuarioAtual = nome.trim();
-      const n = normalizarNome(usuarioAtual);
-      podeEditar = EDITORES_HORAS.some(e => n.startsWith(e));
+      app.auth().onAuthStateChanged(user => {
+        if(user){
+          usuarioAtual = user.email || '';
+          podeEditar = EDITORES_EMAILS.includes(usuarioAtual.toLowerCase());
+          document.getElementById('authBtnLabel').textContent = 'Sair';
+        } else {
+          usuarioAtual = ''; podeEditar = false;
+          document.getElementById('authBtnLabel').textContent = 'Entrar';
+        }
+        atualizarPainelAjuste();
+        renderizar();
+      });
+    }
+
+    function toggleAuth(){
+      const app = inicializarAuth();
+      if(!app){ alert('Login ainda não configurado. Preencha AUTH_CONFIG.'); return; }
+      if(app.auth().currentUser){
+        app.auth().signOut();
+      } else {
+        abrirLogin();
+      }
+    }
+
+    function abrirLogin(){
+      document.getElementById('loginErro').textContent = '';
+      document.getElementById('loginModal').classList.add('open');
+      setTimeout(() => document.getElementById('loginEmail').focus(), 50);
+    }
+    function fecharLogin(){
+      document.getElementById('loginModal').classList.remove('open');
+    }
+
+    async function fazerLogin(){
+      const app = inicializarAuth();
+      if(!app) return;
+      const email = document.getElementById('loginEmail').value.trim();
+      const senha = document.getElementById('loginSenha').value;
+      const erro  = document.getElementById('loginErro');
+      const btn   = document.getElementById('btnLogin');
+      erro.textContent = '';
+      btn.disabled = true; btn.textContent = 'Entrando…';
+      try {
+        await app.auth().signInWithEmailAndPassword(email, senha);
+        document.getElementById('loginSenha').value = '';
+        fecharLogin();
+      } catch(e){
+        erro.textContent = 'E-mail ou senha inválidos.';
+        console.error(e);
+      } finally {
+        btn.disabled = false; btn.textContent = 'Entrar';
+      }
     }
 
     // Mostra/oculta o painel de calibração conforme permissão e atualiza contagem
@@ -1300,70 +1457,118 @@
       if(el) el.textContent = n;
     }
 
-    // Reúne todas as etapas DISTINTAS atualmente em aberto (em qualquer projeto
-    // ativo), com quem responde e em quantos projetos aparece. É o que o
-    // editor mostra: "as etapas que cada um está".
-    function etapasEmAberto(){
-      const mapa = {}; // label → { label, projetos:Set, responsaveis:Set, fonte, horas }
+    // Lista-MESTRA de etapas de equipe: varre TODAS as etapas de TODOS os
+    // projetos (não só as em aberto), agrega por label, marca quantas em
+    // aberto agora e os responsáveis. Inclui também etapas que já têm hora
+    // cadastrada em HORAS_REAIS (ex.: personalizadas), mesmo sem projeto.
+    function etapasMestras(){
+      const mapa = {}; // label → { label, projetos:Set, responsaveis:Set, abertas:int, fonte, horas }
       const tenantsIds = TENANTS.filter(t => t.ativo).map(t => t.id);
+
+      function registrar(lb, p, etapa, aberta){
+        lb = chaveEtapa(lb);
+        if(!lb) return;
+        if(ETAPAS_CLIENTE.has(lb)) return;        // cliente nunca entra
+        if(etapa && etapa.r === 'cl') return;     // etapa marcada cliente
+        if(!mapa[lb]){
+          const d = horasEtapaDetalhe(lb);
+          mapa[lb] = { label:lb, projetos:new Set(), responsaveis:new Set(),
+                       abertas:0, fonte:d.fonte, horas:d.horas };
+        }
+        if(p) mapa[lb].projetos.add(p.nome || p._id);
+        if(aberta) mapa[lb].abertas++;
+        if(etapa){
+          const r = etapa.r;
+          if(r === 'eq' || !r){ (p?.resps||[]).forEach(x => x && mapa[lb].responsaveis.add(x)); }
+          else if(r !== 'cl'){ mapa[lb].responsaveis.add(r); }
+        }
+      }
+
       tenantsIds.forEach(tid => {
         (dadosTenants[tid] || []).forEach(p => {
-          if(!isProjetoAtivo(p)) return;
-          const etapa = etapaAtual(p);
-          if(!etapa) return;
-          const lb = chaveEtapa(etapa.lb);
-          if(!lb) return;
-          if(ETAPAS_CLIENTE.has(lb)) return; // cliente não entra no editor
-          if(!mapa[lb]){
-            const d = horasEtapaDetalhe(lb);
-            mapa[lb] = { label:lb, projetos:new Set(), responsaveis:new Set(),
-                         fonte:d.fonte, horas:d.horas };
-          }
-          mapa[lb].projetos.add(p.nome || p._id);
-          const r = etapa.r;
-          if(r === 'eq' || !r){ (p.resps||[]).forEach(x => x && mapa[lb].responsaveis.add(x)); }
-          else if(r !== 'cl'){ mapa[lb].responsaveis.add(r); }
+          const atual = etapaAtual(p);
+          (p.etapas || []).forEach(e => {
+            const aberta = isProjetoAtivo(p) && atual && atual.lb === e.lb;
+            registrar(e.lb, p, e, aberta);
+          });
         });
       });
-      return Object.values(mapa).sort((a,b) => a.label.localeCompare(b.label));
+
+      // Etapas com hora cadastrada que não apareceram em nenhum projeto
+      Object.keys(HORAS_REAIS).forEach(lb => {
+        const k = chaveEtapa(lb);
+        if(k && !mapa[k] && !ETAPAS_CLIENTE.has(k)){
+          const d = horasEtapaDetalhe(k);
+          mapa[k] = { label:k, projetos:new Set(), responsaveis:new Set(),
+                      abertas:0, fonte:d.fonte, horas:d.horas };
+        }
+      });
+
+      // Ordena: abertas agora primeiro, depois alfabético
+      return Object.values(mapa).sort((a,b) =>
+        (b.abertas>0) - (a.abertas>0) || a.label.localeCompare(b.label));
+    }
+
+    // Adiciona uma etapa personalizada direto no editor (vira linha na lista)
+    function adicionarEtapaPersonalizada(){
+      const nomeEl = document.getElementById('novaEtapaNome');
+      const horasEl = document.getElementById('novaEtapaHoras');
+      const nome = chaveEtapa(nomeEl.value);
+      if(!nome){ nomeEl.focus(); return; }
+      const v = horasEl.value.trim();
+      if(v !== ''){
+        const n = Number(v);
+        if(isFinite(n) && n >= 0) HORAS_REAIS[nome] = n;
+      } else if(!(nome in HORAS_REAIS)){
+        HORAS_REAIS[nome] = 0; // entra na lista mesmo sem hora ainda
+      }
+      nomeEl.value = ''; horasEl.value = '';
+      renderEditorCorpo();   // re-desenha sem fechar
+    }
+
+    function renderEditorCorpo(){
+      const etapas = etapasMestras();
+      const corpo = document.getElementById('editorCorpo');
+      if(etapas.length === 0){
+        corpo.innerHTML = `<p style="color:#9CA3AF;font-size:13.5px">
+          Nenhuma etapa de equipe encontrada nos projetos. Use o campo acima
+          para cadastrar uma etapa personalizada.</p>`;
+        return;
+      }
+      corpo.innerHTML = etapas.map(e => {
+        const valorReal = (e.label in HORAS_REAIS) ? HORAS_REAIS[e.label] : '';
+        const resp = [...e.responsaveis].join(', ') || '—';
+        const nProj = e.projetos.size;
+        const abertaTag = e.abertas > 0
+          ? `<span class="fonte-tag real" style="background:rgba(34,197,94,.15);color:#4ADE80;border-color:rgba(34,197,94,.3)">em aberto</span>`
+          : '';
+        const tag = e.fonte === 'real'
+          ? `<span class="fonte-tag real">real</span>`
+          : `<span class="fonte-tag estimado">estimado ${e.horas}h</span>`;
+        const metaProj = nProj > 0 ? `${nProj} projeto${nProj>1?'s':''}` : 'sem projeto ativo';
+        return `
+          <div class="editor-row">
+            <div class="editor-row-info">
+              <div class="editor-row-nome">${escapeHtml(e.label)} ${tag} ${abertaTag}</div>
+              <div class="editor-row-meta">${escapeHtml(resp)} · ${metaProj}</div>
+            </div>
+            <div class="editor-row-input">
+              <input type="number" min="0" step="0.5" placeholder="${e.fonte==='estimado'?e.horas:''}"
+                     value="${valorReal}" data-etapa="${escapeHtml(e.label)}"
+                     class="hora-input">
+              <span style="font-size:12px;color:#6B7280">h</span>
+            </div>
+          </div>`;
+      }).join('');
     }
 
     function abrirEditorHoras(){
       if(!podeEditar){
-        alert('Apenas Daniel e Fátima podem alocar horas reais.');
+        alert('Apenas usuários autorizados (Daniel e Fátima) podem alocar horas reais.');
         return;
       }
-      const etapas = etapasEmAberto();
-      const modal = document.getElementById('editorModal');
-      const corpo = document.getElementById('editorCorpo');
-
-      if(etapas.length === 0){
-        corpo.innerHTML = `<p style="color:#9CA3AF;font-size:13.5px">
-          Nenhuma etapa de equipe em aberto no momento.</p>`;
-      } else {
-        corpo.innerHTML = etapas.map(e => {
-          const valorReal = (e.label in HORAS_REAIS) ? HORAS_REAIS[e.label] : '';
-          const resp = [...e.responsaveis].join(', ') || '—';
-          const nProj = e.projetos.size;
-          const tag = e.fonte === 'real'
-            ? `<span class="fonte-tag real">real</span>`
-            : `<span class="fonte-tag estimado">estimado ${e.horas}h</span>`;
-          return `
-            <div class="editor-row">
-              <div class="editor-row-info">
-                <div class="editor-row-nome">${escapeHtml(e.label)} ${tag}</div>
-                <div class="editor-row-meta">${escapeHtml(resp)} · ${nProj} projeto${nProj>1?'s':''}</div>
-              </div>
-              <div class="editor-row-input">
-                <input type="number" min="0" step="0.5" placeholder="${e.fonte==='estimado'?e.horas:''}"
-                       value="${valorReal}" data-etapa="${escapeHtml(e.label)}"
-                       class="hora-input">
-                <span style="font-size:12px;color:#6B7280">h</span>
-              </div>
-            </div>`;
-        }).join('');
-      }
-      modal.classList.add('open');
+      renderEditorCorpo();
+      document.getElementById('editorModal').classList.add('open');
     }
 
     function fecharEditor(){
@@ -1416,14 +1621,19 @@
     document.addEventListener('click', e => {
       if(e.target.id === 'avisoModal') fecharAviso();
       if(e.target.id === 'editorModal') fecharEditor();
+      if(e.target.id === 'loginModal')  fecharLogin();
     });
     document.addEventListener('keydown', e => {
-      if(e.key === 'Escape'){ fecharAviso(); fecharEditor(); }
+      if(e.key === 'Escape'){ fecharAviso(); fecharEditor(); fecharLogin(); }
+      // Enter dentro do modal de login = entrar
+      if(e.key === 'Enter' && document.getElementById('loginModal').classList.contains('open')){
+        fazerLogin();
+      }
     });
 
     // Inicializa ao carregar a página
     document.addEventListener('DOMContentLoaded', () => {
-      identificarUsuario();
+      observarAuth();   // login real (sem pop-up); define podeEditar
       abrirAviso();
       carregarTodos();
     });
