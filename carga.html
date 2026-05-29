@@ -775,7 +775,26 @@
       </div>
     </div>
 
-    <!-- Painel de ajuste de horas reais (restrito a Daniel e Fátima) -->
+    <!-- Modo de visão: Carga Atual × Consolidado Mensal -->
+    <div class="filter-section" style="margin-top:-8px">
+      <div class="filter-row" style="justify-content:space-between">
+        <div class="filter-row" style="gap:10px">
+          <span class="filter-label">Modo:</span>
+          <button class="filter-chip active" id="modoAtualBtn" onclick="setModo('atual',this)">
+            <span>📌 Carga atual</span>
+          </button>
+          <button class="filter-chip" id="modoMensalBtn" onclick="setModo('mensal',this)">
+            <span>📅 Consolidado mensal</span>
+          </button>
+        </div>
+        <div class="filter-row" id="seletorMesWrap" style="gap:8px;display:none">
+          <span class="filter-label">Mês:</span>
+          <select id="seletorMes" onchange="setMes(this.value)"
+                  style="padding:8px 12px;border-radius:9px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.05);color:#E5E7EB;font-family:inherit;font-size:12.5px;font-weight:600;cursor:pointer">
+          </select>
+        </div>
+      </div>
+    </div>
     <div class="filter-section" id="ajustePanel" style="margin-top:-8px;display:none">
       <div class="filter-row" style="justify-content:space-between">
         <div class="filter-row" style="gap:10px">
@@ -997,6 +1016,8 @@
     // ═══ ESTADO GLOBAL ═══
     let dadosTenants = {};  // { petrobras: [projetos...], sesi: [...] }
     let filtroAtual = 'all';
+    let modoVisao = 'atual';                          // 'atual' | 'mensal'
+    let mesSelecionado = new Date().toISOString().slice(0,7);  // 'YYYY-MM'
 
     // ═══ INICIALIZAÇÃO ═══
     function gerarSkeleton(){
@@ -1151,7 +1172,65 @@
       return Object.values(pessoas);
     }
 
-    // Determina status baseado em horas + atrasos
+    // ═══════════════════════════════════════════════════════════════
+    //  CONSOLIDADO MENSAL — soma as horas das etapas CONCLUÍDAS no mês.
+    //  Regra acordada:
+    //   • Conta só etapas com responsável NOMINAL (r = nome da pessoa).
+    //   • Ignora etapas de cliente (r:'cl') e de equipe genérica (r:'eq').
+    //   • Etapa entra no mês pela DATA DE CONCLUSÃO (campo e.fim, 'YYYY-MM-DD',
+    //     gravado pelo index.html quando a etapa é marcada done).
+    //   • Vale para projetos ativos OU já encerrados — o que importa é o mês
+    //     em que a etapa foi concluída.
+    //  mesAno: string 'YYYY-MM' (ex.: '2026-05')
+    // ═══════════════════════════════════════════════════════════════
+    function calcularCargasMensal(tenantsAtivos, mesAno){
+      const pessoas = {};
+      tenantsAtivos.forEach(tenantId => {
+        (dadosTenants[tenantId] || []).forEach(p => {
+          (p.etapas || []).forEach(e => {
+            if(!e.done || !e.fim) return;            // só concluídas com data
+            if(String(e.fim).slice(0,7) !== mesAno) return;  // fora do mês
+            if(e.r === 'cl' || e.r === 'eq' || !e.r) return; // só responsável nominal
+            const det = horasEtapaDetalhe(e.lb);
+            if(det.fonte === 'cliente') return;      // etapa de cliente por nome
+            const h = det.horas;
+            if(h <= 0) return;
+            const nome = e.r;
+            if(!pessoas[nome]){
+              pessoas[nome] = { nome, totalHoras:0, porTenant:{}, projetos:[], atrasados:0 };
+            }
+            pessoas[nome].totalHoras += h;
+            pessoas[nome].porTenant[tenantId] = (pessoas[nome].porTenant[tenantId]||0) + h;
+            pessoas[nome].projetos.push({
+              tenant:tenantId, nome:p.nome, etapaLabel:e.lb, horas:h, fim:e.fim,
+            });
+          });
+        });
+      });
+      return Object.values(pessoas);
+    }
+
+    // Lista os meses (YYYY-MM) que têm pelo menos uma etapa concluída,
+    // mais o mês corrente, em ordem decrescente (mais recente primeiro).
+    function mesesDisponiveis(){
+      const set = new Set();
+      TENANTS.filter(t => t.ativo).forEach(t => {
+        (dadosTenants[t.id] || []).forEach(p => {
+          (p.etapas || []).forEach(e => {
+            if(e.done && e.fim) set.add(String(e.fim).slice(0,7));
+          });
+        });
+      });
+      set.add(new Date().toISOString().slice(0,7)); // garante o mês atual
+      return [...set].sort().reverse();
+    }
+
+    function nomeMes(mesAno){
+      const [a,m] = mesAno.split('-');
+      const MES = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho',
+                   'Agosto','Setembro','Outubro','Novembro','Dezembro'];
+      return `${MES[parseInt(m,10)-1]}/${a}`;
+    }
     // Limites de carga (horas/mês). Teto invisível = HORAS_MAX_MES (132h).
     const LIMITE_SOBRECARGA = 120;  // acima disso: sobrecarregado
     const LIMITE_MEDIA      = 66;   // acima disso: carga média; abaixo: carga baixa
@@ -1174,8 +1253,12 @@
     }
 
     function renderizar(){
+      preencherSeletorMes();
       const tenantsIds = tenantsAtivosFiltro();
-      const pessoas = calcularCargas(tenantsIds);
+      const mensal = (modoVisao === 'mensal');
+      const pessoas = mensal
+        ? calcularCargasMensal(tenantsIds, mesSelecionado)
+        : calcularCargas(tenantsIds);
 
       // Ordenar: maior carga primeiro
       pessoas.sort((a,b) => b.totalHoras - a.totalHoras);
@@ -1187,22 +1270,33 @@
         return sum + projs.length;
       }, 0);
       const totalSobrecarregados = pessoas.filter(p => statusPessoa(p) === 'sobrecarga').length;
-      const cargaMedia = totalPessoas > 0
-        ? Math.round(pessoas.reduce((s,p) => s+p.totalHoras, 0) / totalPessoas)
-        : 0;
+      const totalHorasGeral = pessoas.reduce((s,p) => s+p.totalHoras, 0);
+      const cargaMedia = totalPessoas > 0 ? Math.round(totalHorasGeral / totalPessoas) : 0;
 
       document.getElementById('kpiPessoas').textContent = totalPessoas;
-      document.getElementById('kpiPessoasSub').textContent = totalPessoas === 1 ? 'pessoa com etapa atual' : 'pessoas com etapa atual';
       document.getElementById('kpiProjetos').textContent = totalProjetos;
       document.getElementById('kpiSobrecarga').textContent = totalSobrecarregados;
       document.getElementById('kpiSobrecargaSub').textContent = `acima de ${LIMITE_SOBRECARGA}h`;
-      document.getElementById('kpiMedia').textContent = cargaMedia + 'h';
-      document.getElementById('kpiMediaSub').textContent = 'horas/pessoa estimadas';
+
+      if(mensal){
+        document.getElementById('kpiPessoasSub').textContent = totalPessoas === 1 ? 'pessoa com entregas' : 'pessoas com entregas';
+        document.getElementById('kpiMedia').textContent = totalHorasGeral + 'h';
+        document.getElementById('kpiMediaSub').textContent = `total em ${nomeMes(mesSelecionado)}`;
+      } else {
+        document.getElementById('kpiPessoasSub').textContent = totalPessoas === 1 ? 'pessoa com etapa atual' : 'pessoas com etapa atual';
+        document.getElementById('kpiMedia').textContent = cargaMedia + 'h';
+        document.getElementById('kpiMediaSub').textContent = 'horas/pessoa estimadas';
+      }
 
       // ═══ LISTA DE PESSOAS ═══
       const lista = document.getElementById('peopleList');
       if(pessoas.length === 0){
-        lista.innerHTML = `
+        lista.innerHTML = mensal ? `
+          <div class="empty-state" style="grid-column:1/-1">
+            <div class="empty-state-icon">📅</div>
+            <div class="empty-state-title">Nenhuma etapa concluída em ${nomeMes(mesSelecionado)}</div>
+            <div class="empty-state-sub">Só entram etapas com responsável nominal concluídas neste mês. Escolha outro mês ou verifique se as etapas têm data de conclusão.</div>
+          </div>` : `
           <div class="empty-state" style="grid-column:1/-1">
             <div class="empty-state-icon">👥</div>
             <div class="empty-state-title">Nenhuma pessoa com etapas em aberto</div>
@@ -1233,6 +1327,9 @@
           </span>
         `).join('');
 
+        const lblHoras = mensal ? 'no mês' : 'estimadas';
+        const nEtapas = mensal ? `<div class="person-hours-lbl">${p.projetos.length} etapa${p.projetos.length>1?'s':''} concluída${p.projetos.length>1?'s':''}</div>` : '';
+
         return `
           <div class="person-card status-${status} fade-in" style="animation-delay:${idx*0.04}s">
             <div class="person-head">
@@ -1243,7 +1340,8 @@
               </div>
               <div class="person-hours">
                 <div><span class="person-hours-val">${p.totalHoras}h</span></div>
-                <div class="person-hours-lbl">estimadas</div>
+                <div class="person-hours-lbl">${lblHoras}</div>
+                ${nEtapas}
               </div>
             </div>
             <div class="gauge-wrap">
@@ -1338,9 +1436,34 @@
 
     function setFiltroTenant(tenantId, btn){
       filtroAtual = tenantId;
-      document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+      // limpa só os chips de cliente (que têm data-tenant), não os de modo
+      document.querySelectorAll('.filter-chip[data-tenant]').forEach(c => c.classList.remove('active'));
       btn.classList.add('active');
       renderizar();
+    }
+
+    function setModo(modo, btn){
+      modoVisao = modo;
+      document.getElementById('modoAtualBtn').classList.toggle('active', modo === 'atual');
+      document.getElementById('modoMensalBtn').classList.toggle('active', modo === 'mensal');
+      document.getElementById('seletorMesWrap').style.display = (modo === 'mensal') ? '' : 'none';
+      renderizar();
+    }
+
+    function setMes(mesAno){
+      mesSelecionado = mesAno;
+      renderizar();
+    }
+
+    // Preenche o dropdown de meses com base nos dados carregados
+    function preencherSeletorMes(){
+      const sel = document.getElementById('seletorMes');
+      if(!sel) return;
+      const meses = mesesDisponiveis();
+      if(!meses.includes(mesSelecionado)) mesSelecionado = meses[0];
+      sel.innerHTML = meses.map(m =>
+        `<option value="${m}" ${m===mesSelecionado?'selected':''}>${nomeMes(m)}</option>`
+      ).join('');
     }
 
     async function recarregarDados(){
