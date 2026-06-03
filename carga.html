@@ -853,7 +853,7 @@
     <div class="kpi-grid">
       <div class="kpi-card" style="--kpi-color:#6366F1;--kpi-bg:rgba(99,102,241,.15)">
         <div class="kpi-icon">👥</div>
-        <div class="kpi-label">Pessoas Ativas</div>
+        <div class="kpi-label" id="kpiPessoasLabel">Pessoas Ativas</div>
         <div class="kpi-value" id="kpiPessoas">—</div>
         <div class="kpi-sub" id="kpiPessoasSub">aguardando dados</div>
       </div>
@@ -1455,6 +1455,7 @@
       const cargaMedia = comCarga > 0 ? Math.round(totalHorasGeral / comCarga) : 0;
 
       document.getElementById('kpiPessoas').textContent = totalPessoas;
+      document.getElementById('kpiPessoasLabel').textContent = mensal ? 'Pessoas com Entregas' : 'Pessoas na Equipe';
       document.getElementById('kpiProjetos').textContent = totalProjetos;
       document.getElementById('kpiSobrecarga').textContent = totalSobrecarregados;
       document.getElementById('kpiSobrecargaSub').textContent = `acima de ${LIMITE_SOBRECARGA}h`;
@@ -1547,6 +1548,7 @@
       const eq = equilibrioDistribuicao(tenantsIds);
       const rank = rankingEtapas(tenantsIds);
       document.getElementById('kpiPessoas').textContent = rank.length;
+      document.getElementById('kpiPessoasLabel').textContent = 'Tipos de Etapa';
       document.getElementById('kpiPessoasSub').textContent = 'tipos de etapa';
       document.getElementById('kpiProjetos').textContent = tenantsIds.reduce((s,tid) =>
         s + (dadosTenants[tid]||[]).filter(isProjetoAtivo).length, 0);
