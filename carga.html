@@ -457,6 +457,43 @@
     .empty-state-title{font-size:15px;font-weight:700;color:#9CA3AF;margin-bottom:6px}
     .empty-state-sub{font-size:13px}
 
+    /* ── Visão de Processo (3 análises) ── */
+    .proc-section{
+      background:rgba(255,255,255,.025);
+      border:1px solid rgba(255,255,255,.07);
+      border-radius:16px;
+      padding:22px 24px;
+      margin-bottom:18px;
+    }
+    .proc-title{
+      font-family:'Plus Jakarta Sans',sans-serif;
+      font-size:15px;font-weight:800;color:#E5E7EB;
+      display:flex;align-items:center;gap:9px;margin-bottom:4px;
+    }
+    .proc-sub{font-size:12.5px;color:#6B7280;margin-bottom:18px;line-height:1.5}
+    /* barras horizontais (ranking + equilíbrio) */
+    .bar-row{display:flex;align-items:center;gap:12px;margin-bottom:11px}
+    .bar-label{
+      width:210px;flex-shrink:0;font-size:12.5px;color:#D1D5DB;font-weight:600;
+      white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:right;
+    }
+    .bar-track{flex:1;height:22px;background:rgba(255,255,255,.04);border-radius:7px;overflow:hidden;position:relative}
+    .bar-fill{height:100%;border-radius:7px;transition:width .6s cubic-bezier(.4,0,.2,1);min-width:2px}
+    .bar-val{width:96px;flex-shrink:0;font-size:12px;color:#9CA3AF;font-weight:700;font-variant-numeric:tabular-nums}
+    @media(max-width:640px){ .bar-label{width:120px} .bar-val{width:64px} }
+    /* gráfico de evolução mensal (colunas) */
+    .evo-wrap{display:flex;align-items:flex-end;gap:14px;height:200px;padding:8px 4px 0;overflow-x:auto}
+    .evo-col{display:flex;flex-direction:column;align-items:center;gap:8px;flex:1;min-width:46px;height:100%}
+    .evo-bar-area{flex:1;display:flex;align-items:flex-end;width:100%;justify-content:center}
+    .evo-bar{
+      width:60%;max-width:48px;border-radius:8px 8px 0 0;
+      background:linear-gradient(180deg,#6366F1,#4338CA);
+      transition:height .6s cubic-bezier(.4,0,.2,1);min-height:3px;position:relative;
+    }
+    .evo-bar-val{position:absolute;top:-20px;left:50%;transform:translateX(-50%);font-size:11px;font-weight:700;color:#A5B4FC;white-space:nowrap}
+    .evo-label{font-size:11px;color:#9CA3AF;font-weight:600;text-align:center;white-space:nowrap}
+    .proc-note{font-size:11.5px;color:#6B7280;margin-top:14px;padding-top:14px;border-top:1px solid rgba(255,255,255,.06);line-height:1.5}
+
     /* Skeleton loader */
     .skeleton-card{
       background:rgba(255,255,255,.03);
@@ -786,6 +823,9 @@
           <button class="filter-chip" id="modoMensalBtn" onclick="setModo('mensal',this)">
             <span>📅 Consolidado mensal</span>
           </button>
+          <button class="filter-chip" id="modoProcessoBtn" onclick="setModo('processo',this)">
+            <span>📊 Processo</span>
+          </button>
         </div>
         <div class="filter-row" id="seletorMesWrap" style="gap:8px;display:none">
           <span class="filter-label">Mês:</span>
@@ -838,7 +878,7 @@
     </div>
 
     <!-- Lista de pessoas -->
-    <div class="people-section-title">
+    <div class="people-section-title" id="peopleSectionTitle">
       <span>Pessoas · ordenadas por carga (maior carga primeiro)</span>
       <div class="legend">
         <span class="legend-item"><span class="legend-dot" style="background:#EF4444"></span>Sobrecarregado (+120h)</span>
@@ -849,6 +889,7 @@
 
     <div id="errorBox"></div>
     <div id="peopleList" class="people-grid"></div>
+    <div id="processoView" style="display:none"></div>
 
   </main>
 
@@ -1286,6 +1327,72 @@
                    'Agosto','Setembro','Outubro','Novembro','Dezembro'];
       return `${MES[parseInt(m,10)-1]}/${a}`;
     }
+
+    // ═══════════════════════════════════════════════════════════════
+    //  ANÁLISES DE PROCESSO (diagnóstico do fluxo — não de pessoas)
+    // ═══════════════════════════════════════════════════════════════
+
+    // (A) RANKING DE ETAPAS que mais consomem horas no time.
+    // Soma as horas estimadas de cada etapa de equipe CONCLUÍDA (qualquer mês),
+    // agregando por etapa (forma canônica). Mostra onde o esforço se concentra.
+    function rankingEtapas(tenantsAtivos){
+      const mapa = {}; // canon → { label, horas, qtd }
+      tenantsAtivos.forEach(tid => {
+        (dadosTenants[tid] || []).forEach(p => {
+          (p.etapas || []).forEach(e => {
+            if(!e.done) return;
+            if(e.r === 'cl') return;             // cliente fora
+            const det = horasEtapaDetalhe(e.lb);
+            if(det.fonte === 'cliente' || det.horas <= 0) return;
+            const c = canon(e.lb);
+            if(!mapa[c]) mapa[c] = { label:chaveEtapa(e.lb), horas:0, qtd:0 };
+            mapa[c].horas += det.horas;
+            mapa[c].qtd++;
+          });
+        });
+      });
+      return Object.values(mapa).sort((a,b) => b.horas - a.horas);
+    }
+
+    // (B) EVOLUÇÃO MENSAL da carga total do time.
+    // Para cada mês, soma as horas de todas as etapas de equipe concluídas
+    // naquele mês (por e.fim). Retorna em ordem cronológica.
+    function evolucaoMensal(tenantsAtivos){
+      const mapa = {}; // 'YYYY-MM' → horas
+      tenantsAtivos.forEach(tid => {
+        (dadosTenants[tid] || []).forEach(p => {
+          (p.etapas || []).forEach(e => {
+            if(!e.done || !e.fim) return;
+            if(e.r === 'cl') return;
+            const det = horasEtapaDetalhe(e.lb);
+            if(det.fonte === 'cliente' || det.horas <= 0) return;
+            const mes = String(e.fim).slice(0,7);
+            mapa[mes] = (mapa[mes] || 0) + det.horas;
+          });
+        });
+      });
+      return Object.keys(mapa).sort().map(mes => ({ mes, horas: mapa[mes] }));
+    }
+
+    // (C) EQUILÍBRIO DA DISTRIBUIÇÃO — usa a carga ATUAL por pessoa
+    // (incluindo quem está com 0h) para mostrar o quão desigual está a alocação.
+    function equilibrioDistribuicao(tenantsAtivos){
+      const pessoas = incluirCargaZero(calcularCargas(tenantsAtivos), tenantsAtivos);
+      pessoas.sort((a,b) => b.totalHoras - a.totalHoras);
+      const cargas = pessoas.map(p => p.totalHoras);
+      const total = cargas.reduce((s,h) => s+h, 0);
+      const comCarga = cargas.filter(h => h > 0);
+      const media = comCarga.length ? total / comCarga.length : 0;
+      const max = cargas.length ? Math.max(...cargas) : 0;
+      // desvio-padrão (entre quem tem carga) como medida simples de desequilíbrio
+      let desvio = 0;
+      if(comCarga.length){
+        const v = comCarga.reduce((s,h) => s + Math.pow(h-media,2), 0) / comCarga.length;
+        desvio = Math.sqrt(v);
+      }
+      return { pessoas, media, max, desvio, total };
+    }
+
     // Limites de carga (horas/mês). Teto invisível = HORAS_MAX_MES (132h).
     const LIMITE_SOBRECARGA = 120;  // acima disso: sobrecarregado
     const LIMITE_MEDIA      = 66;   // acima disso: carga média; abaixo: carga baixa
@@ -1310,6 +1417,24 @@
     function renderizar(){
       preencherSeletorMes();
       const tenantsIds = tenantsAtivosFiltro();
+
+      const peopleEl = document.getElementById('peopleList');
+      const procEl   = document.getElementById('processoView');
+
+      // Modo PROCESSO: esconde os cartões de pessoa e mostra as análises de fluxo
+      if(modoVisao === 'processo'){
+        peopleEl.style.display = 'none';
+        procEl.style.display = '';
+        const t = document.getElementById('peopleSectionTitle');
+        if(t) t.style.display = 'none';
+        renderizarProcesso(tenantsIds);
+        return;
+      }
+      peopleEl.style.display = '';
+      procEl.style.display = 'none';
+      const _t = document.getElementById('peopleSectionTitle');
+      if(_t) _t.style.display = '';
+
       const mensal = (modoVisao === 'mensal');
       const pessoas = mensal
         ? calcularCargasMensal(tenantsIds, mesSelecionado)
@@ -1411,6 +1536,100 @@
       }).join('');
     }
 
+    // ═══ RENDER da visão de PROCESSO (3 análises de fluxo) ═══
+    function renderizarProcesso(tenantsIds){
+      const cor = ['#6366F1','#8B5CF6','#EC4899','#F59E0B','#10B981','#3B82F6',
+                   '#14B8A6','#F43F5E','#A855F7','#22C55E'];
+
+      // KPIs no topo (reaproveita os 4 cartões)
+      const evo = evolucaoMensal(tenantsIds);
+      const totalHist = evo.reduce((s,m) => s+m.horas, 0);
+      const eq = equilibrioDistribuicao(tenantsIds);
+      const rank = rankingEtapas(tenantsIds);
+      document.getElementById('kpiPessoas').textContent = rank.length;
+      document.getElementById('kpiPessoasSub').textContent = 'tipos de etapa';
+      document.getElementById('kpiProjetos').textContent = tenantsIds.reduce((s,tid) =>
+        s + (dadosTenants[tid]||[]).filter(isProjetoAtivo).length, 0);
+      document.getElementById('kpiSobrecarga').textContent = eq.pessoas.filter(p => statusPessoa(p)==='sobrecarga').length;
+      document.getElementById('kpiSobrecargaSub').textContent = `acima de ${LIMITE_SOBRECARGA}h`;
+      document.getElementById('kpiMedia').textContent = totalHist + 'h';
+      document.getElementById('kpiMediaSub').textContent = 'total concluído (histórico)';
+
+      // ── (A) RANKING DE ETAPAS ──
+      const maxRank = rank.length ? rank[0].horas : 1;
+      const topRank = rank.slice(0, 12); // não poluir
+      const rankHtml = topRank.length ? topRank.map((e,i) => `
+        <div class="bar-row">
+          <div class="bar-label" title="${escapeHtml(e.label)}">${escapeHtml(e.label)}</div>
+          <div class="bar-track">
+            <div class="bar-fill" style="width:${Math.max(2,Math.round(e.horas/maxRank*100))}%;background:${cor[i%cor.length]}"></div>
+          </div>
+          <div class="bar-val">${e.horas}h · ${e.qtd}×</div>
+        </div>`).join('')
+        : `<div class="empty-state-sub" style="padding:12px 0">Nenhuma etapa de equipe concluída ainda.</div>`;
+
+      // ── (B) EVOLUÇÃO MENSAL ──
+      const maxEvo = evo.length ? Math.max(...evo.map(m => m.horas)) : 1;
+      const evoHtml = evo.length ? `
+        <div class="evo-wrap">
+          ${evo.map(m => `
+            <div class="evo-col">
+              <div class="evo-bar-area">
+                <div class="evo-bar" style="height:${Math.max(3,Math.round(m.horas/maxEvo*100))}%">
+                  <span class="evo-bar-val">${m.horas}h</span>
+                </div>
+              </div>
+              <div class="evo-label">${nomeMesCurto(m.mes)}</div>
+            </div>`).join('')}
+        </div>`
+        : `<div class="empty-state-sub" style="padding:12px 0">Sem etapas concluídas com data ainda. Conforme o time fechar etapas, os meses aparecem aqui.</div>`;
+
+      // ── (C) EQUILÍBRIO DA DISTRIBUIÇÃO ──
+      const maxEq = eq.max || 1;
+      const eqHtml = eq.pessoas.map((p,i) => {
+        const st = statusPessoa(p);
+        const c = st==='sobrecarga' ? '#EF4444' : st==='media' ? '#10B981' : (p.totalHoras>0 ? '#3B82F6' : 'rgba(255,255,255,.12)');
+        return `
+        <div class="bar-row">
+          <div class="bar-label" title="${escapeHtml(p.nome)}">${escapeHtml(p.nome)}</div>
+          <div class="bar-track">
+            <div class="bar-fill" style="width:${Math.max(2,Math.round(p.totalHoras/maxEq*100))}%;background:${c}"></div>
+          </div>
+          <div class="bar-val">${p.totalHoras}h</div>
+        </div>`;
+      }).join('');
+      const desbalanceio = eq.media > 0 ? Math.round(eq.desvio/eq.media*100) : 0;
+
+      document.getElementById('processoView').innerHTML = `
+        <div class="proc-section">
+          <div class="proc-title">⏱️ Etapas que mais consomem horas</div>
+          <div class="proc-sub">Soma das horas estimadas de cada tipo de etapa já concluída pela equipe (todos os clientes ativos). Mostra onde o esforço se concentra — útil para repensar processo ou alocar mais gente.</div>
+          ${rankHtml}
+          <div class="proc-note">As horas vêm da estimativa por etapa (ou do valor real que você cadastrar). Não medem tempo de relógio — medem volume × esforço-padrão.</div>
+        </div>
+
+        <div class="proc-section">
+          <div class="proc-title">📈 Evolução mês a mês da carga do time</div>
+          <div class="proc-sub">Total de horas das etapas concluídas em cada mês, pela data de conclusão. Tendência de volume de entrega ao longo do tempo.</div>
+          ${evoHtml}
+          <div class="proc-note">Cada coluna soma todas as etapas de equipe fechadas naquele mês. Meses sem conclusões não aparecem.</div>
+        </div>
+
+        <div class="proc-section">
+          <div class="proc-title">⚖️ Equilíbrio da distribuição entre pessoas</div>
+          <div class="proc-sub">Carga atual de cada pessoa da equipe. Quanto mais parelhas as barras, mais equilibrada a alocação. Índice de desbalanceamento: <strong>${desbalanceio}%</strong> (0% = todos iguais; quanto maior, mais desigual).</div>
+          ${eqHtml}
+          <div class="proc-note">Diagnóstico de alocação, não de desempenho: barra curta pode significar pouco trabalho atribuído, não pouca produtividade.</div>
+        </div>
+      `;
+    }
+
+    function nomeMesCurto(mesAno){
+      const [a,m] = mesAno.split('-');
+      const MES = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+      return `${MES[parseInt(m,10)-1]}/${a.slice(2)}`;
+    }
+
     function escapeHtml(s){
       return String(s||'').replace(/[&<>"']/g, c => ({
         '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
@@ -1502,6 +1721,7 @@
       modoVisao = modo;
       document.getElementById('modoAtualBtn').classList.toggle('active', modo === 'atual');
       document.getElementById('modoMensalBtn').classList.toggle('active', modo === 'mensal');
+      document.getElementById('modoProcessoBtn').classList.toggle('active', modo === 'processo');
       document.getElementById('seletorMesWrap').style.display = (modo === 'mensal') ? '' : 'none';
       renderizar();
     }
