@@ -803,58 +803,6 @@ body.dark .tenant-item.current{background:rgba(34,197,94,.12)}
 .btn-medicao:hover{opacity:.88;transform:translateY(-1px)}
 .badge-medicao-ok{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:12px;background:#DCFCE7;color:#15803D;font-size:11px;font-weight:700}
 .badge-medicao-pend{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:12px;background:#FEF9C3;color:#854D0E;font-size:11px;font-weight:700}
-/* HOMOLOGAÇÕES */
-.hom-card{background:#fff;border-radius:var(--r);border:1px solid var(--bdr);margin-bottom:18px;overflow:hidden;box-shadow:var(--sh)}
-.hom-card-head{background:linear-gradient(135deg,#003DA5,#0060CC);color:#fff;padding:13px 18px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
-.hom-card-title{font-weight:700;font-size:14px;flex:1}
-.hom-card-badges{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
-.hom-badge{display:inline-flex;align-items:center;padding:2px 9px;border-radius:10px;font-size:10.5px;font-weight:700;background:rgba(255,255,255,.18);color:#fff}
-.hom-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:0;border-top:1px solid var(--bdr)}
-.hom-field{padding:11px 14px;border-right:1px solid var(--bdr);border-bottom:1px solid var(--bdr)}
-.hom-field:nth-child(4n){border-right:none}
-.hom-field-label{font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--mu);margin-bottom:5px}
-.hom-field-val{font-size:12.5px;color:var(--txt)}
-.hom-field-val select,.hom-field-val input[type=text],.hom-field-val input[type=date],.hom-field-val input[type=number]{width:100%;border:1px solid var(--bdr);border-radius:5px;padding:5px 7px;font-size:12px;font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(--txt);outline:none;transition:border-color .15s}
-.hom-field-val select:focus,.hom-field-val input:focus{border-color:var(--blue)}
-.hom-foot{padding:10px 14px;display:flex;justify-content:flex-end;gap:8px;background:var(--s2);border-top:1px solid var(--bdr)}
-.hom-status-ok{background:#DCFCE7;color:#15803D}
-.hom-status-pend{background:#FEE2E2;color:#B91C1C}
-.hom-status-homolog{background:#FEF08A;color:#92400E}
-.hom-status-autorizado{background:#EFF6FF;color:#1D4ED8}
-.hom-empty{text-align:center;padding:48px 20px;color:var(--mu);font-size:13px}
-.med-group{margin-bottom:18px;border:1px solid var(--bdr);border-radius:10px;overflow:hidden}
-.med-group-hd{display:flex;align-items:center;justify-content:space-between;padding:11px 16px;cursor:pointer;user-select:none;background:var(--s2);transition:background .15s}
-.med-group-hd:hover{background:var(--bdr)}
-.med-group-hd .med-group-title{font-size:12px;font-weight:700;color:var(--txt);display:flex;align-items:center;gap:8px}
-.med-group-hd .med-group-count{font-size:11px;padding:2px 8px;border-radius:10px;font-weight:700}
-.med-group-hd .med-group-chev{font-size:10px;color:var(--mu);transition:transform .2s}
-.med-group.closed .med-group-chev{transform:rotate(-90deg)}
-.med-group-body{display:block}
-.med-group.closed .med-group-body{display:none}
-.med-group-pendente .med-group-hd{background:#FEF9C3}
-.med-group-pendente .med-group-title{color:#92400E}
-.med-group-pendente .med-group-count{background:#FDE68A;color:#92400E}
-.hom-group-title{display:flex;align-items:center;gap:8px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;padding:8px 14px;border-radius:8px;margin-bottom:10px;margin-top:4px}
-.hom-group-title.pendente{background:#FEE2E2;color:#B91C1C}
-.hom-group-title.homologado{background:#FEF08A;color:#92400E}
-.hom-group-title.autorizado{background:#EFF6FF;color:#1D4ED8}
-.hom-group-title.instalado{background:#DCFCE7;color:#15803D}
-.hom-card-head{cursor:pointer;user-select:none}
-.hom-card-head:hover{filter:brightness(1.08)}
-.hom-chevron{font-size:13px;transition:transform .25s;display:inline-block;margin-left:6px}
-.hom-chevron.open{transform:rotate(180deg)}
-.hom-body{overflow:hidden;transition:max-height .3s ease,opacity .25s ease;max-height:0;opacity:0}
-.hom-body.open{max-height:2000px;opacity:1}
-.hom-sec-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--mu);padding:10px 14px 4px;background:var(--s2);border-bottom:1px solid var(--bdr);grid-column:span 4}
-.hom-pendente .hom-card-head{background:linear-gradient(135deg,#991B1B,#DC2626)}
-.hom-instalado .hom-card-head{background:linear-gradient(135deg,#14532D,#15803d)}
-.hom-homologado .hom-card-head{background:linear-gradient(135deg,#B45309,#F59E0B)}
-.hom-autorizado .hom-card-head{background:linear-gradient(135deg,#1D4ED8,#2563EB)}
-.hom-resumo{display:flex;flex-wrap:wrap;gap:10px;padding:10px 14px;background:var(--s2);border-top:1px solid var(--bdr)}
-.hom-resumo-item{font-size:11.5px;display:flex;gap:4px;align-items:center}
-.hom-resumo-label{color:var(--mu);font-weight:600}
-.hom-resumo-val{color:var(--txt)}
-
 /* ═══ MODO ESCURO ═══ */
 body.dark{
   --bg:#111318;--surface:#1C1F26;--s2:#252830;
@@ -1130,7 +1078,7 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
       </div>
       <div class="sb-group-items">
         <div class="si" role="menuitem" tabindex="0" aria-label="Kanban — Quadro de projetos" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();nav('kanban')}" onclick="nav('kanban')"><span class="si-ic">🗂️</span><span>Kanban</span></div>
-        <div class="si" role="menuitem" tabindex="0" aria-label="Homologações" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();nav('homologacoes')}" onclick="nav('homologacoes')"><span class="si-ic">🔖</span><span>Homologações</span><span class="si-badge" id="badgeHomolog" style="display:none"></span></div>
+        
         <div class="si" role="menuitem" tabindex="0" aria-label="Lista de Projetos" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();nav('projetos')}" onclick="nav('projetos')"><span class="si-ic">📋</span><span>Lista de Projetos</span></div>
         <div class="si" role="menuitem" tabindex="0" aria-label="Cronograma" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();nav('timeline')}" onclick="nav('timeline')"><span class="si-ic">📅</span><span>Cronograma</span></div>
       </div>
@@ -1237,11 +1185,10 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
       <div style="position:relative;display:inline-block" id="exportMenuWrap">
         <button class="btn bg2 bsm" onclick="toggleExportMenu()" aria-label="Exportar dados" aria-haspopup="true" aria-expanded="false" id="btnExport">⬇️ Exportar ▾</button>
         <div id="exportMenu" style="display:none;position:absolute;right:0;top:calc(100% + 6px);background:#fff;border:1px solid var(--bdr);border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.12);z-index:999;min-width:210px;overflow:hidden">
-          <div onclick="exportXLSX();toggleExportMenu()" style="padding:11px 16px;cursor:pointer;font-size:13px;display:flex;align-items:center;gap:9px;transition:background .15s" onmouseover="this.style.background='var(--s2)'" onmouseout="this.style.background=''">📊 <span><strong>Exportar XLSX</strong><br><small style="color:var(--mu)">Projetos, Etapas, Atrasos, Homologações e Medição</small></span></div>
+          <div onclick="exportXLSX();toggleExportMenu()" style="padding:11px 16px;cursor:pointer;font-size:13px;display:flex;align-items:center;gap:9px;transition:background .15s" onmouseover="this.style.background='var(--s2)'" onmouseout="this.style.background=''">📊 <span><strong>Exportar XLSX</strong><br><small style="color:var(--mu)">Projetos, Etapas, Atrasos e Medição</small></span></div>
           <div style="border-top:1px solid var(--bdr);margin:0"></div>
           <div onclick="exportPDFLista();toggleExportMenu()" style="padding:11px 16px;cursor:pointer;font-size:13px;display:flex;align-items:center;gap:9px;transition:background .15s" onmouseover="this.style.background='var(--s2)'" onmouseout="this.style.background=''">📊 <span><strong>PDF — Dashboard Executivo</strong><br><small style="color:var(--mu)">KPIs visuais</small></span></div>
           <div style="border-top:1px solid var(--bdr);margin:0"></div>
-          <div onclick="exportPDFHomologacoes();toggleExportMenu()" style="padding:11px 16px;cursor:pointer;font-size:13px;display:flex;align-items:center;gap:9px;transition:background .15s" onmouseover="this.style.background='var(--s2)'" onmouseout="this.style.background=''">🔖 <span><strong>PDF — Relatório de Homologações</strong><br><small style="color:var(--mu)">Todos os dados das Homologações</small></span></div>
           <div style="border-top:1px solid var(--bdr);margin:0"></div>
           <div onclick="exportPDFRelMedicao();toggleExportMenu()" style="padding:11px 16px;cursor:pointer;font-size:13px;display:flex;align-items:center;gap:9px;transition:background .15s" onmouseover="this.style.background='var(--s2)'" onmouseout="this.style.background=''">📐 <span><strong>PDF — Relatório de Medições</strong><br><small style="color:var(--mu)">Cursos medidos por quinzena, com gráfico</small></span></div>
           <div style="border-top:1px solid var(--bdr);margin:0"></div>
@@ -1637,40 +1584,6 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
     </div>
 
     <!-- CANCELADOS -->
-    <!-- HOMOLOGAÇÕES -->
-    <div class="view" id="view-homologacoes">
-      <div class="st" style="margin-bottom:6px">🔖 Homologações</div>
-      <div style="font-size:12.5px;color:var(--mu);margin-bottom:16px">Projetos na etapa Homologação/Instalação. Preencha os dados e acompanhe o status.</div>
-      <div id="homologStats" style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:18px"></div>
-      <!-- Filtros -->
-      <div class="fbox" style="margin-bottom:18px">
-        <div class="fbox-row">
-          <span style="font-size:11px;font-weight:700;color:var(--mu);text-transform:uppercase;letter-spacing:.6px;align-self:center;padding-bottom:2px">Filtrar por</span>
-          <div class="fg-sm"><label class="fl-sm">👤 Solicitante</label>
-            <div class="ms-wrap" id="msWrap_homSol">
-              <button class="ms-btn" id="msBtn_homSol" onclick="_msToggle('homSol')">Todos</button>
-              <div class="ms-dropdown" id="msDd_homSol"></div>
-            </div>
-          </div>
-          <div class="fg-sm"><label class="fl-sm">📤 Homologado Por</label>
-            <div class="ms-wrap" id="msWrap_homEnv">
-              <button class="ms-btn" id="msBtn_homEnv" onclick="_msToggle('homEnv')">Todos</button>
-              <div class="ms-dropdown" id="msDd_homEnv"></div>
-            </div>
-          </div>
-          <div class="fg-sm"><label class="fl-sm">📅 Medição</label>
-            <div class="ms-wrap" id="msWrap_homMed">
-              <button class="ms-btn" id="msBtn_homMed" onclick="_msToggle('homMed')">Todos</button>
-              <div class="ms-dropdown" id="msDd_homMed"></div>
-            </div>
-          </div>
-          <button onclick="limparFiltrosHomolog()" class="btn-lim">✕ Limpar</button>
-          <span id="homFiltroContador" style="font-size:11px;color:var(--mu);margin-left:auto;align-self:center"></span>
-        </div>
-      </div>
-      <div id="homologLista"></div>
-    </div>
-
     <div class="view" id="view-cancelados">
       <div class="st" style="margin-bottom:16px">🚫 Projetos Cancelados</div>
       <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:22px" id="cancelStats"></div>
@@ -1838,7 +1751,6 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
               <option value="enviou medição">📐 Enviou Medição</option>
               <option value="confirmou medição">🎉 Medição confirmada</option>
               <option value="desmarcou medição">↩️ Medição desmarcada</option>
-              <option value="homologação salva">🔖 Homologação</option>
               <option value="deletou projeto">🗑️ Deletou Projeto</option>
             </select>
           </div>
@@ -1951,7 +1863,6 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
             <option value="8">Revisão Textual/Tradução</option>
             <option value="9">PELD</option>
             <option value="10">Autoria Digital</option>
-            <option value="11">Homologação/Instalação</option>
             <option value="12">Pré-Medição</option>
             <option value="13">Upload BDOC - Files e Scorm</option>
             <option value="14">Projetos Concluídos</option>
@@ -2087,26 +1998,53 @@ const COLUNAS = [
   {k:14, l:'Projetos Concluídos',                 dot:'#7C3AED'},
 ];
 // Colunas ocultas no Kanban (existem no sistema mas não são exibidas)
-const COLUNAS_OCULTAS = new Set([2]); // Fazer Cronograma — cronograma é automático
+const COLUNAS_OCULTAS = new Set([2, 11]); // 2=Fazer Cronograma (automático); 11=Homologação (removida)
 
 const ETPS_DEF = [
-  {lb:'Reunião Inicial',               r:'cl'},  // Cliente
-  {lb:'Elaboração do PI',              r:'eq'},  // Equipe
-  {lb:'Revisão do PI',                 r:'cl'},  // Cliente
-  {lb:'Revisão Textual do PI',         r:'eq'},  // Equipe
-  {lb:'Entrega do PI ao cliente',      r:'eq'},  // Equipe
-  {lb:'Validação do PI',               r:'cl'},  // Cliente
-  {lb:'Desenho/Roteirização',          r:'eq'},  // Equipe
-  {lb:'Validação DI Referência',       r:'eq'},  // Equipe
-  {lb:'Produção de Recursos Gráficos', r:'eq'},  // Equipe
-  {lb:'Entrega do Review ao cliente',  r:'eq'},  // Equipe
-  {lb:'Solicitação de Ajustes',        r:'cl'},  // Cliente
-  {lb:'Implementação de Ajustes',      r:'eq'},  // Equipe
-  {lb:'Validação Final',               r:'cl'},  // Cliente
-  {lb:'Revisão Textual',               r:'eq'},  // Equipe
-  {lb:'Homologação',                   r:'eq'},  // Equipe
-  {lb:'Instalação no SIRH',            r:'eq'},  // Equipe
-  {lb:'Upload Arquivos',               r:'eq'},  // Equipe
+  {lb:'Criação da apresentação do kickoff',                                                              r:'eq'},
+  {lb:'Realização do kickoff',                                                                           r:'eq'},
+  {lb:'Entrega do conteúdo bruto',                                                                       r:'eq'},
+  {lb:'Análise do conteúdo',                                                                             r:'eq'},
+  {lb:'Disponibilização da documentação técnica (manual da marca e verbal, normas e regulamentos internos)', r:'eq'},
+  {lb:'Criação do PICV (Plano Instrucional e Comunicação Visual)',                                       r:'eq'},
+  {lb:'Validação do PICV (Plano Instrucional e Comunicação Visual)',                                     r:'eq'},
+  {lb:'Aplicação de ajustes no PICV (Plano Instrucional e Comunicação Visual)',                          r:'eq'},
+  {lb:'Roteirização do curso online',                                                                    r:'eq'},
+  {lb:'Controle de qualidade da roteirização do curso online',                                           r:'eq'},
+  {lb:'Aplicação de ajustes na roteirização do curso online',                                            r:'eq'},
+  {lb:'Validação da roteirização do curso online',                                                       r:'eq'},
+  {lb:'Aplicação de ajustes na roteirização do curso online após a validação',                           r:'eq'},
+  {lb:'Controle de qualidade da roteirização do curso online (pós-ajustes)',                              r:'eq'},
+  {lb:'Revisão textual da roteirização do curso online',                                                 r:'eq'},
+  {lb:'Produção multimídia do curso online',                                                             r:'eq'},
+  {lb:'Controle de qualidade do curso online',                                                           r:'eq'},
+  {lb:'Aplicação de ajustes no curso online produzido',                                                  r:'eq'},
+  {lb:'Validação 1 da produção do curso online',                                                         r:'eq'},
+  {lb:'Aplicação de ajustes no curso online após a validação 1',                                         r:'eq'},
+  {lb:'Validação final da produção do curso online',                                                     r:'eq'},
+  {lb:'Aplicação de ajustes no curso online após a validação final',                                     r:'eq'},
+  {lb:'Revisão textual final do curso online',                                                           r:'eq'},
+  {lb:'Controle de qualidade final do curso online',                                                     r:'eq'},
+  {lb:'Aplicação de ajustes no curso online após o controle de qualidade',                               r:'eq'},
+  {lb:'Roteirização das videoanimações e dos áudios',                                                    r:'eq'},
+  {lb:'Validação técnica da roteirização das videoanimações e dos áudios',                               r:'eq'},
+  {lb:'Validação da roteirização dos áudios',                                                            r:'eq'},
+  {lb:'Validação da roteirização das videoanimações',                                                    r:'eq'},
+  {lb:'Revisão textual dos roteiros das videoanimações e dos áudios',                                    r:'eq'},
+  {lb:'Produção do moodboard das videoanimações',                                                        r:'eq'},
+  {lb:'Controle de qualidade do moodboard das videoanimações',                                           r:'eq'},
+  {lb:'Aplicação de ajustes no moodboard das videoanimações após o controle de qualidade',               r:'eq'},
+  {lb:'Validação do moodboard das videoanimações',                                                       r:'eq'},
+  {lb:'Aplicação de ajustes no moodboard das videoanimações após a validação',                           r:'eq'},
+  {lb:'Produção multimídia das videoanimações e dos áudios',                                             r:'eq'},
+  {lb:'Controle de qualidade das videoanimações e dos áudios',                                           r:'eq'},
+  {lb:'Aplicação de ajustes nas videoanimações e nos áudios após o controle de qualidade',               r:'eq'},
+  {lb:'Validação da produção das videoanimações e dos áudios',                                           r:'eq'},
+  {lb:'Aplicação de ajustes nas videoanimações e nos áudios após a validação',                           r:'eq'},
+  {lb:'Revisão textual das videoanimações',                                                              r:'eq'},
+  {lb:'Controle de qualidade final das videoanimações e dos áudios',                                     r:'eq'},
+  {lb:'Aplicação de ajustes nas videoanimações e nos áudios',                                            r:'eq'},
+  {lb:'Geração e disponibilização do pacote SCORM',                                                      r:'eq'},
 ];
 
 const TIMAP = {
@@ -2520,7 +2458,8 @@ function sitBdg(p){
 }
 
 
-// Verifica se uma etapa é isenta de atraso para Produção Apostila/E-book
+// [LEGADO Petrobras] Isenção de atraso p/ Produção Apostila/E-book.
+// Inativa no fluxo Transpetro (nenhum projeto usa esse recurso) — retorna sempre false.
 function _isApostilaIsentaAtraso(p, e){
   if(!(p.recursos||[]).includes('Produção Apostila/E-book')) return false;
   const lb = (e.lb||'').toLowerCase();
@@ -2595,7 +2534,7 @@ let DB=[];
 let NXT=1, editId=null, cancId=null, dragId=null;
 
 // ── NAV ──
-const PT={kanban:'Quadro Kanban',homologacoes:'Homologações',projetos:'Lista de Projetos',timeline:'Cronograma',kpis:'KPIs & Indicadores',atrasos:'Relatório de Atrasos',cancelados:'Projetos Cancelados',medicao:'Medição',carga:'Carga da Equipe',historico:'Histórico de Edições',lixeira:'Cards Deletados'};
+const PT={kanban:'Quadro Kanban',projetos:'Lista de Projetos',timeline:'Cronograma',kpis:'KPIs & Indicadores',atrasos:'Relatório de Atrasos',cancelados:'Projetos Cancelados',medicao:'Medição',carga:'Carga da Equipe',historico:'Histórico de Edições',lixeira:'Cards Deletados'};
 function nav(id){
   document.querySelectorAll('.view').forEach(v=>v.classList.remove('on'));
   document.getElementById('view-'+id).classList.add('on');
@@ -2690,22 +2629,6 @@ function rKanban(){
           ${p.criadoPor?`<div class="kcard-autoria"><span>✏️ ${p.criadoPor}</span>${p.editadoPor&&p.editadoPor!==p.criadoPor?`<span>· editado: ${p.editadoPor}</span>`:''}</div>`:''}
           ${(() => {
             const etapas = p.etapas || [];
-
-            // ── BOTÃO HOMOLOGAÇÃO ────────────────────────────────────────────
-            // Regra: encontrar o índice da etapa "Homologação" (excluindo "Instalação")
-            // e verificar se a etapa IMEDIATAMENTE ANTERIOR foi concluída.
-            const idxHom = etapas.findIndex(e =>
-              e.lb && e.lb.toLowerCase().includes('homolog') &&
-              !e.lb.toLowerCase().includes('inst')
-            );
-            if(idxHom > 0){
-              const anterior = etapas[idxHom - 1];
-              const homolog  = etapas[idxHom];
-              // Aparece somente quando a etapa anterior foi concluída E Homologação ainda não
-              if(anterior.done && !homolog.done){
-                return `<button class="btn-medicao" style="background:linear-gradient(135deg,#003DA5,#0060CC)" onclick="event.stopPropagation();nav('homologacoes')">🔖 Ir para Homologação</button>`;
-              }
-            }
 
             // ── BOTÃO MEDIÇÃO ────────────────────────────────────────────────
             // Para Apostila/E-book: gatilho é a conclusão de "Validação final"
@@ -2848,7 +2771,6 @@ function _msChange(id){
   else if(id.startsWith('carga')) rCarga();
   else if(id.startsWith('k') && id!=='kpiPer') rKanban();
   else if(id.startsWith('a')) rAtrasos();
-  else if(id.startsWith('hom')) rHomologacoes();
   else applyLFilts();
   _msUpdateBtn(id);
 }
@@ -2861,7 +2783,6 @@ function _msClear(id){
   else if(id.startsWith('carga')) rCarga();
   else if(id.startsWith('k') && id!=='kpiPer') rKanban();
   else if(id.startsWith('a')) rAtrasos();
-  else if(id.startsWith('hom')) rHomologacoes();
   else applyLFilts();
 }
 function _msUpdateBtn(id){
@@ -3336,7 +3257,6 @@ function rKPIs(){
   const atrasCl = act.filter(p=>atrasadoPorCliente(p)).length;
   const andando = act.filter(p=>calcSit(p)==='andamento').length;
   const aguard  = act.filter(p=>calcSit(p)==='aguardando').length;
-  const homolPend = todos.filter(p=>(p.col===11||p.homologPassou||p.homolog?.preenchido)&&!p.homolog?.dtInstalacao).length;
   const medicPend = todos.filter(p=>p.enviadoMedicao&&!p.medicaoFeita).length;
   const avg     = total>0 ? Math.round(act.reduce((a,p)=>a+p.pct,0)/total) : 0;
   const txConc  = total>0 ? Math.round(conc/total*100) : 0;
@@ -3385,7 +3305,6 @@ function rKPIs(){
       total: actAnt.length,
       conc: actAnt.filter(p=>calcSit(p)==='concluido').length,
       atras: actAnt.filter(p=>calcSit(p)==='atrasado').length,
-      homolPend: todosAnt.filter(p=>(p.col===11||p.homologPassou||p.homolog?.preenchido)&&!p.homolog?.dtInstalacao).length,
     };
     ant.txConc  = ant.total>0 ? Math.round(ant.conc/ant.total*100)  : 0;
     ant.txAtras = ant.total>0 ? Math.round(ant.atras/ant.total*100) : 0;
@@ -3457,13 +3376,13 @@ function rKPIs(){
         </div>
         <div class="kpi-hcard-sub">média geral</div>
       </div>
-      <div class="kpi-hcard tone-${homolPend>0?'amber':'green'}">
-        <div class="kpi-hcard-icon">🔧</div>
-        <div class="kpi-hcard-lbl">Homolog. Pendentes</div>
+      <div class="kpi-hcard tone-${medicPend>0?'amber':'green'}">
+        <div class="kpi-hcard-icon">📏</div>
+        <div class="kpi-hcard-lbl">Medição Pendente</div>
         <div class="kpi-hcard-val-row">
-          <div class="kpi-hcard-val" data-target="${homolPend}">0</div>
+          <div class="kpi-hcard-val" data-target="${medicPend}">0</div>
         </div>
-        <div class="kpi-hcard-sub">${medicPend} aguard. medição</div>
+        <div class="kpi-hcard-sub">aguardando medição</div>
       </div>
       <div class="kpi-hcard tone-gray">
         <div class="kpi-hcard-icon">⏱️</div>
@@ -3541,9 +3460,6 @@ function rKPIs(){
     }).length;
     if(venc7 > 0){
       insights.push({tipo:'warn', ico:'⏰', txt:`<strong>${venc7}</strong> projeto${venc7>1?'s':''} vence${venc7>1?'m':''} em até 7 dias`});
-    }
-    if(homolPend > 0){
-      insights.push({tipo:'', ico:'🔧', txt:`<strong>${homolPend}</strong> homologa${homolPend>1?'ções':'ção'} pendente${homolPend>1?'s':''}`});
     }
     if(medicPend > 0){
       insights.push({tipo:'', ico:'📐', txt:`<strong>${medicPend}</strong> aguardando medição`});
@@ -3700,31 +3616,12 @@ function rKPIs(){
   }
 
   // ── 7. Tempo médio por etapa ──
-  const ETAPAS_MEDIR = [
-    {n:'Reunião Inicial',           busca:['Reunião Inicial'],                                   r:'eq'},
-    {n:'Mat. Base Recebido',        busca:['Material Base Recebido'],                             r:'cl'},
-    {n:'Análise Mat. Base',         busca:['Análise do material base'],                           r:'eq'},
-    {n:'Elaboração PICV/PI',        busca:['Elaboração do PICV','Elaboração do PI'],               r:'eq'},
-    {n:'Valid. PICV DI/DM',         busca:['Validação PICV DI/DM Referência','Validação do PI'],  r:'cl'},
-    {n:'Validação LD',              busca:['Validação LD'],                                       r:'cl'},
-    {n:'Rev. Textual PICV/PI',      busca:['Revisão textual do PICV','Revisão Textual do PI'],    r:'eq'},
-    {n:'Entrega PICV/PI cliente',   busca:['Entrega do PICV ao cliente','Entrega do PI ao cliente'],r:'eq'},
-    {n:'Solic. Ajustes PICV',       busca:['Solicitação de ajustes no PICV'],                     r:'cl'},
-    {n:'Impl. Ajustes (PI)',        busca:['Implementação de ajustes','Implementação de Ajustes'], r:'eq'},
-    {n:'Valid. Final PICV',         busca:['Validação final do PICV'],                            r:'cl'},
-    {n:'Desenho/Rot. Onepage',      busca:['Desenho/roteirização do onepage','Desenho/Roteirização'],r:'eq'},
-    {n:'Valid. DI Referência',      busca:['Validação DI Referência'],                            r:'cl'},
-    {n:'Prod. Recursos Gráficos',   busca:['Produção de recursos gráficos','Produção de Recursos Gráficos'],r:'eq'},
-    {n:'Valid. DM Referência',      busca:['Validação DM Referência'],                            r:'cl'},
-    {n:'Entrega Review cliente',    busca:['Entrega do review ao cliente','Entrega do Review ao cliente'],r:'eq'},
-    {n:'Solic. Ajustes Review',     busca:['Solicitação de ajustes','Solicitação de Ajustes'],     r:'cl'},
-    {n:'Impl. Ajustes (Review)',    busca:['Implementação de ajustes','Implementação de Ajustes'], r:'eq'},
-    {n:'Valid. Final Review',       busca:['Validação final do review','Validação Final'],         r:'cl'},
-    {n:'Rev. Textual Review',       busca:['Revisão textual do review','Revisão Textual'],         r:'eq'},
-    {n:'Homologação',               busca:['Homologação'],                                        r:'eq'},
-    {n:'Instalação SIRH',           busca:['Instalação no SIRH'],                                 r:'eq'},
-    {n:'Upload Arquivos Bdoc',      busca:['Upload Arquivos Bdoc','Upload Arquivos'],              r:'eq'},
-  ];
+  // Derivado diretamente do fluxo de 44 etapas (ETPS_DEF).
+  const ETAPAS_MEDIR = ETPS_DEF.map(e => ({
+    n: e.lb.length > 32 ? e.lb.slice(0, 30) + '…' : e.lb,
+    busca: [e.lb],
+    r: e.r
+  }));
   const etapaMedArr = ETAPAS_MEDIR.map(def => {
     const amostras = [];
     todos.forEach(p => {
@@ -4338,239 +4235,27 @@ let _motivoPid=null, _motivoIdx=null;
 //   'multi': array de fragmentos — TODOS precisam estar concluídos para mover
 // Recurso não listado aqui usa o fluxo padrão (ETPS_DEF).
 
-const TEMPLATES = {
-  'Encapsulamento': {
-    colInicial: 1,
-    etapas: [
-      {lb:'Material Base Recebido',      r:'cl'},
-      {lb:'Entrega do Review ao Cliente',r:'eq'},
-      {lb:'Solicitação de Ajustes',      r:'cl'},
-      {lb:'Implementação de Ajustes',    r:'eq'},
-      {lb:'Validação Final',             r:'cl'},
-      {lb:'Homologação',                 r:'eq'},
-      {lb:'Instalação no SIRH',          r:'eq'},
-      {lb:'Upload Arquivos',             r:'eq'},
-    ],
-    gatilhos: [
-      {nome:'material base recebido',                      col:6},
-      {nome:'entrega do review',                           col:7},
-      {nome:'validação final',                             col:11},
-      {multi:['homologação','instalação no sirh'],         col:12},
-      {nome:'upload arquivos',                             col:14},
-    ],
-    fimCol: 14,
-  },
+const TEMPLATES = {}; // Transpetro: fluxo único — todos os recursos usam ETPS_DEF + ETAPA_COL_MAP_PADRAO
 
-  'Manutenção': {
-    colInicial: 0,
-    etapas: [
-      {lb:'Reunião Inicial',             r:'eq'},
-      {lb:'Material Base Recebido',      r:'cl'},
-      {lb:'Realizar Cronograma',         r:'eq'},
-      {lb:'Desenvolvimento',             r:'eq'},
-      {lb:'Entrega do Review ao Cliente',r:'eq'},
-      {lb:'Solicitação de Ajustes',      r:'cl'},
-      {lb:'Implementação de Ajustes',    r:'eq'},
-      {lb:'Validação Final',             r:'cl'},
-      {lb:'Homologação',                 r:'eq'},
-      {lb:'Instalação no SIRH',          r:'eq'},
-      {lb:'Upload Arquivos',              r:'eq'},
-    ],
-    gatilhos: [
-      {nome:'reunião inicial',                             col:1},
-      {nome:'material base recebido',                      col:2},
-      {nome:'realizar cronograma',                         col:5},
-      {nome:'desenvolvimento',                             col:6},
-      {nome:'entrega do review',                           col:7},
-      {nome:'validação final',                             col:11},
-      {multi:['homologação','instalação no sirh'],         col:12},
-      {nome:'upload arquivos',                             col:14},
-    ],
-    fimCol: 14,
-  },
-
-  'Autoria Digital': {
-    colInicial: 0,
-    etapas: [
-      {lb:'Reunião Inicial',  r:'eq'},
-      {lb:'Desenvolvimento',  r:'cl'},
-      {lb:'Homologação',      r:'eq'},
-      {lb:'Instalação no SIRH',r:'eq'},
-      {lb:'Upload Arquivos',    r:'eq'},
-    ],
-    gatilhos: [
-      {nome:'reunião inicial',                             col:10},
-      {nome:'desenvolvimento',                             col:11},
-      {multi:['homologação','instalação no sirh'],         col:12},
-      {nome:'upload arquivos',                             col:14},
-    ],
-    fimCol: 14,
-  },
-
-  'Web Rise Básico': {
-    colInicial: 0,
-    etapas: [
-      {lb:'Reunião Inicial',                        r:'eq'},
-      {lb:'Material Base Recebido',                 r:'cl'},
-      {lb:'Análise do material base',               r:'eq'},
-      {lb:'Elaboração do PICV',                     r:'eq'},
-      {lb:'Validação PICV DI/DM Referência',        r:'cl'},
-      {lb:'Validação LD',                           r:'cl'},
-      {lb:'Revisão textual do PICV',                r:'eq'},
-      {lb:'Entrega do PICV ao cliente',             r:'eq'},
-      {lb:'Solicitação de ajustes no PICV',         r:'cl'},
-      {lb:'Implementação de ajustes',               r:'eq'},
-      {lb:'Validação final do PICV',                r:'cl'},
-      {lb:'Desenho/roteirização do onepage',        r:'eq'},
-      {lb:'Validação DI Referência',                r:'cl'},
-      {lb:'Produção de recursos gráficos',          r:'eq'},
-      {lb:'Validação DM Referência',                r:'cl'},
-      {lb:'Validação LD',                           r:'cl'},
-      {lb:'Entrega do review ao cliente',           r:'eq'},
-      {lb:'Solicitação de ajustes',                 r:'cl'},
-      {lb:'Implementação de ajustes',               r:'eq'},
-      {lb:'Validação final do review',              r:'cl'},
-      {lb:'Revisão textual do review',              r:'eq'},
-      {lb:'Homologação',                            r:'eq'},
-      {lb:'Instalação no SIRH',                     r:'eq'},
-      {lb:'Upload Arquivos Bdoc',                   r:'eq'},
-    ],
-    gatilhos: [
-      {nome:'reunião inicial',                       col:1,  exato:true},  // → Aguardando Material Base
-      {nome:'material base recebido',                col:3,  exato:true},  // → Projeto Instrucional (PI)
-      {nome:'entrega do picv ao cliente',            col:4,  exato:true},  // → Validação - PI
-      {nome:'validação final do picv',               col:6,  exato:true},  // → Desenvolvimento
-      {nome:'entrega do review ao cliente',          col:7,  exato:true},  // → Validação - Desenvolvimento
-      {nome:'validação final do review',             col:8,  exato:true},  // → Revisão Textual/Tradução
-      {nome:'revisão textual do review',             col:11, exato:true},  // → Homologação/Instalação
-      {multi:['homologação','instalação no sirh'],   col:12},              // → Pré-Medição
-      {nome:'upload arquivos bdoc',                  col:14, exato:true},  // → Projetos Concluídos
-    ],
-    fimCol: 14,
-  },
-
-  'Web Rise Intermediário': {
-    colInicial: 0,
-    etapas: [
-      {lb:'Reunião Inicial',                        r:'eq'},
-      {lb:'Material Base Recebido',                 r:'cl'},
-      {lb:'Análise do material base',               r:'eq'},
-      {lb:'Elaboração do PICV',                     r:'eq'},
-      {lb:'Validação PICV DI/DM Referência',        r:'cl'},
-      {lb:'Validação LD',                           r:'cl'},
-      {lb:'Revisão textual do PICV',                r:'eq'},
-      {lb:'Entrega do PICV ao cliente',             r:'eq'},
-      {lb:'Solicitação de ajustes no PICV',         r:'cl'},
-      {lb:'Implementação de ajustes',               r:'eq'},
-      {lb:'Validação final do PICV',                r:'cl'},
-      {lb:'Desenho/roteirização do onepage',        r:'eq'},
-      {lb:'Validação DI Referência',                r:'cl'},
-      {lb:'Produção de recursos gráficos',          r:'eq'},
-      {lb:'Validação DM Referência',                r:'cl'},
-      {lb:'Validação LD',                           r:'cl'},
-      {lb:'Entrega do review ao cliente',           r:'eq'},
-      {lb:'Solicitação de ajustes',                 r:'cl'},
-      {lb:'Implementação de ajustes',               r:'eq'},
-      {lb:'Validação final do review',              r:'cl'},
-      {lb:'Revisão textual do review',              r:'eq'},
-      {lb:'Homologação',                            r:'eq'},
-      {lb:'Instalação no SIRH',                     r:'eq'},
-      {lb:'Upload Arquivos Bdoc',                   r:'eq'},
-    ],
-    gatilhos: [
-      {nome:'reunião inicial',                       col:1,  exato:true},  // → Aguardando Material Base
-      {nome:'material base recebido',                col:3,  exato:true},  // → Projeto Instrucional (PI)
-      {nome:'entrega do picv ao cliente',            col:4,  exato:true},  // → Validação - PI
-      {nome:'validação final do picv',               col:6,  exato:true},  // → Desenvolvimento
-      {nome:'entrega do review ao cliente',          col:7,  exato:true},  // → Validação - Desenvolvimento
-      {nome:'validação final do review',             col:8,  exato:true},  // → Revisão Textual/Tradução
-      {nome:'revisão textual do review',             col:11, exato:true},  // → Homologação/Instalação
-      {multi:['homologação','instalação no sirh'],   col:12},              // → Pré-Medição
-      {nome:'upload arquivos bdoc',                  col:14, exato:true},  // → Projetos Concluídos
-    ],
-    fimCol: 14,
-  },
-
-  'Web Rise Avançado': {
-    colInicial: 0,
-    etapas: [
-      {lb:'Reunião Inicial',                        r:'eq'},
-      {lb:'Material Base Recebido',                 r:'cl'},
-      {lb:'Análise do material base',               r:'eq'},
-      {lb:'Elaboração do PICV',                     r:'eq'},
-      {lb:'Validação PICV DI/DM Referência',        r:'cl'},
-      {lb:'Validação LD',                           r:'cl'},
-      {lb:'Revisão textual do PICV',                r:'eq'},
-      {lb:'Entrega do PICV ao cliente',             r:'eq'},
-      {lb:'Solicitação de ajustes no PICV',         r:'cl'},
-      {lb:'Implementação de ajustes',               r:'eq'},
-      {lb:'Validação final do PICV',                r:'cl'},
-      {lb:'Desenho/roteirização do onepage',        r:'eq'},
-      {lb:'Validação DI Referência',                r:'cl'},
-      {lb:'Produção de recursos gráficos',          r:'eq'},
-      {lb:'Validação DM Referência',                r:'cl'},
-      {lb:'Validação LD',                           r:'cl'},
-      {lb:'Entrega do review ao cliente',           r:'eq'},
-      {lb:'Solicitação de ajustes',                 r:'cl'},
-      {lb:'Implementação de ajustes',               r:'eq'},
-      {lb:'Validação final do review',              r:'cl'},
-      {lb:'Revisão textual do review',              r:'eq'},
-      {lb:'Homologação',                            r:'eq'},
-      {lb:'Instalação no SIRH',                     r:'eq'},
-      {lb:'Upload Arquivos Bdoc',                   r:'eq'},
-    ],
-    gatilhos: [
-      {nome:'reunião inicial',                       col:1,  exato:true},  // → Aguardando Material Base
-      {nome:'material base recebido',                col:3,  exato:true},  // → Projeto Instrucional (PI)
-      {nome:'entrega do picv ao cliente',            col:4,  exato:true},  // → Validação - PI
-      {nome:'validação final do picv',               col:6,  exato:true},  // → Desenvolvimento
-      {nome:'entrega do review ao cliente',          col:7,  exato:true},  // → Validação - Desenvolvimento
-      {nome:'validação final do review',             col:8,  exato:true},  // → Revisão Textual/Tradução
-      {nome:'revisão textual do review',             col:11, exato:true},  // → Homologação/Instalação
-      {multi:['homologação','instalação no sirh'],   col:12},              // → Pré-Medição
-      {nome:'upload arquivos bdoc',                  col:14, exato:true},  // → Projetos Concluídos
-    ],
-    fimCol: 14,
-  },
-
-  'Produção Apostila/E-book': {
-    colInicial: 0,
-    etapas: [
-      {lb:'Reunião inicial',                                  r:'cl'},
-      {lb:'Revisão textual',                                  r:'eq'},
-      {lb:'Projeto gráfico',                                  r:'eq'},
-      {lb:'Validação técnica/ajustes > PG',                   r:'eq'},
-      {lb:'Validação/Solicitação de ajustes > rev. textual',  r:'cl'},
-      {lb:'Validação/Solicitação de ajustes > proj. gráfico', r:'cl'},
-      {lb:'Implementação ajustes > revisão textual',          r:'eq'},
-      {lb:'Implementação ajustes > projeto gráfico',          r:'eq'},
-      {lb:'Diagramação',                                      r:'eq'},
-      {lb:'Validação técnica/ajustes > diagramação',         r:'eq'},
-      {lb:'Validação/Solicitação de ajustes > diagramação',  r:'cl'},
-      {lb:'Implementação ajustes > diagramação',             r:'eq'},
-      {lb:'Validação final',                                 r:'cl'},
-      {lb:'Upload BDOC',                                     r:'eq'},
-    ],
-    gatilhos: [
-      {nome:'reunião inicial', col:9},    // → PELD (permanece aqui durante toda a produção)
-      {nome:'validação final',  col:13},  // → Upload BDOC - Files e Scorm (última etapa antes do upload)
-      {nome:'upload bdoc',      col:14},  // → Projetos Concluídos
-    ],
-    fimCol: 14,
-  },
-};
-
-// Gatilhos do fluxo PADRÃO (recursos sem template específico)
+// Gatilhos do fluxo PADRÃO — Transpetro (etapa concluída → card avança p/ coluna)
+// Mapeia marcos-chave das 44 etapas às 15 colunas existentes (match por fragmento).
 const ETAPA_COL_MAP_PADRAO = [
-  {nome:'reunião inicial',          col:1},
-  {nome:'entrega do pi ao cliente', col:4},
-  {nome:'validação do pi',          col:6},
-  {nome:'validação di',             col:6},
-  {nome:'entrega do review',        col:7},
-  {nome:'implementação de ajuste',  col:9},
-  {nome:'validação final',          col:11},
-  {nome:'instalação no sirh',       col:12},  // → Pré-Medição
-  {nome:'upload arquivos',           col:14},
+  {nome:'realização do kickoff',                       col:1},   // → Aguardando Material Base
+  {nome:'entrega do conteúdo bruto',                   col:3},   // → Projeto Instrucional (PI)
+  {nome:'criação do picv',                             col:3},   // → Projeto Instrucional (PI)
+  {nome:'validação do picv',                           col:4},   // → Validação - PI
+  {nome:'aplicação de ajustes no picv',                col:5},   // → Fila de Espera - Produção
+  {nome:'roteirização do curso online',                col:6},   // → Desenvolvimento
+  {nome:'validação da roteirização do curso online',   col:7},   // → Validação - Desenvolvimento
+  {nome:'revisão textual da roteirização do curso',    col:8},   // → Revisão Textual/Tradução
+  {nome:'produção multimídia do curso online',         col:6},   // → Desenvolvimento
+  {nome:'validação final da produção do curso online', col:7},   // → Validação - Desenvolvimento
+  {nome:'roteirização das videoanimações',             col:9},   // → PELD
+  {nome:'produção do moodboard das videoanimações',    col:10},  // → Autoria Digital
+  {nome:'produção multimídia das videoanimações',      col:10},  // → Autoria Digital
+  {nome:'validação da produção das videoanimações',    col:12},  // → Pré-Medição (col 11 Homologação removida)
+  {nome:'controle de qualidade final das videoanimações', col:12}, // → Pré-Medição
+  {nome:'geração e disponibilização do pacote scorm',  col:14},  // → Projetos Concluídos
 ];
 
 // Retorna o template ativo do projeto (baseado no primeiro recurso com template)
@@ -4633,14 +4318,10 @@ function avancarColuna(p){
   if(novaCol !== p.col){
     const avancou = novaCol > p.col;
     p.col = novaCol;
-    // Marcar que projeto já passou pela col 11 (Homologação) — persiste mesmo avançando
-    if(novaCol === 11 && !p.homologPassou) p.homologPassou = true;
     const colNome = COLUNAS.find(c=>c.k===novaCol)?.l||'';
     showToast((avancou ? '📌 ' : '↩️ ') + (p.nome.length>22?p.nome.slice(0,20)+'…':p.nome)+' → '+colNome);
     return true;
   }
-  // Também marcar se já está na col 11 (projetos que chegaram antes desta correção)
-  if(p.col === 11 && !p.homologPassou) p.homologPassou = true;
   return false;
 }
 
@@ -4648,11 +4329,11 @@ function toggleE(pid,idx){
   const p=DB.find(x=>x.id===pid);if(!p)return;
   const e=p.etapas[idx];
 
-  // Etapa de Upload: apenas Liderança pode concluir ou reabrir
-  if(e.lb && e.lb.toLowerCase().includes('upload')){
+  // Etapa final (pacote SCORM): apenas Liderança pode concluir ou reabrir
+  if(e.lb && (e.lb.toLowerCase().includes('upload') || e.lb.toLowerCase().includes('scorm'))){
     const usuUpload = nomeUsuarioAtual();
     if(!usuUpload.toLowerCase().includes('liderança')){
-      showToast('🚫 Apenas a Liderança pode concluir a etapa de Upload');
+      showToast('🚫 Apenas a Liderança pode concluir a etapa final (SCORM)');
       return;
     }
   }
@@ -4683,21 +4364,6 @@ function toggleE(pid,idx){
   if(colMudou){
     const colNome = COLUNAS.find(c=>c.k===p.col)?.l||'';
     registrarHistorico(p, 'moveu coluna', `Movido para "${colNome}"`);
-  }
-
-  // ── Sincronizar flag homologPassou com o estado real da etapa ──
-  // Se a etapa "Homologação" foi desmarcada E o projeto não está mais em col >= 11,
-  // zerar homologPassou para que o projeto saia da aba Homologações.
-  // (Mantém true se o projeto já avançou além da col 11 — significa que de fato passou.)
-  if(e.lb === 'Homologação' && !e.done && p.col < 11){
-    if(p.homologPassou){
-      p.homologPassou = false;
-      registrarHistorico(p, 'reabriu homologação', 'Etapa Homologação reaberta — projeto removido da aba Homologações');
-    }
-    // Limpar dados de homologação preenchidos para não reaparecer pela 2ª condição
-    if(p.homolog?.preenchido){
-      p.homolog.preenchido = false;
-    }
   }
 
   fbSalvarProjeto(p);
@@ -4962,120 +4628,25 @@ function onDataInicioChange(){
   }
 }
 
-// ── CRONOGRAMAS FIXOS POR RECURSO (dias úteis por etapa) ────────────────────
-// Chave: nome do recurso → array [{lb, dias}] na mesma ordem das etapas
-// Etapas sem entrada no cronograma ficam sem prazo automático
-const CRONOGRAMAS = {
-  // ─── Totais: Encaps=24d | Básico=51d | Inter=64d | Avançado=78d ───────────
-  'Encapsulamento': [
-    // Reunião Inicial e Material Base Recebido: sem prazo automático (dependem do cliente)
-    {lb:'Entrega do Review ao Cliente', dias:8},  // +3d do Material Base Recebido
-    {lb:'Solicitação de Ajustes',       dias:3},
-    {lb:'Implementação de Ajustes',     dias:3},
-    {lb:'Validação Final',              dias:1},
-    {lb:'Homologação',                  dias:3},
-    {lb:'Instalação no SIRH',           dias:2},
-    {lb:'Upload Arquivos',              dias:4},
-  ],  // total: 24d
-  'Web Rise Básico': [
-    // Reunião Inicial e Material Base Recebido: sem prazo automático
-    {lb:'Elaboração do PICV',                  dias:7},
-    {lb:'Validação PICV DI/DM Referência',     dias:3},
-    {lb:'Validação LD',                        dias:2},
-    {lb:'Revisão textual do PICV',             dias:1},
-    {lb:'Entrega do PICV ao cliente',          dias:1},
-    {lb:'Solicitação de ajustes no PICV',      dias:2},
-    {lb:'Implementação de ajustes',            dias:2},
-    {lb:'Validação final do PICV',             dias:1},
-    {lb:'Desenho/roteirização do onepage',     dias:5},
-    {lb:'Validação DI Referência',             dias:3},
-    {lb:'Produção de recursos gráficos',       dias:2},
-    {lb:'Validação DM Referência',             dias:2},
-    {lb:'Validação LD',                        dias:2},
-    {lb:'Entrega do review ao cliente',        dias:1},
-    {lb:'Solicitação de ajustes',              dias:3},
-    {lb:'Implementação de ajustes',            dias:3},
-    {lb:'Validação final do review',           dias:1},
-    {lb:'Revisão textual do review',           dias:2},
-    {lb:'Homologação',                         dias:3},
-    {lb:'Instalação no SIRH',                  dias:2},
-    {lb:'Upload Arquivos Bdoc',                dias:7},
-  ],  // total: 55d
-  'Web Rise Intermediário': [
-    // Reunião Inicial e Material Base Recebido: sem prazo automático
-    {lb:'Elaboração do PICV',                  dias:7},
-    {lb:'Validação PICV DI/DM Referência',     dias:3},
-    {lb:'Validação LD',                        dias:2},
-    {lb:'Revisão textual do PICV',             dias:1},
-    {lb:'Entrega do PICV ao cliente',          dias:1},
-    {lb:'Solicitação de ajustes no PICV',      dias:2},
-    {lb:'Implementação de ajustes',            dias:2},
-    {lb:'Validação final do PICV',             dias:1},
-    {lb:'Desenho/roteirização do onepage',     dias:10},
-    {lb:'Validação DI Referência',             dias:3},
-    {lb:'Produção de recursos gráficos',       dias:8},
-    {lb:'Validação DM Referência',             dias:3},
-    {lb:'Validação LD',                        dias:2},
-    {lb:'Entrega do review ao cliente',        dias:1},
-    {lb:'Solicitação de ajustes',              dias:3},
-    {lb:'Implementação de ajustes',            dias:3},
-    {lb:'Validação final do review',           dias:1},
-    {lb:'Revisão textual do review',           dias:3},
-    {lb:'Homologação',                         dias:3},
-    {lb:'Instalação no SIRH',                  dias:2},
-    {lb:'Upload Arquivos Bdoc',                dias:7},
-  ],  // total: 68d
-  'Web Rise Avançado': [
-    // Reunião Inicial e Material Base Recebido: sem prazo automático
-    {lb:'Elaboração do PICV',                  dias:7},
-    {lb:'Validação PICV DI/DM Referência',     dias:3},
-    {lb:'Validação LD',                        dias:2},
-    {lb:'Revisão textual do PICV',             dias:1},
-    {lb:'Entrega do PICV ao cliente',          dias:1},
-    {lb:'Solicitação de ajustes no PICV',      dias:2},
-    {lb:'Implementação de ajustes',            dias:2},
-    {lb:'Validação final do PICV',             dias:1},
-    {lb:'Desenho/roteirização do onepage',     dias:15},
-    {lb:'Validação DI Referência',             dias:3},
-    {lb:'Produção de recursos gráficos',       dias:16},
-    {lb:'Validação DM Referência',             dias:3},
-    {lb:'Validação LD',                        dias:2},
-    {lb:'Entrega do review ao cliente',        dias:1},
-    {lb:'Solicitação de ajustes',              dias:3},
-    {lb:'Implementação de ajustes',            dias:3},
-    {lb:'Validação final do review',           dias:1},
-    {lb:'Revisão textual do review',           dias:4},
-    {lb:'Homologação',                         dias:3},
-    {lb:'Instalação no SIRH',                  dias:2},
-    {lb:'Upload Arquivos Bdoc',                dias:7},
-  ],  // total: 82d
-  'Produção Apostila/E-book': [
-    {lb:'Reunião inicial',                                  dias:5},
-    {lb:'Revisão textual',                                  dias:5},
-    {lb:'Projeto gráfico',                                  dias:5},
-    {lb:'Validação técnica/ajustes > PG',                   dias:2},
-    {lb:'Validação/Solicitação de ajustes > rev. textual',  dias:4},
-    {lb:'Validação/Solicitação de ajustes > proj. gráfico', dias:3},
-    {lb:'Implementação ajustes > revisão textual',          dias:2},
-    {lb:'Implementação ajustes > projeto gráfico',          dias:2},
-    {lb:'Diagramação',                                      dias:10},
-    {lb:'Validação técnica/ajustes > diagramação',         dias:2},
-    {lb:'Validação/Solicitação de ajustes > diagramação',  dias:4},
-    {lb:'Implementação ajustes > diagramação',             dias:4},
-    {lb:'Validação final',                                 dias:3},
-    {lb:'Upload BDOC',                                     dias:1},
-  ],  // total: 52d
-  'Autoria Digital': [
-    // Reunião Inicial: sem prazo automático (depende do cliente)
-    {lb:'Desenvolvimento',     dias:2},  // +1d da Reunião Inicial
-    {lb:'Homologação',         dias:2},
-    {lb:'Instalação no SIRH',  dias:1},
-    {lb:'Upload Arquivos',     dias:1},
-  ],  // total: 6d
-};
+// ── CRONOGRAMA ÚNICO TRANSPETRO (dias úteis por etapa) ──────────────────────
+// Fluxo único: as 44 etapas, todas com 2 dias úteis (total 88du).
+// Para ajustar a duração de uma etapa, mude o valor de `dias` abaixo.
+const CRONOGRAMA_TRANSPETRO = ETPS_DEF.map(e => ({lb:e.lb, dias:2})); // 44 × 2du = 88du
+
+// CRONOGRAMAS é consultado por nome de recurso (CRONOGRAMAS[r]). Como o fluxo
+// é único, qualquer recurso selecionado herda o mesmo cronograma — o Proxy
+// devolve CRONOGRAMA_TRANSPETRO para qualquer chave string consultada.
+const CRONOGRAMAS = new Proxy({}, {
+  get(_t, prop){
+    if(typeof prop === 'string') return CRONOGRAMA_TRANSPETRO;
+    return undefined;
+  }
+});
 
 // Etapas que ficam sem prazo automático (dependem do cliente)
-const ETAPAS_SEM_PRAZO_AUTO = new Set(['Reunião Inicial','Material Base Recebido','Reunião inicial','Material base recebido']);
+// Transpetro: todas as 44 etapas entram no cronograma automático.
+// Para isentar alguma etapa do prazo/atraso automático, adicione o label exato aqui.
+const ETAPAS_SEM_PRAZO_AUTO = new Set([]);
 
 // Avança N dias úteis a partir de uma data ISO
 // Feriados nacionais fixos (MM-DD) e móveis calculados por ano
@@ -5927,8 +5498,6 @@ function salvar(){
     mudouEscopo:projAnterior?.mudouEscopo||'',
     escopoAntigoRecurso:projAnterior?.escopoAntigoRecurso||'',
     escopoNovoRecurso:projAnterior?.escopoNovoRecurso||'',
-    homolog:projAnterior?.homolog||{},          // preserva dados de homologação
-    homologPassou:projAnterior?.homologPassou||false,
     medicaoQuinzena:projAnterior?.medicaoQuinzena||'',
     historico:projAnterior?.historico||[],
     etapas,
@@ -6400,27 +5969,8 @@ function exportXLSX(){
   wsA['!cols'] = [40,16,36,10,14,14,22,40].map(w=>({wch:w}));
   XLSX.utils.book_append_sheet(wb, wsA, 'Atrasos');
 
-  // ── Aba 4: Homologações ──
-  const hdrH = ['Projeto','Situação','RP','Academia','ID Curso','Pacote SCORM','Solicitou a Homologação','Homologado Por','RT','Conclusão','Nota de Corte','Novo/Manutenção','Serviço','Dt. Homologação','Dt. Autorização','Dt. Instalação SIRH','Status'];
+  // ── Aba 4: Medição ──
   const todosTodos = activeDB().concat(cancelDB());
-  const rowsH = todosTodos
-    .filter(p => p.col === 11 || p.homologPassou || p.homolog?.preenchido)
-    .map(p => {
-      const h = p.homolog || {};
-      return [
-        p.nome, sitLabel(p), p.rp||'', p.academia||'',
-        h.idCurso||'', h.pacoteScorm||'', h.solicitante||'', h.enviadaPor||'',
-        h.rt||'', h.conclusao||'', h.notaCorte||'', h.nPaginas||'', h.novoManut||'', h.servico||'',
-        isoToBR(h.dtHomolog), isoToBR(h.dtAutorizacao), isoToBR(h.dtInstalacao),
-        h.dtInstalacao ? 'Instalado' : 'Pendente'
-      ];
-    });
-  if(rowsH.length === 0) rowsH.push(['Nenhuma homologação registrada']);
-  const wsH = XLSX.utils.aoa_to_sheet([hdrH, ...rowsH]);
-  wsH['!cols'] = [44,16,14,14,14,22,16,16,16,14,14,16,18,18,18,18,12].map(w=>({wch:w}));
-  XLSX.utils.book_append_sheet(wb, wsH, 'Homologações');
-
-  // ── Aba 5: Medição ──
   const hdrM = ['Projeto','Situação','Responsáveis','Recursos','Coluna Atual','Enviado p/ Medição em','Medição Feita?','Medição Concluída em'];
   const rowsM = todosTodos
     .filter(p => p.enviadoMedicao)
@@ -6737,7 +6287,6 @@ function exportPDFLista(){
   const atrasClV = act.filter(p=>atrasadoPorCliente(p)).length;
   const andando = act.filter(p=>calcSit(p)==='andamento').length;
   const aguard = act.filter(p=>calcSit(p)==='aguardando').length;
-  const homolPendV = todos.filter(p=>(p.col===11||p.homologPassou||p.homolog?.preenchido)&&!p.homolog?.dtInstalacao).length;
   const medicPendV = todos.filter(p=>p.enviadoMedicao&&!p.medicaoFeita).length;
   const avg = total>0 ? Math.round(act.reduce((a,p)=>a+p.pct,0)/total) : 0;
   const txConc = total>0 ? Math.round(conc/total*100) : 0;
@@ -6761,9 +6310,9 @@ function exportPDFLista(){
       barColor:(txAtras>20?C.red:txAtras>10?C.amber:C.green),
       valColor:(txAtras>20?C.red:txAtras>10?C.amber:C.green)},
     {label:'Progresso Medio', value:avg+'%', sub:'media geral', barColor:C.purple, valColor:C.purple},
-    {label:'Homolog. Pendentes', value:homolPendV, sub:medicPendV+' aguard. medicao',
-      barColor:(homolPendV>0?C.amber:C.green),
-      valColor:(homolPendV>0?C.amber:C.green)},
+    {label:'Medicao Pendente', value:medicPendV, sub:'aguardando medicao',
+      barColor:(medicPendV>0?C.amber:C.green),
+      valColor:(medicPendV>0?C.amber:C.green)},
     {label:'Tempo Medio Ciclo', value:tmCiclo!==null?tmCiclo+'d':'-',
       sub:ciclos.length+' proj. concluido'+(ciclos.length!==1?'s':''),
       barColor:C.gray, valColor:C.text},
@@ -6824,7 +6373,6 @@ function exportPDFLista(){
     return d>=0 && d<=7;
   }).length;
   if(venc7>0) insights.push({tone:'warn', txt:venc7+' projeto'+(venc7>1?'s':'')+' vence'+(venc7>1?'m':'')+' em ate 7 dias'});
-  if(homolPendV>0) insights.push({tone:'info', txt:homolPendV+' homologa'+(homolPendV>1?'coes':'cao')+' pendente'+(homolPendV>1?'s':'')});
   if(medicPendV>0) insights.push({tone:'info', txt:medicPendV+' projeto'+(medicPendV>1?'s':'')+' aguardando medicao'});
   if(tmCiclo!==null) insights.push({tone:'info', txt:'Tempo medio de ciclo: '+tmCiclo+' dias ('+ciclos.length+' projeto'+(ciclos.length!==1?'s':'')+' concluido'+(ciclos.length!==1?'s':'')+')'});
   if(txConc>=70) insights.push({tone:'ok', txt:'Excelente taxa de conclusao: '+txConc+'%'});
@@ -7069,31 +6617,12 @@ function exportPDFLista(){
   drawText('Tempo Medio por Etapa', ML+4, p4Y+6, {size:11, bold:true, color:C.text});
   drawText('dias medios para conclusao', ML+etW-4, p4Y+6, {size:7.5, color:C.textMuted, align:'right'});
 
-  const ETAPAS_MEDIR = [
-    {n:'Reuniao Inicial', busca:['Reunião Inicial'], r:'eq'},
-    {n:'Mat. Base Recebido', busca:['Material Base Recebido'], r:'cl'},
-    {n:'Analise Mat. Base', busca:['Análise do material base'], r:'eq'},
-    {n:'Elaboracao PICV/PI', busca:['Elaboração do PICV','Elaboração do PI'], r:'eq'},
-    {n:'Valid. PICV DI/DM', busca:['Validação PICV DI/DM Referência','Validação do PI'], r:'cl'},
-    {n:'Validacao LD', busca:['Validação LD'], r:'cl'},
-    {n:'Rev. Textual PICV/PI', busca:['Revisão textual do PICV','Revisão Textual do PI'], r:'eq'},
-    {n:'Entrega PICV/PI cliente', busca:['Entrega do PICV ao cliente','Entrega do PI ao cliente'], r:'eq'},
-    {n:'Solic. Ajustes PICV', busca:['Solicitação de ajustes no PICV'], r:'cl'},
-    {n:'Impl. Ajustes (PI)', busca:['Implementação de ajustes','Implementação de Ajustes'], r:'eq'},
-    {n:'Valid. Final PICV', busca:['Validação final do PICV'], r:'cl'},
-    {n:'Desenho/Rot. Onepage', busca:['Desenho/roteirização do onepage','Desenho/Roteirização'], r:'eq'},
-    {n:'Valid. DI Referencia', busca:['Validação DI Referência'], r:'cl'},
-    {n:'Prod. Recursos Graficos', busca:['Produção de recursos gráficos','Produção de Recursos Gráficos'], r:'eq'},
-    {n:'Valid. DM Referencia', busca:['Validação DM Referência'], r:'cl'},
-    {n:'Entrega Review cliente', busca:['Entrega do review ao cliente','Entrega do Review ao cliente'], r:'eq'},
-    {n:'Solic. Ajustes Review', busca:['Solicitação de ajustes','Solicitação de Ajustes'], r:'cl'},
-    {n:'Impl. Ajustes (Review)', busca:['Implementação de ajustes','Implementação de Ajustes'], r:'eq'},
-    {n:'Valid. Final Review', busca:['Validação final do review','Validação Final'], r:'cl'},
-    {n:'Rev. Textual Review', busca:['Revisão textual do review','Revisão Textual'], r:'eq'},
-    {n:'Homologacao', busca:['Homologação'], r:'eq'},
-    {n:'Instalacao SIRH', busca:['Instalação no SIRH'], r:'eq'},
-    {n:'Upload Arquivos Bdoc', busca:['Upload Arquivos Bdoc','Upload Arquivos'], r:'eq'},
-  ];
+  const ETAPAS_MEDIR = ETPS_DEF.map(e => ({
+    n: (e.lb.length > 30 ? e.lb.slice(0, 28) + '...' : e.lb)
+         .normalize('NFD').replace(/[\u0300-\u036f]/g, ''),
+    busca: [e.lb],
+    r: e.r
+  }));
   const etArrPdf = ETAPAS_MEDIR.map(def => {
     const amostras = [];
     todos.forEach(p => {
@@ -7207,255 +6736,6 @@ function exportPDFLista(){
 
   doc.save('dashboard-executivo-ead-'+td()+'.pdf');
   showToast('Dashboard exportado!');
-}
-
-function exportPDFHomologacoes(){
-  if(typeof jspdf === 'undefined'){ showToast('⚠️ Biblioteca PDF não carregada ainda.'); return; }
-  const { jsPDF } = jspdf;
-  const doc = new jsPDF({ orientation:'landscape', unit:'mm', format:'a4' });
-  const PW=297, PH=210, ML=14, MR=14, TW=PW-ML-MR;
-
-  const AZUL    = [0,61,165];
-  const AZUL2   = [37,99,235];
-  const VERDE   = [21,128,61];
-  const LARANJA = [194,65,12];
-  const AMBAR   = [146,64,14];
-  const CINZA   = [100,116,139];
-  const CINZACL = [241,245,249];
-  const BRANCO  = [255,255,255];
-
-  const isoFmt = d => d ? d.split('-').reverse().join('/') : '—';
-  const hoje = new Date();
-  const dataGer = hoje.toLocaleDateString('pt-BR') + ' ' + hoje.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
-
-  // ── Dados ──
-  const todos = activeDB().concat(cancelDB());
-  const lista = todos
-    .filter(p => p.col === 11 || p.homologPassou || p.homolog?.preenchido)
-    .sort((a,b) => a.nome.localeCompare(b.nome,'pt-BR'));
-
-  const grpPendente   = lista.filter(p => !(p.homolog?.dtHomolog) && !(p.homolog?.dtAutorizacao) && !(p.homolog?.dtInstalacao));
-  const grpHomologado = lista.filter(p =>  !!(p.homolog?.dtHomolog) && !(p.homolog?.dtAutorizacao) && !(p.homolog?.dtInstalacao));
-  const grpAutorizado = lista.filter(p =>  !!(p.homolog?.dtAutorizacao) && !(p.homolog?.dtInstalacao));
-  const grpInstalado  = lista.filter(p =>  !!(p.homolog?.dtInstalacao));
-
-  // ════════════════════════════════════════
-  //  CAPA
-  // ════════════════════════════════════════
-  // Fundo degradê topo
-  doc.setFillColor(...AZUL);
-  doc.rect(0, 0, PW, 70, 'F');
-
-  // Faixa decorativa lateral
-  doc.setFillColor(37,99,235);
-  doc.rect(0, 0, 6, PH, 'F');
-
-  // Badge FIRJAN SENAI
-  doc.setFillColor(8,145,178);
-  doc.roundedRect(ML+2, 10, 44, 8, 2, 2, 'F');
-  doc.setTextColor(...BRANCO);
-  doc.setFont('helvetica','bold'); doc.setFontSize(7.5);
-  doc.text('FIRJAN SENAI', ML+24, 15.2, {align:'center'});
-
-  // Título principal
-  doc.setFont('helvetica','bold'); doc.setFontSize(24);
-  doc.setTextColor(...BRANCO);
-  doc.text('Relatorio de Homologacoes', ML+2, 36);
-
-  // Subtítulo
-  doc.setFont('helvetica','normal'); doc.setFontSize(10);
-  doc.setTextColor(186,230,253);
-  doc.text('Sistema de Gestao de Projetos EAD - Educacao a Distancia', ML+2, 44);
-
-  // Data geração
-  doc.setFontSize(8.5); doc.setTextColor(148,163,184);
-  doc.text('Gerado em ' + dataGer, PW-MR, 44, {align:'right'}); /* capa */
-
-  // ── Cards de estatísticas ──
-  const cards = [
-    { label:'Total', val: lista.length,           cor: AZUL,    icone:'TOTAL' },
-    { label:'Pendentes', val: grpPendente.length,  cor: [185,28,28],  icone:'PEND'  }, // vermelho
-    { label:'Homologados', val: grpHomologado.length, cor: [161,98,7],  icone:'HOM' }, // ambar
-    { label:'Autorizados', val: grpAutorizado.length, cor: AZUL2,   icone:'AUT' },
-    { label:'Instalados', val: grpInstalado.length,   cor: VERDE,   icone:'INST' },
-  ];
-  const cw = 48, ch = 28, gap = 4;
-  const totalW = cards.length * cw + (cards.length-1)*gap;
-  let cx = (PW - totalW) / 2;
-  const cy = 76;
-
-  cards.forEach(card => {
-    // Sombra suave
-    doc.setFillColor(200,210,225);
-    doc.roundedRect(cx+1, cy+1, cw, ch, 3, 3, 'F');
-    // Card
-    doc.setFillColor(...BRANCO);
-    doc.roundedRect(cx, cy, cw, ch, 3, 3, 'F');
-    // Borda colorida topo
-    doc.setFillColor(...card.cor);
-    doc.roundedRect(cx, cy, cw, 2.5, 1, 1, 'F');
-    // Número
-    doc.setFont('helvetica','bold'); doc.setFontSize(22);
-    doc.setTextColor(...card.cor);
-    doc.text(String(card.val), cx + cw/2, cy + 17, {align:'center'});
-    // Label
-    doc.setFont('helvetica','normal'); doc.setFontSize(7.5);
-    doc.setTextColor(...CINZA);
-    doc.text(card.label, cx + cw/2, cy + 23, {align:'center'});
-    cx += cw + gap;
-  });
-
-  // Linha separadora
-  doc.setDrawColor(226,232,240);
-  doc.setLineWidth(0.4);
-  doc.line(ML, cy+ch+8, PW-MR, cy+ch+8);
-
-  // Nota de rodapé da capa
-  doc.setFont('helvetica','italic'); doc.setFontSize(7.5);
-  doc.setTextColor(...CINZA);
-  doc.text('Este relatorio contem informacoes confidenciais de uso interno exclusivo da Firjan SENAI.', PW/2, cy+ch+15, {align:'center'});
-
-  // ════════════════════════════════════════
-  //  Função auxiliar: cabeçalho de página
-  // ════════════════════════════════════════
-  function cabecalhoPag(titulo, corFundo){
-    doc.setFillColor(...corFundo);
-    doc.rect(0, 0, PW, 18, 'F');
-    doc.setFillColor(37,99,235);
-    doc.rect(0, 0, 6, PH, 'F');
-    doc.setTextColor(...BRANCO);
-    doc.setFont('helvetica','bold'); doc.setFontSize(11);
-    doc.text('Firjan SENAI  |  Relatorio de Homologacoes', ML+2, 8);
-    doc.setFont('helvetica','normal'); doc.setFontSize(8.5);
-    doc.text(titulo, ML+2, 14.5);
-    doc.setFontSize(7.5);
-    doc.text('Gerado em '+dataGer, PW-MR, 14.5, {align:'right'}); /* ok */
-  }
-
-  // ════════════════════════════════════════
-  //  Função: renderizar grupo numa página
-  // ════════════════════════════════════════
-  function renderGrupo(grp, titulo, corFundo, corHead, corAlt, corStatus, statusLabel){
-    if(grp.length === 0) return;
-
-    doc.addPage();
-    cabecalhoPag(titulo, corFundo);
-
-    // Pílula de contagem
-    doc.setFillColor(...corHead);
-    doc.roundedRect(PW-MR-22, 4, 22, 8, 3, 3, 'F');
-    doc.setFont('helvetica','bold'); doc.setFontSize(8);
-    doc.setTextColor(...BRANCO);
-    doc.text(grp.length + (grp.length===1?' projeto':' projetos'), PW-MR-11, 9, {align:'center'});
-
-    const rows = grp.map(p => {
-      const h = p.homolog || {};
-      return [
-        p.nome,
-        p.rp || '—',
-        p.academia || '—',
-        h.solicitante || '—',
-        h.enviadaPor || '—',
-        h.servico || '—',
-        h.novoManut || '—',
-        h.conclusao || '—',
-        h.idCurso || '—',
-        h.notaCorte || '—',
-        h.nPaginas  || '—',
-        isoFmt(h.dtHomolog),
-        isoFmt(h.dtAutorizacao),
-        isoFmt(h.dtInstalacao),
-      ];
-    });
-
-    doc.autoTable({
-      head: [[
-        'Projeto','RP','Academia','Solicitou a Homologação','Homologado Por',
-        'Servico','Tipo','Conclusao','ID Curso','Nota','Pag.',
-        'Homologacao','Autorizacao','Instalacao'
-      ]],
-      body: rows,
-      startY: 23,
-      margin: { left: ML, right: MR },
-      styles: {
-        fontSize: 7.5,
-        cellPadding: { top:2.5, bottom:2.5, left:2.5, right:2.5 },
-        overflow: 'linebreak',
-        lineColor: [226,232,240],
-        lineWidth: 0.2,
-      },
-      headStyles: {
-        fillColor: corHead,
-        textColor: BRANCO,
-        fontStyle: 'bold',
-        fontSize: 7.5,
-        cellPadding: 3,
-      },
-      alternateRowStyles: { fillColor: corAlt },
-      columnStyles: {
-        0: { cellWidth: 58, fontStyle:'bold' },
-        1: { cellWidth: 13, halign:'center' },
-        2: { cellWidth: 22 },
-        3: { cellWidth: 22 },
-        4: { cellWidth: 22 },
-        5: { cellWidth: 22 },
-        6: { cellWidth: 14, halign:'center' },
-        7: { cellWidth: 16, halign:'center' },
-        8: { cellWidth: 14, halign:'center' },
-        9: { cellWidth: 10, halign:'center' },
-        10:{ cellWidth: 14, halign:'center' },
-        11:{ cellWidth: 10, halign:'center' },
-        12:{ cellWidth: 18, halign:'center' },
-        13:{ cellWidth: 18, halign:'center' },
-        14:{ cellWidth: 18, halign:'center' },
-      },
-      didParseCell(data){
-        if(data.section === 'body'){
-          // Datas preenchidas em negrito colorido
-          if([12,13,14].includes(data.column.index) && data.cell.raw !== '—'){
-            data.cell.styles.textColor = corHead;
-            data.cell.styles.fontStyle = 'bold';
-          }
-          // Datas ausentes em cinza
-          if([12,13,14].includes(data.column.index) && data.cell.raw === '—'){
-            data.cell.styles.textColor = [156,163,175];
-          }
-        }
-      },
-      willDrawCell(data){
-        // Linha de separação mais visível entre projetos
-        if(data.section === 'body' && data.row.index % 2 === 0){
-          doc.setDrawColor(...corAlt);
-        }
-      }
-    });
-  }
-
-  // ════════════════════════════════════════
-  //  Renderizar os 4 grupos
-  // ════════════════════════════════════════
-  renderGrupo(grpPendente,   'PENDENTES — sem data de Homologacao',   [185,28,28],  [185,28,28],  [255,241,241], [220,38,38],  'Pendente');
-  renderGrupo(grpHomologado, 'HOMOLOGADOS — aguardando Autorizacao',  [161,98,7],   [161,98,7],   [254,252,232], [234,179,8],  'Homologado');
-  renderGrupo(grpAutorizado, 'AUTORIZADOS — aguardando Instalacao SIRH',   [0,61,165],  [0,61,165],  [239,246,255], [37,99,235],  'Autorizado');
-  renderGrupo(grpInstalado,  'INSTALADOS NO SIRH',                    [21,128,61],  [21,128,61],  [240,253,244], [34,197,94],  'Instalado');
-
-  // ── Rodapé em todas as páginas ──
-  const pages = doc.internal.getNumberOfPages();
-  for(let i = 1; i <= pages; i++){
-    doc.setPage(i);
-    doc.setFillColor(248,250,252);
-    doc.rect(0, PH-8, PW, 8, 'F');
-    doc.setDrawColor(226,232,240);
-    doc.setLineWidth(0.3);
-    doc.line(0, PH-8, PW, PH-8);
-    doc.setFont('helvetica','normal'); doc.setFontSize(7);
-    doc.setTextColor(...CINZA);
-    doc.text('© '+new Date().getFullYear()+' Firjan SENAI | Relatorio de Homologacoes | Uso interno exclusivo', ML+4, PH-3);
-    doc.text('Pág. '+i+'/'+pages, PW-MR, PH-3, {align:'right'});
-  }
-
-  doc.save('homologacoes-firjan-'+td()+'.pdf');
-  showToast('🔖 PDF de Homologações exportado!');
 }
 
 // ── CSV (mantido como fallback interno) ──
@@ -7595,7 +6875,7 @@ function _fmtQuinzena(label){
 
 function abrirSeletorQuinzena(pid){
   const p = DB.find(x=>x.id===pid); if(!p) return;
-  const atual = p.medicaoQuinzena || _labelMedicao(p.homolog?.dtInstalacao || p.medicaoFeitaEm || p.termino || p.enviadoMedicao) || '';
+  const atual = p.medicaoQuinzena || _labelMedicao(p.medicaoFeitaEm || p.termino || p.enviadoMedicao) || '';
   const opts = _opcoesQuinzena();
 
   // Criar modal inline
@@ -7749,7 +7029,7 @@ function rMedicao(){
   // ── Agrupar confirmados por quinzena (usa medicaoFeitaEm) ──
   const quinzenas = {};
   confirmados.forEach(p => {
-    const label = p.medicaoQuinzena || _labelMedicao(p.homolog?.dtInstalacao || p.medicaoFeitaEm || p.termino || p.enviadoMedicao) || 'Sem data';
+    const label = p.medicaoQuinzena || _labelMedicao(p.medicaoFeitaEm || p.termino || p.enviadoMedicao) || 'Sem data';
     if(!quinzenas[label]) quinzenas[label] = [];
     quinzenas[label].push(p);
   });
@@ -8198,470 +7478,8 @@ function exportPDFRelMedicao(){
 
 // ─────────────────────────────────────────────────────────────────────────────
 
-// ── HOMOLOGAÇÕES ─────────────────────────────────────────────────────────────
-
-// Auto-save silencioso ao sair de qualquer campo de homologação
-function _homAutoSave(pid){
-  const p = DB.find(x=>x.id===pid); if(!p) return;
-  const h = p.homolog || {};
-  const g = fld => document.getElementById('hom_'+pid+'_'+fld)?.value?.trim() || '';
-  const gd = fld => { const v=document.getElementById('hom_'+pid+'_'+fld)?.value; return v||null; };
-
-  // Preservar dados existentes e sobrescrever só o que está no DOM
-  const campos = {
-    idCurso:      g('idCurso')      || h.idCurso      || '',
-    pacoteScorm:  g('pacoteScorm')  || h.pacoteScorm  || '',
-    nPaginas:     g('nPaginas')     || h.nPaginas     || '',
-    solicitante:  g('solicitante')  || h.solicitante  || '',
-    enviadaPor:   g('enviadaPor')   || h.enviadaPor   || '',
-    rt:           g('rt')           || h.rt           || '',
-    academia:     g('academia')     || h.academia     || '',
-    conclusao:    g('conclusao')    || h.conclusao    || '',
-    notaCorte:    g('notaCorte')    || h.notaCorte    || '',
-    novoManut:    g('novoManut')    || h.novoManut    || '',
-    servico:      g('servico')      || h.servico      || '',
-    dtHomolog:    gd('dtHomolog')   ?? h.dtHomolog    ?? null,
-    dtAutorizacao:gd('dtAutorizacao')?? h.dtAutorizacao?? null,
-    dtInstalacao: gd('dtInstalacao')?? h.dtInstalacao ?? null,
-  };
-
-  // Só salvar se houve alguma mudança real
-  const mudou = Object.keys(campos).some(k => campos[k] !== (h[k]||null) && campos[k] !== (h[k]||''));
-  if(!mudou && h.preenchido) return;
-
-  p.homolog = { ...h, ...campos, preenchido: true };
-  p.homologPassou = true;
-  fbSalvarProjeto(p);
-}
-
-function salvarHomolog(pid){
-  const p = DB.find(x=>x.id===pid); if(!p) return;
-  const h = p.homolog || {};
-  const g = id => document.getElementById('hom_'+pid+'_'+id)?.value || '';
-
-  h.idCurso       = g('idCurso');
-  h.pacoteScorm   = g('pacoteScorm');
-  h.solicitante   = g('solicitante');
-  h.enviadaPor    = g('enviadaPor');
-  h.rt            = g('rt');
-  h.academia      = g('academia');
-  h.conclusao     = g('conclusao');
-  h.notaCorte     = g('notaCorte');
-  h.nPaginas      = g('nPaginas');
-  h.novoManut     = g('novoManut');
-  h.dtHomolog     = g('dtHomolog');
-  h.dtAutorizacao = g('dtAutorizacao');
-  h.dtInstalacao  = g('dtInstalacao');
-  h.servico       = g('servico');
-  h.preenchido    = true; // marca que o usuário já iniciou o preenchimento
-  p.homologPassou  = true; // projeto já esteve na col 11
-
-  p.homolog = h;
-  const dtStr = h.dtInstalacao ? `Instalação: ${h.dtInstalacao.split('-').reverse().join('/')}` :
-                h.dtHomolog    ? `Homologação: ${h.dtHomolog.split('-').reverse().join('/')}` :
-                'Dados atualizados';
-  registrarHistorico(p, 'homologação salva', dtStr);
-  fbSalvarProjeto(p);
-  showToast('💾 Dados salvos!');
-  // Não re-renderiza — gaveta permanece aberta para continuar editando
-}
-
-function _homSel(pid, fld, opts, val){
-  const sel = opts.map(o => `<option value="${o}" ${val===o?'selected':''}>${o}</option>`).join('');
-  return `<select id="hom_${pid}_${fld}" onchange="_homAutoSave(${pid})">${sel}</select>`;
-}
-
-function _homInput(pid, fld, val, type='text', placeholder=''){
-  const evtAttr = type==='date' ? `onchange="_homAutoSave(${pid})"` : `onblur="_homAutoSave(${pid})"`;
-  return `<input type="${type}" id="hom_${pid}_${fld}" value="${val||''}" placeholder="${placeholder}" style="width:100%" ${evtAttr}>`;
-}
-
-function toggleHomolog(id){
-  const body   = document.getElementById('hom_body_'+id);
-  const chev   = document.getElementById('hom_chev_'+id);
-  if(!body) return;
-  const aberto = body.classList.contains('open');
-  body.classList.toggle('open', !aberto);
-  if(chev) chev.classList.toggle('open', !aberto);
-}
-
-function buildHomologCard(p){
-  const h = p.homolog || {};
-  const completo    = !!(h.dtInstalacao);
-  const autorizado  = !!(h.dtAutorizacao) && !completo;
-  const homologado  = !!(h.dtHomolog) && !autorizado && !completo;
-
-  const cardCls = completo   ? 'hom-instalado'
-                : autorizado ? 'hom-autorizado'
-                : homologado ? 'hom-homologado'
-                : 'hom-pendente';
-
-  const statusBdg = completo
-    ? `<span class="hom-badge hom-status-ok">✅ Instalado</span>`
-    : autorizado
-      ? `<span class="hom-badge hom-status-autorizado">🔓 Autorizado</span>`
-      : homologado
-        ? `<span class="hom-badge hom-status-homolog">🔖 Homologado</span>`
-        : `<span class="hom-badge hom-status-pend">⏳ Pendente</span>`;
-
-  const acadBdg = p.academia ? `<span class="hom-badge">${p.academia}</span>` : '';
-  const rpBdg   = p.rp       ? `<span class="hom-badge">RP: ${p.rp}</span>`  : '';
-
-  // Mini resumo visível quando recolhido (só mostra se já tem dados)
-  const temDados = h.preenchido;
-  const resumo = temDados ? `
-    <div class="hom-resumo">
-      ${h.idCurso      ? `<span class="hom-resumo-item"><span class="hom-resumo-label">ID:</span><span class="hom-resumo-val">${h.idCurso}</span></span>` : ''}
-      ${h.solicitante  ? `<span class="hom-resumo-item"><span class="hom-resumo-label">Solicitante:</span><span class="hom-resumo-val">${h.solicitante}</span></span>` : ''}
-      ${h.servico      ? `<span class="hom-resumo-item"><span class="hom-resumo-label">Serviço:</span><span class="hom-resumo-val">${h.servico}</span></span>` : ''}
-      ${h.novoManut    ? `<span class="hom-resumo-item"><span class="hom-resumo-label">Tipo:</span><span class="hom-resumo-val">${h.novoManut}</span></span>` : ''}
-      ${h.dtHomolog     ? `<span class="hom-resumo-item"><span class="hom-resumo-label">Homolog.:</span><span class="hom-resumo-val" style="color:var(--blue);font-weight:700">${h.dtHomolog.split('-').reverse().join('/')}</span></span>` : ''}
-      ${h.dtAutorizacao ? `<span class="hom-resumo-item"><span class="hom-resumo-label">Autorização:</span><span class="hom-resumo-val" style="color:var(--blue);font-weight:700">${h.dtAutorizacao.split('-').reverse().join('/')}</span></span>` : ''}
-      ${h.dtInstalacao  ? `<span class="hom-resumo-item"><span class="hom-resumo-label">Instalação:</span><span class="hom-resumo-val" style="color:var(--blue);font-weight:700">${h.dtInstalacao.split('-').reverse().join('/')}</span></span>` : ''}
-    </div>` : '';
-
-  const SOLICITANTES = ['','Tatiana','Thiago','Simone','Mariana','Mateus','Julia','Liderança Julia','Liderança Maria Emilia','Liderança Marise','Fatima','Liderança Fabiana','Daniel','Claudio','Ana Paula','Patricia','RPCI - Cristina (DI)','RPCI - Fátima (DI)','RPCI - Sheila (DI)','RPCI - Carla (DI)','RPCI Dedicado - Daniela (DI)','RPCI Dedicado - Leonidas (DI)','RPCI Dedicado - Haline (DI)','RPCI - Alex (DM)','RPCI - Leo (DM)','RPCI - Rafael (DM)','RPCI Dedicado - Wagner (DM)','RPCI - Patricia (RT)','RPCI - Rubio (RT)'];
-  const ENVIADA_POR  = ['','Tatiana','Thiago','Simone','Mariana','Mateus','Julia','Liderança Julia','Liderança Maria Emilia','Liderança Marise','Fatima','Liderança Fabiana','Daniel','Claudio','Ana Paula','Patricia','RPCI - Cristina (DI)','RPCI - Fátima (DI)','RPCI - Sheila (DI)','RPCI - Carla (DI)','RPCI Dedicado - Daniela (DI)','RPCI Dedicado - Leonidas (DI)','RPCI Dedicado - Haline (DI)','RPCI - Alex (DM)','RPCI - Leo (DM)','RPCI - Rafael (DM)','RPCI Dedicado - Wagner (DM)','RPCI - Patricia (RT)','RPCI - Rubio (RT)'];
-  const CONCLUSAO    = ['','Navegação','Avaliação'];
-  const NOVO_MANUT   = ['','Novo','Manutenção'];
-  const SERVICOS     = ['','Básico','Intermediário','Avançado','Encapsulamento','Manutenção','Autoria Digital','Versionamento'];
-
-  return `
-  <div class="hom-card ${cardCls}" id="homcard_${p.id}">
-
-    <div class="hom-card-head" onclick="toggleHomolog(${p.id})" title="Clique para expandir / recolher">
-      <div class="hom-card-title">
-        📂 ${p.nome}
-        <span class="hom-chevron" id="hom_chev_${p.id}">▼</span>
-      </div>
-      <div class="hom-card-badges" onclick="event.stopPropagation()">
-        ${rpBdg}${acadBdg}${statusBdg}
-        <button onclick="openDet(${p.id})" style="background:rgba(255,255,255,.15);border:none;color:#fff;padding:3px 10px;border-radius:6px;cursor:pointer;font-size:11.5px;font-family:'Plus Jakarta Sans',sans-serif">Ver ↗</button>
-      </div>
-    </div>
-
-    ${resumo}
-
-    <div class="hom-body" id="hom_body_${p.id}">
-      <div class="hom-grid">
-
-        <div class="hom-sec-title">📋 Identificação</div>
-
-        <div class="hom-field">
-          <div class="hom-field-label">Nome do Curso</div>
-          <div class="hom-field-val" style="font-weight:600">${p.nome}</div>
-        </div>
-        <div class="hom-field">
-          <div class="hom-field-label">ID do Curso</div>
-          <div class="hom-field-val">${_homInput(p.id,'idCurso',h.idCurso||p.idCurso||'','text','Ex: 12345')}</div>
-        </div>
-        <div class="hom-field">
-          <div class="hom-field-label">Pacote SCORM</div>
-          <div class="hom-field-val">${_homInput(p.id,'pacoteScorm',h.pacoteScorm,'text','Ex: curso_v1.zip')}</div>
-        </div>
-        <div class="hom-field">
-          <div class="hom-field-label">Nº de Páginas</div>
-          <div class="hom-field-val">${_homInput(p.id,'nPaginas',h.nPaginas||'','number','Ex: 42')}</div>
-        </div>
-
-        <div class="hom-sec-title">👥 Responsáveis</div>
-
-        <div class="hom-field">
-          <div class="hom-field-label">Solicitou a Homologação</div>
-          <div class="hom-field-val">${_homSel(p.id,'solicitante',SOLICITANTES,h.solicitante||'')}</div>
-        </div>
-        <div class="hom-field">
-          <div class="hom-field-label">Homologado Por</div>
-          <div class="hom-field-val">${_homSel(p.id,'enviadaPor',ENVIADA_POR,h.enviadaPor||'')}</div>
-        </div>
-        <div class="hom-field">
-          <div class="hom-field-label">RT</div>
-          <div class="hom-field-val">${_homInput(p.id,'rt',h.rt||p.rp||'','text','Responsável Técnico')}</div>
-        </div>
-        <div class="hom-field">
-          <div class="hom-field-label">Academia</div>
-          <div class="hom-field-val">${_homInput(p.id,'academia',h.academia||p.academia||'','text','Academia')}</div>
-        </div>
-
-        <div class="hom-sec-title">⚙️ Configurações do Curso</div>
-
-        <div class="hom-field">
-          <div class="hom-field-label">Conclusão</div>
-          <div class="hom-field-val">${_homSel(p.id,'conclusao',CONCLUSAO,h.conclusao||'')}</div>
-        </div>
-        <div class="hom-field">
-          <div class="hom-field-label">Nota de Corte</div>
-          <div class="hom-field-val">${_homInput(p.id,'notaCorte',h.notaCorte,'text','Ex: 70')}</div>
-        </div>
-        <div class="hom-field">
-          <div class="hom-field-label">Novo ou Manutenção</div>
-          <div class="hom-field-val">${_homSel(p.id,'novoManut',NOVO_MANUT,h.novoManut||'')}</div>
-        </div>
-        <div class="hom-field">
-          <div class="hom-field-label">Serviço</div>
-          <div class="hom-field-val">${_homSel(p.id,'servico',SERVICOS,h.servico||'')}</div>
-        </div>
-
-        <div class="hom-sec-title">📅 Datas</div>
-
-        <div class="hom-field">
-          <div class="hom-field-label">📅 Homologação</div>
-          <div class="hom-field-val">${_homInput(p.id,'dtHomolog',h.dtHomolog,'date','')}</div>
-        </div>
-        <div class="hom-field">
-          <div class="hom-field-label">✅ Autorização</div>
-          <div class="hom-field-val">${_homInput(p.id,'dtAutorizacao',h.dtAutorizacao,'date','')}</div>
-        </div>
-        <div class="hom-field">
-          <div class="hom-field-label">🖥️ Instalação SIRH</div>
-          <div class="hom-field-val">${_homInput(p.id,'dtInstalacao',h.dtInstalacao,'date','')}</div>
-        </div>
-        <div class="hom-field"></div>
-
-      </div>
-      <div class="hom-foot">
-        <span style="font-size:11px;color:var(--mu);align-self:center">
-          ${temDados ? 'Dados salvos — edite e salve novamente para atualizar' : 'Preencha os campos e salve'}
-        </span>
-        <button onclick="salvarHomolog(${p.id})"
-          style="padding:7px 18px;background:var(--blue);color:#fff;border:none;border-radius:7px;cursor:pointer;font-size:12.5px;font-weight:600;font-family:'Plus Jakarta Sans',sans-serif">
-          💾 Salvar
-        </button>
-      </div>
-    </div>
-
-  </div>`;
-}
-
-// Retorna o label da quinzena de medição para uma data ISO (ex: "Abril01", "Maio02")
-// Regra: dia 26 mês M até dia 09 mês M+1 = "MêsM+101"
-//        dia 10 mês M até dia 25 mês M   = "MêsM02"
-const _MESES_MEDICAO = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
-
-function _labelMedicao(isoDate){
-  if(!isoDate) return null;
-  const [y, m, d] = isoDate.split('-').map(Number);
-  if(d >= 10 && d <= 25){
-    // Segunda quinzena do mês m
-    return _MESES_MEDICAO[m-1] + '02';
-  } else if(d >= 26){
-    // Primeira quinzena do mês seguinte (m+1)
-    const proxMes = m === 12 ? 0 : m;
-    return _MESES_MEDICAO[proxMes] + '01';
-  } else {
-    // d >= 1 && d <= 9 → primeira quinzena do mês m
-    return _MESES_MEDICAO[m-1] + '01';
-  }
-}
-
-// Verifica se uma data ISO pertence ao label de quinzena informado
-function _dataEmMedicao(isoDate, label){
-  if(!isoDate || !label) return false;
-  return _labelMedicao(isoDate) === label;
-}
-
-function limparFiltrosHomolog(){
-  ['homSol','homEnv','homMed'].forEach(id=>{
-    const dd=document.getElementById('msDd_'+id);
-    if(dd) dd.querySelectorAll('input[type=checkbox]').forEach(cb=>cb.checked=false);
-    _msUpdateBtn(id);
-  });
-  rHomologacoes();
-}
-
-function _popularFiltrosHomolog(lista){
-  const solicitantes = [...new Set(lista.map(p=>p.homolog?.solicitante).filter(Boolean))].sort();
-  const enviadosPor  = [...new Set(lista.map(p=>p.homolog?.enviadaPor).filter(Boolean))].sort();
-
-  // Quinzenas: gerar a partir das datas de instalação presentes
-  const labelsSet = new Set(lista.map(p=>_labelMedicao(p.homolog?.dtInstalacao)).filter(Boolean));
-  // Ordenar cronologicamente: extrair mês e quinzena do label
-  const labelsOrdenados = [...labelsSet].sort((a,b)=>{
-    const mi = n => _MESES_MEDICAO.indexOf(n.slice(0,-2));
-    const qi = n => parseInt(n.slice(-2));
-    return mi(a)!==mi(b) ? mi(a)-mi(b) : qi(a)-qi(b);
-  });
-
-  // Label de exibição: "Abril01" → "Abril 1ª Quinzena", "Abril02" → "Abril 2ª Quinzena"
-  const fmtLabel = l => l.slice(0,-2) + (l.slice(-2)==='01' ? ' — 1ª Quinzena' : ' — 2ª Quinzena');
-
-  // Multi-select Solicitante
-  const ddSol = document.getElementById('msDd_homSol');
-  if(ddSol){
-    const sel = _msGetVals('homSol');
-    ddSol.innerHTML = (solicitantes.length
-      ? solicitantes.map(s=>`<label class="ms-opt"><input type="checkbox" value="${s}" onchange="_msChange('homSol')"${sel.includes(s)?' checked':''}> ${s}</label>`).join('')
-      : '<div style="padding:10px 12px;font-size:11.5px;color:var(--mu);font-style:italic">Nenhum solicitante</div>')
-      + '<div class="ms-sep"></div><div class="ms-clear" data-ms-clear="homSol">✕ Limpar</div>';
-    _msUpdateBtn('homSol');
-  }
-
-  // Multi-select Enviada Por
-  const ddEnv = document.getElementById('msDd_homEnv');
-  if(ddEnv){
-    const sel = _msGetVals('homEnv');
-    ddEnv.innerHTML = (enviadosPor.length
-      ? enviadosPor.map(s=>`<label class="ms-opt"><input type="checkbox" value="${s}" onchange="_msChange('homEnv')"${sel.includes(s)?' checked':''}> ${s}</label>`).join('')
-      : '<div style="padding:10px 12px;font-size:11.5px;color:var(--mu);font-style:italic">Ninguém ainda</div>')
-      + '<div class="ms-sep"></div><div class="ms-clear" data-ms-clear="homEnv">✕ Limpar</div>';
-    _msUpdateBtn('homEnv');
-  }
-
-  // Multi-select Medição (quinzena)
-  const ddMed = document.getElementById('msDd_homMed');
-  if(ddMed){
-    const sel = _msGetVals('homMed');
-    ddMed.innerHTML = (labelsOrdenados.length
-      ? labelsOrdenados.map(l=>`<label class="ms-opt"><input type="checkbox" value="${l}" onchange="_msChange('homMed')"${sel.includes(l)?' checked':''}> ${fmtLabel(l)}</label>`).join('')
-      : '<div style="padding:10px 12px;font-size:11.5px;color:var(--mu);font-style:italic">Sem datas de instalação</div>')
-      + '<div class="ms-sep"></div><div class="ms-clear" data-ms-clear="homMed">✕ Limpar</div>';
-    _msUpdateBtn('homMed');
-  }
-}
-
-function rHomologacoes(){
-  const todos = activeDB().concat(cancelDB());
-
-  // Todos que aparecem na lista
-  const listaTotal = todos.filter(p => p.col === 11 || p.homologPassou || p.homolog?.preenchido);
-
-  // Ordenação alfabética dentro de cada grupo
-  listaTotal.sort((a,b) => a.nome.localeCompare(b.nome, 'pt-BR'));
-
-  // Estatísticas sempre do total (sem filtro)
-  const cntPendente   = listaTotal.filter(p => !(p.homolog?.dtHomolog) && !(p.homolog?.dtAutorizacao) && !(p.homolog?.dtInstalacao)).length;
-  const cntHomologado = listaTotal.filter(p =>  !!(p.homolog?.dtHomolog) && !(p.homolog?.dtAutorizacao) && !(p.homolog?.dtInstalacao)).length;
-  const cntAutorizado = listaTotal.filter(p =>  !!(p.homolog?.dtAutorizacao) && !(p.homolog?.dtInstalacao)).length;
-  const cntInstalado  = listaTotal.filter(p =>  !!(p.homolog?.dtInstalacao)).length;
-
-  const statsEl = document.getElementById('homologStats');
-  if(statsEl){
-    statsEl.style.gridTemplateColumns = 'repeat(4,1fr)';
-    statsEl.innerHTML = `
-      <div class="sc" style="border-left:4px solid var(--red)">
-        <div class="sc-l">⏳ Pendentes</div><div class="sc-v">${cntPendente}</div>
-        <div class="sc-s">sem data de homologação</div><div class="sc-i">⏳</div>
-      </div>
-      <div class="sc" style="border-left:4px solid var(--yel)">
-        <div class="sc-l">🔖 Homologados</div><div class="sc-v">${cntHomologado}</div>
-        <div class="sc-s">aguardando autorização</div><div class="sc-i">🔖</div>
-      </div>
-      <div class="sc" style="border-left:4px solid var(--blue)">
-        <div class="sc-l">🔓 Autorizados</div><div class="sc-v">${cntAutorizado}</div>
-        <div class="sc-s">aguardando instalação SIRH</div><div class="sc-i">🔓</div>
-      </div>
-      <div class="sc" style="border-left:4px solid var(--green)">
-        <div class="sc-l">✅ Instalados</div><div class="sc-v">${cntInstalado}</div>
-        <div class="sc-s">com data de instalação</div><div class="sc-i">✅</div>
-      </div>`;
-  }
-
-  // Popular filtros com valores únicos do total
-  _popularFiltrosHomolog(listaTotal);
-
-  const listaEl = document.getElementById('homologLista');
-  if(!listaEl) return;
-
-  if(listaTotal.length === 0){
-    listaEl.innerHTML = `<div class="hom-empty">
-      <div style="font-size:32px;margin-bottom:10px">🔖</div>
-      <div style="font-weight:600;margin-bottom:6px">Nenhum projeto em Homologação ainda</div>
-      <div>Quando um projeto chegar na coluna <strong>Homologação/Instalação</strong> no Kanban, ele aparecerá aqui automaticamente.</div>
-    </div>`;
-    return;
-  }
-
-  // Aplicar filtros (multi-select)
-  const filtroSolic   = _msGetVals('homSol');
-  const filtroEnvPor  = _msGetVals('homEnv');
-  const filtroMedicao = _msGetVals('homMed');
-
-  const lista = listaTotal.filter(p => {
-    if(filtroSolic.length   && !filtroSolic.includes(p.homolog?.solicitante || ''))  return false;
-    if(filtroEnvPor.length  && !filtroEnvPor.includes(p.homolog?.enviadaPor  || '')) return false;
-    if(filtroMedicao.length && !filtroMedicao.some(l=>_dataEmMedicao(p.homolog?.dtInstalacao, l))) return false;
-    return true;
-  });
-
-  // Contador de resultados quando filtro ativo
-  const contador = document.getElementById('homFiltroContador');
-  if(contador){
-    const ativo = filtroSolic.length || filtroEnvPor.length || filtroMedicao.length;
-    contador.textContent = ativo ? `${lista.length} de ${listaTotal.length} projeto(s)` : '';
-  }
-
-  if(lista.length === 0){
-    listaEl.innerHTML = `<div class="hom-empty">
-      <div style="font-size:28px;margin-bottom:10px">🔍</div>
-      <div style="font-weight:600;margin-bottom:6px">Nenhum resultado para os filtros selecionados</div>
-      <div><button onclick="limparFiltrosHomolog()" class="btn bg2 bsm" style="margin-top:8px">✕ Limpar filtros</button></div>
-    </div>`;
-    return;
-  }
-
-  // Separar em 4 grupos
-  const grpPendente   = lista.filter(p => !(p.homolog?.dtHomolog) && !(p.homolog?.dtAutorizacao) && !(p.homolog?.dtInstalacao));
-  const grpHomologado = lista.filter(p =>  !!(p.homolog?.dtHomolog) && !(p.homolog?.dtAutorizacao) && !(p.homolog?.dtInstalacao));
-  const grpAutorizado = lista.filter(p =>  !!(p.homolog?.dtAutorizacao) && !(p.homolog?.dtInstalacao));
-  const grpInstalado  = lista.filter(p =>  !!(p.homolog?.dtInstalacao));
-
-  let html = '';
-  let temAnterior = false;
-
-  if(grpPendente.length > 0){
-    html += `<div class="hom-group-title pendente" style="margin-top:${temAnterior?'28px':'4px'}">⏳ Pendentes <span style="font-size:12px;font-weight:800">${grpPendente.length}</span></div>`;
-    html += grpPendente.map(p => buildHomologCard(p)).join('');
-    temAnterior = true;
-  }
-
-  if(grpHomologado.length > 0){
-    html += `<div class="hom-group-title homologado" style="margin-top:${temAnterior?'28px':'4px'}">🔖 Homologados <span style="font-size:12px;font-weight:800">${grpHomologado.length}</span></div>`;
-    html += grpHomologado.map(p => buildHomologCard(p)).join('');
-    temAnterior = true;
-  }
-
-  if(grpAutorizado.length > 0){
-    html += `<div class="hom-group-title autorizado" style="margin-top:${temAnterior?'28px':'4px'}">🔓 Autorizados <span style="font-size:12px;font-weight:800">${grpAutorizado.length}</span></div>`;
-    html += grpAutorizado.map(p => buildHomologCard(p)).join('');
-    temAnterior = true;
-  }
-
-  if(grpInstalado.length > 0){
-    html += `<div class="hom-group-title instalado" style="margin-top:${temAnterior?'28px':'4px'}">✅ Instalados <span style="font-size:12px;font-weight:800">${grpInstalado.length}</span></div>`;
-    html += grpInstalado.map(p => buildHomologCard(p)).join('');
-  }
-
-  // Salvar gavetas abertas antes de re-renderizar
-  const _gavetasAbertas = [...document.querySelectorAll('.hom-body.open')].map(el=>el.id.replace('hom_body_',''));
-  listaEl.innerHTML = html;
-  // Restaurar gavetas abertas após re-render
-  _gavetasAbertas.forEach(id => {
-    const body = document.getElementById('hom_body_'+id);
-    const chev = document.getElementById('hom_chev_'+id);
-    if(body) body.classList.add('open');
-    if(chev) chev.classList.add('open');
-  });
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-
-
 function renderAll(){
-  // Garantir que projetos já na col 11 tenham homologPassou marcado
-  DB.forEach(p=>{ if(p.col===11 && !p.homologPassou){ p.homologPassou=true; fbSalvarProjeto(p); } });
-  // Migração silenciosa: limpar homologPassou de projetos que recuaram antes da col 11
-  // E têm a etapa "Homologação" não concluída (corrige inconsistências antigas)
-  DB.forEach(p=>{
-    if(p.homologPassou && p.col < 11){
-      const etapaHom = (p.etapas||[]).find(e => e.lb === 'Homologação');
-      if(etapaHom && !etapaHom.done){
-        p.homologPassou = false;
-        if(p.homolog?.preenchido) p.homolog.preenchido = false;
-        fbSalvarProjeto(p);
-      }
-    }
-  });
-  rDash();rKanban();rList();rTimeline();rKPIs();rAtrasos();rCancelados();rMedicao();rHomologacoes();rCarga();rHistorico();rLixeira();limparNotifObsoletas();detectarNotificacoes();
+  rDash();rKanban();rList();rTimeline();rKPIs();rAtrasos();rCancelados();rMedicao();rCarga();rHistorico();rLixeira();limparNotifObsoletas();detectarNotificacoes();
 }
 
 // ══════════════════════════════════════════════
@@ -8695,74 +7513,6 @@ const _NOMES_MIGRAR = {
 };
 function _migrarNome(nome){ return _NOMES_MIGRAR[nome] || nome; }
 
-// ── Migração silenciosa de etapas Web Rise ────────────────────────────────────
-const _RECURSOS_WEB_RISE = ['Web Rise Básico','Web Rise Intermediário','Web Rise Avançado'];
-
-const _ETAPAS_RENOMEAR = {
-  'Elaboração do PI':              'Elaboração do PICV',
-  'Revisão Textual do PI':         'Revisão textual do PICV',
-  'Entrega do PI ao cliente':      'Entrega do PICV ao cliente',
-  'Validação do PI':               'Validação PICV DI/DM Referência',
-  'Desenho/Roteirização':          'Desenho/roteirização do onepage',
-  'Produção de Recursos Gráficos': 'Produção de recursos gráficos',
-  'Entrega do Review ao cliente':  'Entrega do review ao cliente',
-  'Solicitação de Ajustes':        'Solicitação de ajustes',
-  'Implementação de Ajustes':      'Implementação de ajustes',
-  'Validação Final':               'Validação final do review',
-  'Revisão Textual':               'Revisão textual do review',
-  'Upload Arquivos':               'Upload Arquivos Bdoc',
-};
-
-// Etapas que indicam projeto já migrado
-const _ETAPAS_NOVAS = new Set([
-  'Validação LD','Validação DM Referência','Validação final do PICV',
-  'Solicitação de ajustes no PICV','Análise do material base',
-]);
-
-// Sequência final correta das etapas Web Rise
-const _SEQUENCIA_WEB_RISE = [
-  {lb:'Reunião Inicial',                     r:'eq'},
-  {lb:'Material Base Recebido',              r:'cl'},
-  {lb:'Análise do material base',            r:'eq'},
-  {lb:'Elaboração do PICV',                  r:'eq'},
-  {lb:'Validação PICV DI/DM Referência',     r:'cl'},
-  {lb:'Validação LD',                        r:'cl'},
-  {lb:'Revisão textual do PICV',             r:'eq'},
-  {lb:'Entrega do PICV ao cliente',          r:'eq'},
-  {lb:'Solicitação de ajustes no PICV',      r:'cl'},
-  {lb:'Implementação de ajustes',            r:'eq'},
-  {lb:'Validação final do PICV',             r:'cl'},
-  {lb:'Desenho/roteirização do onepage',     r:'eq'},
-  {lb:'Validação DI Referência',             r:'cl'},
-  {lb:'Produção de recursos gráficos',       r:'eq'},
-  {lb:'Validação DM Referência',             r:'cl'},
-  {lb:'Validação LD',                        r:'cl'},
-  {lb:'Entrega do review ao cliente',        r:'eq'},
-  {lb:'Solicitação de ajustes',              r:'cl'},
-  {lb:'Implementação de ajustes',            r:'eq'},
-  {lb:'Validação final do review',           r:'cl'},
-  {lb:'Revisão textual do review',           r:'eq'},
-  {lb:'Homologação',                         r:'eq'},
-  {lb:'Instalação no SIRH',                  r:'eq'},
-  {lb:'Upload Arquivos Bdoc',                r:'eq'},
-];
-
-function _migrarEtapasWebRise(etapas){
-  // Mapear dados existentes por nome antigo e novo
-  const dados = {};
-  etapas.forEach(e => {
-    dados[e.lb] = e;
-    const novo = _ETAPAS_RENOMEAR[e.lb];
-    if(novo && !dados[novo]) dados[novo] = e;
-  });
-  // Montar sequência final preservando todos os dados históricos
-  return _SEQUENCIA_WEB_RISE.map(tmpl => {
-    const existente = dados[tmpl.lb];
-    if(existente) return {...existente, lb: tmpl.lb, r: tmpl.r};
-    return {lb: tmpl.lb, r: tmpl.r, prazo: null, done: false, fim: null};
-  });
-}
-
 function normalizar(p){
   if(!p) return p;
   p.resps          = (p.resps || []).map(_migrarNome);
@@ -8773,56 +7523,8 @@ function normalizar(p){
   p.enviadoMedicao = p.enviadoMedicao || null;
   p.medicaoFeita   = !!p.medicaoFeita;
   p.medicaoFeitaEm = p.medicaoFeitaEm || null;
-  p.homolog        = p.homolog || {};
-
-  // Migração de etapas Web Rise: roda APENAS em projetos não personalizados pelo usuário.
-  // Se o usuário renomeou, removeu ou reordenou etapas (etapasCustomizadas), a migração
-  // NÃO deve rodar — caso contrário ela reconstrói o template e desfaz a personalização
-  // a cada sync do Firebase (era a causa de "renomear/remover não salva e volta ao original").
-  const ehWebRise = (p.recursos||[]).some(r => _RECURSOS_WEB_RISE.includes(r));
-  if(ehWebRise && p.etapas.length > 0 && !p.etapasCustomizadas){
-    const temAntiga = p.etapas.some(e => _ETAPAS_RENOMEAR[e.lb]);
-    // 'faltaNova' sozinho não é confiável (remover uma etapa dispararia migração).
-    // Só migramos por 'faltaNova' se o projeto NÃO mostra sinais de personalização,
-    // ou seja, se TODAS as etapas atuais ainda batem com o template padrão Web Rise.
-    const nomesPadrao = new Set(_SEQUENCIA_WEB_RISE.map(t => t.lb));
-    const todasNoPadrao = p.etapas.every(e => nomesPadrao.has(e.lb) || _ETAPAS_RENOMEAR[e.lb]);
-    const faltaNova = !p.etapas.some(e => _ETAPAS_NOVAS.has(e.lb));
-    if(temAntiga || (faltaNova && todasNoPadrao)) p.etapas = _migrarEtapasWebRise(p.etapas);
-
-    // Preencher prazos em cascata nas etapas sem prazo (se há data de início)
-    const recursoWR = (p.recursos||[]).find(r => _RECURSOS_WEB_RISE.includes(r));
-    const temEtapasSemPrazo = p.etapas.some(e =>
-      !e.prazo && !ETAPAS_SEM_PRAZO_AUTO.has(e.lb)
-    );
-    if(recursoWR && p.inicio && CRONOGRAMAS[recursoWR] && temEtapasSemPrazo){
-      p.etapas = _cronogramaEtapasSilencioso(p.etapas, CRONOGRAMAS[recursoWR], p.inicio);
-    }
-  }
 
   return p;
-}
-
-// Aplica cronograma diretamente no array de etapas — sem depender do formulário.
-// Preserva prazos já existentes; preenche apenas os que estão null.
-function _cronogramaEtapasSilencioso(etapas, cron, dataInicio){
-  let cursor = dataInicio;
-  const usados = new Set();
-  return etapas.map(e => {
-    if(!e.lb || ETAPAS_SEM_PRAZO_AUTO.has(e.lb)) return e;
-    const lbLow = e.lb.toLowerCase();
-    const idx = cron.findIndex((c, i) =>
-      !usados.has(i) && (
-        lbLow.includes(c.lb.toLowerCase()) ||
-        c.lb.toLowerCase().includes(lbLow)
-      )
-    );
-    if(idx === -1) return e;
-    usados.add(idx);
-    cursor = addDiasUteis(cursor, cron[idx].dias);
-    // Só preenche prazo se ainda não tem — preserva datas já definidas
-    return e.prazo ? {...e} : {...e, prazo: cursor};
-  });
 }
 
 // ── SALVAR UM PROJETO ESPECÍFICO no Firebase ──
@@ -9231,7 +7933,6 @@ function rHistorico(){
     'enviou medição':      '#7C3AED',
     'confirmou medição':   '#1A8A4A',
     'desmarcou medição':   '#9CA3AF',
-    'homologação salva':   '#0891B2',
     'deletou projeto':     '#DC2626',
     'alterou prazo':       '#F59E0B',
     'alterou responsável': '#8B5CF6',
@@ -9249,7 +7950,6 @@ function rHistorico(){
     'enviou medição':      '📐',
     'confirmou medição':   '🎉',
     'desmarcou medição':   '↩️',
-    'homologação salva':   '🔖',
     'deletou projeto':     '🗑️',
     'alterou prazo':       '📅',
     'alterou responsável': '👤',
@@ -9283,7 +7983,6 @@ function _renderHistRows(el, rows){
     'enviou medição':      '#7C3AED',
     'confirmou medição':   '#1A8A4A',
     'desmarcou medição':   '#9CA3AF',
-    'homologação salva':   '#0891B2',
     'alterou prazo':       '#F59E0B',
     'alterou responsável': '#8B5CF6',
     'registrou motivo':    '#EF4444',
@@ -9301,7 +8000,6 @@ function _renderHistRows(el, rows){
     'enviou medição':      '📐',
     'confirmou medição':   '🎉',
     'desmarcou medição':   '↩️',
-    'homologação salva':   '🔖',
     'alterou prazo':       '📅',
     'alterou responsável': '👤',
     'registrou motivo':    '⚠️',
@@ -9983,18 +8681,6 @@ function detectarNotificacoes(){
       }
     }
 
-    // 3. Homologação pendente (sem data de instalação)
-    if((p.col===11 || p.homologPassou || p.homolog?.preenchido) && !p.homolog?.dtInstalacao){
-      const id = _notifId('homolog', p.id, 'pend');
-      if(!idsExist.has(id) && !descartados.has(id)){
-        novas.push({
-          id, tipo:'homolog', projId:p.id,
-          texto:`<strong>${p.nome}</strong> aguarda instalação na Homologação.`,
-          icone:'🔖', dt: new Date().toISOString(), lida:false
-        });
-      }
-    }
-
     // 4. Medição pendente
     if(p.enviadoMedicao && !p.medicaoFeita){
       const id = _notifId('medicao', p.id, 'pend');
@@ -10042,7 +8728,6 @@ function limparNotifObsoletas(){
     if(!p) return false; // projeto deletado
     if(n.tipo==='atraso'   && calcSit(p)!=='atrasado') return false;
     if(n.tipo==='prazo'    && (calcSit(p)==='concluido'||p.cancelado)) return false;
-    if(n.tipo==='homolog'  && p.homolog?.dtInstalacao) return false;
     if(n.tipo==='medicao'  && p.medicaoFeita) return false;
     if(n.tipo==='etapacl'){
       const etapa = (p.etapas||[]).find(e=>e.lb===n.id.split('_').slice(2).join('_'));
@@ -10068,14 +8753,11 @@ function atualizarUINotif(){
   }
 
   // Badges do menu lateral
-  const homologPend = notifs.filter(n=>n.tipo==='homolog'&&!n.lida).length;
   const atrasosPend = notifs.filter(n=>(n.tipo==='atraso'||n.tipo==='prazo')&&!n.lida).length;
   const medicaoPend = notifs.filter(n=>n.tipo==='medicao'&&!n.lida).length;
 
-  const bH = document.getElementById('badgeHomolog');
   const bA = document.getElementById('badgeAtrasos');
   const bM = document.getElementById('badgeMedicao');
-  if(bH){ bH.style.display=homologPend>0?'inline-flex':'none'; bH.textContent=homologPend||''; }
   if(bA){ bA.style.display=atrasosPend>0?'inline-flex':'none'; bA.textContent=atrasosPend||''; }
   if(bM){ bM.style.display=medicaoPend>0?'inline-flex':'none'; bM.textContent=medicaoPend||''; }
 
@@ -10094,7 +8776,7 @@ function renderNotifPanel(){
     return;
   }
 
-  const tipoLabel={atraso:'Atraso',prazo:'Prazo',homolog:'Homologação',medicao:'Medição',etapacl:'Cliente'};
+  const tipoLabel={atraso:'Atraso',prazo:'Prazo',medicao:'Medição',etapacl:'Cliente'};
   listEl.innerHTML = notifs.map((n,i)=>`
     <div class="notif-item ${n.lida?'read':'unread'}" id="notifItem_${i}">
       <div class="notif-icon">${n.icone}</div>
@@ -10296,127 +8978,6 @@ document.addEventListener('keydown', function(e){
 initDark();
 document.getElementById('topDate').textContent=
   new Date().toLocaleDateString('pt-BR',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
-
-// ── MIGRAÇÃO DE ETAPAS Web Rise ─────────────────────────────────────────────
-function migrarEtapasWebRise(){
-  const RECURSOS_WEB_RISE = ['Web Rise Básico','Web Rise Intermediário','Web Rise Avançado'];
-
-  // Mapa de renomeação: nome antigo → nome novo
-  // null = remover a etapa (ex: 'Revisão do PI' foi removida)
-  const RENOMEAR = {
-    'Elaboração do PI':              'Elaboração do PICV',
-    'Revisão do PI':                 null,  // removida
-    'Revisão Textual do PI':         'Revisão textual do PICV',
-    'Entrega do PI ao cliente':      'Entrega do PICV ao cliente',
-    'Validação do PI':               'Validação PICV DI/DM Referência',
-    'Desenho/Roteirização':          'Desenho/roteirização do onepage',
-    'Produção de Recursos Gráficos': 'Produção de recursos gráficos',
-    'Entrega do Review ao cliente':  'Entrega do review ao cliente',
-    'Solicitação de Ajustes':        'Solicitação de ajustes',
-    'Implementação de Ajustes':      'Implementação de ajustes',
-    'Validação Final':               'Validação final do review',
-    'Revisão Textual':               'Revisão textual do review',
-    'Upload Arquivos':               'Upload Arquivos Bdoc',
-  };
-
-  // Etapas novas a inserir (em posição específica relativa a outras etapas)
-  // Formato: { apos: 'nome da etapa anterior', inserir: {lb, r} }
-  const INSERIR = [
-    { apos: 'Material Base Recebido',     lb:'Análise do material base',         r:'eq' },
-    { apos: 'Validação PICV DI/DM Referência', lb:'Validação LD',               r:'cl' },
-    { apos: 'Validação final do PICV',    lb:'Validação final do PICV',          r:'cl', skip:true }, // já existe após renomeação
-    { apos: 'Validação DI Referência',    lb:'Validação DM Referência',          r:'cl' },
-    { apos: 'Validação DM Referência',    lb:'Validação LD',                     r:'cl' },
-    { apos: 'Solicitação de ajustes no PICV', lb:'Implementação de ajustes',    r:'eq', skip:true }, // já existe
-    { apos: 'Implementação de ajustes (PICV)', lb:'Validação final do PICV',    r:'cl' },
-  ];
-
-  // Sequência final esperada (para reordenar se necessário)
-  const SEQUENCIA_FINAL = [
-    {lb:'Reunião Inicial',                     r:'eq'},
-    {lb:'Material Base Recebido',              r:'cl'},
-    {lb:'Análise do material base',            r:'eq'},
-    {lb:'Elaboração do PICV',                  r:'eq'},
-    {lb:'Validação PICV DI/DM Referência',     r:'cl'},
-    {lb:'Validação LD',                        r:'cl'},
-    {lb:'Revisão textual do PICV',             r:'eq'},
-    {lb:'Entrega do PICV ao cliente',          r:'eq'},
-    {lb:'Solicitação de ajustes no PICV',      r:'cl'},
-    {lb:'Implementação de ajustes',            r:'eq'},
-    {lb:'Validação final do PICV',             r:'cl'},
-    {lb:'Desenho/roteirização do onepage',     r:'eq'},
-    {lb:'Validação DI Referência',             r:'cl'},
-    {lb:'Produção de recursos gráficos',       r:'eq'},
-    {lb:'Validação DM Referência',             r:'cl'},
-    {lb:'Validação LD',                        r:'cl'},
-    {lb:'Entrega do review ao cliente',        r:'eq'},
-    {lb:'Solicitação de ajustes',              r:'cl'},
-    {lb:'Implementação de ajustes',            r:'eq'},
-    {lb:'Validação final do review',           r:'cl'},
-    {lb:'Revisão textual do review',           r:'eq'},
-    {lb:'Homologação',                         r:'eq'},
-    {lb:'Instalação no SIRH',                  r:'eq'},
-    {lb:'Upload Arquivos Bdoc',                r:'eq'},
-  ];
-
-  if(!confirm('Migrar etapas de todos os projetos Web Rise para o novo padrão?\n\nEsta ação não pode ser desfeita. Recomenda-se exportar o XLSX antes.')) return;
-
-  const statusEl = document.getElementById('migracaoStatus') || document.getElementById('migracaoStatus2');
-  const statusEl2 = document.getElementById('migracaoStatus2');
-  if(statusEl) statusEl.textContent = '⏳ Migrando...';
-  if(statusEl2) statusEl2.textContent = '⏳ Migrando...';
-
-  const todosDB = activeDB().concat(cancelDB());
-  const projWebRise = todosDB.filter(p =>
-    (p.recursos||[]).some(r => RECURSOS_WEB_RISE.includes(r))
-  );
-
-  if(projWebRise.length === 0){
-    statusEl.textContent = '⚠️ Nenhum projeto Web Rise encontrado.';
-    return;
-  }
-
-  let migrados = 0;
-  let erros = 0;
-
-  projWebRise.forEach(p => {
-    try {
-      const etapasAntigas = p.etapas || [];
-
-      // Construir mapa de dados existentes (prazo, done, fim, etc.) por nome antigo
-      const dadosEtapa = {};
-      etapasAntigas.forEach(e => { dadosEtapa[e.lb] = {...e}; });
-
-      // Montar novas etapas preservando dados (prazo, done, fim, motivo)
-      const novasEtapas = SEQUENCIA_FINAL.map(tmpl => {
-        // Verificar se já existe com o novo nome
-        if(dadosEtapa[tmpl.lb]){
-          return {...dadosEtapa[tmpl.lb], lb: tmpl.lb, r: tmpl.r};
-        }
-        // Verificar se existe com nome antigo (buscar no mapa de renomeação)
-        const nomeAntigo = Object.entries(RENOMEAR).find(([,novo]) => novo === tmpl.lb)?.[0];
-        if(nomeAntigo && dadosEtapa[nomeAntigo]){
-          return {...dadosEtapa[nomeAntigo], lb: tmpl.lb, r: tmpl.r};
-        }
-        // Etapa nova — sem dados históricos
-        return {lb: tmpl.lb, r: tmpl.r, prazo: null, done: false, fim: null};
-      });
-
-      p.etapas = novasEtapas;
-      fbSalvarProjeto(p);
-      migrados++;
-    } catch(e) {
-      console.error('Erro ao migrar projeto', p.nome, e);
-      erros++;
-    }
-  });
-
-  const msg = `✅ ${migrados} projeto(s)${erros > 0 ? ` · ⚠️ ${erros} erro(s)` : ''}`;
-  if(statusEl) statusEl.textContent = msg;
-  if(statusEl2) statusEl2.textContent = msg;
-  showToast(`✅ Migração concluída: ${migrados} projeto(s) Web Rise atualizados`);
-  setTimeout(() => renderAll(), 500);
-}
 
 // ── INIT — sessão gerenciada pelo Firebase Authentication ──────────────────
 const savedUrl     = localStorage.getItem(CFG_KEY);
