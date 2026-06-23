@@ -1333,7 +1333,7 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
 
     <!-- LISTA -->
     <div class="view" id="view-projetos">
-      <div class="sh"><div class="st">Lista de Projetos</div></div>
+      <div class="sh" style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap"><div class="st">Lista de Projetos</div><div id="listCount" style="font-size:12px;color:var(--mu);font-weight:600"></div></div>
       <div class="fbox">
         <div class="fbox-row" style="flex-wrap:wrap;gap:10px;align-items:flex-end">
           <div class="fg-sm"><label class="fl-sm">Responsável</label>
@@ -3039,7 +3039,17 @@ function toggleListSort(col){
 }
 function rList(){
   populateFiltSelects();
-  let data=applyFilt(activeDB(),getLFilts());
+  const _allList=activeDB();
+  let data=applyFilt(_allList,getLFilts());
+
+  // Contador de projetos (total e filtrado)
+  const _cntEl=document.getElementById('listCount');
+  if(_cntEl){
+    const _tot=_allList.length, _flt=data.length;
+    _cntEl.textContent = _flt===_tot
+      ? `${_tot} projeto${_tot!==1?'s':''}`
+      : `${_flt} de ${_tot} projeto${_tot!==1?'s':''}`;
+  }
 
   // Ordenação dinâmica — todas as colunas
   const _ordPrioList={urgente:0,alta:1,media:2,baixa:3};
