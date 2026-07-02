@@ -16,7 +16,9 @@
 <meta http-equiv="X-Frame-Options" content="SAMEORIGIN">
 <meta name="author" content="Daniel David — Firjan SENAI">
 <title>Projetos Petrobras · Firjan SENAI</title>
-<link href="https://fonts.googleapis.com/css2?family=Plus Jakarta Sans:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
 :root{
   --red:#E8002D;--dark:#0D0D0D;--blue:#003DA5;
@@ -1050,10 +1052,10 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
 
 </style>
 <!-- SheetJS (XLSX) -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js" integrity="sha384-vtjasyidUo0kW94K5MXDXntzOJpQgBKXmE7e2Ga4LG0skTTLeBi97eFAXsqewJjw" crossorigin="anonymous"></script>
 <!-- jsPDF + AutoTable -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" integrity="sha384-JcnsjUPPylna1s1fvi1u12X5qjY5OL56iySh75FdtrwhO/SWXgMjoVqcKyIIWOLk" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js" integrity="sha384-fCAW/rDWORTbQXSiB7mOg0QtQ5c+r0f544y6XoKjuVva0nMBlCpNUjiFeG5iMdS3" crossorigin="anonymous"></script>
 </head>
 <body>
 <a class="skip-link" href="#main-content">Pular para o conteúdo</a>
@@ -1231,7 +1233,7 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
       <span style="font-size:11px;color:var(--mu);margin-left:12px;opacity:.8">&middot; Sistema atualizado em 23/06/2026 às 08:45</span>
       <div class="search-box">
         <span class="search-icon">🔍</span>
-        <input id="searchInp" placeholder="Buscar projeto..." oninput="buscarGlobal(this.value)" onblur="setTimeout(()=>fecharBusca(),180)">
+        <input id="searchInp" placeholder="Buscar projeto..." oninput="buscarGlobalDeb(this.value)" onblur="setTimeout(()=>fecharBusca(),180)">
         <div class="search-drop" id="searchDrop"></div>
       </div>
       <div style="position:relative;display:inline-block" id="exportMenuWrap">
@@ -1689,7 +1691,7 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
         <div class="fbox-row" style="flex-wrap:wrap;gap:10px;align-items:flex-end">
           <div class="fg" style="flex:1;min-width:200px">
             <label class="fl">Buscar</label>
-            <input class="fi" id="lixBusca" type="text" placeholder="Nome do projeto ou motivo..." oninput="rLixeira()">
+            <input class="fi" id="lixBusca" type="text" placeholder="Nome do projeto ou motivo..." oninput="rLixeiraDeb()">
           </div>
           <div class="fg" style="min-width:170px">
             <label class="fl">Deletado por</label>
@@ -2171,6 +2173,17 @@ function avList(resps){
   return `<div style="display:flex;flex-wrap:wrap;gap:3px">${(resps||[]).map(avHtml).join('')}</div>`;
 }
 function tagH(t){const m=TIMAP[t]||{l:t,c:'tdi'};return`<span class="tag ${m.c}">${m.l}</span>`}
+// ── ESCAPE HTML — sempre usar em dados digitados pelo usuário dentro de templates ──
+function esc(s){
+  return String(s ?? '')
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+// ── DEBOUNCE — adia execução até o usuário parar de digitar ──
+function debounce(fn, ms){
+  let t = null;
+  return function(...args){ clearTimeout(t); t = setTimeout(()=>fn.apply(this,args), ms); };
+}
 function fd(d){if(!d)return'—';try{const[y,m,day]=d.split('-');return`${day}/${m}/${y}`}catch{return d}}
 function td(){return new Date().toISOString().split('T')[0]}
 // Converte DD,MM,AAAA → 'YYYY-MM-DD' ou '' se incompleto
@@ -2599,7 +2612,8 @@ function nav(id){
   document.querySelectorAll('.si').forEach(n=>n.classList.remove('on'));
   document.querySelectorAll('.si').forEach(n=>{if(n.getAttribute('onclick')===`nav('${id}')`)n.classList.add('on');});
   document.getElementById('pageTitle').textContent=PT[id]||id;
-  renderAll();
+  // Renderiza a view só se ela estiver "suja" (dados mudaram desde a última renderização)
+  if(_viewsDirty.has(id)) renderView(id);
 }
 
 // ── ACTIVE DB (excluindo cancelados para views normais) ──
@@ -2653,7 +2667,7 @@ function rKanban(){
         const{eq,cl}=delInf(p);
         return`<div class="kcard" draggable="true" data-id="${p.id}"
           role="article" tabindex="0"
-          aria-label="${p.nome}${p.prioridade?' — '+PRIO_MAP[p.prioridade]?.label.replace(/./u,'').trim():''}"
+          aria-label="${esc(p.nome)}${p.prioridade?' — '+PRIO_MAP[p.prioridade]?.label.replace(/./u,'').trim():''}"
           onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openDet(${p.id})}"
           ondragstart="onDragStart(event,${p.id})" ondragend="onDragEnd()" onclick="cardClick(event,${p.id})">
           <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:4px;margin-bottom:4px">
@@ -2663,10 +2677,10 @@ function rKanban(){
               ${prazoBadge(p.prazo,sit)}
             </div>
           </div>
-          <div class="kcard-t">${p.nome}</div>
+          <div class="kcard-t">${esc(p.nome)}</div>
           <div style="font-size:10px;color:var(--mu);margin-bottom:2px">
             ${p.idCurso
-              ? `<span style="background:var(--s2);border:1px solid var(--bdr);border-radius:4px;padding:1px 5px;font-weight:600">${p.idCurso}</span>`
+              ? `<span style="background:var(--s2);border:1px solid var(--bdr);border-radius:4px;padding:1px 5px;font-weight:600">${esc(p.idCurso)}</span>`
               : '<span style="color:#CBD5E1;font-style:italic">Sem ID</span>'
             }
           </div>
@@ -2684,7 +2698,7 @@ function rKanban(){
             ${avList(p.resps)}
             <span style="font-size:10.5px;font-weight:600;color:var(--mu)">${p.pct}%</span>
           </div>
-          ${p.criadoPor?`<div class="kcard-autoria"><span>✏️ ${p.criadoPor}</span>${p.editadoPor&&p.editadoPor!==p.criadoPor?`<span>· editado: ${p.editadoPor}</span>`:''}</div>`:''}
+          ${p.criadoPor?`<div class="kcard-autoria"><span>✏️ ${esc(p.criadoPor)}</span>${p.editadoPor&&p.editadoPor!==p.criadoPor?`<span>· editado: ${esc(p.editadoPor)}</span>`:''}</div>`:''}
           ${(() => {
             const etapas = p.etapas || [];
 
@@ -3092,7 +3106,7 @@ function rList(){
     const{eq,cl}=delInf(p);
     const _area=p.area?'<br><small style="color:var(--mu)">'+p.area+'</small>':'';
     return`<tr>
-      <td><span style="font-weight:600;cursor:pointer" onclick="openDet(${p.id})">${p.nome}</span>${_area}${p.prioridade?'<div style="margin-top:3px">'+prioBadge(p.prioridade)+'</div>':''}</td>
+      <td><span style="font-weight:600;cursor:pointer" onclick="openDet(${p.id})">${esc(p.nome)}</span>${_area}${p.prioridade?'<div style="margin-top:3px">'+prioBadge(p.prioridade)+'</div>':''}</td>
       <td>${recTags(p.recursos)}</td>
       <td>${avList(p.resps)}</td>
       <td style="font-size:11.5px"><span style="display:inline-flex;align-items:center;gap:4px"><span style="width:6px;height:6px;border-radius:50%;background:${colDot(p.col)};flex-shrink:0;display:inline-block"></span>${colLabel(p.col)}</span></td>
@@ -3839,7 +3853,7 @@ function rKPIs(){
            const cor = _espCor(e.media, _espMn, mx5);
            return `<div class="kpi-bar2-row">
              <div class="kpi-bar2-head">
-               <span class="kpi-bar2-name">${e.lb} <span class="kpi-bar2-resp-tag muted">${e.n}x</span></span>
+               <span class="kpi-bar2-name">${esc(e.lb)} <span class="kpi-bar2-resp-tag muted">${e.n}x</span></span>
                <span class="kpi-bar2-val" style="color:${cor}">${e.media}d</span>
              </div>
              <div class="kpi-bar2-track"><div class="kpi-bar2-fill" style="width:${e.media/mx5*100}%;background:${cor}"></div></div>
@@ -3870,7 +3884,7 @@ function rKPIs(){
         const nov = p.escopoNovoRecurso   || '<em style="color:var(--mu);font-weight:400">não informado</em>';
         const cancBdg = p.cancelado ? '<span style="font-size:9px;background:#FEE2E2;color:#991B1B;padding:1px 6px;border-radius:8px;font-weight:700;margin-left:5px">CANC.</span>' : '';
         return `<div class="kpi-escopo-item" onclick="openDet(${p.id})">
-          <div class="kpi-escopo-nome">${p.nome}${cancBdg}</div>
+          <div class="kpi-escopo-nome">${esc(p.nome)}${cancBdg}</div>
           <div class="kpi-escopo-trans">
             <span class="kpi-escopo-rec ant">${ant}</span>
             <span class="kpi-escopo-arrow">→</span>
@@ -4063,7 +4077,7 @@ function rAtrasos(){
       const diasColor = r.diasAtraso > 10 ? 'var(--red)' : r.diasAtraso > 5 ? 'var(--yel)' : 'var(--org)';
       return `<div class="atraso-etapa-row">
         <div style="min-width:0">
-          <div style="font-weight:600;font-size:12.5px">${r.etapa}</div>
+          <div style="font-weight:600;font-size:12.5px">${esc(r.etapa)}</div>
           <div style="font-size:11px;color:var(--mu);margin-top:2px">${respBdg} · Prazo: ${fd(r.prazo)} · ${r.antFim ? 'Ant: '+fd(r.antFim) : '<span style="color:var(--mu)">primeira etapa</span>'}</div>
         </div>
         <div><span class="sit sit-ov" style="font-size:11px">⚠️ Em aberto</span></div>
@@ -4074,10 +4088,10 @@ function rAtrasos(){
     return `<div class="atraso-proj">
       <div class="atraso-proj-hd" onclick="toggleAtrasoProj(this)">
         <div class="atraso-proj-info">
-          <div class="atraso-proj-nome" onclick="event.stopPropagation();openDet(${pg.projId})">${pg.proj}</div>
+          <div class="atraso-proj-nome" onclick="event.stopPropagation();openDet(${pg.projId})">${esc(pg.proj)}</div>
           <div class="atraso-proj-meta">
             ${sitProjBdg(pg)}
-            <span style="font-size:11px;color:var(--mu)">${pg.resp}</span>
+            <span style="font-size:11px;color:var(--mu)">${esc(pg.resp)}</span>
           </div>
         </div>
         <div class="atraso-proj-right">
@@ -4125,7 +4139,7 @@ function rCancelados(){
   document.getElementById('cancelTbl').innerHTML=canc.length===0?
     '<tr><td colspan="9" style="text-align:center;padding:20px;color:var(--mu)">Nenhum projeto cancelado</td></tr>':
     canc.map(p=>`<tr class="canc-row">
-      <td><strong>${p.nome}</strong></td>
+      <td><strong>${esc(p.nome)}</strong></td>
       <td>${recTags(p.recursos)}</td>
       <td>${avList(p.resps)}</td>
       <td>${fd(p.criado)}</td>
@@ -4173,7 +4187,7 @@ function openDet(id){
     return`<tr class="${rowCls}">
       <td><div style="display:flex;align-items:center;gap:6px">
         <div class="chk ${e.done?'done':isCl&&!e.done&&!ETAPAS_SEM_PRAZO_AUTO.has(e.lb)?'cwait':''}" onclick="toggleE(${id},${i})">${e.done?'✓':isCl&&!ETAPAS_SEM_PRAZO_AUTO.has(e.lb)?'⏳':''}</div>
-        <span>${e.lb}</span>
+        <span>${esc(e.lb)}</span>
       </div></td>
       <td>
         <select class="iis" onchange="setER(${id},${i},this.value)">
@@ -4210,13 +4224,13 @@ function openDet(id){
       <td style="min-width:160px;font-size:11.5px;vertical-align:middle">
         ${ETAPAS_SEM_PRAZO_AUTO.has(e.lb)
           ? `<input class="fi ii" type="text" placeholder="Observação…"
-               value="${(e.obs||''   ).replace(/"/g,'&quot;')}"
+               value="${esc(e.obs||'')}"
                style="width:100%;font-size:11.5px;padding:4px 7px"
                onchange="setEObs(${id},${i},this.value)"
                title="Observação livre para esta etapa">`
           : `${e.done && e.r!=='cl' && e.prazo && e.fim && new Date(e.prazo)<new Date(e.fim)
               ? e.atrasoMotivo
-                ? `<span style="color:var(--red)" title="${e.atrasoMotivo}">⚠️ ${e.atrasoMotivo.length>38?e.atrasoMotivo.slice(0,36)+'…':e.atrasoMotivo}</span>`
+                ? `<span style="color:var(--red)" title="${esc(e.atrasoMotivo)}">⚠️ ${esc(e.atrasoMotivo.length>38?e.atrasoMotivo.slice(0,36)+'…':e.atrasoMotivo)}</span>`
                 : '<span style="color:var(--mu);font-style:italic">sem motivo registrado</span>'
               : ''
             }
@@ -4234,7 +4248,7 @@ function openDet(id){
   document.getElementById('detBody').innerHTML=`
     <div class="dl2r">
       <div>
-        ${p.idCurso?dl2('ID do Projeto',`<span style="font-weight:600;font-family:monospace">${p.idCurso}</span>`):''}${p.prioridade?dl2('Prioridade',prioBadge(p.prioridade)):''}${p.rp?dl2('RP',`<span style="font-weight:600">${p.rp}</span>`):''}${p.academia?dl2('Academia',`<span style="font-weight:600">${p.academia}</span>`):''}${dl2('Recursos',recTags(p.recursos))}
+        ${p.idCurso?dl2('ID do Projeto',`<span style="font-weight:600;font-family:monospace">${esc(p.idCurso)}</span>`):''}${p.prioridade?dl2('Prioridade',prioBadge(p.prioridade)):''}${p.rp?dl2('RP',`<span style="font-weight:600">${esc(p.rp)}</span>`):''}${p.academia?dl2('Academia',`<span style="font-weight:600">${esc(p.academia)}</span>`):''}${dl2('Recursos',recTags(p.recursos))}
         ${dl2('Coluna',`<span style="display:inline-flex;align-items:center;gap:5px"><span style="width:8px;height:8px;border-radius:50%;background:${colDot(p.col)};display:inline-block"></span>${colLabel(p.col)}</span>`)}
         ${dl2('Situação',sitBdg(p))}
         ${dl2('Mudou de escopo?', _buildEscopoHtml(p))}
@@ -4243,7 +4257,7 @@ function openDet(id){
       <div>
         ${dl2('Responsável(is)',avList(p.resps)+'<div style="font-size:11.5px;margin-top:3px">'+(p.resps||[]).join(', ')+'</div>')}
         ${dl2('Progresso',progH(p,'110px'))}
-        ${p.linkBdoc?dl2('Link BDOC',`<a href="${p.linkBdoc}" target="_blank" rel="noopener noreferrer" style="color:var(--blue);text-decoration:underline;word-break:break-all;font-size:12.5px">🔗 ${p.linkBdoc}</a>`):''}
+        ${p.linkBdoc?dl2('Link BDOC',`<a href="${esc(p.linkBdoc)}" target="_blank" rel="noopener noreferrer" style="color:var(--blue);text-decoration:underline;word-break:break-all;font-size:12.5px">🔗 ${esc(p.linkBdoc)}</a>`):''}
         ${p.prazObs?dl2('Obs. Prazo',`<em style="color:var(--mu)">${p.prazObs}</em>`):''}
       </div>
     </div>
@@ -4278,9 +4292,9 @@ function openDet(id){
           : (p.comentarios||[]).slice().reverse().map(cm=>`
             <div class="coment-item">
               <div class="coment-header">
-                <div class="coment-av">${cm.autor.charAt(0).toUpperCase()}</div>
-                <span class="coment-autor">${cm.autor}</span>
-                <span class="coment-dt">${cm.dt}</span>
+                <div class="coment-av">${esc(cm.autor.charAt(0).toUpperCase())}</div>
+                <span class="coment-autor">${esc(cm.autor)}</span>
+                <span class="coment-dt">${esc(cm.dt)}</span>
               </div>
               <div class="coment-txt">${linkify(cm.txt).replace(/\n/g,'<br>')}</div>
             </div>`).join('')
@@ -6070,7 +6084,7 @@ function rLixeira(){
     const atual = selPor.value;
     const usuarios = [...new Set(LIXEIRA.map(r=>r.usuario).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'pt-BR'));
     selPor.innerHTML = '<option value="">Todos</option>' +
-      usuarios.map(u=>`<option value="${u.replace(/"/g,'&quot;')}">${u}</option>`).join('');
+      usuarios.map(u=>`<option value="${esc(u)}">${esc(u)}</option>`).join('');
     if(usuarios.includes(atual)) selPor.value = atual;
   }
 
@@ -6120,10 +6134,10 @@ function rLixeira(){
     aviso + lista.map(r=>{
       const data = r.ts ? new Date(r.ts).toLocaleDateString('pt-BR') : '—';
       return `<tr>
-        <td><strong>${r.nome||'—'}</strong>${r.idProjeto?` <span style="font-size:10px;color:var(--mu)">(${r.idProjeto})</span>`:''}</td>
+        <td><strong>${esc(r.nome||'—')}</strong>${r.idProjeto?` <span style="font-size:10px;color:var(--mu)">(${esc(r.idProjeto)})</span>`:''}</td>
         <td style="color:var(--red)">${data}</td>
-        <td style="font-size:12px">${r.usuario||'—'}</td>
-        <td style="font-size:12px;color:var(--mu);max-width:300px">${r.motivo||'—'}</td>
+        <td style="font-size:12px">${esc(r.usuario||'—')}</td>
+        <td style="font-size:12px;color:var(--mu);max-width:300px">${esc(r.motivo||'—')}</td>
       </tr>`;
     }).join('');
 }
@@ -7530,7 +7544,7 @@ function confirmarMedicao(id){
 function _buildMedRow(p){
   return `<tr style="${p.medicaoFeita?'opacity:.75':''}">
     <td>
-      <span style="font-weight:600;cursor:pointer;color:var(--blue)" onclick="openDet(${p.id})">${p.nome}</span>
+      <span style="font-weight:600;cursor:pointer;color:var(--blue)" onclick="openDet(${p.id})">${esc(p.nome)}</span>
       ${p.cancelado?'<span style="font-size:10px;color:var(--mu);margin-left:6px">(cancelado)</span>':''}
     </td>
     <td>${avList(p.resps)}</td>
@@ -7546,7 +7560,7 @@ function _buildMedRow(p){
       ${p.medicaoFeita && p.medicaoConfirmadaPor
         ? `<span style="font-size:11.5px;font-weight:600;color:var(--green);display:flex;align-items:center;justify-content:center;gap:4px">
              <span style="width:22px;height:22px;border-radius:50%;background:var(--green);color:#fff;font-size:9px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0">${p.medicaoConfirmadaPor.charAt(0).toUpperCase()}</span>
-             ${p.medicaoConfirmadaPor}
+             ${esc(p.medicaoConfirmadaPor)}
            </span>`
         : `<span style="font-size:11px;color:var(--mu);font-style:italic">—</span>`}
     </td>
@@ -8311,8 +8325,8 @@ function buildHomologCard(p){
         ? `<span class="hom-badge hom-status-homolog">🔖 Homologado</span>`
         : `<span class="hom-badge hom-status-pend">⏳ Pendente</span>`;
 
-  const acadBdg = p.academia ? `<span class="hom-badge">${p.academia}</span>` : '';
-  const rpBdg   = p.rp       ? `<span class="hom-badge">RP: ${p.rp}</span>`  : '';
+  const acadBdg = p.academia ? `<span class="hom-badge">${esc(p.academia)}</span>` : '';
+  const rpBdg   = p.rp       ? `<span class="hom-badge">RP: ${esc(p.rp)}</span>`  : '';
 
   // Mini resumo visível quando recolhido (só mostra se já tem dados)
   const temDados = h.preenchido;
@@ -8338,7 +8352,7 @@ function buildHomologCard(p){
 
     <div class="hom-card-head" onclick="toggleHomolog(${p.id})" title="Clique para expandir / recolher">
       <div class="hom-card-title">
-        📂 ${p.nome}
+        📂 ${esc(p.nome)}
         <span class="hom-chevron" id="hom_chev_${p.id}">▼</span>
       </div>
       <div class="hom-card-badges" onclick="event.stopPropagation()">
@@ -8356,7 +8370,7 @@ function buildHomologCard(p){
 
         <div class="hom-field">
           <div class="hom-field-label">Nome do Curso</div>
-          <div class="hom-field-val" style="font-weight:600">${p.nome}</div>
+          <div class="hom-field-val" style="font-weight:600">${esc(p.nome)}</div>
         </div>
         <div class="hom-field">
           <div class="hom-field-label">ID do Curso</div>
@@ -8655,7 +8669,7 @@ function rHomologacoes(){
 
 function renderAll(){
   // Garantir que projetos já na col 11 tenham homologPassou marcado
-  DB.forEach(p=>{ if(p.col===11 && !p.homologPassou){ p.homologPassou=true; fbSalvarProjeto(p); } });
+  DB.forEach(p=>{ if(p.col===11 && !p.homologPassou){ p.homologPassou=true; fbSalvarProjeto(p,{force:true}); } });
   // Migração silenciosa: limpar homologPassou de projetos que recuaram antes da col 11
   // E têm a etapa "Homologação" não concluída (corrige inconsistências antigas)
   DB.forEach(p=>{
@@ -8664,11 +8678,40 @@ function renderAll(){
       if(etapaHom && !etapaHom.done){
         p.homologPassou = false;
         if(p.homolog?.preenchido) p.homolog.preenchido = false;
-        fbSalvarProjeto(p);
+        fbSalvarProjeto(p,{force:true});
       }
     }
   });
-  rDash();rKanban();rList();rTimeline();rKPIs();rAtrasos();rCancelados();rMedicao();rHomologacoes();rCarga();rHistorico();rLixeira();limparNotifObsoletas();detectarNotificacoes();
+  // Marca TODAS as views como sujas e renderiza apenas a visível.
+  // As demais serão renderizadas sob demanda ao navegar (ver nav/renderView).
+  Object.keys(VIEW_RENDERERS).forEach(k => _viewsDirty.add(k));
+  renderView(currentViewId());
+  limparNotifObsoletas();detectarNotificacoes();
+}
+
+// ── RENDERIZAÇÃO POR VIEW (lazy) ──────────────────────────────────────────
+const VIEW_RENDERERS = {
+  kanban:        () => { rDash(); rKanban(); },
+  projetos:      () => rList(),
+  timeline:      () => rTimeline(),
+  kpis:          () => rKPIs(),
+  atrasos:       () => rAtrasos(),
+  cancelados:    () => rCancelados(),
+  medicao:       () => rMedicao(),
+  homologacoes:  () => rHomologacoes(),
+  carga:         () => rCarga(),
+  historico:     () => rHistorico(),
+  lixeira:       () => rLixeira(),
+};
+const _viewsDirty = new Set(Object.keys(VIEW_RENDERERS));
+
+function currentViewId(){
+  const v = document.querySelector('.view.on');
+  return v ? v.id.replace('view-','') : 'kanban';
+}
+function renderView(id){
+  const fn = VIEW_RENDERERS[id];
+  if(fn){ fn(); _viewsDirty.delete(id); }
 }
 
 // ══════════════════════════════════════════════
@@ -8834,14 +8877,48 @@ function _cronogramaEtapasSilencioso(etapas, cron, dataInicio){
 
 // ── SALVAR UM PROJETO ESPECÍFICO no Firebase ──
 // Usamos set no nó individual para evitar sobrescrever dados de outros usuários
-function fbSalvarProjeto(proj){
-  if(!fbProjetos){ showToast('⚠️ Sem conexão com Firebase'); return; }
+function fbSalvarProjeto(proj, opts){
+  if(!fbProjetos){ showToast('⚠️ Sem conexão com Firebase'); return Promise.resolve(); }
   // Limpar undefined (Firebase rejeita undefined values)
   const limpo = JSON.parse(JSON.stringify(proj, (k,v) => v === undefined ? null : v));
-  setStatus('sync','Salvando...');
-  fbProjetos.child('p' + limpo.id).set(limpo)
-    .then(()  => setStatus('online','Salvo ✓'))
-    .catch(e  => { setStatus('offline','Erro ao salvar: '+e.message); console.error(e); });
+  const ref = fbProjetos.child('p' + limpo.id);
+
+  const gravar = () => {
+    // Carimbo de versão — base do optimistic locking
+    limpo._updatedAt = new Date().toISOString();
+    limpo._updatedBy = (typeof nomeUsuarioAtual === 'function' ? nomeUsuarioAtual() : '') || '';
+    proj._updatedAt  = limpo._updatedAt;   // mantém a referência local em sincronia
+    proj._updatedBy  = limpo._updatedBy;
+    setStatus('sync','Salvando...');
+    // update() em vez de set(): mescla no nível raiz do projeto — não apaga
+    // chaves que outro usuário tenha criado e que não existam neste cliente.
+    return ref.update(limpo)
+      .then(()  => setStatus('online','Salvo ✓'))
+      .catch(e  => { setStatus('offline','Erro ao salvar: '+e.message); console.error(e); });
+  };
+
+  // Salvamentos forçados/programáticos pulam a verificação de conflito
+  if(opts && opts.force) return gravar();
+
+  // OPTIMISTIC LOCKING: compara o _updatedAt do servidor com o desta cópia local.
+  // Se o servidor tem uma versão mais nova, outra pessoa salvou nesse meio-tempo.
+  return ref.child('_updatedAt').once('value').then(snap => {
+    const remoto = snap.val();
+    if(remoto && proj._updatedAt && remoto !== proj._updatedAt && remoto > proj._updatedAt){
+      const ok = confirm(
+        '⚠️ Este projeto foi alterado por outra pessoa enquanto você editava.\n\n' +
+        'OK — sobrescrever com a sua versão\n' +
+        'Cancelar — descartar sua alteração e manter a versão mais recente'
+      );
+      if(!ok){
+        setStatus('online','Salvamento cancelado');
+        showToast('↩️ Alteração descartada — dados recarregados');
+        renderAll();
+        return;
+      }
+    }
+    return gravar();
+  }).catch(() => gravar()); // se a leitura falhar (offline etc.), salva mesmo assim
 }
 
 // ── EXCLUIR UM PROJETO ──
@@ -9129,7 +9206,8 @@ function buscarGlobal(q){
   ).slice(0, 8);
   function hl(str){
     if(!str) return '';
-    return String(str).replace(new RegExp(q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'),'gi'),
+    // Escapa HTML ANTES de destacar — impede XSS via nome de projeto na busca
+    return esc(str).replace(new RegExp(q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'),'gi'),
       m => `<span class="sri-hl">${m}</span>`);
   }
   if(!res.length){
@@ -9139,11 +9217,14 @@ function buscarGlobal(q){
   drop.innerHTML = res.map(p => {
     return `<div class="sri" onclick="fecharBusca();openDet(${p.id})">
       <div class="sri-name">${hl(p.nome)}</div>
-      <div class="sri-meta">${sitBdg(p)} · ${(p.resps||[]).join(', ')||'—'}</div>
+      <div class="sri-meta">${sitBdg(p)} · ${esc((p.resps||[]).join(', ')||'—')}</div>
     </div>`;
   }).join('');
   drop.classList.add('on');
 }
+// Versões com debounce — só executam 200ms após a última tecla
+const buscarGlobalDeb = debounce(buscarGlobal, 200);
+const rLixeiraDeb     = debounce(()=>rLixeira(), 200);
 function fecharBusca(){
   const drop = document.getElementById('searchDrop');
   const inp = document.getElementById('searchInp');
@@ -9182,7 +9263,7 @@ function rHistorico(){
     const allUsers = [...new Set([...usersHist, ...usersDel].filter(Boolean))].sort();
     const cur = uSel.value;
     uSel.innerHTML = '<option value="">Todos</option>' + allUsers.map(u =>
-      `<option value="${u}" ${u===cur?'selected':''}>${u}</option>`).join('');
+      `<option value="${esc(u)}" ${u===cur?'selected':''}>${esc(u)}</option>`).join('');
   }
 
   let rows = [];
@@ -9336,14 +9417,14 @@ function _renderHistRows(el, rows){
       </div>
       <div class="hist-info">
         <div class="hist-line">
-          <strong>${ev.usuario}</strong>
-          <span style="color:${acaoCor[ev.acao]||'var(--mu)'};font-weight:600;margin:0 5px">${ev.acao}</span>
+          <strong>${esc(ev.usuario)}</strong>
+          <span style="color:${acaoCor[ev.acao]||'var(--mu)'};font-weight:600;margin:0 5px">${esc(ev.acao)}</span>
           ${ev.projId
-            ? `<span style="color:var(--blue);cursor:pointer;text-decoration:underline" onclick="openDet(${ev.projId})">${ev.projNome}</span>`
-            : `<span style="color:var(--red);font-style:italic">${ev.projNome}</span>`}
+            ? `<span style="color:var(--blue);cursor:pointer;text-decoration:underline" onclick="openDet(${ev.projId})">${esc(ev.projNome)}</span>`
+            : `<span style="color:var(--red);font-style:italic">${esc(ev.projNome)}</span>`}
           <span style="color:var(--mu);font-size:11px;margin-left:6px">${_fmtDt(ev.dt)}</span>
         </div>
-        ${ev.desc ? `<div class="hist-detail">${ev.desc}</div>` : ''}
+        ${ev.desc ? `<div class="hist-detail">${esc(ev.desc)}</div>` : ''}
       </div>
     </div>`).join('');
 }
@@ -9969,7 +10050,7 @@ function detectarNotificacoes(){
         const dias = p.prazo ? Math.round((hoje-new Date(p.prazo))/864e5) : '?';
         novas.push({
           id, tipo:'atraso', projId:p.id,
-          texto:`<strong>${p.nome}</strong> está atrasado há ${dias} dia${dias!==1?'s':''}.`,
+          texto:`<strong>${esc(p.nome)}</strong> está atrasado há ${dias} dia${dias!==1?'s':''}.`,
           icone:'⚠️', dt: new Date().toISOString(), lida:false
         });
       }
@@ -9983,7 +10064,7 @@ function detectarNotificacoes(){
         if(!idsExist.has(id) && !descartados.has(id)){
           novas.push({
             id, tipo:'prazo', projId:p.id,
-            texto:`<strong>${p.nome}</strong> vence ${diasPrazo===0?'hoje':`em ${diasPrazo} dia${diasPrazo!==1?'s':''}`}.`,
+            texto:`<strong>${esc(p.nome)}</strong> vence ${diasPrazo===0?'hoje':`em ${diasPrazo} dia${diasPrazo!==1?'s':''}`}.`,
             icone:'⏰', dt: new Date().toISOString(), lida:false
           });
         }
@@ -9996,7 +10077,7 @@ function detectarNotificacoes(){
       if(!idsExist.has(id) && !descartados.has(id)){
         novas.push({
           id, tipo:'homolog', projId:p.id,
-          texto:`<strong>${p.nome}</strong> aguarda instalação na Homologação.`,
+          texto:`<strong>${esc(p.nome)}</strong> aguarda instalação na Homologação.`,
           icone:'🔖', dt: new Date().toISOString(), lida:false
         });
       }
@@ -10008,7 +10089,7 @@ function detectarNotificacoes(){
       if(!idsExist.has(id) && !descartados.has(id)){
         novas.push({
           id, tipo:'medicao', projId:p.id,
-          texto:`<strong>${p.nome}</strong> foi enviado para Medição e aguarda confirmação.`,
+          texto:`<strong>${esc(p.nome)}</strong> foi enviado para Medição e aguarda confirmação.`,
           icone:'📐', dt: new Date().toISOString(), lida:false
         });
       }
@@ -10025,7 +10106,7 @@ function detectarNotificacoes(){
         const maxDias = Math.max(...etapasClAtrasadas.map(e=>Math.round((hoje-new Date(e.prazo))/864e5)));
         novas.push({
           id, tipo:'etapacl', projId:p.id,
-          texto:`<strong>${p.nome}</strong>: ${etapasClAtrasadas.length} etapa(s) aguardando cliente (${maxDias}d) — ${nomes.length>60?nomes.slice(0,58)+'…':nomes}.`,
+          texto:`<strong>${esc(p.nome)}</strong>: ${etapasClAtrasadas.length} etapa(s) aguardando cliente (${maxDias}d) — ${esc(nomes.length>60?nomes.slice(0,58)+'…':nomes)}.`,
           icone:'🏢', dt: new Date().toISOString(), lida:false
         });
       }
@@ -10410,7 +10491,7 @@ function migrarEtapasWebRise(){
       });
 
       p.etapas = novasEtapas;
-      fbSalvarProjeto(p);
+      fbSalvarProjeto(p,{force:true});
       migrados++;
     } catch(e) {
       console.error('Erro ao migrar projeto', p.nome, e);
