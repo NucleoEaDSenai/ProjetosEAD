@@ -1172,7 +1172,7 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
         <span class="sb-sec-chevron">▼</span>
       </div>
       <div class="sb-group-items">
-        <div class="si" role="menuitem" tabindex="0" aria-label="Central de Ajuda" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();nav('ajuda')}" onclick="nav('ajuda')"><span class="si-ic">❓</span><span>Central de Ajuda</span></div>
+        <div class="si" role="menuitem" tabindex="0" aria-label="Central de Ajuda" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();window.location.href='ajuda.html'}" onclick="window.location.href='ajuda.html'"><span class="si-ic">❓</span><span>Central de Ajuda</span></div>
       </div>
     </div>
   </nav>
@@ -1858,14 +1858,6 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
         </div>
       </div>
       <div class="kk"><div id="histList" style="max-height:600px;overflow-y:auto;padding:4px 0"></div></div>
-    </div>
-
-    <div class="view" id="view-ajuda">
-      <div style="height:calc(100vh - 130px);min-height:520px;border:1px solid var(--bdr);border-radius:12px;overflow:hidden;background:#fff;box-shadow:var(--sh)">
-        <iframe id="ajudaFrame" src="ajuda.html" title="Central de Ajuda"
-          style="width:100%;height:100%;border:0;display:block"
-          loading="lazy" referrerpolicy="no-referrer"></iframe>
-      </div>
     </div>
 
   </div>
@@ -2629,7 +2621,7 @@ let DB=[];
 let NXT=1, editId=null, cancId=null, dragId=null;
 
 // ── NAV ──
-const PT={kanban:'Quadro Kanban',homologacoes:'Homologações',projetos:'Lista de Projetos',timeline:'Cronograma',kpis:'KPIs & Indicadores',atrasos:'Relatório de Atrasos',cancelados:'Projetos Cancelados',medicao:'Medição',carga:'Carga da Equipe',historico:'Histórico de Edições',lixeira:'Cards Deletados',ajuda:'Central de Ajuda'};
+const PT={kanban:'Quadro Kanban',homologacoes:'Homologações',projetos:'Lista de Projetos',timeline:'Cronograma',kpis:'KPIs & Indicadores',atrasos:'Relatório de Atrasos',cancelados:'Projetos Cancelados',medicao:'Medição',carga:'Carga da Equipe',historico:'Histórico de Edições',lixeira:'Cards Deletados'};
 function nav(id){
   document.querySelectorAll('.view').forEach(v=>v.classList.remove('on'));
   document.getElementById('view-'+id).classList.add('on');
