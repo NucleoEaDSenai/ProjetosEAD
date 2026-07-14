@@ -841,6 +841,13 @@ body.dark .tenant-item.current{background:rgba(34,197,94,.12)}
 .hom-group-title.homologado{background:#FEF08A;color:#92400E}
 .hom-group-title.autorizado{background:#EFF6FF;color:#1D4ED8}
 .hom-group-title.instalado{background:#DCFCE7;color:#15803D}
+.hom-mes-title{display:flex;align-items:center;gap:8px;cursor:pointer;user-select:none;font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;padding:9px 14px;border-radius:8px;margin:10px 0 8px;background:#ECFDF5;color:#166534;border:1px solid #BBF7D0;transition:filter .15s}
+.hom-mes-title:hover{filter:brightness(.97)}
+.hom-mes-title .hom-mes-count{margin-left:auto;font-size:11px;font-weight:800;background:#15803D;color:#fff;border-radius:20px;padding:2px 9px}
+.hom-mes-chev{font-size:12px;transition:transform .25s}
+.hom-mes-chev.open{transform:rotate(180deg)}
+.hom-mes-body{overflow:hidden;transition:max-height .35s ease,opacity .25s ease;max-height:0;opacity:0}
+.hom-mes-body.open{max-height:100000px;opacity:1}
 .hom-card-head{cursor:pointer;user-select:none}
 .hom-card-head:hover{filter:brightness(1.08)}
 .hom-chevron{font-size:13px;transition:transform .25s;display:inline-block;margin-left:6px}
@@ -1659,6 +1666,12 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
       <div class="fbox" style="margin-bottom:18px">
         <div class="fbox-row">
           <span style="font-size:11px;font-weight:700;color:var(--mu);text-transform:uppercase;letter-spacing:.6px;align-self:center;padding-bottom:2px">Filtrar por</span>
+          <div class="fg-sm"><label class="fl-sm">🔎 ID do Projeto</label>
+            <input type="text" id="homBuscaId" class="ms-btn" style="width:120px;cursor:text" placeholder="Buscar ID…" oninput="rHomologacoes()" autocomplete="off">
+          </div>
+          <div class="fg-sm"><label class="fl-sm">🔎 Nome do Projeto</label>
+            <input type="text" id="homBuscaNome" class="ms-btn" style="width:180px;cursor:text" placeholder="Buscar nome…" oninput="rHomologacoes()" autocomplete="off">
+          </div>
           <div class="fg-sm"><label class="fl-sm">👤 Solicitante</label>
             <div class="ms-wrap" id="msWrap_homSol">
               <button class="ms-btn" id="msBtn_homSol" onclick="_msToggle('homSol')">Todos</button>
@@ -8503,6 +8516,8 @@ function limparFiltrosHomolog(){
     if(dd) dd.querySelectorAll('input[type=checkbox]').forEach(cb=>cb.checked=false);
     _msUpdateBtn(id);
   });
+  const bId=document.getElementById('homBuscaId');     if(bId)   bId.value='';
+  const bNm=document.getElementById('homBuscaNome');   if(bNm)   bNm.value='';
   rHomologacoes();
 }
 
@@ -8554,6 +8569,20 @@ function _popularFiltrosHomolog(lista){
       + '<div class="ms-sep"></div><div class="ms-clear" data-ms-clear="homMed">✕ Limpar</div>';
     _msUpdateBtn('homMed');
   }
+}
+
+// Estado das gavetas de mês (Instalados). Por padrão, abre só o mês mais recente.
+const _homMesAbertos = new Set();
+let _homMesInicializado = false;
+
+function toggleHomMes(gid){
+  const body = document.getElementById(gid+'_body');
+  const chev = document.getElementById(gid+'_chev');
+  if(!body) return;
+  const abrir = !body.classList.contains('open');
+  body.classList.toggle('open', abrir);
+  if(chev) chev.classList.toggle('open', abrir);
+  if(abrir) _homMesAbertos.add(gid); else _homMesAbertos.delete(gid);
 }
 
 function rHomologacoes(){
@@ -8613,17 +8642,26 @@ function rHomologacoes(){
   const filtroEnvPor  = _msGetVals('homEnv');
   const filtroMedicao = _msGetVals('homMed');
 
+  // Buscas por texto (ID e nome do projeto)
+  const buscaId   = (document.getElementById('homBuscaId')?.value   || '').trim().toLowerCase();
+  const buscaNome = (document.getElementById('homBuscaNome')?.value || '').trim().toLowerCase();
+
   const lista = listaTotal.filter(p => {
     if(filtroSolic.length   && !filtroSolic.includes(p.homolog?.solicitante || ''))  return false;
     if(filtroEnvPor.length  && !filtroEnvPor.includes(p.homolog?.enviadaPor  || '')) return false;
     if(filtroMedicao.length && !filtroMedicao.some(l=>_dataEmMedicao(p.homolog?.dtInstalacao, l))) return false;
+    if(buscaId){
+      const idProj = String(p.homolog?.idCurso || p.idCurso || '').toLowerCase();
+      if(!idProj.includes(buscaId)) return false;
+    }
+    if(buscaNome && !String(p.nome || '').toLowerCase().includes(buscaNome)) return false;
     return true;
   });
 
   // Contador de resultados quando filtro ativo
   const contador = document.getElementById('homFiltroContador');
   if(contador){
-    const ativo = filtroSolic.length || filtroEnvPor.length || filtroMedicao.length;
+    const ativo = filtroSolic.length || filtroEnvPor.length || filtroMedicao.length || buscaId || buscaNome;
     contador.textContent = ativo ? `${lista.length} de ${listaTotal.length} projeto(s)` : '';
   }
 
@@ -8665,7 +8703,47 @@ function rHomologacoes(){
 
   if(grpInstalado.length > 0){
     html += `<div class="hom-group-title instalado" style="margin-top:${temAnterior?'28px':'4px'}">✅ Instalados <span style="font-size:12px;font-weight:800">${grpInstalado.length}</span></div>`;
-    html += grpInstalado.map(p => buildHomologCard(p)).join('');
+
+    const MESES_PT = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+    // Agrupar por mês/ano da data de instalação (ISO YYYY-MM-DD)
+    const gavetas = {};
+    grpInstalado.forEach(p => {
+      const iso = p.homolog?.dtInstalacao || '';
+      const m = iso.match(/^(\d{4})-(\d{2})/);
+      const chave = m ? `${m[1]}-${m[2]}` : '0000-00';
+      (gavetas[chave] = gavetas[chave] || []).push(p);
+    });
+    // Ordenar meses do mais recente para o mais antigo; "sem data" por último
+    const chaves = Object.keys(gavetas).sort((a,b) => b.localeCompare(a));
+
+    // Na primeira renderização, deixa apenas o mês mais recente aberto
+    if(!_homMesInicializado){
+      _homMesInicializado = true;
+      const primeira = chaves.find(c => c !== '0000-00') || chaves[0];
+      if(primeira) _homMesAbertos.add('mes_'+primeira.replace('-',''));
+    }
+
+    chaves.forEach(chave => {
+      const itens = gavetas[chave];
+      let rotulo;
+      if(chave === '0000-00'){
+        rotulo = 'Sem data de instalação';
+      } else {
+        const [ano, mes] = chave.split('-');
+        rotulo = `${MESES_PT[parseInt(mes,10)-1]} / ${ano}`;
+      }
+      const gid = 'mes_'+chave.replace('-','');
+      // Se há busca por texto ativa, abre todas as gavetas para não esconder resultados
+      const aberto = (buscaId || buscaNome) ? true : _homMesAbertos.has(gid);
+      html += `<div class="hom-mes-title" onclick="toggleHomMes('${gid}')">
+        <span>📅</span><span>${rotulo}</span>
+        <span class="hom-mes-count">${itens.length}</span>
+        <span class="hom-mes-chev ${aberto?'open':''}" id="${gid}_chev">▼</span>
+      </div>
+      <div class="hom-mes-body ${aberto?'open':''}" id="${gid}_body">
+        ${itens.map(p => buildHomologCard(p)).join('')}
+      </div>`;
+    });
   }
 
   // Salvar gavetas abertas antes de re-renderizar
