@@ -1251,7 +1251,7 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
       <span style="font-size:11px;color:var(--mu);margin-left:12px;opacity:.8">&middot; Sistema atualizado em 14/07/2026 às 09:49</span>
       <div class="search-box">
         <span class="search-icon">🔍</span>
-        <input id="searchInp" placeholder="Buscar projeto..." oninput="buscarGlobalDeb(this.value)" onblur="setTimeout(()=>fecharBusca(),180)">
+        <input id="searchInp" placeholder="Buscar projeto..." oninput="buscarGlobalDeb(this.value)" autocomplete="off">
         <div class="search-drop" id="searchDrop"></div>
       </div>
       <div style="position:relative;display:inline-block" id="exportMenuWrap">
@@ -9309,7 +9309,7 @@ function buscarGlobal(q){
     drop.classList.add('on'); return;
   }
   drop.innerHTML = res.map(p => {
-    return `<div class="sri" onclick="fecharBusca();openDet(${p.id})">
+    return `<div class="sri" data-pid="${p.id}">
       <div class="sri-name">${hl(p.nome)}</div>
       <div class="sri-meta">${sitBdg(p)} · ${esc((p.resps||[]).join(', ')||'—')}</div>
     </div>`;
@@ -9319,12 +9319,39 @@ function buscarGlobal(q){
 // Versões com debounce — só executam 200ms após a última tecla
 const buscarGlobalDeb = debounce(buscarGlobal, 200);
 const rLixeiraDeb     = debounce(()=>rLixeira(), 200);
-function fecharBusca(){
+function fecharBusca(limpar){
   const drop = document.getElementById('searchDrop');
   const inp = document.getElementById('searchInp');
   if(drop) drop.classList.remove('on');
-  if(inp) inp.value = '';
+  if(limpar && inp) inp.value = '';
 }
+
+// Delegação de evento: o dropdown é reescrito a cada busca, então o listener
+// fica no container (que nunca é recriado), não nos itens.
+document.addEventListener('DOMContentLoaded', () => {
+  const drop = document.getElementById('searchDrop');
+  const inp  = document.getElementById('searchInp');
+  if(!drop || !inp) return;
+
+  // Impede que o mousedown tire o foco do input antes do clique ser processado
+  drop.addEventListener('mousedown', e => e.preventDefault());
+
+  drop.addEventListener('click', e => {
+    const item = e.target.closest('.sri');
+    if(!item || !item.dataset.pid) return;
+    fecharBusca(true);
+    openDet(Number(item.dataset.pid));
+  });
+
+  // Fecha ao clicar fora, sem corrida com o clique no resultado
+  document.addEventListener('mousedown', e => {
+    if(!e.target.closest('.search-box')) fecharBusca(false);
+  });
+
+  // Esc fecha; reabre ao focar se já houver texto
+  inp.addEventListener('keydown', e => { if(e.key === 'Escape') fecharBusca(false); });
+  inp.addEventListener('focus', () => { if(inp.value.length >= 2) buscarGlobal(inp.value); });
+});
 
 // ══════════════════════════════════════════════
 //  TAGS PERSONALIZÁVEIS
