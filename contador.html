@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="author" content="Daniel David — Firjan SENAI">
+  <title>Contador de Palavras Rise · Firjan SENAI</title>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    html,body{height:100%}
+    body{
+      font-family:'Plus Jakarta Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+      background:#0F0F11;color:#E5E7EB;min-height:100vh;
+      display:flex;flex-direction:column;overflow-x:hidden;position:relative;
+    }
+    body::before{
+      content:'';position:fixed;top:-20%;left:50%;transform:translateX(-50%);
+      width:1200px;height:600px;
+      background:radial-gradient(ellipse at center, rgba(99,102,241,.08) 0%, transparent 60%);
+      pointer-events:none;z-index:0;
+    }
+
+    /* HEADER */
+    .hub-header{flex-shrink:0;position:relative;z-index:1;padding:48px 32px 24px;text-align:center}
+    .hub-brand{
+      display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,.05);
+      backdrop-filter:blur(10px);padding:7px 16px;border-radius:22px;font-size:11px;
+      font-weight:700;letter-spacing:1.6px;text-transform:uppercase;color:#A5B4FC;
+      margin-bottom:24px;border:1px solid rgba(255,255,255,.08);
+    }
+    .hub-brand::before{content:'';width:6px;height:6px;border-radius:50%;background:#22C55E;box-shadow:0 0 8px #22C55E}
+    .hub-title{font-size:40px;font-weight:800;line-height:1.1;margin-bottom:14px;color:#FFFFFF;letter-spacing:-1.2px}
+    .hub-title-highlight{
+      background:linear-gradient(135deg,#4F46E5 0%,#6366F1 100%);color:#fff;padding:4px 16px;
+      border-radius:10px;display:inline-block;box-shadow:0 4px 14px rgba(99,102,241,.3);
+    }
+    .hub-subtitle{font-size:15px;color:#9CA3AF;font-weight:400;max-width:580px;margin:0 auto;line-height:1.5}
+
+    /* MAIN */
+    .hub-main{flex:1;max-width:860px;margin:24px auto 40px;padding:0 32px;width:100%;position:relative;z-index:1}
+    .back-link{
+      display:inline-flex;align-items:center;gap:7px;color:#9CA3AF;text-decoration:none;
+      font-size:12.5px;font-weight:600;margin-bottom:20px;transition:color .2s;
+    }
+    .back-link:hover{color:#A5B4FC}
+
+    .panel{
+      background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);
+      border-radius:20px;padding:28px;
+    }
+    .hub-section-label{
+      font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1.8px;
+      color:#6B7280;margin-bottom:14px;padding-left:2px;
+    }
+
+    /* DROPZONE */
+    .dropzone{
+      border:2px dashed rgba(255,255,255,.14);border-radius:14px;padding:44px 24px;
+      text-align:center;cursor:pointer;transition:all .25s;background:rgba(255,255,255,.015);
+    }
+    .dropzone:hover,.dropzone.dragover{
+      border-color:rgba(99,102,241,.55);background:rgba(99,102,241,.06);
+    }
+    .dz-icon{
+      width:52px;height:52px;border-radius:12px;margin:0 auto 16px;
+      background:linear-gradient(135deg,#4F46E5,#6366F1);color:#fff;
+      display:flex;align-items:center;justify-content:center;font-size:22px;
+    }
+    .dz-title{font-size:15px;font-weight:700;color:#E5E7EB;margin-bottom:5px}
+    .dz-desc{font-size:12.5px;color:#9CA3AF;line-height:1.5}
+    .dz-desc code{
+      background:rgba(255,255,255,.07);padding:1px 6px;border-radius:4px;
+      font-size:11.5px;color:#A5B4FC;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
+    }
+    #fileInput{display:none}
+
+    /* STATUS */
+    .status{
+      margin-top:18px;padding:13px 16px;border-radius:9px;font-size:13px;
+      font-weight:500;display:none;line-height:1.45;
+    }
+    .status.error{display:block;background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);color:#FCA5A5}
+    .status.loading{display:block;background:rgba(99,102,241,.1);border:1px solid rgba(99,102,241,.3);color:#A5B4FC}
+
+    /* RESULTADO */
+    .result{display:none;margin-top:26px;animation:fadeInUp .5s cubic-bezier(.16,1,.3,1) backwards}
+    .result.show{display:block}
+    .result-course{
+      font-size:19px;font-weight:800;color:#fff;letter-spacing:-.3px;
+      line-height:1.35;margin-bottom:20px;padding-bottom:18px;
+      border-bottom:1px solid rgba(255,255,255,.07);
+    }
+    .metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+    .metric{
+      background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);
+      border-radius:12px;padding:22px 18px;text-align:center;
+    }
+    .metric-val{
+      font-size:30px;font-weight:800;color:#fff;line-height:1;
+      letter-spacing:-1px;margin-bottom:7px;
+      font-variant-numeric:tabular-nums;
+    }
+    .metric-lbl{
+      font-size:10px;color:#9CA3AF;font-weight:700;
+      text-transform:uppercase;letter-spacing:.7px;line-height:1.3;
+    }
+
+    /* FOOTER */
+    .hub-footer{
+      text-align:center;padding:24px;font-size:11.5px;color:#6B7280;
+      border-top:1px solid rgba(255,255,255,.05);position:relative;z-index:1;
+    }
+
+    @media (max-width:640px){
+      .hub-header{padding:36px 20px 20px}
+      .hub-title{font-size:27px;line-height:1.2}
+      .hub-title-highlight{padding:2px 10px;border-radius:6px}
+      .hub-subtitle{font-size:13.5px}
+      .hub-main{padding:0 16px;margin:16px auto 24px}
+      .panel{padding:18px;border-radius:16px}
+      .dropzone{padding:32px 16px}
+      .metrics{grid-template-columns:1fr;gap:10px}
+      .metric{padding:18px;display:flex;align-items:center;justify-content:space-between;text-align:left}
+      .metric-val{font-size:24px;margin-bottom:0}
+      .metric-lbl{max-width:130px}
+    }
+
+    @keyframes fadeInUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+  </style>
+</head>
+<body>
+
+  <header class="hub-header">
+    <div class="hub-brand">Plataforma Institucional - Firjan SENAI - EAD</div>
+    <h1 class="hub-title">Contador de Palavras <span class="hub-title-highlight">Rise</span></h1>
+    <p class="hub-subtitle">
+      Contagem de palavras e caracteres de cursos exportados do Articulate Rise.
+      O processamento é feito no seu navegador — nenhum arquivo é enviado.
+    </p>
+  </header>
+
+  <main class="hub-main">
+    <a href="index.html" class="back-link">← Voltar ao hub</a>
+
+    <div class="panel">
+      <div class="hub-section-label">Arquivo do curso</div>
+
+      <div class="dropzone" id="dropzone">
+        <div class="dz-icon">📄</div>
+        <div class="dz-title">Clique ou arraste o arquivo aqui</div>
+        <p class="dz-desc">
+          Envie o <code>runtime-data.js</code>, localizado na raiz<br>
+          da pasta do curso exportado do Rise.
+        </p>
+      </div>
+      <input type="file" id="fileInput" accept=".js">
+
+      <div class="status" id="status"></div>
+
+      <div class="result" id="result">
+        <div class="result-course" id="courseTitle"></div>
+        <div class="metrics">
+          <div class="metric">
+            <div class="metric-val" id="mWords">0</div>
+            <div class="metric-lbl">Palavras</div>
+          </div>
+          <div class="metric">
+            <div class="metric-val" id="mCharsWs">0</div>
+            <div class="metric-lbl">Caracteres<br>c/ espaços</div>
+          </div>
+          <div class="metric">
+            <div class="metric-val" id="mCharsNs">0</div>
+            <div class="metric-lbl">Caracteres<br>s/ espaços</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="hub-footer">
+    © 2026 Firjan SENAI · Plataforma de Gestão EAD · Uso interno exclusivo
+  </footer>
+
+  <script>
+  (function(){
+    'use strict';
+
+    var TEXT_KEYS = new Set(["title","subtitle","body","content","heading","paragraph",
+      "text","html","label","caption","quote","description","question","answer",
+      "prompt","snippet","buttonText"]);
+    var BLOCK = 'p,li,div,h1,h2,h3,h4,h5,h6,td,th,blockquote,figcaption,dt,dd,pre';
+    var PAT = /__jsonp\(\s*(['"])[^'"]*\1\s*,\s*(['"])([A-Za-z0-9+/=_-]+)\2/;
+    var scratch = document.createElement('div');
+
+    function stripHtml(s){
+      if (!/[<&]/.test(s)) return s.replace(/\s+/g,' ').trim();
+      scratch.innerHTML = s.replace(/</g,' <');
+      var blocks = [];
+      scratch.querySelectorAll(BLOCK).forEach(function(b){
+        if (!b.querySelector(BLOCK)) blocks.push(b);
+      });
+      var src = blocks.length ? blocks : [scratch];
+      var parts = [];
+      src.forEach(function(b){
+        var t = (b.textContent || '').replace(/\s+/g,' ').trim();
+        if (t) parts.push(t);
+      });
+      return parts.join(' ');
+    }
+
+    function collect(o, out){
+      out = out || [];
+      if (Array.isArray(o)) {
+        o.forEach(function(e){ collect(e, out); });
+      } else if (o && typeof o === 'object') {
+        Object.keys(o).forEach(function(k){
+          var v = o[k];
+          if (v && typeof v === 'object') { collect(v, out); return; }
+          if (typeof v !== 'string') return;
+          var kl = k.toLowerCase();
+          if (TEXT_KEYS.has(k) || kl.indexOf('text') !== -1 || kl.indexOf('title') !== -1) {
+            var t = stripHtml(v);
+            if (t && /[A-Za-zÀ-ÖØ-öø-ÿ]/.test(t) && t.length >= 5) out.push(t);
+          }
+        });
+      }
+      return out;
+    }
+
+    function findCourse(obj){
+      var q = [obj];
+      while (q.length) {
+        var c = q.shift();
+        if (Array.isArray(c)) {
+          c.forEach(function(v){ if (v && typeof v === 'object') q.push(v); });
+        } else if (c && typeof c === 'object') {
+          if (Array.isArray(c.lessons)) return c;
+          Object.keys(c).forEach(function(k){
+            var v = c[k];
+            if (v && typeof v === 'object') q.push(v);
+          });
+        }
+      }
+      return null;
+    }
+
+    function decodeB64(b64){
+      var bin = atob(b64 + '='.repeat((4 - b64.length % 4) % 4));
+      var bytes = new Uint8Array(bin.length);
+      for (var i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+      return new TextDecoder('utf-8').decode(bytes);
+    }
+
+    function countCourse(lessons){
+      var w = 0, cw = 0, cn = 0;
+      lessons.forEach(function(lesson){
+        if (!lesson || typeof lesson !== 'object') return;
+        var blocks = lesson.items || lesson.blocks || [];
+        blocks.forEach(function(b){
+          var texts = collect(b);
+          if (!texts.length) return;
+          var merged = texts.join(' ').replace(/\s+/g,' ').trim();
+          if (!merged) return;
+          w  += merged.split(' ').length;
+          cw += merged.length;
+          cn += merged.replace(/\s+/g,'').length;
+        });
+      });
+      return { words: w, charsWs: cw, charsNs: cn };
+    }
+
+    var dropzone   = document.getElementById('dropzone');
+    var fileInput  = document.getElementById('fileInput');
+    var statusEl   = document.getElementById('status');
+    var resultEl   = document.getElementById('result');
+    var courseEl   = document.getElementById('courseTitle');
+
+    function setStatus(msg, kind){
+      statusEl.textContent = msg;
+      statusEl.className = 'status' + (kind ? ' ' + kind : '');
+    }
+    function fmt(n){ return n.toLocaleString('pt-BR'); }
+
+    function handleFile(file){
+      resultEl.classList.remove('show');
+
+      if (!file) return;
+      if (file.name !== 'runtime-data.js') {
+        setStatus('Envie o arquivo chamado runtime-data.js. Ele fica na raiz da pasta do curso exportado do Rise.', 'error');
+        return;
+      }
+
+      setStatus('Processando o curso…', 'loading');
+
+      var reader = new FileReader();
+      reader.onerror = function(){ setStatus('Não foi possível ler o arquivo.', 'error'); };
+      reader.onload = function(e){
+        try {
+          var m = PAT.exec(e.target.result);
+          if (!m) { setStatus('Não foi possível ler os dados do curso neste arquivo.', 'error'); return; }
+
+          var data   = JSON.parse(decodeB64(m[3]));
+          var course = findCourse(data);
+          if (!course) { setStatus('Estrutura do curso não encontrada.', 'error'); return; }
+
+          var r = countCourse(course.lessons);
+
+          courseEl.textContent = course.title || 'Curso sem título';
+          document.getElementById('mWords').textContent   = fmt(r.words);
+          document.getElementById('mCharsWs').textContent = fmt(r.charsWs);
+          document.getElementById('mCharsNs').textContent = fmt(r.charsNs);
+
+          setStatus('', '');
+          resultEl.classList.add('show');
+        } catch (err) {
+          setStatus('Não foi possível ler os dados do curso neste arquivo.', 'error');
+        }
+      };
+      reader.readAsText(file, 'utf-8');
+    }
+
+    dropzone.addEventListener('click', function(){ fileInput.click(); });
+    fileInput.addEventListener('change', function(e){ handleFile(e.target.files[0]); });
+
+    ['dragenter','dragover'].forEach(function(ev){
+      dropzone.addEventListener(ev, function(e){
+        e.preventDefault(); e.stopPropagation();
+        dropzone.classList.add('dragover');
+      });
+    });
+    ['dragleave','drop'].forEach(function(ev){
+      dropzone.addEventListener(ev, function(e){
+        e.preventDefault(); e.stopPropagation();
+        dropzone.classList.remove('dragover');
+      });
+    });
+    dropzone.addEventListener('drop', function(e){
+      handleFile(e.dataTransfer.files[0]);
+    });
+  })();
+  </script>
+
+</body>
+</html>
