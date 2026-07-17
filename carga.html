@@ -918,12 +918,18 @@
     //    3. Copiar apiKey / authDomain / projectId em Configurações do projeto
     //       e colar abaixo. (Esses dados são públicos por design — a segurança
     //       vem das Regras do Realtime Database, não de esconder a apiKey.)
-    //    4. Nas REGRAS do Realtime Database de cada tenant, restringir escrita
-    //       de 'calibracaoHoras' aos UIDs autorizados, ex.:
-    //         "calibracaoHoras": {
-    //           ".read": true,
-    //           ".write": "auth != null && (auth.uid === 'UID_DANIEL' || auth.uid === 'UID_FATIMA')"
+    //    4. Nas REGRAS do Realtime Database de cada tenant, usar leitura apenas
+    //       para logados (NADA de ".read": true global) e escrita granular:
+    //         {
+    //           "rules": {
+    //             ".read":  "auth != null",
+    //             "projetos":        { ".write": "auth != null" },
+    //             "calibracaoHoras": { ".write": "auth != null && (auth.uid === 'UID_DANIEL' || auth.uid === 'UID_FATIMA')" }
+    //           }
     //         }
+    //       ATENÇÃO (cascata do RTDB): permissão concedida no nó-pai NÃO pode
+    //       ser revogada no filho. Se ".write" for true na raiz, a restrição
+    //       de calibracaoHoras deixa de valer. Conceda escrita só nos nós certos.
     //  Sem isso preenchido, a página roda 100% em modo leitura.
     // ═══════════════════════════════════════════════════════════════
     const AUTH_CONFIG = {
@@ -949,6 +955,11 @@
         corBadgeBorder:'rgba(0,168,89,.3)',
         firebaseUrl:'https://petrobras-firjan-senai-default-rtdb.firebaseio.com',
         firebaseAppName:'app-petrobras',
+        // Config completa do projeto — necessária para que as LEITURAS saiam
+        // autenticadas (o token de login só viaja no app que tem apiKey).
+        apiKey:'AIzaSyDnmw3v0eCLQjn6D_J5VQtRu7vGF4OIUb0',
+        authDomain:'petrobras-firjan-senai.firebaseapp.com',
+        projectId:'petrobras-firjan-senai',
         ativo:true,
       },
       {
@@ -959,6 +970,7 @@
         corBadgeBorder:'rgba(232,116,32,.3)',
         firebaseUrl:'',  // ← preencher quando criar
         firebaseAppName:'app-sesi',
+        apiKey:'', authDomain:'', projectId:'',  // ← config do projeto (Configurações → Geral)
         ativo:false,
       },
       {
@@ -969,6 +981,7 @@
         corBadgeBorder:'rgba(30,136,229,.3)',
         firebaseUrl:'',  // ← preencher quando criar
         firebaseAppName:'app-metrorio',
+        apiKey:'', authDomain:'', projectId:'',  // ← config do projeto (Configurações → Geral)
         ativo:false,
       },
       {
@@ -979,6 +992,7 @@
         corBadgeBorder:'rgba(240,180,41,.35)',
         firebaseUrl:'',  // ← preencher quando criar
         firebaseAppName:'app-transpetro',
+        apiKey:'', authDomain:'', projectId:'',  // ← config do projeto (Configurações → Geral)
         ativo:false,
       },
     ];
@@ -1645,7 +1659,15 @@
         // Reutiliza o app se já foi criado (evita erro "app already exists" no Atualizar)
         const existente = firebase.apps.find(a => a.name === tenant.firebaseAppName);
         if(existente) return existente;
-        const config = {databaseURL: tenant.firebaseUrl};
+        // IMPORTANTE: cada app do SDK tem sessão de auth PRÓPRIA. Sem apiKey,
+        // o app não autentica e toda leitura chega ao banco como anônima
+        // (PERMISSION_DENIED). Por isso a config completa entra aqui.
+        const config = {
+          databaseURL: tenant.firebaseUrl,
+          apiKey:      tenant.apiKey     || undefined,
+          authDomain:  tenant.authDomain || undefined,
+          projectId:   tenant.projectId  || undefined,
+        };
         return firebase.initializeApp(config, tenant.firebaseAppName);
       } catch(e){
         console.error('Erro inicializando Firebase para', tenant.id, e);
@@ -1653,23 +1675,33 @@
       }
     }
 
-    function lerTenant(tenant){
+    // Aguarda o SDK terminar de restaurar (ou não) a sessão persistida do app.
+    // Resolve com o usuário atual — necessário antes de qualquer leitura, senão
+    // a leitura pode sair ANTES do token ser restaurado e cair como anônima.
+    function esperarSessao(app){
       return new Promise(resolve => {
-        const app = inicializarFirebase(tenant);
-        if(!app){ resolve([]); return; }
-        const db = app.database();
-        db.ref('projetos').once('value')
-          .then(snap => {
-            const val = snap.val() || {};
-            const projetos = Object.entries(val).map(([id, p]) => ({...p, _id:id}));
-            resolve(projetos);
-          })
-          .catch(err => {
-            console.error('Erro lendo', tenant.id, err);
-            mostrarErro(`Não foi possível ler dados de ${tenant.nome}. Verifique permissões.`);
-            resolve([]);
-          });
+        const off = app.auth().onAuthStateChanged(u => { off(); resolve(u); });
       });
+    }
+
+    async function lerTenant(tenant){
+      const app = inicializarFirebase(tenant);
+      if(!app) return [];
+      let user = null;
+      if(tenant.apiKey) user = await esperarSessao(app);
+      try {
+        const snap = await app.database().ref('projetos').once('value');
+        const val = snap.val() || {};
+        return Object.entries(val).map(([id, p]) => ({...p, _id:id}));
+      } catch(err){
+        console.error('Erro lendo', tenant.id, err);
+        if(!user){
+          mostrarErro(`Os dados de ${tenant.nome} exigem login. Clique em <strong>Entrar</strong> no topo da página.`);
+        } else {
+          mostrarErro(`Não foi possível ler dados de ${tenant.nome}. Verifique se o usuário <code>${user.email||''}</code> tem permissão de leitura nas Regras do banco.`);
+        }
+        return [];
+      }
     }
 
     function mostrarErro(msg){
@@ -1681,14 +1713,14 @@
       document.getElementById('errorBox').innerHTML = '';
     }
 
-    function lerCalibracao(tenant){
-      return new Promise(resolve => {
-        const app = inicializarFirebase(tenant);
-        if(!app){ resolve({}); return; }
-        app.database().ref('calibracaoHoras').once('value')
-          .then(snap => resolve(snap.val() || {}))
-          .catch(() => resolve({}));  // silencioso: calibração é opcional
-      });
+    async function lerCalibracao(tenant){
+      const app = inicializarFirebase(tenant);
+      if(!app) return {};
+      if(tenant.apiKey) await esperarSessao(app);
+      try {
+        const snap = await app.database().ref('calibracaoHoras').once('value');
+        return snap.val() || {};
+      } catch(e){ return {}; }  // silencioso: calibração é opcional
     }
 
     async function carregarTodos(){
@@ -1813,6 +1845,14 @@
       if(!app){ alert('Login ainda não configurado. Preencha AUTH_CONFIG.'); return; }
       if(app.auth().currentUser){
         app.auth().signOut();
+        // Encerra também a sessão de cada tenant e limpa a tela
+        TENANTS.filter(t => t.ativo && t.firebaseUrl && t.apiKey).forEach(t => {
+          const tApp = firebase.apps.find(a => a.name === t.firebaseAppName);
+          if(tApp && tApp.auth().currentUser) tApp.auth().signOut();
+        });
+        dadosTenants = {};
+        renderizar();
+        mostrarErro('Sessão encerrada. Clique em <strong>Entrar</strong> para carregar os dados novamente.');
       } else {
         abrirLogin();
       }
@@ -1838,8 +1878,26 @@
       btn.disabled = true; btn.textContent = 'Entrando…';
       try {
         await app.auth().signInWithEmailAndPassword(email, senha);
+
+        // Propaga o login para o app de CADA tenant ativo: cada projeto
+        // Firebase tem sessão própria, então o mesmo usuário precisa existir
+        // no Authentication de cada projeto (mesmo e-mail/senha).
+        const ativos = TENANTS.filter(t => t.ativo && t.firebaseUrl && t.apiKey);
+        const resultados = await Promise.allSettled(ativos.map(t => {
+          const tApp = inicializarFirebase(t);
+          if(!tApp) return Promise.reject(new Error('init falhou'));
+          if(tApp.auth().currentUser) return Promise.resolve();
+          return tApp.auth().signInWithEmailAndPassword(email, senha);
+        }));
+        const falhas = ativos.filter((t, i) => resultados[i].status === 'rejected').map(t => t.nome);
+
         document.getElementById('loginSenha').value = '';
         fecharLogin();
+        limparErro();
+        if(falhas.length){
+          mostrarErro(`Login efetuado, mas sem acesso a: <strong>${falhas.join(', ')}</strong>. Crie este mesmo usuário (e-mail e senha) no Authentication desse(s) projeto(s) Firebase.`);
+        }
+        carregarTodos();
       } catch(e){
         erro.textContent = 'E-mail ou senha inválidos.';
         console.error(e);
@@ -2040,10 +2098,22 @@
     });
 
     // Inicializa ao carregar a página
-    document.addEventListener('DOMContentLoaded', () => {
+    document.addEventListener('DOMContentLoaded', async () => {
       observarAuth();   // login real (sem pop-up); define podeEditar
       abrirAviso();
-      carregarTodos();
+
+      // Espera o SDK restaurar a sessão persistida ANTES de tentar ler.
+      // Com sessão → carrega direto. Sem sessão → convida a entrar
+      // (em vez de disparar leituras anônimas que caem em PERMISSION_DENIED).
+      const authAppInit = inicializarAuth();
+      if(!authAppInit){ carregarTodos(); return; }  // Auth não configurado: comportamento antigo
+      const user = await esperarSessao(authAppInit);
+      if(user){
+        carregarTodos();
+      } else {
+        mostrarErro('Entre com seu e-mail e senha para carregar os dados dos projetos (botão <strong>Entrar</strong> no topo).');
+        abrirLogin();
+      }
     });
 
   </script>
