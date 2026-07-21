@@ -1110,6 +1110,16 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
         <div class="si" role="menuitem" tabindex="0" aria-label="Histórico de Edições" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();nav('historico')}" onclick="nav('historico')"><span class="si-ic">📝</span><span>Histórico</span></div>
       </div>
     </div>
+
+    <div class="sb-group" id="sbg-ajuda">
+      <div class="sb-sec-btn" onclick="toggleSbGroup('sbg-ajuda')" title="Recolher/expandir">
+        <span class="sb-sec-label">Ajuda</span>
+        <span class="sb-sec-chevron">▼</span>
+      </div>
+      <div class="sb-group-items">
+        <div class="si" role="menuitem" tabindex="0" aria-label="Central de Ajuda" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();window.location.href='ajuda.html'}" onclick="window.location.href='ajuda.html'"><span class="si-ic">❓</span><span>Central de Ajuda</span></div>
+      </div>
+    </div>
   </nav>
   <div class="sb-foot" style="display:flex;align-items:center;justify-content:space-between"><span>v2.0 · Firjan SENAI</span><button class="dark-btn" id="darkBtn" onclick="toggleDark()">🌙</button></div>
 
@@ -1457,15 +1467,6 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
         <div class="kpi-row" style="grid-template-columns:1fr">
           <div class="kpi-card">
             <div class="kpi-card-head">
-              <span class="kpi-card-title">👤 Projetos por RP</span>
-              <span class="kpi-card-sub">distribuição atual</span>
-            </div>
-            <div id="kpiRP"></div>
-          </div>
-        </div>
-        <div class="kpi-row" style="grid-template-columns:1fr">
-          <div class="kpi-card">
-            <div class="kpi-card-head">
               <span class="kpi-card-title">🛠️ Projetos por Recurso</span>
               <span class="kpi-card-sub">tipo de produção</span>
             </div>
@@ -1770,22 +1771,6 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
               <option value="alta">🟠 Alta</option>
               <option value="media">🟡 Média</option>
               <option value="baixa">🔵 Baixa</option>
-            </select>
-          </div>
-          <div class="fg">
-            <label class="fl" for="fRP">RP</label>
-            <select class="prio-select" id="fRP" aria-label="RP do projeto" style="width:100%">
-              <option value="">— Sem RP —</option>
-              <option value="Anna Carolina">Anna Carolina</option>
-              <option value="Daniela">Daniela</option>
-              <option value="Betty">Betty</option>
-              <option value="Rodrigo">Rodrigo</option>
-              <option value="Thiago">Thiago</option>
-              <option value="Fernanda">Fernanda</option>
-              <option value="Jean">Jean</option>
-              <option value="Wellington">Wellington</option>
-              <option value="Renato">Renato</option>
-              <option value="Lucas">Lucas</option>
             </select>
           </div>
         </div>
@@ -3400,25 +3385,6 @@ function rKPIs(){
          </div>`;
   }
 
-  // ── 4. Por RP ──
-  const rpEl = document.getElementById('kpiRP');
-  if(rpEl){
-    const map = {};
-    act.forEach(p => { const r = p.rp || 'Não definido'; map[r] = (map[r]||0)+1; });
-    const arr = Object.entries(map).sort((a,b) => b[1]-a[1]);
-    const mx = arr.length ? arr[0][1] : 1;
-    rpEl.innerHTML = arr.length === 0
-      ? '<div class="kpi-empty"><div class="kpi-empty-icon">👤</div>Sem RPs cadastrados</div>'
-      : `<div class="kpi-bar2">${arr.map(([nome,n]) => `
-          <div class="kpi-bar2-row">
-            <div class="kpi-bar2-head">
-              <span class="kpi-bar2-name">${nome}</span>
-              <span class="kpi-bar2-val">${n}</span>
-            </div>
-            <div class="kpi-bar2-track"><div class="kpi-bar2-fill" style="width:${n/mx*100}%;background:${NOME_CORES[nome]||'var(--blue)'}"></div></div>
-          </div>`).join('')}</div>`;
-  }
-
   // ── 5. Pipeline por fase ──
   const pipeEl = document.getElementById('kpiPipeline');
   if(pipeEl){
@@ -4018,7 +3984,7 @@ function openDet(id){
   document.getElementById('detBody').innerHTML=`
     <div class="dl2r">
       <div>
-        ${p.prioridade?dl2('Prioridade',prioBadge(p.prioridade)):''}${p.rp?dl2('RP',`<span style="font-weight:600">${p.rp}</span>`):''}${dl2('Recursos',recTags(p.recursos))}
+        ${p.prioridade?dl2('Prioridade',prioBadge(p.prioridade)):''}${dl2('Recursos',recTags(p.recursos))}
         ${dl2('Coluna',`<span style="display:inline-flex;align-items:center;gap:5px"><span style="width:8px;height:8px;border-radius:50%;background:${colDot(p.col)};display:inline-block"></span>${colLabel(p.col)}</span>`)}
         ${dl2('Situação',sitBdg(p))}
         ${dl2('Mudou de escopo?', _buildEscopoHtml(p))}
@@ -5280,7 +5246,6 @@ function openNew(){
   document.getElementById('mNewTitle').textContent='Novo Projeto EAD';
   ['fn','fd','fpo','fLinkBdoc'].forEach(id=>document.getElementById(id).value='');
   const prioEl=document.getElementById('fPrio');if(prioEl)prioEl.value='';
-  const rpEl=document.getElementById('fRP');if(rpEl)rpEl.value='';
   buildRecChips([]);
   iso2dma(td(),'fcr');
   ['fi','fp','fte'].forEach(p=>iso2dma('',p));
@@ -5306,7 +5271,6 @@ function openEdit(id){
   editId=id; document.getElementById('mNewTitle').textContent='Editar Projeto';
   document.getElementById('fn').value=p.nome;
   const _pe=document.getElementById('fPrio');if(_pe)_pe.value=p.prioridade||'';
-  const _rp=document.getElementById('fRP');if(_rp)_rp.value=p.rp||'';
   // Travar etapas ANTES de buildRecChips para que toggleRec não sobrescreva as etapas salvas
   _efEtapasLockadas = !!(p.etapas && p.etapas.length > 0);
   buildRecChips(p.recursos||[]);
@@ -5364,7 +5328,6 @@ function salvar(){
     editadoPor:editId?usuarioAtual:(projAnterior?.editadoPor||null),
     comentarios:projAnterior?.comentarios||[],
     prioridade:document.getElementById('fPrio')?.value||'',
-    rp:document.getElementById('fRP')?.value||'',
     tags:editId?(DB.find(x=>x.id===editId)?.tags||[]):[],
     linkBdoc:document.getElementById('fLinkBdoc')?.value.trim()||projAnterior?.linkBdoc||'',  // preserva tags existentes
     mudouEscopo:projAnterior?.mudouEscopo||'',
@@ -5774,12 +5737,11 @@ function exportXLSX(){
   const wb = XLSX.utils.book_new();
 
   // ── Aba 1: Projetos (dados básicos) ──
-  const hdrP = ['ID','Nome','Recursos','Tags','Situação','Coluna','Responsáveis','Prioridade','RP','Criado','Início','Prazo','Término','% Concluído','Atraso Eq (d)','Atraso Cliente (d)','Observação Prazo'];
+  const hdrP = ['ID','Nome','Recursos','Tags','Situação','Coluna','Responsáveis','Prioridade','Criado','Início','Prazo','Término','% Concluído','Atraso Eq (d)','Atraso Cliente (d)','Observação Prazo'];
   const rowsP = todos.map(p=>{
     const{eq,cl}=delInf(p);
     return [p.id, p.nome, (p.recursos||[]).join('; '), (p.tags||[]).join('; '),
       sitLabel(p), colLabel(p.col), (p.resps||[]).join('; '), p.prioridade||'',
-      p.rp||'',
       isoToBR(p.criado), isoToBR(p.inicio), isoToBR(p.prazo), isoToBR(p.termino),
       p.pct, eq, cl, p.prazObs||''];
   });
@@ -5911,7 +5873,6 @@ function exportPDFFicha(id){
   const campos = [
     ['Coluna / Status', colLabel(p.col)],
     ['Prioridade',      p.prioridade ? p.prioridade.charAt(0).toUpperCase()+p.prioridade.slice(1) : '—'],
-    ['RP',             p.rp||'—'],
     ['Responsáveis',    (p.resps||[]).join(', ')||'—'],
     ['Recursos',        (p.recursos||[]).join(', ')||'—'],
     ['Data de Criação', isoToBR(p.criado)],
@@ -6422,7 +6383,7 @@ function exportPDFLista(){
   // PÁGINA 3 — PESSOAS
   // ═══════════════════════════════════════════════════════
   doc.addPage();
-  heroPagina('Pessoas', 'Distribuicao de projetos por responsavel e tipo de recurso');
+  heroPagina('Pessoas', 'Distribuicao de projetos por tipo de recurso');
 
   const p3Y = 36;
   const ACAD_COLS = [
@@ -6431,24 +6392,8 @@ function exportPDFLista(){
     [132,204,22], [190,24,93]
   ];
 
-  // RP (largura total)
-  const rpX = ML;
-  const rpW = TW;
-  roundRect(rpX, p3Y, rpW, 100, 3, C.white, C.grayLight, 0.3);
-  drawText('Projetos por RP', rpX+4, p3Y+6, {size:11, bold:true, color:C.text});
-
-  const mapRP = {};
-  act.forEach(p => { const r = p.rp || 'Nao definido'; mapRP[r] = (mapRP[r]||0)+1; });
-  const arrRP = Object.entries(mapRP).sort((a,b) => b[1]-a[1]).slice(0, 12);
-  const mxRP = arrRP.length ? arrRP[0][1] : 1;
-  let ry = p3Y + 14;
-  arrRP.forEach(([nome, n], i) => {
-    barraH(rpX+4, ry, rpW-8, n, mxRP, C.blue, nome, String(n));
-    ry += 7;
-  });
-
-  // Recursos (parte inferior)
-  const recY = p3Y + 106;
+  // Recursos
+  const recY = p3Y;
   roundRect(ML, recY, TW, 50, 3, C.white, C.grayLight, 0.3);
   drawText('Projetos por Recurso', ML+4, recY+6, {size:11, bold:true, color:C.text});
 
@@ -6598,10 +6543,10 @@ function exportPDFLista(){
 
 // ── CSV (mantido como fallback interno) ──
 function exportCSV(){
-  const hdr='ID,Nome,Recursos,Tags,Situação,Coluna,Responsáveis,RP,Prioridade,Criado,Início,Prazo,Término,% Concluído,Atraso Eq(d),Atraso Cl(d),Link BDOC';
+  const hdr='ID,Nome,Recursos,Tags,Situação,Coluna,Responsáveis,Prioridade,Criado,Início,Prazo,Término,% Concluído,Atraso Eq(d),Atraso Cl(d),Link BDOC';
   const rows=activeDB().concat(cancelDB()).map(p=>{
     const{eq,cl}=delInf(p);
-    return[p.id,`"${p.nome}"`,`"${(p.recursos||[]).join('; ')}"`,`"${(p.tags||[]).join('; ')}"`,sitLabel(p),colLabel(p.col),`"${(p.resps||[]).join('; ')}"`,p.rp||'',p.prioridade||'',p.criado,p.inicio||'',p.prazo||'',p.termino||'',p.pct,eq,cl,`"${p.linkBdoc||''}"`].join(',');
+    return[p.id,`"${p.nome}"`,`"${(p.recursos||[]).join('; ')}"`,`"${(p.tags||[]).join('; ')}"`,sitLabel(p),colLabel(p.col),`"${(p.resps||[]).join('; ')}"`,p.prioridade||'',p.criado,p.inicio||'',p.prazo||'',p.termino||'',p.pct,eq,cl,`"${p.linkBdoc||''}"`].join(',');
   });
   const a=document.createElement('a');
   a.href='data:text/csv;charset=utf-8,'+encodeURIComponent('\uFEFF'+[hdr,...rows].join('\n'));
@@ -8462,7 +8407,6 @@ function _euEnvolvidoEm(p){
   const eu = nomeUsuarioAtual();
   if(!eu || eu === 'Desconhecido') return true; // sem usuário identificado, mostra tudo
   return (p.resps||[]).some(r => _nomeMatch(r, eu))
-    || _nomeMatch(p.rp||'', eu)
     || _nomeMatch(p.criadoPor||'', eu)
     || _nomeMatch(p.editadoPor||'', eu);
 }
