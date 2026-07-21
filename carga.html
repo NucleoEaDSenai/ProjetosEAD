@@ -804,10 +804,9 @@
           <span>MetrôRio</span>
           <span class="filter-chip-pending">Em breve</span>
         </button>
-        <button class="filter-chip disabled" data-tenant="transpetro" title="Em implantação">
+        <button class="filter-chip" data-tenant="transpetro" onclick="setFiltroTenant('transpetro',this)">
           <span class="filter-chip-dot transpetro"></span>
           <span>Transpetro</span>
-          <span class="filter-chip-pending">Em breve</span>
         </button>
       </div>
     </div>
@@ -990,10 +989,12 @@
         cor:'#F0B429',
         corBadgeBg:'rgba(240,180,41,.12)',
         corBadgeBorder:'rgba(240,180,41,.35)',
-        firebaseUrl:'',  // ← preencher quando criar
+        firebaseUrl:'https://transpetro-firjan-senai-default-rtdb.firebaseio.com',
         firebaseAppName:'app-transpetro',
-        apiKey:'', authDomain:'', projectId:'',  // ← config do projeto (Configurações → Geral)
-        ativo:false,
+        apiKey:'AIzaSyC86s5I4ZaqK32yPVV7rxbiAX4afT0e708',
+        authDomain:'transpetro-firjan-senai.firebaseapp.com',
+        projectId:'transpetro-firjan-senai',
+        ativo:true,
       },
     ];
 
