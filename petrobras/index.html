@@ -7614,10 +7614,14 @@ function _buildMedTabela(projetos){
   return `<div class="tw" style="margin:0;border-radius:0;border:none">
     <table>
       <thead><tr>
-        <th>Projeto</th><th>Responsáveis</th><th>Recursos</th>
-        <th>Concluído em</th><th>Enviado para Medição em</th>
-        <th style="text-align:center">Medição Feita</th>
-        <th style="text-align:center">Confirmada por</th><th></th>
+        <th style="cursor:pointer;white-space:nowrap" onclick="toggleMedSort('nome')">Projeto <span class="medSI" data-c="nome" style="font-size:10px;color:var(--mu)"></span></th>
+        <th style="cursor:pointer;white-space:nowrap" onclick="toggleMedSort('resp')">Responsáveis <span class="medSI" data-c="resp" style="font-size:10px;color:var(--mu)"></span></th>
+        <th style="cursor:pointer;white-space:nowrap" onclick="toggleMedSort('rec')">Recursos <span class="medSI" data-c="rec" style="font-size:10px;color:var(--mu)"></span></th>
+        <th style="cursor:pointer;white-space:nowrap" onclick="toggleMedSort('concl')">Concluído em <span class="medSI" data-c="concl" style="font-size:10px;color:var(--mu)"></span></th>
+        <th style="cursor:pointer;white-space:nowrap" onclick="toggleMedSort('env')">Enviado para Medição em <span class="medSI" data-c="env" style="font-size:10px;color:var(--mu)"></span></th>
+        <th style="cursor:pointer;white-space:nowrap;text-align:center" onclick="toggleMedSort('stat')">Medição Feita <span class="medSI" data-c="stat" style="font-size:10px;color:var(--mu)"></span></th>
+        <th style="cursor:pointer;white-space:nowrap;text-align:center" onclick="toggleMedSort('conf')">Confirmada por <span class="medSI" data-c="conf" style="font-size:10px;color:var(--mu)"></span></th>
+        <th></th>
       </tr></thead>
       <tbody>${projetos.map(_buildMedRow).join('')}</tbody>
     </table>
@@ -7736,6 +7740,14 @@ function _populateMedFiltros(lista){
   _msUpdateBtn('medStat');
 }
 
+let _medSortCol = '';
+let _medSortDir = 1;
+function toggleMedSort(col){
+  if(_medSortCol === col){ _medSortDir *= -1; }
+  else { _medSortCol = col; _medSortDir = 1; }
+  rMedicao();
+}
+
 function rMedicao(){
   const listaTotal = activeDB().concat(cancelDB()).filter(p => p.enviadoMedicao);
   const pendentes  = listaTotal.filter(p => !p.medicaoFeita).length;
@@ -7790,11 +7802,27 @@ function rMedicao(){
   }
 
   // ── Separar pendentes e confirmados ──
+  const _medCmp = (a,b) => {
+    const d = _medSortDir, S = v => (v||'').toString().toLowerCase(), D = v => v||'9999-99-99';
+    switch(_medSortCol){
+      case 'nome':  return S(a.nome).localeCompare(S(b.nome))*d;
+      case 'resp':  return S((a.resps||[]).join(', ')).localeCompare(S((b.resps||[]).join(', ')))*d;
+      case 'rec':   return S((a.recursos||[]).join(', ')).localeCompare(S((b.recursos||[]).join(', ')))*d;
+      case 'concl': return D(a.termino||a.enviadoMedicao).localeCompare(D(b.termino||b.enviadoMedicao))*d;
+      case 'env':   return D(a.enviadoMedicao).localeCompare(D(b.enviadoMedicao))*d;
+      case 'stat':  return ((a.medicaoFeita?1:0)-(b.medicaoFeita?1:0))*d;
+      case 'conf':  return S(a.medicaoConfirmadaPor).localeCompare(S(b.medicaoConfirmadaPor))*d;
+      default:      return 0;
+    }
+  };
+
   const grpPend = lista.filter(p => !p.medicaoFeita)
-    .sort((a,b) => (b.enviadoMedicao||'').localeCompare(a.enviadoMedicao||''));
+    .sort((a,b) => _medSortCol ? _medCmp(a,b)
+                               : (b.enviadoMedicao||'').localeCompare(a.enviadoMedicao||''));
 
   const confirmados = lista.filter(p => p.medicaoFeita)
-    .sort((a,b) => (b.medicaoFeitaEm||'').localeCompare(a.medicaoFeitaEm||''));
+    .sort((a,b) => _medSortCol ? _medCmp(a,b)
+                               : (b.medicaoFeitaEm||'').localeCompare(a.medicaoFeitaEm||''));
 
   // ── Agrupar confirmados por quinzena (usa medicaoFeitaEm) ──
   const quinzenas = {};
@@ -7853,6 +7881,12 @@ function rMedicao(){
   });
 
   el.innerHTML = html;
+
+  // Atualizar ícones de ordenação
+  el.querySelectorAll('.medSI').forEach(sp => {
+    const c = sp.dataset.c;
+    sp.textContent = _medSortCol === c ? (_medSortDir === 1 ? '↑' : '↓') : '⇅';
+  });
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
