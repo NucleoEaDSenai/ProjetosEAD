@@ -863,6 +863,13 @@ body.dark .tenant-item.current{background:rgba(34,197,94,.12)}
 .hom-resumo-item{font-size:11.5px;display:flex;gap:4px;align-items:center}
 .hom-resumo-label{color:var(--mu);font-weight:600}
 .hom-resumo-val{color:var(--txt)}
+.hom-card-destaque{animation:homDestaque 2.6s ease-out}
+@keyframes homDestaque{
+  0%{box-shadow:0 0 0 0 rgba(0,96,204,.75)}
+  15%{box-shadow:0 0 0 5px rgba(0,96,204,.55)}
+  70%{box-shadow:0 0 0 5px rgba(0,96,204,.30)}
+  100%{box-shadow:0 0 0 0 rgba(0,96,204,0)}
+}
 
 /* ═══ MODO ESCURO ═══ */
 body.dark{
@@ -2731,20 +2738,11 @@ function rKanban(){
           ${(() => {
             const etapas = p.etapas || [];
 
-            // ── BOTÃO HOMOLOGAÇÃO ────────────────────────────────────────────
-            // Regra: encontrar o índice da etapa "Homologação" (excluindo "Instalação")
-            // e verificar se a etapa IMEDIATAMENTE ANTERIOR foi concluída.
-            const idxHom = etapas.findIndex(e =>
-              e.lb && e.lb.toLowerCase().includes('homolog') &&
-              !e.lb.toLowerCase().includes('inst')
-            );
-            if(idxHom > 0){
-              const anterior = etapas[idxHom - 1];
-              const homolog  = etapas[idxHom];
-              // Aparece somente quando a etapa anterior foi concluída E Homologação ainda não
-              if(anterior.done && !homolog.done){
-                return `<button class="btn-medicao" style="background:linear-gradient(135deg,#003DA5,#0060CC)" onclick="event.stopPropagation();nav('homologacoes')">🔖 Ir para Homologação</button>`;
-              }
+            // ── BOTÃO ABRIR CARD NA ABA HOMOLOGAÇÕES ─────────────────────────
+            // Aparece para projetos que estão na coluna Homologação/Instalação.
+            // Leva direto ao card correspondente na aba Homologações.
+            if(p.col === 11){
+              return `<button class="btn-medicao" style="background:linear-gradient(135deg,#003DA5,#0060CC)" onclick="event.stopPropagation();irParaCardHomologacao(${p.id})">🔖 Abrir na aba Homologações</button>`;
             }
 
             // ── BOTÃO MEDIÇÃO ────────────────────────────────────────────────
@@ -8617,6 +8615,42 @@ function toggleHomMes(gid){
   body.classList.toggle('open', abrir);
   if(chev) chev.classList.toggle('open', abrir);
   if(abrir) _homMesAbertos.add(gid); else _homMesAbertos.delete(gid);
+}
+
+function irParaCardHomologacao(id){
+  nav('homologacoes');
+
+  let card = document.getElementById('homcard_'+id);
+
+  // 1ª tentativa: a aba pode não ter sido re-renderizada ainda
+  if(!card){ rHomologacoes(); card = document.getElementById('homcard_'+id); }
+
+  // 2ª tentativa: o card pode estar oculto por filtros/busca ativos
+  if(!card){ limparFiltrosHomolog(); card = document.getElementById('homcard_'+id); }
+
+  if(!card){
+    showToast('⚠️ Este projeto ainda não aparece na aba Homologações.');
+    return;
+  }
+
+  // Abre a gaveta do mês (grupo "Instalados"), se estiver recolhida
+  const mesBody = card.closest('.hom-mes-body');
+  if(mesBody && !mesBody.classList.contains('open')) toggleHomMes(mesBody.id.replace(/_body$/,''));
+
+  // Expande o corpo do card
+  const body = document.getElementById('hom_body_'+id);
+  const chev = document.getElementById('hom_chev_'+id);
+  if(body && !body.classList.contains('open')){
+    body.classList.add('open');
+    if(chev) chev.classList.add('open');
+  }
+
+  // Rola até o card e destaca
+  setTimeout(()=>{
+    card.scrollIntoView({behavior:'smooth', block:'center'});
+    card.classList.add('hom-card-destaque');
+    setTimeout(()=>card.classList.remove('hom-card-destaque'), 2600);
+  }, 120);
 }
 
 function rHomologacoes(){
