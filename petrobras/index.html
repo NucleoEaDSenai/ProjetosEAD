@@ -4336,7 +4336,7 @@ function openDet(id){
 
   document.getElementById('detFt').innerHTML=`
     <button class="btn bg2" onclick="cm('ovDet')">Fechar</button>
-    ${p.col===11?`<button class="btn" style="background:linear-gradient(135deg,#003DA5,#0060CC);color:#fff" onclick="cm('ovDet');irParaCardHomologacao(${p.id})" title="Abrir este projeto na aba Homologações">🔖 Abrir na aba Homologações</button>`:''}
+    ${(p.col===11 || p.homologPassou || p.homolog?.preenchido)?`<button class="btn" style="background:linear-gradient(135deg,#003DA5,#0060CC);color:#fff" onclick="cm('ovDet');irParaCardHomologacao(${p.id})" title="Abrir este projeto na aba Homologações">🔖 Abrir na aba Homologações</button>`:''}
     <button class="btn bg2" onclick="cm('ovDet');duplicarProjeto(${p.id})" title="Criar cópia deste projeto">📋 Duplicar</button>
     <button class="btn bb" onclick="cm('ovDet');openEdit(${p.id})">✏️ Editar</button>
     <button class="btn" style="background:var(--red);color:#fff" onclick="exportPDFFicha(${p.id})">📄 Exportar PDF</button>
