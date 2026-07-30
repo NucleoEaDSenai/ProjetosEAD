@@ -1914,7 +1914,9 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
 // ══════════════════════════════════════════════
 const NOMES = ['Tatiana','Thiago','Simone','Mariana','Mateus','Julia','Liderança Julia','Liderança Maria Emilia','Liderança Marise','Fatima','Liderança Fabiana','Daniel','Claudio','Ana Paula','Patricia','RPCI - Cristina (DI)','RPCI - Fátima (DI)','RPCI - Sheila (DI)','RPCI - Carla (DI)','RPCI Dedicado - Daniela (DI)','RPCI Dedicado - Leonidas (DI)','RPCI Dedicado - Haline (DI)','RPCI - Alex (DM)','RPCI - Leo (DM)','RPCI - Rafael (DM)','RPCI Dedicado - Wagner (DM)','RPCI - Patricia (RT)','RPCI - Rubio (RT)'];
 
-const RECURSOS = ['Planejamento e Estruturação do Projeto','Workshop com especialistas da Transpetro','Acompanhamento pedagógico - Apostila','Acomp pedagógico - Exerc fixação e Aval','Acompanhamento pedagógico - PPT','Editoração das apostilas','Animação 2D','Animação 3D','Objeto interativo 2D','Objeto interativo 3D','Game 2D','Atualização do Game 2D','Game 3D','Reprodução de apostila/ Pencard','Plano Instrucional','Plano de Identidade Visual','Personagem','Roteiro (Storyboard)','Cursos de alta complexidade até 20 min','Cursos alta comp até 40 mim até 20 telas','Cursos alta comp até 60 mim até 40 telas','Cursos alta comp até 90 mim até 60 telas','Cursos de baixa complexidade até 20 min','Cursos baix comp até 40 mim até 20 telas','Cursos baix comp até 60 mim até 40 telas','Cursos baix comp até 90 mim até 60 telas','One Page - Web Content até 30 min','Vídeo Interativo','Pós-produção de Vídeo até 10 min','Pós-produção de Vídeo até 2 horas','Vídeo Aula - gravação','Vídeo Aula - edição','Vídeo Instrucional 5 min','Vídeo Instrucional 10 min','Gestão do projeto MES','Manutenção mensal do projeto'];
+const RECURSOS = ['Planejamento e Estruturação do Projeto','Workshop com especialistas da Transpetro','Acompanhamento pedagógico - Apostila','Acomp pedagógico - Exerc fixação e Aval','Acompanhamento pedagógico - PPT','Editoração das apostilas','Animação 2D','Animação 3D','Objeto interativo 2D','Objeto interativo 3D','Game 2D','Atualização do Game 2D','Game 3D','Reprodução de apostila/ Pencard','Plano Instrucional','Plano de Identidade Visual','Personagem','Roteiro (Storyboard)','Cursos de alta complexidade até 20 min','Cursos alta comp até 40 mim até 20 telas','Cursos alta comp até 60 mim até 40 telas','Cursos alta comp até 90 mim até 60 telas','Cursos de baixa complexidade até 20 min','Cursos baix comp até 40 mim até 20 telas','Cursos baix comp até 60 mim até 40 telas','Cursos baix comp até 90 mim até 60 telas','One Page - Web Content até 30 min','Vídeo Interativo','Pós-produção de Vídeo até 10 min','Pós-produção de Vídeo até 2 horas','Vídeo Aula - gravação','Vídeo Aula - edição','Vídeo Instrucional 5 min','Vídeo Instrucional 10 min','Gestão do projeto MES','Manutenção mensal do projeto',
+// ── Recursos com fluxo de etapas próprio (ver FLUXOS / FLUXO_RECURSOS) ──
+'PICV','Onepage','Videoanimação','Avaliação'];
 
 const COLUNAS = [
   {k:0,  l:'Aguardando Reunião Inicial',      dot:'#94A3B8'},
@@ -4095,7 +4097,166 @@ let _motivoPid=null, _motivoIdx=null;
 //   'multi': array de fragmentos — TODOS precisam estar concluídos para mover
 // Recurso não listado aqui usa o fluxo padrão (ETPS_DEF).
 
-const TEMPLATES = {}; // Transpetro: fluxo único — todos os recursos usam ETPS_DEF + ETAPA_COL_MAP_PADRAO
+// ── FLUXOS PERSONALIZADOS ───────────────────────────────────────────────────
+// Cada fluxo é apenas o PADRÃO carregado ao selecionar o recurso.
+// O usuário continua livre para ADICIONAR, REMOVER e MOVER etapas depois
+// (isso liga a flag _efEtapasCustomizadas e o template nunca sobrescreve).
+//
+// r: 'eq' = equipe | 'cl' = cliente (fica em espera, não conta atraso da equipe)
+// dias: dias úteis usados pelo cronograma automático (padrão 2)
+
+const FLUXOS = {
+
+  PICV: {
+    colInicial: 0,
+    etapas: [
+      {lb:'Criação da apresentação do Kickoff',   r:'eq'},
+      {lb:'Realização da reunião de Kickoff',     r:'eq'},
+      {lb:'Alinhamento da equipe',                r:'eq'},
+      {lb:'Disponibilização dos conteúdos base',  r:'cl'},
+      {lb:'Elaboração do PICV',                   r:'eq'},
+      {lb:'Revisão textual do PICV',              r:'eq'},
+      {lb:'Validação inicial do PICV',            r:'cl'},
+      {lb:'Aplicação de ajustes no PICV',         r:'eq'},
+      {lb:'Validação final do PICV',              r:'cl'},
+    ],
+    gatilhos: [
+      {nome:'realização da reunião de kickoff',    col:1},
+      {nome:'disponibilização dos conteúdos base', col:3},
+      {nome:'elaboração do picv',                  col:3},
+      {nome:'validação inicial do picv',           col:4},
+      {nome:'validação final do picv',             col:5},
+    ],
+  },
+
+  Onepage: {
+    colInicial: 6,
+    etapas: [
+      {lb:'Produção DI do onepage',                       r:'eq'},
+      {lb:'Validação técnica inicial do DI do onepage',   r:'eq'},
+      {lb:'Aplicação de ajustes no DI do onepage',        r:'eq'},
+      {lb:'Validação técnica final no DI do onepage',     r:'eq'},
+      {lb:'Aplicação de ajustes no DI do onepage',        r:'eq'},
+      {lb:'Produção DM do onepage',                       r:'eq'},
+      {lb:'Validação técnica inicial do DM do onepage',   r:'eq'},
+      {lb:'Aplicação de ajustes no DM do onepage',        r:'eq'},
+      {lb:'Validação técnica final no DM do onepage',     r:'eq'},
+      {lb:'Aplicação de ajustes no DM do onepage',        r:'eq'},
+      {lb:'Validação inicial do onepage pelo cliente',    r:'cl'},
+      {lb:'Aplicação de ajustes no onepage',              r:'eq'},
+      {lb:'Validação final do onepage pelo cliente',      r:'cl'},
+      {lb:'Aplicação de ajustes no onepage',              r:'eq'},
+      {lb:'Revisão textual do one page',                  r:'eq'},
+      {lb:'Aplicação de ajustes no onepage',              r:'eq'},
+      {lb:'Geração do pacote SCORM',                      r:'eq'},
+      {lb:'Entrega do onepage',                           r:'eq'},
+    ],
+    gatilhos: [
+      {nome:'produção di do onepage',                    col:6},
+      {nome:'produção dm do onepage',                    col:6},
+      {nome:'validação inicial do onepage pelo cliente', col:7},
+      {nome:'validação final do onepage pelo cliente',   col:7},
+      {nome:'revisão textual do one page',               col:8},
+      {nome:'geração do pacote scorm',                   col:13},
+      {nome:'entrega do onepage',                        col:14},
+    ],
+  },
+
+  'Videoanimação': {
+    colInicial: 6,
+    etapas: [
+      {lb:'Roteirização da videoanimação',                             r:'eq'},
+      {lb:'Validação técnica do roteiro da videoanimação',             r:'eq'},
+      {lb:'Aplicação de ajustes no roteiro da videoanimação',          r:'eq'},
+      {lb:'Validação do roteiro da videoanimação pelo cliente',        r:'cl'},
+      {lb:'Aplicação de ajustes no roteiro na videoanimação',          r:'eq'},
+      {lb:'Revisão textual do roteiro da videoanimação',               r:'eq'},
+      {lb:'Produção do moodboard da videoanimação',                    r:'eq'},
+      {lb:'Controle de qualidade do moodboard da videoanimação',       r:'eq'},
+      {lb:'Aplicação de ajustes no moodboard da videoanimação',        r:'eq'},
+      {lb:'Validação do moodboard da videoanimação',                   r:'cl'},
+      {lb:'Aplicação de ajustes no moodboard da videoanimação',        r:'eq'},
+      {lb:'Produção multimídia da videoanimação',                      r:'eq'},
+      {lb:'Controle de qualidade da videoanimação',                    r:'eq'},
+      {lb:'Aplicação de ajustes na videoanimação',                     r:'eq'},
+      {lb:'Validação inicial da produção da videoanimação pelo cliente',r:'cl'},
+      {lb:'Aplicação de ajustes na videoanimação',                     r:'eq'},
+      {lb:'Validação final da produção da videoanimação pelo cliente', r:'cl'},
+      {lb:'Aplicação de ajustes na videoanimação',                     r:'eq'},
+      {lb:'Revisão textual da videoanimação',                          r:'eq'},
+      {lb:'Aplicação de ajustes na videoanimação',                     r:'eq'},
+      {lb:'Controle de qualidade da videoanimação',                    r:'eq'},
+      {lb:'Aplicação de ajustes na videoanimação',                     r:'eq'},
+      {lb:'Inclusão da animação na solução educacional',               r:'eq'},
+      {lb:'Entrega da videoanimação',                                  r:'eq'},
+    ],
+    gatilhos: [
+      {nome:'roteirização da videoanimação',                    col:6},
+      {nome:'validação do roteiro da videoanimação pelo cliente',col:7},
+      {nome:'revisão textual do roteiro da videoanimação',      col:8},
+      {nome:'produção do moodboard da videoanimação',           col:10},
+      {nome:'produção multimídia da videoanimação',             col:10},
+      {nome:'validação final da produção da videoanimação pelo cliente', col:10},
+      {nome:'inclusão da animação na solução educacional',      col:12},
+      {nome:'entrega da videoanimação',                         col:14},
+    ],
+  },
+
+  'Avaliação': {
+    colInicial: 1,
+    etapas: [
+      {lb:'Criação do banco de questões pelo cliente',                 r:'cl'},
+      {lb:'Análise do banco de questões',                              r:'eq'},
+      {lb:'Aplicação de ajustes no banco de questões',                 r:'eq'},
+      {lb:'Tratamento pedagógico do banco de questões',                r:'eq'},
+      {lb:'Validação inicial do banco de questões pelo cliente',       r:'cl'},
+      {lb:'Aplicação de ajustes no banco de questões',                 r:'eq'},
+      {lb:'Validação final do banco de questões pelo cliente',         r:'cl'},
+      {lb:'Aplicação de ajustes no banco de questões',                 r:'eq'},
+      {lb:'Revisão textual do banco de questões',                      r:'eq'},
+      {lb:'Aplicação de ajustes no banco de questões',                 r:'eq'},
+      {lb:'Aplicação da comunicação visual no Articulate',             r:'eq'},
+      {lb:'Controle de qualidade da comunicação visual no Articulate', r:'eq'},
+      {lb:'Aplicação de ajustes na comunicação visual no Articulate',  r:'eq'},
+      {lb:'Cadastro das questões no Articulate',                       r:'eq'},
+      {lb:'Controle de qualidade do funcionamento da avaliação',       r:'eq'},
+      {lb:'Aplicação de ajustes no Articulate',                        r:'eq'},
+      {lb:'Geração do pacote SCORM',                                   r:'eq'},
+      {lb:'Entrega da avaliação',                                      r:'eq'},
+    ],
+    gatilhos: [
+      {nome:'análise do banco de questões',                       col:3},
+      {nome:'tratamento pedagógico do banco de questões',         col:3},
+      {nome:'validação inicial do banco de questões pelo cliente',col:4},
+      {nome:'validação final do banco de questões pelo cliente',  col:4},
+      {nome:'revisão textual do banco de questões',               col:8},
+      {nome:'aplicação da comunicação visual no articulate',      col:10},
+      {nome:'cadastro das questões no articulate',                col:10},
+      {nome:'controle de qualidade do funcionamento da avaliação',col:12},
+      {nome:'geração do pacote scorm',                            col:13},
+      {nome:'entrega da avaliação',                               col:14},
+    ],
+  },
+
+};
+
+// ── MAPA: nome do RECURSO (chip do formulário) → fluxo ───────────────────────
+// Para ligar um fluxo a outro recurso, basta acrescentar o nome exato do
+// recurso (como aparece em RECURSOS) na lista correspondente.
+const FLUXO_RECURSOS = {
+  PICV:           ['PICV', 'Plano Instrucional', 'Plano de Identidade Visual'],
+  Onepage:        ['Onepage', 'One Page - Web Content até 30 min'],
+  'Videoanimação':['Videoanimação', 'Animação 2D', 'Animação 3D'],
+  'Avaliação':    ['Avaliação', 'Acomp pedagógico - Exerc fixação e Aval'],
+};
+
+// Monta TEMPLATES (consumido por getTemplate/calcColIdeal/toggleRec)
+const TEMPLATES = {};
+Object.entries(FLUXO_RECURSOS).forEach(([fluxo, recursos]) => {
+  const def = FLUXOS[fluxo];
+  if(!def) return;
+  recursos.forEach(rec => { TEMPLATES[rec] = {...def, _fluxo: fluxo}; });
+});
 
 // Gatilhos do fluxo PADRÃO — Transpetro (etapa concluída → card avança p/ coluna)
 // Mapeia marcos-chave das 44 etapas às 15 colunas existentes (match por fragmento).
@@ -4496,10 +4657,14 @@ const CRONOGRAMA_TRANSPETRO = ETPS_DEF.map(e => ({lb:e.lb, dias:2})); // 44 × 2
 // CRONOGRAMAS é consultado por nome de recurso (CRONOGRAMAS[r]). Como o fluxo
 // é único, qualquer recurso selecionado herda o mesmo cronograma — o Proxy
 // devolve CRONOGRAMA_TRANSPETRO para qualquer chave string consultada.
+// Recursos com fluxo próprio (PICV, Onepage, Videoanimação, Avaliação) usam o
+// cronograma derivado das etapas do próprio template.
 const CRONOGRAMAS = new Proxy({}, {
   get(_t, prop){
-    if(typeof prop === 'string') return CRONOGRAMA_TRANSPETRO;
-    return undefined;
+    if(typeof prop !== 'string') return undefined;
+    const tmpl = TEMPLATES[prop];
+    if(tmpl) return tmpl.etapas.map(e => ({lb:e.lb, dias:e.dias || 2}));
+    return CRONOGRAMA_TRANSPETRO;
   }
 });
 
