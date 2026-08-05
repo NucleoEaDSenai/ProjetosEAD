@@ -10697,27 +10697,27 @@ function migrarEtapasWebRise(){
 }
 
 // ── INIT — sessão gerenciada pelo Firebase Authentication ──────────────────
+// Config padrão do projeto — usada quando não há configuração salva no localStorage,
+// para pular a tela "configurar o Firebase" e ir direto para o login.
+const DEFAULT_FB_CONFIG = {
+  apiKey:      "AIzaSyDnmw3v0eCLQjn6D_J5VQtRu7vGF4OIUb0",
+  authDomain:  "petrobras-firjan-senai.firebaseapp.com",
+  databaseURL: "https://petrobras-firjan-senai-default-rtdb.firebaseio.com",
+  projectId:   "petrobras-firjan-senai",
+};
+
 const savedUrl     = localStorage.getItem(CFG_KEY);
 const savedApiKey  = localStorage.getItem('firjan_fb_apikey');
 const savedDomain  = localStorage.getItem('firjan_fb_domain');
 const savedProject = localStorage.getItem('firjan_fb_project');
-if(savedUrl && savedApiKey){
-  // Passa objeto completo — garante que apiKey e projectId chegam corretamente
-  carregarSDKeFire({
-    apiKey:      savedApiKey,
-    authDomain:  savedDomain  || '',
-    databaseURL: savedUrl,
-    projectId:   savedProject || '',
-  });
-} else if(savedUrl){
-  // URL salva mas sem apiKey (config legada incompleta) → pedir reconfiguração
-  _loginEstado('semconfig');
-  renderAll();
-} else {
-  // Sem config → mostrar tela de configuração
-  _loginEstado('semconfig');
-  renderAll();
-}
+
+// Sempre usa config salva se existir; caso contrário, cai na config padrão acima.
+carregarSDKeFire({
+  apiKey:      savedApiKey  || DEFAULT_FB_CONFIG.apiKey,
+  authDomain:  savedDomain  || DEFAULT_FB_CONFIG.authDomain,
+  databaseURL: savedUrl     || DEFAULT_FB_CONFIG.databaseURL,
+  projectId:   savedProject || DEFAULT_FB_CONFIG.projectId,
+});
 
 </script>
 
