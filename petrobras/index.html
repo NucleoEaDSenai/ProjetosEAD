@@ -595,18 +595,6 @@ tr.canc-row td{opacity:.55}
 .fb-dot.sync{background:var(--yel);animation:pulse .8s infinite}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
 /* SETUP MODAL */
-.setup-ov{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:4000;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
-.setup-box{background:#fff;border-radius:16px;padding:36px 40px;width:540px;max-width:96vw;text-align:center}
-.setup-logo{font-family:'Plus Jakarta Sans',sans-serif;font-weight:800;font-size:22px;margin-bottom:6px}
-.setup-sub{color:var(--mu);font-size:13px;margin-bottom:28px;line-height:1.5}
-.setup-step{background:var(--s2);border-radius:10px;padding:14px 18px;text-align:left;margin-bottom:14px;font-size:12.5px;line-height:1.7}
-.setup-step strong{font-size:13px;color:var(--dark)}
-.setup-step code{background:#E8E8E8;padding:1px 6px;border-radius:4px;font-family:monospace;font-size:11.5px;word-break:break-all}
-.setup-inp{width:100%;padding:10px 14px;border:1.5px solid var(--bdr);border-radius:8px;font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;margin-top:6px;outline:none}
-.setup-inp:focus{border-color:var(--blue)}
-.setup-btn{width:100%;padding:12px;background:var(--red);color:#fff;border:none;border-radius:8px;font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:15px;cursor:pointer;margin-top:16px;transition:background .15s}
-.setup-btn:hover{background:#c4001f}
-.setup-err{color:var(--red);font-size:12px;margin-top:8px;min-height:18px}
 @media(max-width:960px){.sb{width:50px}.main{margin-left:50px}.sb-title,.sb-sub,.sb-sec,.sb-badge,.si span{display:none}.si{justify-content:center;padding:11px}}
 /* Collapse de seções do menu */
 .sb-group{overflow:hidden}
@@ -1108,14 +1096,13 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
       <button class="login-forgot" onclick="recuperarSenha()">Esqueci minha senha</button>
     </div>
 
-    <!-- estado 3: Firebase não configurado -->
+    <!-- estado 3: falha ao carregar o Firebase (sem internet / bloqueio de rede) -->
     <div id="loginSemConfig" style="display:none;text-align:center;padding:8px 0">
       <div style="font-size:13px;color:var(--mu);margin-bottom:14px">
-        Firebase não configurado.
+        Não foi possível conectar ao servidor.<br>Verifique sua conexão com a internet.
       </div>
-      <button class="login-btn"
-        onclick="document.getElementById('ovLogin').style.display='none';document.getElementById('setupOv').style.display='flex'">
-        🔥 Configurar Firebase
+      <button class="login-btn" onclick="location.reload()">
+        🔄 Tentar novamente
       </button>
     </div>
 
@@ -2120,23 +2107,6 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
 <div class="fb-status" id="fbStatus" style="opacity:0">
   <div class="fb-dot offline" id="fbDot"></div>
   <span id="fbLabel">Conectando...</span>
-</div>
-<!-- Setup modal (aparece na 1ª vez) -->
-<div class="setup-ov" id="setupOv" style="display:none">
-  <div class="setup-box">
-    <div class="setup-logo">🔥 Configurar Firebase</div>
-    <div class="setup-sub">
-      Cole as configurações do seu projeto Firebase.<br>
-      <strong>console.firebase.google.com → ⚙️ Configurações → Seus apps → &lt;/&gt; Web</strong>
-    </div>
-    <input class="setup-inp" id="setupApiKey"     placeholder="apiKey  (AIzaSy...)" autocomplete="off">
-    <input class="setup-inp" id="setupAuthDomain" placeholder="authDomain  (projeto.firebaseapp.com)" autocomplete="off">
-    <input class="setup-inp" id="setupDbUrl"      placeholder="databaseURL  (https://projeto-rtdb.firebaseio.com)" autocomplete="off">
-    <input class="setup-inp" id="setupProjectId"  placeholder="projectId  (nome-do-projeto)" autocomplete="off">
-    <div class="setup-err" id="setupErr"></div>
-    <button class="setup-btn" onclick="conectarFirebase()">🔗 Conectar e Salvar</button>
-
-  </div>
 </div>
 <div class="toast" id="toast"></div>
 
@@ -9034,7 +9004,6 @@ function renderView(id){
 // ══════════════════════════════════════════════
 //  FIREBASE — PERSISTÊNCIA EM TEMPO REAL
 // ══════════════════════════════════════════════
-const CFG_KEY  = 'firjan_fb_url';
 let fbProjetos = null;   // db.ref('projetos')
 let fbNxtRef   = null;   // db.ref('nxt')
 let fbLogRef   = null;   // db.ref('log_delecoes')
@@ -9357,30 +9326,13 @@ function carregarScript(src){
 }
 
 function carregarSDKeFire(cfg){
-  // cfg: objeto {apiKey,authDomain,databaseURL,projectId} ou string URL (legado)
-  let config;
-  if(typeof cfg === 'object' && cfg !== null){
-    config = {
-      apiKey:      cfg.apiKey      || '',
-      authDomain:  cfg.authDomain  || '',
-      databaseURL: cfg.databaseURL || '',
-      projectId:   cfg.projectId   || '',
-    };
-  } else {
-    config = {
-      databaseURL: cfg || '',
-      apiKey:      localStorage.getItem('firjan_fb_apikey')  || '',
-      authDomain:  localStorage.getItem('firjan_fb_domain')  || '',
-      projectId:   localStorage.getItem('firjan_fb_project') || '',
-    };
-  }
-
-  // Sem apiKey → mostrar tela de configuração
-  if(!config.apiKey){
-    _loginEstado('semconfig');
-    renderAll();
-    return;
-  }
+  // cfg: sempre DEFAULT_FB_CONFIG (config fixa do projeto)
+  const config = {
+    apiKey:      cfg.apiKey,
+    authDomain:  cfg.authDomain,
+    databaseURL: cfg.databaseURL,
+    projectId:   cfg.projectId,
+  };
 
   // Mostrar "Conectando..." enquanto o SDK carrega
   _loginEstado('loading');
@@ -9443,30 +9395,6 @@ function _loginEstado(estado){
   if(semCfg)  semCfg.style.display  = estado === 'semconfig' ? 'block' : 'none';
 }
 
-// ── SETUP MODAL ──
-function conectarFirebase(){
-  const apiKey     = document.getElementById('setupApiKey').value.trim();
-  const authDomain = document.getElementById('setupAuthDomain').value.trim();
-  const url        = document.getElementById('setupDbUrl').value.trim();
-  const projectId  = document.getElementById('setupProjectId').value.trim();
-  const err        = document.getElementById('setupErr');
-  err.textContent  = '';
-  if(!apiKey)     { err.textContent = '⚠️ apiKey obrigatório.'; return; }
-  if(!authDomain) { err.textContent = '⚠️ authDomain obrigatório.'; return; }
-  if(!url || !url.includes('firebaseio.com')){
-    err.textContent = '⚠️ databaseURL inválida. Formato: https://projeto-rtdb.firebaseio.com';
-    return;
-  }
-  if(!projectId)  { err.textContent = '⚠️ projectId obrigatório.'; return; }
-  const cfg = { apiKey, authDomain, databaseURL: url, projectId };
-  localStorage.setItem(CFG_KEY,             url);
-  localStorage.setItem('firjan_fb_apikey',  apiKey);
-  localStorage.setItem('firjan_fb_domain',  authDomain);
-  localStorage.setItem('firjan_fb_project', projectId);
-  document.getElementById('setupOv').style.display = 'none';
-  document.getElementById('ovLogin').style.display  = 'none';
-  carregarSDKeFire(cfg);
-}
 
 
 // ══════════════════════════════════════════════
@@ -10897,27 +10825,21 @@ function migrarEtapasWebRise(){
 }
 
 // ── INIT — sessão gerenciada pelo Firebase Authentication ──────────────────
-// Config padrão do projeto — usada quando não há configuração salva no localStorage,
-// para pular a tela "configurar o Firebase" e ir direto para o login.
-const DEFAULT_FB_CONFIG = {
+// Config web do Firebase — pública por design (a segurança está nas regras do
+// Realtime Database e na restrição da chave no Google Cloud). É SEMPRE esta config:
+// nada vindo do localStorage pode substituí-la.
+const DEFAULT_FB_CONFIG = Object.freeze({
   apiKey:      "AIzaSyDnmw3v0eCLQjn6D_J5VQtRu7vGF4OIUb0",
   authDomain:  "petrobras-firjan-senai.firebaseapp.com",
   databaseURL: "https://petrobras-firjan-senai-default-rtdb.firebaseio.com",
   projectId:   "petrobras-firjan-senai",
-};
-
-const savedUrl     = localStorage.getItem(CFG_KEY);
-const savedApiKey  = localStorage.getItem('firjan_fb_apikey');
-const savedDomain  = localStorage.getItem('firjan_fb_domain');
-const savedProject = localStorage.getItem('firjan_fb_project');
-
-// Sempre usa config salva se existir; caso contrário, cai na config padrão acima.
-carregarSDKeFire({
-  apiKey:      savedApiKey  || DEFAULT_FB_CONFIG.apiKey,
-  authDomain:  savedDomain  || DEFAULT_FB_CONFIG.authDomain,
-  databaseURL: savedUrl     || DEFAULT_FB_CONFIG.databaseURL,
-  projectId:   savedProject || DEFAULT_FB_CONFIG.projectId,
 });
+
+// Remove configs antigas que versões anteriores gravavam no navegador
+['firjan_fb_url','firjan_fb_apikey','firjan_fb_domain','firjan_fb_project']
+  .forEach(k => { try { localStorage.removeItem(k); } catch(e){} });
+
+carregarSDKeFire(DEFAULT_FB_CONFIG);
 
 </script>
 
