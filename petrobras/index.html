@@ -954,14 +954,17 @@ body.dark .carga-card-cliente{background:linear-gradient(180deg,rgba(14,165,233,
 .carga-bar-bg{height:6px;background:var(--bdr);border-radius:3px;overflow:hidden;margin:0 18px 8px;flex-shrink:0}
 .carga-bar-fill{height:100%;border-radius:3px;transition:width .5s ease}
 .carga-stats-row{display:flex;gap:6px;padding:0 18px 14px;flex-wrap:wrap}
-.carga-stat-pill{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:12px;font-size:11px;font-weight:600;background:var(--s2);color:var(--txt)}
-.carga-stat-pill.red{background:#FEE2E2;color:#991B1B}
-.carga-stat-pill.org{background:#FFF7ED;color:#9A3412}
-.carga-stat-pill.blue{background:#EFF6FF;color:#1E40AF}
+.carga-stat-pill{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:12px;font-size:11px;font-weight:600;background:var(--s2);color:var(--txt);border:1px solid var(--bdr)}
+.carga-stat-pill.red{background:#FEE2E2;color:#991B1B;border-color:#FCA5A5}
+.carga-stat-pill.org{background:#FFF7ED;color:#9A3412;border-color:#FDBA74}
+.carga-stat-pill.blue{background:#EFF6FF;color:#1E40AF;border-color:#93C5FD}
 .carga-stat-pill.gray{background:var(--s2);color:var(--mu)}
+.carga-stat-pill.purple{background:#F3E8FF;color:#6B21A8;border-color:#D8B4FE}
+.carga-stat-pill-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;display:inline-block}
 body.dark .carga-stat-pill.red{background:rgba(220,38,38,.18);color:#FCA5A5}
 body.dark .carga-stat-pill.org{background:rgba(234,88,12,.18);color:#FDBA74}
 body.dark .carga-stat-pill.blue{background:rgba(30,64,175,.22);color:#93C5FD}
+body.dark .carga-stat-pill.purple{background:rgba(147,51,234,.18);color:#D8B4FE}
 
 .carga-body{display:none;border-top:1px solid var(--bdr);background:var(--s2)}
 .carga-body.open{display:block}
@@ -1759,7 +1762,7 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
     <!-- HISTÓRICO DE PROJETOS DELETADOS -->
     <div class="view" id="view-lixeira">
       <div class="st" style="margin-bottom:6px">🗑️ Cards Deletados</div>
-      <div style="font-size:12.5px;color:var(--mu);margin-bottom:20px">Histórico de cards deletados. Apenas usuários com <strong>Liderança</strong> no nome podem deletar projetos.</div>
+      <div style="font-size:12.5px;color:var(--mu);margin-bottom:20px">Histórico de cards deletados. Apenas <strong>lideranças</strong> podem deletar projetos.</div>
       <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:22px" id="lixeiraStats"></div>
       <div class="fbox" style="margin-bottom:14px">
         <div class="fbox-row" style="flex-wrap:wrap;gap:10px;align-items:flex-end">
@@ -4852,8 +4855,7 @@ function toggleE(pid,idx){
 
   // Etapa de Upload: apenas Liderança pode concluir ou reabrir
   if(e.lb && e.lb.toLowerCase().includes('upload')){
-    const usuUpload = nomeUsuarioAtual();
-    if(!usuUpload.toLowerCase().includes('liderança')){
+    if(!ehLideranca()){
       showToast('🚫 Apenas a Liderança pode concluir a etapa de Upload');
       return;
     }
@@ -6193,7 +6195,7 @@ function salvar(){
 
 function delP(id){
   if(!podeApagarProjeto()){
-    showToast('🔒 Apenas usuários com "Liderança" no nome podem deletar projetos');
+    showToast('🔒 Apenas lideranças podem deletar projetos');
     return;
   }
   delMotivoId = id;
@@ -7692,9 +7694,8 @@ function enviarMedicao(id){
 
 function confirmarMedicao(id){
   const p = DB.find(x=>x.id===id); if(!p) return;
-  // Apenas usuários com "Liderança" no nome podem confirmar/desmarcar medição
-  const usuConfirm = nomeUsuarioAtual();
-  if(!usuConfirm.toLowerCase().includes('liderança')){
+  // Apenas lideranças podem confirmar/desmarcar medição (regra real no Firebase)
+  if(!ehLideranca()){
     showToast('🚫 Apenas a Liderança pode confirmar a Medição');
     return;
   }
@@ -9398,6 +9399,10 @@ function carregarSDKeFire(cfg){
       fbAuth.onAuthStateChanged(user => {
         if(user){
           fbCurrentUser = user;
+          firebase.database(app).ref('lideranca/' + user.uid).once('value')
+            .then(s => { _ehLideranca = s.val() === true; })
+            .catch(() => { _ehLideranca = false; })
+            .then(() => renderAll());
           const nome = user.displayName || user.email.split('@')[0];
           // Persiste nome e email para uso no histórico mesmo após reload
           localStorage.setItem('firjan_user', nome);
@@ -9412,6 +9417,7 @@ function carregarSDKeFire(cfg){
           escutarFirebase(firebase.database(app));
         } else {
           fbCurrentUser = null;
+          _ehLideranca  = false;
           // Firebase pronto → mostrar form de login
           _loginEstado('form');
         }
@@ -9874,23 +9880,36 @@ function rCarga(){
   const el = document.getElementById('cargaGrid'); if(!el) return;
   const ativos = activeDB().filter(p => calcSit(p) !== 'concluido');
 
-  // ── Agrupar por membro: incluir somente projetos cuja etapa atual está
-  //    com a pessoa (etapa atribuída ao nome dela ou genérica para a equipe).
-  //    Projetos com etapa atual com cliente entram em uma gaveta especial. ──
-  const membrosTotal = {};
-  const projsCliente = [];   // projetos cuja etapa atual está com o cliente
+  // ── Gaveta especial "Cliente": projetos cuja etapa atual está com o cliente ──
+  const projsCliente = [];
   const seenCl = new Set();
-
   ativos.forEach(p => {
     const et = etapaAtual(p);
-    if(et && et.r === 'cl'){
-      // Etapa atual está com o cliente
-      if(!seenCl.has(p.id)){ projsCliente.push(p); seenCl.add(p.id); }
-      return;
-    }
-    // Etapa atual está com a equipe — distribuir entre os responsáveis
+    if(et && et.r === 'cl' && !seenCl.has(p.id)){ projsCliente.push(p); seenCl.add(p.id); }
+  });
+
+  // ── Agrupamento estreito (só quem está com a etapa atual agora) — usado
+  //    apenas para a métrica "Projetos Ativos - Equipe" no topo, preservando
+  //    o significado original desse número. ──
+  const membrosEtapaAtual = {};
+  ativos.forEach(p => {
+    const et = etapaAtual(p);
+    if(et && et.r === 'cl') return;
     (p.resps||[]).forEach(r => {
       if(!_etapaAtualEhDaPessoa(p, r)) return;
+      if(!membrosEtapaAtual[r]) membrosEtapaAtual[r] = [];
+      membrosEtapaAtual[r].push(p);
+    });
+  });
+
+  // ── Agrupar por membro para os CARDS: TODOS os responsáveis alocados no
+  //    projeto (todo mundo em p.resps), independente de quem está com a
+  //    etapa atual no momento — reflete a carga/alocação total de cada
+  //    pessoa. 100% dinâmico: nomes e projetos novos aparecem automaticamente
+  //    assim que entram em algum p.resps, sem precisar de cadastro à parte. ──
+  const membrosTotal = {};
+  ativos.forEach(p => {
+    (p.resps||[]).forEach(r => {
       if(!membrosTotal[r]) membrosTotal[r] = [];
       membrosTotal[r].push(p);
     });
@@ -9904,7 +9923,7 @@ function rCarga(){
   _populateCargaFiltros(membrosTotalComCl, ativos);
 
   // ── Stats globais ──
-  const totalAtivosEquipe = new Set(Object.values(membrosTotal).flat().map(p=>p.id)).size;
+  const totalAtivosEquipe = new Set(Object.values(membrosEtapaAtual).flat().map(p=>p.id)).size;
   const totalAtivosCliente = projsCliente.length;
   const totalAtrasoEq = ativos.filter(atrasadoPorEquipe).length;
   const totalAtrasoCl = ativos.filter(p => !atrasadoPorEquipe(p) && atrasadoPorCliente(p)).length;
@@ -9965,6 +9984,28 @@ function rCarga(){
   }).join('');
 }
 
+// Agrupa os projetos de uma pessoa (ou da gaveta Cliente) pela COLUNA do Kanban
+// em que estão — ex: 2 projetos na coluna "Homologação/Instalação" viram um
+// pill "🏷️ 2 Homologação/Instalação", colorido com a mesma cor da coluna.
+// Dinâmico: funciona para qualquer coluna existente ou criada depois (COLUNAS).
+// Só é exibido dentro do card expandido (junto da lista de projetos), não no resumo fechado.
+function _cargaEtapaCounts(projs){
+  const counts = {};
+  projs.forEach(p => { counts[p.col] = (counts[p.col]||0) + 1; });
+  return Object.entries(counts)
+    .map(([k,n]) => ({n, col: COLUNAS.find(c => c.k === Number(k))}))
+    .filter(x => x.col)
+    .sort((a,b) => b.n-a.n || a.col.l.localeCompare(b.col.l,'pt-BR'));
+}
+function _cargaEtapaPillsHtml(projs){
+  const itens = _cargaEtapaCounts(projs);
+  if(!itens.length) return '';
+  const pills = itens.map(({n,col}) =>
+    `<span class="carga-stat-pill purple" title="Coluna: ${esc(col.l)}"><span class="carga-stat-pill-dot" style="background:${col.dot}"></span>${n} ${esc(col.l)}</span>`
+  ).join('');
+  return `<div class="carga-stats-row" style="padding:10px 12px 0">${pills}</div>`;
+}
+
 function _buildCargaCardPessoa(nome, projs, max, stOpen){
   // Projetos atrasados onde a etapa atual está com a pessoa (não com cliente)
   const atrasados = projs.filter(atrasadoPorEquipe).length;
@@ -10013,6 +10054,7 @@ function _buildCargaCardPessoa(nome, projs, max, stOpen){
       ${aguard > 0 ? `<span class="carga-stat-pill gray">⏸️ ${aguard} aguardando</span>` : ''}
     </div>
     <div class="carga-body${isOpen?' open':''}" id="${uid}_body">
+      ${_cargaEtapaPillsHtml(projs)}
       <div class="carga-proj-list">
         ${projsOrdenados.map(p => _buildCargaProjCard(p, nome)).join('')}
       </div>
@@ -10062,6 +10104,7 @@ function _buildCargaCardCliente(projs, max, stOpen){
       ${aguardando > 0 ? `<span class="carga-stat-pill blue">📨 ${aguardando} aguardando retorno</span>` : ''}
     </div>
     <div class="carga-body${isOpen?' open':''}" id="${uid}_body">
+      ${_cargaEtapaPillsHtml(projs)}
       <div class="carga-proj-list">
         ${projsOrdenados.map(p => _buildCargaProjCard(p, '__cliente__')).join('')}
       </div>
@@ -10187,6 +10230,7 @@ function duplicarProjeto(id){
   novo.termino = ''; novo.pct = 0; novo.col = 0;
   novo.comentarios = [];
   novo.criadoPor = usuario; novo.editadoPor = null;
+  novo.enviadoMedicao = null; novo.medicaoFeita = false; novo.medicaoFeitaEm = null; novo.medicaoConfirmadaPor = null;
   novo.tags = orig.tags ? [...orig.tags] : [];
   novo.historico = [{usuario, acao:'duplicou', dt:dtAgora(), desc:`Duplicado de "${orig.nome}"`}];
   novo.etapas = (orig.etapas||[]).map(e => ({...e, done:false, fim:null, atrasoMotivo:null, diasCl:null}));
@@ -10206,6 +10250,8 @@ function duplicarProjeto(id){
 // Gerencie usuários em: console.firebase.google.com → Authentication → Usuários
 let fbAuth        = null;  // instância firebase.auth()
 let fbCurrentUser = null;  // usuário autenticado atual
+let _ehLideranca  = false; // lido de lideranca/{uid}; a regra real está no Firebase
+function ehLideranca(){ return _ehLideranca; }
 
 // Mapa e-mail → nome da equipe
 const EMAIL_NOMES = {
@@ -10313,9 +10359,10 @@ function nomeUsuarioAtual(){
   return localStorage.getItem('firjan_user') || 'Desconhecido';
 }
 
-// ── PERMISSÃO: só usuários com "Liderança" no nome podem apagar projetos ──
+// ── PERMISSÃO: só lideranças (nó lideranca/{uid} no Realtime Database) podem apagar projetos ──
+// A verificação real está nas regras do Firebase; aqui só controla o que a UI exibe.
 function podeApagarProjeto(){
-  return /liderança|lideranca/i.test(nomeUsuarioAtual()||'');
+  return ehLideranca();
 }
 
 // ══════════════════════════════════════════════════════════════════════════════
