@@ -785,7 +785,24 @@ body.dark .tenant-item.current{background:rgba(34,197,94,.12)}
 .coment-av{width:22px;height:22px;border-radius:50%;background:var(--blue);color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .coment-autor{font-weight:600;font-size:12px}
 .coment-dt{font-size:10.5px;color:var(--mu);margin-left:auto}
-.coment-txt{color:var(--txt);line-height:1.5}
+.coment-txt{color:var(--txt);line-height:1.5;flex:1;min-width:0;overflow-wrap:anywhere}
+.coment-body{display:flex;align-items:flex-start;gap:8px}
+.coment-acoes{display:flex;gap:2px;flex-shrink:0;margin-top:-2px}
+.coment-acao{background:none;border:none;cursor:pointer;font-size:13px;padding:3px 5px;border-radius:6px;opacity:.55;transition:opacity .15s,background .15s}
+.coment-acao:hover{opacity:1;background:var(--s1,rgba(0,0,0,.06))}
+.coment-acao.del:hover{background:rgba(239,68,68,.12)}
+.coment-edit{flex:1;display:flex;flex-direction:column;gap:6px}
+.coment-edit .coment-ta{width:100%;box-sizing:border-box}
+.coment-edit-btns{display:flex;justify-content:flex-end;gap:6px}
+.link-apoio-item{display:flex;align-items:center;gap:9px;background:var(--s2);border-radius:8px;padding:8px 12px;margin-bottom:6px;font-size:12.5px}
+.link-apoio-ic{flex-shrink:0;font-size:14px}
+.link-apoio-info{flex:1;min-width:0}
+.link-apoio-tit{color:var(--blue);font-weight:600;text-decoration:none;word-break:break-all}
+.link-apoio-tit:hover{text-decoration:underline}
+.link-apoio-meta{font-size:10.5px;color:var(--mu);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.link-apoio-form{display:grid;grid-template-columns:1fr 1.4fr auto;gap:8px;margin-top:8px;align-items:center}
+.link-apoio-form .fi{width:100%;box-sizing:border-box}
+@media(max-width:640px){.link-apoio-form{grid-template-columns:1fr}}
 .coment-input-area{display:flex;gap:8px;align-items:flex-end;margin-top:10px}
 .coment-ta{flex:1;padding:9px 12px;border:1.5px solid var(--bdr);border-radius:8px;font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;resize:none;height:64px;outline:none}
 .coment-ta:focus{border-color:var(--blue)}
@@ -4400,18 +4417,45 @@ function openDet(id){
     <tbody>${eRows}</tbody></table></div>
     <div class="coments-area">
       <hr class="dv" style="margin:18px 0 14px">
+      <div class="coments-title">🔗 Links de Apoio <span style="font-weight:400;font-size:11px;color:var(--mu)">${(p.linksApoio||[]).length} link(s)</span></div>
+      <div class="links-apoio-list">
+        ${(p.linksApoio||[]).length===0
+          ? '<div style="color:var(--mu);font-size:12px;padding:4px 0 8px">Nenhum link de apoio ainda.</div>'
+          : (p.linksApoio||[]).map((lk,i)=>`
+            <div class="link-apoio-item">
+              <span class="link-apoio-ic">🔗</span>
+              <div class="link-apoio-info">
+                <a href="${esc(lk.url)}" target="_blank" rel="noopener noreferrer" class="link-apoio-tit">${esc(lk.titulo||lk.url)}</a>
+                <div class="link-apoio-meta">${lk.titulo?`<span class="link-apoio-url">${esc(lk.url)}</span> · `:''}${esc(lk.autor||'')}${lk.dt?` · ${esc(lk.dt)}`:''}</div>
+              </div>
+              ${_podeRemoverLink(lk)?`<button class="coment-acao del" onclick="removerLinkApoio(${p.id},${i})" title="Remover link" aria-label="Remover link">🗑️</button>`:''}
+            </div>`).join('')
+        }
+      </div>
+      <div class="link-apoio-form">
+        <input class="fi" type="text" id="linkApoioTit" placeholder="Título (opcional) — ex: Pasta no Drive" maxlength="120">
+        <input class="fi" type="text" id="linkApoioUrl" placeholder="https://..." onkeydown="if(event.key==='Enter')adicionarLinkApoio(${p.id})">
+        <button class="btn br bsm" onclick="adicionarLinkApoio(${p.id})">➕ Adicionar</button>
+      </div>
+      <hr class="dv" style="margin:18px 0 14px">
       <div class="coments-title">💬 Anotações e Comentários <span style="font-weight:400;font-size:11px;color:var(--mu)">${(p.comentarios||[]).length} comentário(s)</span></div>
       <div id="comentsList">
         ${(p.comentarios||[]).length===0
           ? '<div style="color:var(--mu);font-size:12px;padding:8px 0">Nenhuma anotação ainda.</div>'
-          : (p.comentarios||[]).slice().reverse().map(cm=>`
-            <div class="coment-item">
+          : (p.comentarios||[]).map((cm,i)=>({cm,i})).reverse().map(({cm,i})=>`
+            <div class="coment-item" id="coment_${p.id}_${i}">
               <div class="coment-header">
                 <div class="coment-av">${esc(cm.autor.charAt(0).toUpperCase())}</div>
                 <span class="coment-autor">${esc(cm.autor)}</span>
-                <span class="coment-dt">${esc(cm.dt)}</span>
+                <span class="coment-dt">${esc(cm.dt)}${cm.editadoEm?` · <span title="Editado em ${esc(cm.editadoEm)}">editado</span>`:''}</span>
               </div>
-              <div class="coment-txt">${linkify(cm.txt).replace(/\n/g,'<br>')}</div>
+              <div class="coment-body">
+                <div class="coment-txt">${linkify(cm.txt).replace(/\n/g,'<br>')}</div>
+                ${_ehMeuComent(cm)?`<div class="coment-acoes">
+                  <button class="coment-acao" onclick="editarComent(${p.id},${i})" title="Editar comentário" aria-label="Editar comentário">✏️</button>
+                  <button class="coment-acao del" onclick="excluirComent(${p.id},${i})" title="Excluir comentário" aria-label="Excluir comentário">🗑️</button>
+                </div>`:''}
+              </div>
             </div>`).join('')
         }
       </div>
@@ -4456,11 +4500,114 @@ function adicionarComent(pid){
   const autor=nomeUsuarioAtual();
   const agora=new Date();
   const dt=agora.toLocaleDateString('pt-BR')+' '+agora.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
-  p.comentarios.push({autor,dt,txt});
+  const autorEmail=(fbCurrentUser?.email||localStorage.getItem('firjan_user_email')||'').toLowerCase();
+  p.comentarios.push({autor,autorEmail,dt,txt});
   fbSalvarProjeto(p);
   ta.value='';
   openDet(pid);
   showToast('💬 Comentário adicionado!');
+}
+
+function _dtAgora(){
+  const agora=new Date();
+  return agora.toLocaleDateString('pt-BR')+' '+agora.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+}
+
+// Só quem escreveu o comentário pode editar/excluir.
+// Comentários novos guardam o e-mail do autor; os antigos só têm o nome.
+function _ehMeuComent(cm){
+  if(!cm) return false;
+  const meuEmail=(fbCurrentUser?.email||localStorage.getItem('firjan_user_email')||'').toLowerCase();
+  if(cm.autorEmail) return !!meuEmail && cm.autorEmail===meuEmail;
+  return cm.autor===nomeUsuarioAtual();
+}
+
+function editarComent(pid,i){
+  const p=DB.find(x=>x.id===pid);
+  const cm=p?.comentarios?.[i];
+  if(!_ehMeuComent(cm)){showToast('⚠️ Você só pode editar seus próprios comentários');return;}
+  const body=document.querySelector(`#coment_${pid}_${i} .coment-body`);
+  if(!body) return;
+  body.innerHTML=`
+    <div class="coment-edit">
+      <textarea class="coment-ta" id="comentEditTa_${pid}_${i}"></textarea>
+      <div class="coment-edit-btns">
+        <button class="btn bg2 bsm" onclick="openDet(${pid})">Cancelar</button>
+        <button class="btn br bsm" onclick="salvarEdicaoComent(${pid},${i})">💾 Salvar</button>
+      </div>
+    </div>`;
+  const ta=document.getElementById(`comentEditTa_${pid}_${i}`);
+  ta.value=cm.txt;
+  ta.focus();
+  ta.setSelectionRange(ta.value.length,ta.value.length);
+}
+
+function salvarEdicaoComent(pid,i){
+  const p=DB.find(x=>x.id===pid);
+  const cm=p?.comentarios?.[i];
+  if(!_ehMeuComent(cm)){showToast('⚠️ Você só pode editar seus próprios comentários');return;}
+  const txt=(document.getElementById(`comentEditTa_${pid}_${i}`)?.value||'').trim();
+  if(!txt){showToast('⚠️ O comentário não pode ficar vazio');return;}
+  if(txt!==cm.txt){
+    cm.txt=txt;
+    cm.editadoEm=_dtAgora();
+    fbSalvarProjeto(p);
+    showToast('✏️ Comentário editado!');
+  }
+  openDet(pid);
+}
+
+// ── LINKS DE APOIO ──
+// Quem adicionou o link (ou a liderança) pode removê-lo.
+function _podeRemoverLink(lk){
+  if(!lk) return false;
+  if(ehLideranca()) return true;
+  const meuEmail=(fbCurrentUser?.email||localStorage.getItem('firjan_user_email')||'').toLowerCase();
+  if(lk.autorEmail) return !!meuEmail && lk.autorEmail===meuEmail;
+  return lk.autor===nomeUsuarioAtual();
+}
+
+function adicionarLinkApoio(pid){
+  const p=DB.find(x=>x.id===pid);if(!p)return;
+  const titEl=document.getElementById('linkApoioTit');
+  const urlEl=document.getElementById('linkApoioUrl');
+  let url=(urlEl?.value||'').trim();
+  const titulo=(titEl?.value||'').trim();
+  if(!url){showToast('⚠️ Informe o endereço do link');urlEl?.focus();return;}
+  if(!/^https?:\/\//i.test(url)) url='https://'+url;
+  try{ new URL(url); }catch(e){ showToast('⚠️ Link inválido');urlEl?.focus();return; }
+  if(!p.linksApoio)p.linksApoio=[];
+  p.linksApoio.push({
+    titulo, url,
+    autor:nomeUsuarioAtual(),
+    autorEmail:(fbCurrentUser?.email||localStorage.getItem('firjan_user_email')||'').toLowerCase(),
+    dt:_dtAgora()
+  });
+  fbSalvarProjeto(p);
+  openDet(pid);
+  showToast('🔗 Link adicionado!');
+}
+
+function removerLinkApoio(pid,i){
+  const p=DB.find(x=>x.id===pid);
+  const lk=p?.linksApoio?.[i];
+  if(!_podeRemoverLink(lk)){showToast('⚠️ Você só pode remover links que adicionou');return;}
+  if(!confirm(`Remover o link "${lk.titulo||lk.url}"?`)) return;
+  p.linksApoio.splice(i,1);
+  fbSalvarProjeto(p);
+  openDet(pid);
+  showToast('🗑️ Link removido!');
+}
+
+function excluirComent(pid,i){
+  const p=DB.find(x=>x.id===pid);
+  const cm=p?.comentarios?.[i];
+  if(!_ehMeuComent(cm)){showToast('⚠️ Você só pode excluir seus próprios comentários');return;}
+  if(!confirm('Excluir este comentário?')) return;
+  p.comentarios.splice(i,1);
+  fbSalvarProjeto(p);
+  openDet(pid);
+  showToast('🗑️ Comentário excluído!');
 }
 
 let _motivoPid=null, _motivoIdx=null;
@@ -6051,6 +6198,7 @@ function salvar(){
     criadoPor:editId?(projAnterior?.criadoPor||usuarioAtual):usuarioAtual,
     editadoPor:editId?usuarioAtual:(projAnterior?.editadoPor||null),
     comentarios:projAnterior?.comentarios||[],
+    linksApoio:projAnterior?.linksApoio||[],
     idCurso:projAnterior?.idCurso||'',
     prioridade:document.getElementById('fPrio')?.value||'',
     rp:document.getElementById('fRP')?.value||'',
