@@ -2124,7 +2124,7 @@ const NOMES = ['Tatiana','Ana Paula','Amanda','Gabriel','Liderança Flavia','RPC
 // Categorias de Projetos da Transpetro (campo "academia" no banco)
 const CATEGORIAS_PROJETO = ['ECorp','PQDT','PQTM'];
 
-const RECURSOS = ['Acomp pedagógico - Exerc fixação e Aval','Acompanhamento pedagógico - apostila','Acompanhamento pedagógico - PPT','Animação 2D','Animação 3D','Atualização do Game 2D','Cursos alta comp até 40 mim até 20 telas','Cursos alta comp até 60 mim até 40 telas','Cursos alta comp até 90 mim até 60 telas','Cursos baix comp até 40 mim até 20 telas','Cursos baix comp até 60 mim até 40 telas','Cursos baix comp até 90 mim até 60 telas','Cursos de alta complexidade até 20 mim','Cursos de baixa complexidade até 20 mim','Editoração das apostilas','Game 2D','Game 3D','Gestão do projeto','Manutenção mensal do projeto','Objeto interativo 2D','Objeto interativo 3D','One Page - Web Content até 30 mim','Personagem','Planejamento e Estruturação do Projeto','Plano de Identidade Visual','Plano Instrucional','Pós-produção de Vídeo até 10 mim','Pós-produção de Vídeo até 2 horas','Reprodução de apostila/ Pencard','Roteiro (Storyboard)','Vídeo Aula - edição','Vídeo Aula - gravação','Vídeo Instrucional 10 min','Vídeo Instrucional 5 mim','Vídeo Interativo','Workshop com especialistas da Transpetro'];
+const RECURSOS = ['Acomp pedagógico - Exerc fixação e Aval','Acompanhamento pedagógico - apostila','Acompanhamento pedagógico - PPT','Animação 2D','Animação 3D','Atualização do Game 2D','Cursos alta comp até 40 mim até 20 telas','Cursos alta comp até 60 mim até 40 telas','Cursos alta comp até 90 mim até 60 telas','Cursos baix comp até 40 mim até 20 telas','Cursos baix comp até 60 mim até 40 telas','Cursos baix comp até 90 mim até 60 telas','Cursos de alta complexidade até 20 mim','Cursos de baixa complexidade até 20 mim','Editoração das apostilas','Game 2D','Game 3D','Gestão do projeto','Manutenção mensal do projeto','Objeto interativo 2D','Objeto interativo 3D','One Page - Web Content até 30 mim','Personagem','Planejamento e Estruturação do Projeto','Plano Instrucional e Plano de Identidade Visual (PICV)','Pós-produção de Vídeo até 10 mim','Pós-produção de Vídeo até 2 horas','Reprodução de apostila/ Pencard','Roteiro (Storyboard)','Vídeo Aula - edição','Vídeo Aula - gravação','Vídeo Instrucional 10 min','Vídeo Instrucional 5 mim','Vídeo Interativo','Workshop com especialistas da Transpetro'];
 
 const COLUNAS = [
   {k:0,  l:'Aguardando Reunião Inicial',      dot:'#94A3B8'},
@@ -9323,7 +9323,7 @@ function _migrarEtapasWebRise(etapas){
 function normalizar(p){
   if(!p) return p;
   p.resps          = (p.resps || []).map(_migrarNome);
-  p.recursos       = p.recursos || [];
+  p.recursos       = [...new Set((p.recursos || []).map(r => (r==='Plano Instrucional'||r==='Plano de Identidade Visual') ? 'Plano Instrucional e Plano de Identidade Visual (PICV)' : r))];  // recursos unificados no PICV
   p.etapas         = (p.etapas || []).map(e => ({...e, r: _migrarNome(e.r||'')}));
   p.col            = typeof p.col === 'string' ? parseInt(p.col) : (p.col || 0);
   if(p.col === 9 || p.col === 10) p.col = 8;  // PELD/Autoria Digital foram removidas → Revisão Textual/Tradução
