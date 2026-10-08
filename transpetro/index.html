@@ -2229,7 +2229,8 @@ function debounce(fn, ms){
   return function(...args){ clearTimeout(t); t = setTimeout(()=>fn.apply(this,args), ms); };
 }
 function fd(d){if(!d)return'—';try{const[y,m,day]=d.split('-');return`${day}/${m}/${y}`}catch{return d}}
-function td(){return new Date().toISOString().split('T')[0]}
+// Data de hoje (AAAA-MM-DD) no fuso local — toISOString() usa UTC e virava o dia às 21h no Brasil
+function td(){const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
 // Converte DD,MM,AAAA → 'YYYY-MM-DD' ou '' se incompleto
 function dma2iso(d,m,a){
   const dd=parseInt(d),mm=parseInt(m),aa=parseInt(a);
@@ -6211,6 +6212,7 @@ function salvar(){
     homolog:projAnterior?.homolog||{},          // preserva dados de homologação
     homologPassou:projAnterior?.homologPassou||false,
     medicaoQuinzena:projAnterior?.medicaoQuinzena||'',
+    medicaoMes:projAnterior?.medicaoMes||'',
     historico:projAnterior?.historico||[],
     etapas,
     etapasCustomizadas: _efEtapasCustomizadas || projAnterior?.etapasCustomizadas || false,  // persiste flag
@@ -6490,7 +6492,7 @@ function exportBackupJSON(){
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    const dataStr = new Date().toISOString().slice(0,10);
+    const dataStr = td();
     a.download = `backup-firjan-ead-${dataStr}.json`;
     document.body.appendChild(a);
     a.click();
@@ -7832,7 +7834,7 @@ function _buildMedRow(p){
       </button>
       ${p.medicaoFeita
         ? `<button onclick="abrirSeletorQuinzena(${p.id})"
-             title="Alterar quinzena de medição"
+             title="Alterar mês de medição (RAMP)"
              style="padding:5px 8px;border:1.5px solid #CBD5E1;border-radius:6px;background:#F8FAFC;cursor:pointer;font-size:12px;margin-left:4px">📅</button>`
         : ''}
     </td>
@@ -7858,29 +7860,24 @@ function _buildMedTabela(projetos){
   </div>`;
 }
 
-// Gera opções de quinzena para os próximos/anteriores 12 meses
-function _opcoesQuinzena(){
-  const hoje = new Date();
+// Gera opções de mês de medição (RAMP): 3 meses à frente até 12 meses para trás, mais recente primeiro
+function _opcoesQuinzena(atual){
+  const base = _medicaoAtual();
   const opts = [];
-  for(let delta = -6; delta <= 6; delta++){
-    const d = new Date(hoje.getFullYear(), hoje.getMonth() + delta, 1);
-    const mes = _MESES_MEDICAO[d.getMonth()];
-    opts.push(mes+'01');
-    opts.push(mes+'02');
-  }
-  // Remover duplicatas mantendo ordem
-  return [...new Set(opts)];
+  for(let delta = 3; delta >= -12; delta--) opts.push(_somaMesMedicao(base, delta));
+  if(_ehChaveMedicao(atual) && !opts.includes(atual)) opts.push(atual);
+  return opts.sort((a,b)=>b.localeCompare(a));
 }
 
 function _fmtQuinzena(label){
   if(!label) return '';
-  return label.slice(0,-2) + (label.slice(-2)==='01' ? ' — 1ª Quinzena' : ' — 2ª Quinzena');
+  return _fmtMedicao(label);
 }
 
 function abrirSeletorQuinzena(pid){
   const p = DB.find(x=>x.id===pid); if(!p) return;
-  const atual = p.medicaoQuinzena || _labelMedicao(p.homolog?.dtInstalacao || p.medicaoFeitaEm || p.termino || p.enviadoMedicao) || '';
-  const opts = _opcoesQuinzena();
+  const atual = _medicaoDoProjeto(p);
+  const opts = _opcoesQuinzena(atual);
 
   // Criar modal inline
   const existing = document.getElementById('quinzenaModal');
@@ -7891,7 +7888,7 @@ function abrirSeletorQuinzena(pid){
   div.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:9999;display:flex;align-items:center;justify-content:center';
   div.innerHTML = `
     <div style="background:#fff;border-radius:14px;padding:28px;min-width:320px;box-shadow:0 8px 32px rgba(0,0,0,.18)">
-      <div style="font-size:15px;font-weight:700;margin-bottom:6px">📅 Quinzena de Medição</div>
+      <div style="font-size:15px;font-weight:700;margin-bottom:6px">📅 Mês de Medição (RAMP)</div>
       <div style="font-size:12px;color:#64748B;margin-bottom:18px">${p.nome.length>55?p.nome.slice(0,53)+'…':p.nome}</div>
       <select id="quinzenaSelect" style="width:100%;padding:9px 12px;border:1.5px solid #CBD5E1;border-radius:8px;font-size:13px;font-family:'Plus Jakarta Sans',sans-serif;background:#F8FAFC;margin-bottom:20px">
         ${opts.map(o=>`<option value="${o}" ${o===atual?'selected':''}>${_fmtQuinzena(o)}</option>`).join('')}
@@ -7911,10 +7908,10 @@ function salvarQuinzenaMedicao(pid){
   const p = DB.find(x=>x.id===pid); if(!p) return;
   const sel = document.getElementById('quinzenaSelect');
   if(!sel) return;
-  p.medicaoQuinzena = sel.value;
+  p.medicaoMes = sel.value;
   fbSalvarProjeto(p);
   document.getElementById('quinzenaModal')?.remove();
-  showToast('📅 Quinzena de medição atualizada!');
+  showToast('📅 Mês de medição atualizado!');
   rMedicao();
 }
 
@@ -8054,21 +8051,19 @@ function rMedicao(){
     .sort((a,b) => _medSortCol ? _medCmp(a,b)
                                : (b.medicaoFeitaEm||'').localeCompare(a.medicaoFeitaEm||''));
 
-  // ── Agrupar confirmados por quinzena (usa medicaoFeitaEm) ──
+  // ── Agrupar confirmados por mês de medição (RAMP) ──
   const quinzenas = {};
   confirmados.forEach(p => {
-    const label = p.medicaoQuinzena || _labelMedicao(p.homolog?.dtInstalacao || p.medicaoFeitaEm || p.termino || p.enviadoMedicao) || 'Sem data';
+    const label = _medicaoDoProjeto(p);
     if(!quinzenas[label]) quinzenas[label] = [];
     quinzenas[label].push(p);
   });
 
-  // Ordenar quinzenas cronologicamente
+  // Ordenar meses: mais recente primeiro, "Sem data" por último
   const quinzenasOrdenadas = Object.keys(quinzenas).sort((a,b) => {
     if(a==='Sem data') return 1;
     if(b==='Sem data') return -1;
-    const mi = n => _MESES_MEDICAO.indexOf(n.slice(0,-2));
-    const qi = n => parseInt(n.slice(-2));
-    return mi(a)!==mi(b) ? mi(b)-mi(a) : qi(b)-qi(a); // mais recente primeiro
+    return b.localeCompare(a);
   });
 
   // Restaurar estado das gavetas — DEFAULT: FECHADAS
@@ -8092,16 +8087,19 @@ function rMedicao(){
     </div>`;
   }
 
-  // ── Grupos por quinzena ──
+  // ── Grupos por mês de medição (RAMP) ──
+  const _medAtual = _medicaoAtual();
   quinzenasOrdenadas.forEach(label => {
     const projs = quinzenas[label];
     const gid = 'medg_'+label.replace(/\s/g,'_').replace(/[^\w]/g,'');
     const fechado = st[gid] === true ? '' : 'closed';
-    const fmtLabel = label === 'Sem data' ? '📅 Sem data de medição'
-      : label.slice(0,-2) + (label.slice(-2)==='01' ? ' — 1ª Quinzena' : ' — 2ª Quinzena');
+    const fmtLabel = label === 'Sem data' ? '📅 Sem data de medição' : _fmtMedicao(label);
+    const range = _rangeMedicao(label);
     html += `<div class="med-group ${fechado}" id="${gid}">
       <div class="med-group-hd" onclick="toggleMedGroup('${gid}')">
         <span class="med-group-title">✅ ${fmtLabel}
+          ${range?`<span style="font-weight:400;font-size:11px;color:var(--mu)">${range}</span>`:''}
+          ${label===_medAtual?'<span style="font-size:10px;font-weight:700;background:var(--green);color:#fff;border-radius:6px;padding:1px 7px">MÊS ATUAL</span>':''}
           <span class="med-group-count" style="background:#DCFCE7;color:#15803D">${projs.length}</span>
         </span>
         <span class="med-group-chev">▼</span>
@@ -8123,44 +8121,27 @@ function rMedicao(){
 // PDF — RELATORIO DE MEDICOES (exportação)
 // ─────────────────────────────────────────────────────────────────────────────
 
-// Retorna a label da quinzena vigente HOJE (ex: 'Maio02')
+// Retorna o mês de medição vigente HOJE (ex: '2026-11')
 function _quinzenaAtualPDF(){
-  return _labelMedicao(new Date().toISOString().slice(0,10));
+  return _medicaoAtual();
 }
 
-// Formata "Maio02" como "Maio - 2a Quinzena"
+// Formata "2026-11" como "RAMP 17 - Nov de 2026"
 function _fmtQuinzenaPDF(label){
   if(!label || label === 'Sem data') return 'Sem data de medicao';
-  const mes = label.slice(0,-2);
-  const q = label.slice(-2);
-  return mes + (q === '01' ? ' - 1a Quinzena' : ' - 2a Quinzena');
+  return _fmtMedicao(label);
 }
 
-// Retorna intervalo "DD/MM - DD/MM" da quinzena
+// Retorna intervalo "DD/MM/AAAA - DD/MM/AAAA" do mês de medição
 function _rangeQuinzenaPDF(label){
-  if(!label || label === 'Sem data') return '';
-  const mes = label.slice(0,-2);
-  const q   = label.slice(-2);
-  const idx = _MESES_MEDICAO.indexOf(mes);
-  if(idx < 0) return '';
-  if(q === '01'){
-    const mesAnt = idx === 0 ? 11 : idx-1;
-    return `26/${String(mesAnt+1).padStart(2,'0')} - 09/${String(idx+1).padStart(2,'0')}`;
-  }
-  return `10/${String(idx+1).padStart(2,'0')} - 25/${String(idx+1).padStart(2,'0')}`;
+  return _rangeMedicao(label);
 }
 
-// Gera ultimas N quinzenas em ordem cronologica
+// Gera os ultimos N meses de medicao em ordem cronologica
 function _gerarHistoricoQuinzenasPDF(n){
+  const atual = _quinzenaAtualPDF();
   const labels = [];
-  const hoje = new Date();
-  let mes = hoje.getMonth();
-  let qAtual = parseInt(_quinzenaAtualPDF().slice(-2));
-  for(let i = 0; i < n; i++){
-    labels.unshift(_MESES_MEDICAO[mes] + (qAtual === 1 ? '01' : '02'));
-    if(qAtual === 1){ qAtual = 2; mes--; if(mes < 0) mes = 11; }
-    else qAtual = 1;
-  }
+  for(let i = n-1; i >= 0; i--) labels.push(_somaMesMedicao(atual, -i));
   return labels;
 }
 
@@ -8226,7 +8207,7 @@ function exportPDFRelMedicao(){
     doc.setFontSize(16);
     doc.text(s('Relatorio de Medicoes'), ML, 18);
     doc.setFont('helvetica','normal'); doc.setFontSize(9);
-    doc.text(s('Cursos medidos por quinzena, com totalizacao e detalhamento'), ML, 24);
+    doc.text(s('Cursos medidos por mes (RAMP), com totalizacao e detalhamento'), ML, 24);
     doc.setFontSize(8);
     doc.text(s('Gerado em '+isoToBR(td())), PW-MR, 9, {align:'right'});
     doc.setFont('helvetica','bold'); doc.setFontSize(10);
@@ -8281,10 +8262,10 @@ function exportPDFRelMedicao(){
   const todos = activeDB().concat(cancelDB());
   const medidos = todos.filter(p => p.medicaoFeita);
 
-  // Agrupar por quinzena
+  // Agrupar por mes de medicao (RAMP) — mesma regra da aba Medicao
   const quinzenas = {};
   medidos.forEach(p => {
-    const label = p.medicaoQuinzena || _labelMedicao(p.medicaoFeitaEm) || 'Sem data';
+    const label = _medicaoDoProjeto(p);
     if(!quinzenas[label]) quinzenas[label] = [];
     quinzenas[label].push(p);
   });
@@ -8292,9 +8273,7 @@ function exportPDFRelMedicao(){
   const quinzenasOrd = Object.keys(quinzenas).sort((a,b) => {
     if(a === 'Sem data') return 1;
     if(b === 'Sem data') return -1;
-    const mi = n => _MESES_MEDICAO.indexOf(n.slice(0,-2));
-    const qi = n => parseInt(n.slice(-2));
-    return mi(a) !== mi(b) ? mi(b) - mi(a) : qi(b) - qi(a);
+    return b.localeCompare(a);
   });
 
   const totalMedidos = medidos.length;
@@ -8311,19 +8290,19 @@ function exportPDFRelMedicao(){
   const cardW = (TW - 3*cardGap) / 4;
   rcard(ML + 0*(cardW+cardGap), cardY, cardW, cardH, 'Total Medido',
         totalMedidos, 'curso'+(totalMedidos!==1?'s':'')+' registrado'+(totalMedidos!==1?'s':''), 'purple');
-  rcard(ML + 1*(cardW+cardGap), cardY, cardW, cardH, 'Quinzena Atual',
+  rcard(ML + 1*(cardW+cardGap), cardY, cardW, cardH, 'RAMP Atual',
         medAtual, _fmtQuinzenaPDF(labelAtual), 'green');
-  rcard(ML + 2*(cardW+cardGap), cardY, cardW, cardH, 'Quinzenas Ativas',
+  rcard(ML + 2*(cardW+cardGap), cardY, cardW, cardH, 'Meses Ativos',
         qtdQuinzenas, 'com medicoes registradas', 'blue');
-  rcard(ML + 3*(cardW+cardGap), cardY, cardW, cardH, 'Media por Quinzena',
+  rcard(ML + 3*(cardW+cardGap), cardY, cardW, cardH, 'Media por Mes',
         mediaPorQuinzena, 'cursos medidos em media', 'amber');
 
-  // Grafico de barras: ultimas 12 quinzenas
+  // Grafico de barras: ultimos 12 meses (RAMP)
   const graficoY = cardY + cardH + 8;
   const graficoH = 75;
   roundRect(ML, graficoY, TW, graficoH, 3, C.white, C.grayLight, 0.3);
-  drawText('Medicoes por Quinzena', ML+4, graficoY+6, {size:11, bold:true});
-  drawText('ultimas 12 quinzenas (mais antiga a esquerda) - quinzena atual destacada em verde', ML+TW-4, graficoY+6, {size:8, color:C.textMuted, align:'right'});
+  drawText('Medicoes por Mes (RAMP)', ML+4, graficoY+6, {size:11, bold:true});
+  drawText('ultimos 12 meses (mais antigo a esquerda) - mes atual destacado em verde', ML+TW-4, graficoY+6, {size:8, color:C.textMuted, align:'right'});
 
   const graficoLabels = _gerarHistoricoQuinzenasPDF(12);
   const maxVal = Math.max(...graficoLabels.map(lbl => (quinzenas[lbl]?.length || 0)), 1);
@@ -8337,11 +8316,8 @@ function exportPDFRelMedicao(){
     const ratio = n > 0 ? Math.max(n/maxVal, 0.08) : 0;
     const barH = barsAreaH * ratio;
     const x = ML + 6 + i*colW + (colW - barColW)/2;
-    const mes = lbl.slice(0,-2);
-    const q = lbl.slice(-2);
-    const mesAbrev = mes.slice(0,3);
-    const qLbl = q === '01' ? '1a Q' : '2a Q';
-    barraV(x, barsY + barsAreaH - barH, barColW, barH, C.purple, n, mesAbrev, qLbl, lbl === labelAtual);
+    const [ano, mesN] = lbl.split('-').map(Number);
+    barraV(x, barsY + barsAreaH - barH, barColW, barH, C.purple, n, 'RAMP '+_rampNum(lbl), _MESES_ABREV[mesN-1]+'/'+String(ano).slice(-2), lbl === labelAtual);
   });
 
   // ═══════════ PAGINAS SEGUINTES — DETALHAMENTO ═══════════
@@ -8354,7 +8330,7 @@ function exportPDFRelMedicao(){
     setFill(C.purpleDark); doc.rect(0,0,PW,12,'F');
     setText(C.white);
     doc.setFont('helvetica','bold'); doc.setFontSize(10);
-    doc.text(s('Relatorio de Medicoes - Detalhamento por Quinzena'), ML, 8);
+    doc.text(s('Relatorio de Medicoes - Detalhamento por Mes (RAMP)'), ML, 8);
     doc.setFontSize(8); doc.setFont('helvetica','normal');
     doc.text(s('Gerado em '+isoToBR(td())), PW-MR, 8, {align:'right'});
     yCursor = 18;
@@ -8364,8 +8340,8 @@ function exportPDFRelMedicao(){
   if(yCursor > 160){ novaPagina(); }
 
   // Titulo da secao "Detalhamento"
-  drawText('Detalhamento por Quinzena', ML, yCursor+2, {size:13, bold:true});
-  drawText('cursos medidos em cada quinzena (mais recente primeiro)', ML, yCursor+7, {size:8, color:C.textMuted});
+  drawText('Detalhamento por Mes (RAMP)', ML, yCursor+2, {size:13, bold:true});
+  drawText('cursos medidos em cada mes (mais recente primeiro)', ML, yCursor+7, {size:8, color:C.textMuted});
   yCursor += 13;
 
   quinzenasOrd.forEach((label, idx) => {
@@ -8394,16 +8370,21 @@ function exportPDFRelMedicao(){
     roundRect(iconX, iconY, iconW, 9, 1.5, eAtual ? C.green : C.purple);
     doc.setFont('helvetica','bold'); doc.setFontSize(7);
     setText(C.white);
-    const q = label === 'Sem data' ? '-' : label.slice(-2);
-    doc.text(s(q === '01' ? '1a' : q === '02' ? '2a' : '-'), iconX+iconW/2, iconY+4, {align:'center'});
-    doc.text(s('Q'), iconX+iconW/2, iconY+7.5, {align:'center'});
+    if(label === 'Sem data'){
+      doc.text('-', iconX+iconW/2, iconY+5.5, {align:'center'});
+    } else {
+      doc.setFontSize(5.5);
+      doc.text(s('RAMP'), iconX+iconW/2, iconY+3.8, {align:'center'});
+      doc.setFontSize(8);
+      doc.text(s(String(_rampNum(label))), iconX+iconW/2, iconY+7.6, {align:'center'});
+    }
 
     // Titulo + range
     let tituloTxt = _fmtQuinzenaPDF(label);
     drawText(tituloTxt, iconX+iconW+4, yCursor+5.5, {size:11, bold:true, color:C.text});
     if(eAtual){
-      // Badge "QUINZENA ATUAL"
-      const lblTxt = 'QUINZENA ATUAL';
+      // Badge "MES ATUAL"
+      const lblTxt = 'MES ATUAL';
       doc.setFont('helvetica','bold'); doc.setFontSize(7);
       const lblW = doc.getTextWidth(s(lblTxt)) + 4;
       const lblX = iconX+iconW+4+doc.getTextWidth(s(tituloTxt))+5;
@@ -8487,7 +8468,7 @@ function exportPDFRelMedicao(){
       yCursor += rowH;
     });
 
-    yCursor += 6;  // espaco entre quinzenas
+    yCursor += 6;  // espaco entre meses
   });
 
   // Se nao houver medicoes
@@ -8747,28 +8728,62 @@ function buildHomologCard(p){
   </div>`;
 }
 
-// Retorna o label da quinzena de medição para uma data ISO (ex: "Abril01", "Maio02")
-// Regra: dia 26 mês M até dia 09 mês M+1 = "MêsM+101"
-//        dia 10 mês M até dia 25 mês M   = "MêsM02"
+// ── MEDIÇÃO MENSAL (RAMP) ──
+// Cada mês de medição é identificado internamente por "AAAA-MM" e exibido como
+// "RAMP 17 - Nov de 2026". A numeração avança 1 por mês a partir da referência abaixo
+// (Dez/2026 = RAMP 18, Out/2026 = RAMP 16, e assim por diante).
+// Regra do período: dia 26 do mês anterior até dia 25 do mês (mesmo corte das antigas quinzenas).
 const _MESES_MEDICAO = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+const _MESES_ABREV   = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+const _RAMP_REF      = {ano:2026, mes:11, num:17};  // Nov/2026 = RAMP 17
+const _MED_DIA_CORTE = 25;                          // a partir do dia 26 conta para o mês seguinte
 
 function _labelMedicao(isoDate){
-  if(!isoDate) return null;
-  const [y, m, d] = isoDate.split('-').map(Number);
-  if(d >= 10 && d <= 25){
-    // Segunda quinzena do mês m
-    return _MESES_MEDICAO[m-1] + '02';
-  } else if(d >= 26){
-    // Primeira quinzena do mês seguinte (m+1)
-    const proxMes = m === 12 ? 0 : m;
-    return _MESES_MEDICAO[proxMes] + '01';
-  } else {
-    // d >= 1 && d <= 9 → primeira quinzena do mês m
-    return _MESES_MEDICAO[m-1] + '01';
-  }
+  if(!isoDate || !/^\d{4}-\d{2}-\d{2}/.test(isoDate)) return null;
+  let [y, m, d] = isoDate.slice(0,10).split('-').map(Number);
+  if(d > _MED_DIA_CORTE){ m++; if(m > 12){ m = 1; y++; } }
+  return y + '-' + String(m).padStart(2,'0');
 }
 
-// Verifica se uma data ISO pertence ao label de quinzena informado
+function _ehChaveMedicao(k){ return typeof k === 'string' && /^\d{4}-\d{2}$/.test(k); }
+
+function _rampNum(chave){
+  const [y, m] = chave.split('-').map(Number);
+  return _RAMP_REF.num + (y - _RAMP_REF.ano)*12 + (m - _RAMP_REF.mes);
+}
+
+// "2026-11" → "RAMP 17 - Nov de 2026"
+function _fmtMedicao(chave){
+  if(!_ehChaveMedicao(chave)) return 'Sem data de medição';
+  const [y, m] = chave.split('-').map(Number);
+  return `RAMP ${_rampNum(chave)} - ${_MESES_ABREV[m-1]} de ${y}`;
+}
+
+// "2026-11" → "26/10/2026 - 25/11/2026"
+function _rangeMedicao(chave){
+  if(!_ehChaveMedicao(chave)) return '';
+  const [y, m] = chave.split('-').map(Number);
+  const ya = m === 1 ? y-1 : y, ma = m === 1 ? 12 : m-1;
+  const p2 = n => String(n).padStart(2,'0');
+  return `${_MED_DIA_CORTE+1}/${p2(ma)}/${ya} - ${_MED_DIA_CORTE}/${p2(m)}/${y}`;
+}
+
+// Soma n meses a uma chave "AAAA-MM"
+function _somaMesMedicao(chave, n){
+  const [y, m] = chave.split('-').map(Number);
+  const d = new Date(y, m-1+n, 1);
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0');
+}
+
+function _medicaoAtual(){ return _labelMedicao(td()); }
+
+// Mês de medição de um projeto: escolha manual (📅) ou calculado pelas datas
+function _medicaoDoProjeto(p){
+  if(_ehChaveMedicao(p.medicaoMes)) return p.medicaoMes;
+  return _labelMedicao(p.homolog?.dtInstalacao || p.medicaoFeitaEm || p.termino || p.enviadoMedicao) || 'Sem data';
+}
+
+// Verifica se uma data ISO pertence ao mês de medição informado
 function _dataEmMedicao(isoDate, label){
   if(!isoDate || !label) return false;
   return _labelMedicao(isoDate) === label;
@@ -8789,17 +8804,11 @@ function _popularFiltrosHomolog(lista){
   const solicitantes = [...new Set(lista.map(p=>p.homolog?.solicitante).filter(Boolean))].sort();
   const enviadosPor  = [...new Set(lista.map(p=>p.homolog?.enviadaPor).filter(Boolean))].sort();
 
-  // Quinzenas: gerar a partir das datas de instalação presentes
+  // Meses de medição (RAMP): gerar a partir das datas de instalação presentes, mais recente primeiro
   const labelsSet = new Set(lista.map(p=>_labelMedicao(p.homolog?.dtInstalacao)).filter(Boolean));
-  // Ordenar cronologicamente: extrair mês e quinzena do label
-  const labelsOrdenados = [...labelsSet].sort((a,b)=>{
-    const mi = n => _MESES_MEDICAO.indexOf(n.slice(0,-2));
-    const qi = n => parseInt(n.slice(-2));
-    return mi(a)!==mi(b) ? mi(a)-mi(b) : qi(a)-qi(b);
-  });
+  const labelsOrdenados = [...labelsSet].sort((a,b)=>b.localeCompare(a));
 
-  // Label de exibição: "Abril01" → "Abril 1ª Quinzena", "Abril02" → "Abril 2ª Quinzena"
-  const fmtLabel = l => l.slice(0,-2) + (l.slice(-2)==='01' ? ' — 1ª Quinzena' : ' — 2ª Quinzena');
+  const fmtLabel = l => _fmtMedicao(l);
 
   // Multi-select Solicitante
   const ddSol = document.getElementById('msDd_homSol');
@@ -8823,7 +8832,7 @@ function _popularFiltrosHomolog(lista){
     _msUpdateBtn('homEnv');
   }
 
-  // Multi-select Medição (quinzena)
+  // Multi-select Medição (RAMP mensal)
   const ddMed = document.getElementById('msDd_homMed');
   if(ddMed){
     const sel = _msGetVals('homMed');
@@ -10269,6 +10278,7 @@ function duplicarProjeto(id){
   novo.comentarios = [];
   novo.criadoPor = usuario; novo.editadoPor = null;
   novo.enviadoMedicao = null; novo.medicaoFeita = false; novo.medicaoFeitaEm = null; novo.medicaoConfirmadaPor = null;
+  novo.medicaoMes = ''; novo.medicaoQuinzena = '';
   novo.tags = orig.tags ? [...orig.tags] : [];
   novo.historico = [{usuario, acao:'duplicou', dt:dtAgora(), desc:`Duplicado de "${orig.nome}"`}];
   novo.etapas = (orig.etapas||[]).map(e => ({...e, done:false, fim:null, atrasoMotivo:null, diasCl:null}));
