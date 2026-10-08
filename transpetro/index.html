@@ -1717,7 +1717,7 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
     <!-- HOMOLOGAÇÕES -->
     <div class="view" id="view-homologacoes">
       <div class="st" style="margin-bottom:6px">🔖 Homologações</div>
-      <div style="font-size:12.5px;color:var(--mu);margin-bottom:16px">Projetos na etapa Homologação/Instalação. Preencha os dados e acompanhe o status.</div>
+      <div style="font-size:12.5px;color:var(--mu);margin-bottom:16px">Projetos na etapa Homologação. Preencha os dados e acompanhe o status.</div>
       <div id="homologStats" style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:18px"></div>
       <!-- Filtros -->
       <div class="fbox" style="margin-bottom:18px">
@@ -2001,11 +2001,9 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
             <option value="6">Desenvolvimento</option>
             <option value="7">Validação - Desenvolvimento</option>
             <option value="8">Revisão Textual/Tradução</option>
-            <option value="9">PELD</option>
-            <option value="10">Autoria Digital</option>
-            <option value="11">Homologação/Instalação</option>
+            <option value="11">Homologação</option>
             <option value="12">Pré-Medição</option>
-            <option value="13">Upload BDOC - Files e Scorm</option>
+            <option value="13">Upload SharePoint - Arquivos</option>
             <option value="14">Projetos Concluídos</option>
           </select>
         </div>
@@ -2097,6 +2095,9 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
 // ══════════════════════════════════════════════
 const NOMES = ['Tatiana','Ana Paula','Amanda','Gabriel','Liderança Flavia','RPCI - Cristina (DI)','RPCI - Carla (DI)','RPCI - Leo (DM)','RPCI - Rafael (DM)','RPCI - Rubio (RT)','RPCI - Débora (RT)'];
 
+// Categorias de Projetos da Transpetro (campo "academia" no banco)
+const CATEGORIAS_PROJETO = ['ECorp','PQDT','PQTM'];
+
 const RECURSOS = ['Acomp pedagógico - Exerc fixação e Aval','Acompanhamento pedagógico - apostila','Acompanhamento pedagógico - PPT','Animação 2D','Animação 3D','Atualização do Game 2D','Cursos alta comp até 40 mim até 20 telas','Cursos alta comp até 60 mim até 40 telas','Cursos alta comp até 90 mim até 60 telas','Cursos baix comp até 40 mim até 20 telas','Cursos baix comp até 60 mim até 40 telas','Cursos baix comp até 90 mim até 60 telas','Cursos de alta complexidade até 20 mim','Cursos de baixa complexidade até 20 mim','Editoração das apostilas','Game 2D','Game 3D','Gestão do projeto','Manutenção mensal do projeto','Objeto interativo 2D','Objeto interativo 3D','One Page - Web Content até 30 mim','Personagem','Planejamento e Estruturação do Projeto','Plano de Identidade Visual','Plano Instrucional','Pós-produção de Vídeo até 10 mim','Pós-produção de Vídeo até 2 horas','Reprodução de apostila/ Pencard','Roteiro (Storyboard)','Vídeo Aula - edição','Vídeo Aula - gravação','Vídeo Instrucional 10 min','Vídeo Instrucional 5 mim','Vídeo Interativo','Workshop com especialistas da Transpetro'];
 
 const COLUNAS = [
@@ -2111,13 +2112,13 @@ const COLUNAS = [
   {k:8,  l:'Revisão Textual/Tradução',         dot:'#10B981'},
   {k:9,  l:'PELD',                             dot:'#14B8A6'},
   {k:10, l:'Autoria Digital',                  dot:'#F97316'},
-  {k:11, l:'Homologação/Instalação',           dot:'#84CC16'},
+  {k:11, l:'Homologação',           dot:'#84CC16'},
   {k:12, l:'Pré-Medição',                      dot:'#22C55E'},
-  {k:13, l:'Upload BDOC - Files e Scorm',      dot:'#1A8A4A'},
+  {k:13, l:'Upload SharePoint - Arquivos',      dot:'#1A8A4A'},
   {k:14, l:'Projetos Concluídos',                 dot:'#7C3AED'},
 ];
 // Colunas ocultas no Kanban (existem no sistema mas não são exibidas)
-const COLUNAS_OCULTAS = new Set([2]); // Fazer Cronograma — cronograma é automático
+const COLUNAS_OCULTAS = new Set([2, 9, 10]); // 2: Fazer Cronograma (automático) · 9: PELD e 10: Autoria Digital (não usadas na Transpetro)
 
 const ETPS_DEF = [
   {lb:'Reunião Inicial',               r:'cl'},  // Cliente
@@ -2748,10 +2749,17 @@ function rKanban(){
             const etapas = p.etapas || [];
 
             // ── BOTÃO ABRIR CARD NA ABA HOMOLOGAÇÕES ─────────────────────────
-            // Aparece para projetos que estão na coluna Homologação/Instalação.
+            // Aparece para projetos que estão na coluna Homologação.
             // Leva direto ao card correspondente na aba Homologações.
             if(p.col === 11){
               return `<button class="btn-medicao" style="background:linear-gradient(135deg,#003DA5,#0060CC)" onclick="event.stopPropagation();irParaCardHomologacao(${p.id})">🔖 Abrir na aba Homologações</button>`;
+            }
+
+            // ── BOTÃO ENVIAR PRÉ-MEDIÇÃO ─────────────────────────────────────
+            // Todo projeto na coluna Pré-Medição pode ser enviado para a fila da aba Medição,
+            // sem depender da conclusão de etapas.
+            if(p.col === 12 && !p.enviadoMedicao){
+              return `<button class="btn-medicao" onclick="event.stopPropagation();enviarMedicao(${p.id})">📐 Enviar pré-medição</button>`;
             }
 
             // ── BOTÃO MEDIÇÃO ────────────────────────────────────────────────
@@ -2789,10 +2797,8 @@ function rKanban(){
 // Preencher selects de filtro com dados dinâmicos
 function populateFiltSelects(){
   const resps=[...new Set(activeDB().flatMap(p=>p.resps||[]))].sort();
-  // Popular Academia no Kanban
-  const _ACADS_FIXAS=["CCT-FSGC", "CEEI", "CL", "COA/T&D", "EXP", "FSGC", "GL", "GPTDI", "ITD", "Local", "NTTE", "PO\u00c7OS", "PPRG", "RES & EE", "SMS", "SUB-NAV"];
-  const _acadsProj=[...new Set(activeDB().map(p=>p.academia).filter(Boolean))];
-  const _acads=[...new Set([..._ACADS_FIXAS,..._acadsProj])].sort();
+  // Categorias de Projetos (Kanban e Lista): somente as categorias da Transpetro
+  const _acads=[...CATEGORIAS_PROJETO];
 
   // ── Multi-select Academia (Kanban) ──
   const _ddKAcad = document.getElementById('msDd_kAcad');
@@ -3046,7 +3052,7 @@ function applyFilt(data,f){
   if(f.sits &&f.sits.length)  r=r.filter(p=>f.sits.includes(calcSit(p)));
   if(f.recs &&f.recs.length)  r=r.filter(p=>f.recs.some(rv=>(p.recursos||[]).includes(rv)));
   if(f.prios&&f.prios.length) r=r.filter(p=>f.prios.includes(p.prioridade));
-  if(f.acads&&f.acads.length) r=r.filter(p=>f.acads.some(a=>a==='__sem_academia__'?!p.academia:p.academia===a));
+  if(f.acads&&f.acads.length) r=r.filter(p=>f.acads.some(a=>a==='__sem_academia__'?!CATEGORIAS_PROJETO.includes(p.academia):p.academia===a));
   if(f.cols &&f.cols.length)  r=r.filter(p=>f.cols.includes(String(p.col)));
   if(f.prazos&&f.prazos.length) r=r.filter(p=>p.prazo&&f.prazos.includes(p.prazo));
   if(f.prazosEt&&f.prazosEt.length) r=r.filter(p=>(p.etapas||[]).some(e=>e.prazo&&!e.done&&f.prazosEt.includes(e.prazo)));
@@ -3165,7 +3171,7 @@ function onDrop(e,col){
   p.col=newCol;
   // auto início
   if(oldCol===0&&!p.inicio) p.inicio=td();
-  // auto concluído se Upload BDOC (col 13) ou Projetos Concluídos (col 14)
+  // auto concluído se Upload SharePoint - Arquivos (col 13) ou Projetos Concluídos (col 14)
   if(newCol===13||newCol===14){if(!p.termino)p.termino=td();p.pct=100;}
   // volta de 13/14
   if((oldCol===13||oldCol===14)&&newCol!==13&&newCol!==14){p.termino='';if(p.pct===100)p.pct=90;}
@@ -4684,7 +4690,7 @@ const TEMPLATES = {
       {lb:'Upload Arquivos',    r:'eq'},
     ],
     gatilhos: [
-      {nome:'reunião inicial',                             col:10},
+      {nome:'reunião inicial',                             col:6},   // Autoria Digital (coluna 10) não é usada na Transpetro
       {nome:'desenvolvimento',                             col:11},
       {multi:['homologação','instalação no sirh'],         col:12},
       {nome:'upload arquivos',                             col:14},
@@ -4727,7 +4733,7 @@ const TEMPLATES = {
       {nome:'validação final do picv',               col:6,  exato:true},  // → Desenvolvimento
       {nome:'entrega do review ao cliente',          col:7,  exato:true},  // → Validação - Desenvolvimento
       {nome:'validação final do review',             col:8,  exato:true},  // → Revisão Textual/Tradução
-      {nome:'revisão textual do review',             col:11, exato:true},  // → Homologação/Instalação
+      {nome:'revisão textual do review',             col:11, exato:true},  // → Homologação
       {multi:['homologação','instalação no sirh'],   col:12},              // → Pré-Medição
       {nome:'upload arquivos bdoc',                  col:14, exato:true},  // → Projetos Concluídos
     ],
@@ -4769,7 +4775,7 @@ const TEMPLATES = {
       {nome:'validação final do picv',               col:6,  exato:true},  // → Desenvolvimento
       {nome:'entrega do review ao cliente',          col:7,  exato:true},  // → Validação - Desenvolvimento
       {nome:'validação final do review',             col:8,  exato:true},  // → Revisão Textual/Tradução
-      {nome:'revisão textual do review',             col:11, exato:true},  // → Homologação/Instalação
+      {nome:'revisão textual do review',             col:11, exato:true},  // → Homologação
       {multi:['homologação','instalação no sirh'],   col:12},              // → Pré-Medição
       {nome:'upload arquivos bdoc',                  col:14, exato:true},  // → Projetos Concluídos
     ],
@@ -4811,7 +4817,7 @@ const TEMPLATES = {
       {nome:'validação final do picv',               col:6,  exato:true},  // → Desenvolvimento
       {nome:'entrega do review ao cliente',          col:7,  exato:true},  // → Validação - Desenvolvimento
       {nome:'validação final do review',             col:8,  exato:true},  // → Revisão Textual/Tradução
-      {nome:'revisão textual do review',             col:11, exato:true},  // → Homologação/Instalação
+      {nome:'revisão textual do review',             col:11, exato:true},  // → Homologação
       {multi:['homologação','instalação no sirh'],   col:12},              // → Pré-Medição
       {nome:'upload arquivos bdoc',                  col:14, exato:true},  // → Projetos Concluídos
     ],
@@ -4837,8 +4843,8 @@ const TEMPLATES = {
       {lb:'Upload BDOC',                                     r:'eq'},
     ],
     gatilhos: [
-      {nome:'reunião inicial', col:9},    // → PELD (permanece aqui durante toda a produção)
-      {nome:'validação final',  col:13},  // → Upload BDOC - Files e Scorm (última etapa antes do upload)
+      {nome:'reunião inicial', col:6},    // → Desenvolvimento (PELD não é usada na Transpetro)
+      {nome:'validação final',  col:13},  // → Upload SharePoint - Arquivos (última etapa antes do upload)
       {nome:'upload bdoc',      col:14},  // → Projetos Concluídos
     ],
     fimCol: 14,
@@ -4852,7 +4858,7 @@ const ETAPA_COL_MAP_PADRAO = [
   {nome:'validação do pi',          col:6},
   {nome:'validação di',             col:6},
   {nome:'entrega do review',        col:7},
-  {nome:'implementação de ajuste',  col:9},
+  {nome:'implementação de ajuste',  col:8},   // → Revisão Textual/Tradução (PELD não é usada na Transpetro)
   {nome:'validação final',          col:11},
   {nome:'instalação no sirh',       col:12},  // → Pré-Medição
   {nome:'upload arquivos',           col:14},
@@ -7784,18 +7790,19 @@ function confirmarMedicao(id){
     p.medicaoFeitaEm        = null;
     p.medicaoConfirmadaPor  = null;
     const ehApostilaDesm = (p.recursos||[]).includes('Produção Apostila/E-book');
-    p.col = ehApostilaDesm ? 13 : 12; // Apostila volta p/ Upload BDOC; demais p/ Pré-Medição
-    registrarHistorico(p, 'desmarcou medição', 'Medição desmarcada — retornou para Upload BDOC');
+    p.col = ehApostilaDesm ? 13 : 12; // Apostila volta p/ Upload SharePoint - Arquivos; demais p/ Pré-Medição
+    const _colVolta = colLabel(p.col);
+    registrarHistorico(p, 'desmarcou medição', 'Medição desmarcada — retornou para ' + _colVolta);
     fbSalvarProjeto(p);
     renderAll();
-    showToast('↩️ Medição desmarcada — projeto retornou para Upload BDOC.');
+    showToast('↩️ Medição desmarcada — projeto retornou para ' + _colVolta + '.');
     return;
   }
   if(!confirm(`Confirmar que a medição de "${p.nome}" foi realizada?`)) return;
   p.medicaoFeita          = true;
   p.medicaoFeitaEm        = td();
   p.medicaoConfirmadaPor  = nomeUsuarioAtual();
-  p.col = 13; // move para Upload BDOC — aguarda Upload Arquivos para concluir
+  p.col = 13; // move para Upload SharePoint - Arquivos — aguarda Upload Arquivos para concluir
   registrarHistorico(p, 'confirmou medição', `Medição confirmada por ${p.medicaoConfirmadaPor}`);
   fbSalvarProjeto(p);
   renderAll();
@@ -8941,7 +8948,7 @@ function rHomologacoes(){
     listaEl.innerHTML = `<div class="hom-empty">
       <div style="font-size:32px;margin-bottom:10px">🔖</div>
       <div style="font-weight:600;margin-bottom:6px">Nenhum projeto em Homologação ainda</div>
-      <div>Quando um projeto chegar na coluna <strong>Homologação/Instalação</strong> no Kanban, ele aparecerá aqui automaticamente.</div>
+      <div>Quando um projeto chegar na coluna <strong>Homologação</strong> no Kanban, ele aparecerá aqui automaticamente.</div>
     </div>`;
     return;
   }
@@ -9224,6 +9231,7 @@ function normalizar(p){
   p.recursos       = p.recursos || [];
   p.etapas         = (p.etapas || []).map(e => ({...e, r: _migrarNome(e.r||'')}));
   p.col            = typeof p.col === 'string' ? parseInt(p.col) : (p.col || 0);
+  if(p.col === 9 || p.col === 10) p.col = 8;  // PELD/Autoria Digital foram removidas → Revisão Textual/Tradução
   p.cancelado      = !!p.cancelado;
   p.enviadoMedicao = p.enviadoMedicao || null;
   p.medicaoFeita   = !!p.medicaoFeita;
@@ -10032,8 +10040,8 @@ function rCarga(){
 }
 
 // Agrupa os projetos de uma pessoa (ou da gaveta Cliente) pela COLUNA do Kanban
-// em que estão — ex: 2 projetos na coluna "Homologação/Instalação" viram um
-// pill "🏷️ 2 Homologação/Instalação", colorido com a mesma cor da coluna.
+// em que estão — ex: 2 projetos na coluna "Homologação" viram um
+// pill "🏷️ 2 Homologação", colorido com a mesma cor da coluna.
 // Dinâmico: funciona para qualquer coluna existente ou criada depois (COLUNAS).
 // Só é exibido dentro do card expandido (junto da lista de projetos), não no resumo fechado.
 function _cargaEtapaCounts(projs){
