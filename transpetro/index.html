@@ -1349,6 +1349,12 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
               <div class="ms-dropdown" id="msDd_kAcad"></div>
             </div>
           </div>
+          <div class="fg-sm"><label class="fl-sm">Relevância (ECorp)</label>
+            <div class="ms-wrap" id="msWrap_kRel">
+              <button class="ms-btn" id="msBtn_kRel" onclick="_msToggle('kRel')">Todas</button>
+              <div class="ms-dropdown" id="msDd_kRel"></div>
+            </div>
+          </div>
           <div class="fg-sm"><label class="fl-sm">Coluna</label>
             <div class="ms-wrap" id="msWrap_kCol">
               <button class="ms-btn" id="msBtn_kCol" onclick="_msToggle('kCol')">Todas</button>
@@ -1439,6 +1445,12 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
               <div class="ms-dropdown" id="msDd_lAcad"></div>
             </div>
           </div>
+          <div class="fg-sm"><label class="fl-sm">Relevância (ECorp)</label>
+            <div class="ms-wrap" id="msWrap_lRel">
+              <button class="ms-btn" id="msBtn_lRel" onclick="_msToggle('lRel')">Todas</button>
+              <div class="ms-dropdown" id="msDd_lRel"></div>
+            </div>
+          </div>
           <div class="fg-sm"><label class="fl-sm">Coluna</label>
             <div class="ms-wrap" id="msWrap_lCol">
               <button class="ms-btn" id="msBtn_lCol" onclick="_msToggle('lCol')">Todas</button>
@@ -1475,6 +1487,7 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
       <div class="tw"><table>
         <thead><tr>
   <th style="cursor:pointer;white-space:nowrap" onclick="toggleListSort('nome')">Projeto <span id="lSI_nome" style="font-size:10px;color:var(--mu)"></span></th>
+  <th style="cursor:pointer;white-space:nowrap;text-align:center" onclick="toggleListSort('rel')" title="Relevância ECorp (0 = mais importante)">Relevância <span id="lSI_rel" style="font-size:10px;color:var(--mu)"></span></th>
   <th style="cursor:pointer;white-space:nowrap" onclick="toggleListSort('rec')">Recursos <span id="lSI_rec" style="font-size:10px;color:var(--mu)"></span></th>
   <th style="cursor:pointer;white-space:nowrap" onclick="toggleListSort('resp')">Responsável(is) <span id="lSI_resp" style="font-size:10px;color:var(--mu)"></span></th>
   <th style="cursor:pointer;white-space:nowrap" onclick="toggleListSort('col')">Coluna <span id="lSI_col" style="font-size:10px;color:var(--mu)"></span></th>
@@ -1971,13 +1984,26 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
           </div>
           <div class="fg">
             <label class="fl" for="fAcademia">CATEGORIAS DE PROJETOS</label>
-            <select class="prio-select" id="fAcademia" aria-label="Categoria do projeto" style="width:100%">
+            <select class="prio-select" id="fAcademia" aria-label="Categoria do projeto" style="width:100%" onchange="toggleRelevancia()">
               <option value="">— Sem Categoria —</option>
               <option value="ECorp">ECorp</option>
               <option value="PQDT">PQDT</option>
               <option value="PQTM">PQTM</option>
             </select>
           </div>
+        </div>
+        <!-- Relevância: só aparece quando a categoria é ECorp (classificação do cliente, 0 a 5) -->
+        <div class="fg" id="fgRelevancia" style="display:none;max-width:260px">
+          <label class="fl" for="fRelevancia">Relevância * <span style="font-weight:400;text-transform:none;color:var(--mu)">(ECorp — 0 a 5)</span></label>
+          <select class="prio-select" id="fRelevancia" aria-label="Relevância do projeto ECorp" style="width:100%">
+            <option value="">— Selecione —</option>
+            <option value="0">0</option>
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5">5</option>
+          </select>
         </div>
         <div class="fg ff">
           <label class="fl">Tipos de Recurso — selecione um ou mais</label>
@@ -2696,6 +2722,10 @@ function rKanban(){
   const flt=applyFilt(activeDB(),getKFilts());
   const _ordPrio={urgente:0,alta:1,media:2,baixa:3};
   const _sortCards = arr => [...arr].sort((a,b)=>{
+    // 1º Relevância ECorp (0 = mais importante; sem relevância vai depois)
+    const ra=_ordRelev(a), rb=_ordRelev(b);
+    if(ra!==rb) return ra-rb;
+    // 2º Prioridade · 3º data de criação
     const pa=_ordPrio[a.prioridade]??4, pb=_ordPrio[b.prioridade]??4;
     if(pa!==pb) return pa-pb;
     return new Date(a.criado||0)-new Date(b.criado||0);
@@ -2719,6 +2749,7 @@ function rKanban(){
           <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:4px;margin-bottom:4px">
             ${recTags(p.recursos)}
             <div style="display:flex;gap:4px;align-items:center;flex-wrap:wrap">
+              ${relevanciaBadge(p)}
               ${prioBadge(p.prioridade)}
               ${prazoBadge(p.prazo,sit)}
             </div>
@@ -2811,6 +2842,18 @@ function populateFiltSelects(){
     _ddKAcad.innerHTML = _kAcadItems + _kSemAcad + '<div class="ms-sep"></div><div class="ms-clear" data-ms-clear="kAcad">✕ Limpar</div>';
     _msUpdateBtn('kAcad');
   }
+
+  // ── Multi-select Relevância ECorp (Kanban e Lista) ──
+  ['kRel','lRel'].forEach(id=>{
+    const dd=document.getElementById('msDd_'+id);
+    if(!dd) return;
+    const sel=_msGetVals(id);
+    const opt=(v,txt)=>`<label class="ms-opt"><input type="checkbox" value="${v}" onchange="_msChange('${id}')"${sel.includes(v)?' checked':''}> ${txt}</label>`;
+    dd.innerHTML=['0','1','2','3','4','5'].map(v=>opt(v,'⭐ '+v+(v==='0'?' (mais importante)':''))).join('')
+      + opt('__sem_relevancia__','— Sem relevância —')
+      + `<div class="ms-sep"></div><div class="ms-clear" data-ms-clear="${id}">✕ Limpar</div>`;
+    _msUpdateBtn(id);
+  });
 
   // Multi-select Academia (Lista)
   const _ddAcad = document.getElementById('msDd_lAcad');
@@ -2971,6 +3014,7 @@ function getKFilts(){
     resps:      _msGetVals('kResp'),
     sits:       _msGetVals('kSit'),
     acads:      _msGetVals('kAcad'),
+    rels:       _msGetVals('kRel'),
     cols:       _msGetVals('kCol'),
     prazos:     _msGetVals('kPrazo'),
     prazosEt:   _msGetVals('kPrazoEt'),
@@ -3015,10 +3059,10 @@ function _msUpdateBtn(id){
   const btn=document.getElementById('msBtn_'+id);
   if(!btn) return;
   const labels={
-    'lResp':'Todos','lSit':'Todas','lRec':'Todos','lPrio':'Todas','lAcad':'Todas','lCol':'Todas','lPrazo':'Todas','lPrazoEt':'Todas',
+    'lResp':'Todos','lSit':'Todas','lRec':'Todos','lPrio':'Todas','lAcad':'Todas','lRel':'Todas','lCol':'Todas','lPrazo':'Todas','lPrazoEt':'Todas',
     'medConf':'Todos','medResp':'Todos','medRec':'Todos','medStat':'Todos',
     'cargaResp':'Todos','cargaStat':'Todos','cargaRec':'Todos','cargaPrio':'Todas',
-    'kResp':'Todos','kSit':'Todas','kAcad':'Todas','kCol':'Todas','kPrazo':'Todas','kPrazoEt':'Todas',
+    'kResp':'Todos','kSit':'Todas','kAcad':'Todas','kRel':'Todas','kCol':'Todas','kPrazo':'Todas','kPrazoEt':'Todas',
     'aTipo':'Todos','aRespGeral':'Todos','aRespEt':'Todos',
     'homSol':'Todos','homEnv':'Todos','homMed':'Todos'
   };
@@ -3039,6 +3083,7 @@ function getLFilts(){
     recs:       _msGetVals('lRec'),
     prios:      _msGetVals('lPrio'),
     acads:      _msGetVals('lAcad'),
+    rels:       _msGetVals('lRel'),
     cols:       _msGetVals('lCol'),
     prazos:     _msGetVals('lPrazo'),
     prazosEt:   _msGetVals('lPrazoEt'),
@@ -3053,6 +3098,7 @@ function applyFilt(data,f){
   if(f.recs &&f.recs.length)  r=r.filter(p=>f.recs.some(rv=>(p.recursos||[]).includes(rv)));
   if(f.prios&&f.prios.length) r=r.filter(p=>f.prios.includes(p.prioridade));
   if(f.acads&&f.acads.length) r=r.filter(p=>f.acads.some(a=>a==='__sem_academia__'?!CATEGORIAS_PROJETO.includes(p.academia):p.academia===a));
+  if(f.rels &&f.rels.length)  r=r.filter(p=>f.rels.includes(_relevanciaTxt(p)||'__sem_relevancia__'));
   if(f.cols &&f.cols.length)  r=r.filter(p=>f.cols.includes(String(p.col)));
   if(f.prazos&&f.prazos.length) r=r.filter(p=>p.prazo&&f.prazos.includes(p.prazo));
   if(f.prazosEt&&f.prazosEt.length) r=r.filter(p=>(p.etapas||[]).some(e=>e.prazo&&!e.done&&f.prazosEt.includes(e.prazo)));
@@ -3071,7 +3117,7 @@ function _kbUpdateFades(){
 function applyKFilts(){rKanban();}
 function applyLFilts(){rList();}
 function limparKFilts(){
-  ['kResp','kSit','kAcad','kCol','kPrazo','kPrazoEt'].forEach(id=>{
+  ['kResp','kSit','kAcad','kRel','kCol','kPrazo','kPrazoEt'].forEach(id=>{
     const dd=document.getElementById('msDd_'+id);
     if(dd) dd.querySelectorAll('input[type=checkbox]').forEach(cb=>cb.checked=false);
     _msUpdateBtn(id);
@@ -3080,7 +3126,7 @@ function limparKFilts(){
   rKanban();
 }
 function limparLFilts(){
-  ['lResp','lSit','lRec','lPrio','lAcad','lCol','lPrazo','lPrazoEt'].forEach(id=>_msClear(id));
+  ['lResp','lSit','lRec','lPrio','lAcad','lRel','lCol','lPrazo','lPrazoEt'].forEach(id=>_msClear(id));
   ['lFiltDe','lFiltAte'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
   _listSortCol=''; _listSortDir=1;
   rList();
@@ -3227,8 +3273,12 @@ function rList(){
         case 'eq':      return (aeq-beq)*d;
         case 'cl':      return (acl-bcl)*d;
         case 'prog':    return ((a.pct||0)-(b.pct||0))*d;
+        case 'rel':     return (_ordRelev(a)-_ordRelev(b))*d;
       }
     }
+    // Ordem padrão: Relevância ECorp (0 primeiro) → Prioridade → Situação → Criação
+    const rA=_ordRelev(a),rB=_ordRelev(b);
+    if(rA!==rB) return rA-rB;
     const pA=_ordPrioList[a.prioridade]??4,pB=_ordPrioList[b.prioridade]??4;
     if(pA!==pB) return pA-pB;
     const sA=_ordSitList[calcSit(a)]??5,sB=_ordSitList[calcSit(b)]??5;
@@ -3236,7 +3286,7 @@ function rList(){
     return new Date(a.criado||0)-new Date(b.criado||0);
   });
   // Atualizar ícones
-  ['nome','rec','resp','col','sit','criado','inicio','prazo','termino','eq','cl','prog'].forEach(col=>{
+  ['nome','rel','rec','resp','col','sit','criado','inicio','prazo','termino','eq','cl','prog'].forEach(col=>{
     const el=document.getElementById('lSI_'+col);
     if(el) el.textContent=_lsc===col?(_lsd===1?'↑':'↓'):'⇅';
   });
@@ -3246,6 +3296,7 @@ function rList(){
     const _area=p.area?'<br><small style="color:var(--mu)">'+p.area+'</small>':'';
     return`<tr>
       <td><span style="font-weight:600;cursor:pointer" onclick="openDet(${p.id})">${esc(p.nome)}</span>${_area}${p.prioridade?'<div style="margin-top:3px">'+prioBadge(p.prioridade)+'</div>':''}</td>
+      <td style="text-align:center">${_relevanciaTxt(p)!==''?`<span class="prio-badge" style="background:rgba(0,61,165,.1);color:var(--blue)" title="Relevância ECorp (0 = mais importante)">⭐ ${_relevanciaTxt(p)}</span>`:'<span style="color:var(--mu)">—</span>'}</td>
       <td>${recTags(p.recursos)}</td>
       <td>${avList(p.resps)}</td>
       <td style="font-size:11.5px"><span style="display:inline-flex;align-items:center;gap:4px"><span style="width:6px;height:6px;border-radius:50%;background:${colDot(p.col)};flex-shrink:0;display:inline-block"></span>${colLabel(p.col)}</span></td>
@@ -4387,7 +4438,7 @@ function openDet(id){
   document.getElementById('detBody').innerHTML=`
     <div class="dl2r">
       <div>
-        ${p.idCurso?dl2('ID do Projeto',`<span style="font-weight:600;font-family:monospace">${esc(p.idCurso)}</span>`):''}${p.prioridade?dl2('Prioridade',prioBadge(p.prioridade)):''}${p.rp?dl2('RP',`<span style="font-weight:600">${esc(p.rp)}</span>`):''}${p.academia?dl2('Categoria de Projeto',`<span style="font-weight:600">${esc(p.academia)}</span>`):''}${dl2('Recursos',recTags(p.recursos))}
+        ${p.idCurso?dl2('ID do Projeto',`<span style="font-weight:600;font-family:monospace">${esc(p.idCurso)}</span>`):''}${p.prioridade?dl2('Prioridade',prioBadge(p.prioridade)):''}${p.rp?dl2('RP',`<span style="font-weight:600">${esc(p.rp)}</span>`):''}${p.academia?dl2('Categoria de Projeto',`<span style="font-weight:600">${esc(p.academia)}</span>`):''}${relevanciaBadge(p)?dl2('Relevância',relevanciaBadge(p)):''}${dl2('Recursos',recTags(p.recursos))}
         ${dl2('Coluna',`<span style="display:inline-flex;align-items:center;gap:5px"><span style="width:8px;height:8px;border-radius:50%;background:${colDot(p.col)};display:inline-block"></span>${colLabel(p.col)}</span>`)}
         ${dl2('Situação',sitBdg(p))}
         ${dl2('Mudou de escopo?', _buildEscopoHtml(p))}
@@ -6100,6 +6151,38 @@ function getEtapasDoForm(projAnterior){
 
 // ── SUGESTÃO AUTOMÁTICA DE PRAZOS POR ETAPA ──────────────────────────────────
 
+// ── RELEVÂNCIA (ECorp) ──
+// Classificação do cliente de 0 a 5, exigida apenas para projetos da categoria ECorp.
+function toggleRelevancia(){
+  const ehECorp = document.getElementById('fAcademia')?.value === 'ECorp';
+  const fg = document.getElementById('fgRelevancia');
+  if(fg) fg.style.display = ehECorp ? '' : 'none';
+}
+
+// Valor da Relevância no formulário (número 0–5) ou null se não for ECorp / não preenchida
+function _relevanciaDoForm(){
+  if(document.getElementById('fAcademia')?.value !== 'ECorp') return null;
+  const v = document.getElementById('fRelevancia')?.value;
+  return v === '' || v == null ? null : parseInt(v, 10);
+}
+
+// Relevância como texto ('0'–'5') ou '' quando não se aplica
+function _relevanciaTxt(p){
+  if(p?.academia !== 'ECorp' || p.relevancia == null || p.relevancia === '') return '';
+  return String(p.relevancia);
+}
+
+// Chave de ordenação: 0 é o mais importante; projetos sem relevância vão depois de todos (6)
+function _ordRelev(p){
+  const t = _relevanciaTxt(p);
+  return t === '' ? 6 : parseInt(t, 10);
+}
+
+function relevanciaBadge(p){
+  if(p?.academia !== 'ECorp' || p.relevancia == null || p.relevancia === '') return '';
+  return `<span class="prio-badge" style="background:rgba(0,61,165,.1);color:var(--blue)" title="Relevância ECorp (0 a 5)" aria-label="Relevância ${p.relevancia}">⭐ Relevância ${p.relevancia}</span>`;
+}
+
 function toggleIdCursoInput(){
   const tipo = document.getElementById('fIdCursoTipo')?.value;
   const inp  = document.getElementById('fIdCurso');
@@ -6115,6 +6198,8 @@ function openNew(){
   const prioEl=document.getElementById('fPrio');if(prioEl)prioEl.value='';
   const rpEl=document.getElementById('fRP');if(rpEl)rpEl.value='';
   const acadEl=document.getElementById('fAcademia');if(acadEl)acadEl.value='';
+  const relEl=document.getElementById('fRelevancia');if(relEl)relEl.value='';
+  toggleRelevancia();
   const _idTipo=document.getElementById('fIdCursoTipo');if(_idTipo)_idTipo.value='';
   const _idInp=document.getElementById('fIdCurso');if(_idInp){_idInp.value='';_idInp.style.display='none';}
   buildRecChips([]);
@@ -6144,6 +6229,8 @@ function openEdit(id){
   const _pe=document.getElementById('fPrio');if(_pe)_pe.value=p.prioridade||'';
   const _rp=document.getElementById('fRP');if(_rp)_rp.value=p.rp||'';
   const _ac=document.getElementById('fAcademia');if(_ac)_ac.value=p.academia||'';
+  const _rel=document.getElementById('fRelevancia');if(_rel)_rel.value=(p.relevancia===0||p.relevancia)?String(p.relevancia):'';
+  toggleRelevancia();
   const _idTipoE=document.getElementById('fIdCursoTipo');
   const _idInpE=document.getElementById('fIdCurso');
   if(_idTipoE&&_idInpE){
@@ -6180,6 +6267,12 @@ function salvar(){
   if(!nome){showToast('❌ Informe o nome do projeto');return;}
   const resps=getSelectedResps();
   if(!resps.length){showToast('❌ Selecione ao menos um responsável');return;}
+  if(document.getElementById('fAcademia')?.value==='ECorp' && _relevanciaDoForm()===null){
+    stab(0,document.querySelectorAll('.tab')[0]);
+    document.getElementById('fRelevancia')?.focus();
+    showToast('❌ Projetos ECorp precisam da Relevância (0 a 5)');
+    return;
+  }
 
   const projAnterior2 = editId ? DB.find(x=>x.id===editId) : null;
   const etapas = getEtapasDoForm(projAnterior2);
@@ -6210,6 +6303,7 @@ function salvar(){
     prioridade:document.getElementById('fPrio')?.value||'',
     rp:document.getElementById('fRP')?.value||'',
     academia:document.getElementById('fAcademia')?.value||'',
+    relevancia:_relevanciaDoForm(),
     tags:editId?(DB.find(x=>x.id===editId)?.tags||[]):[],
     linkBdoc:projAnterior?.linkBdoc||'',  // preserva tags existentes
     mudouEscopo:projAnterior?.mudouEscopo||'',
@@ -6622,18 +6716,18 @@ function exportXLSX(){
   const wb = XLSX.utils.book_new();
 
   // ── Aba 1: Projetos (dados básicos) ──
-  const hdrP = ['ID','Nome','Recursos','Tags','Situação','Coluna','Responsáveis','Prioridade','RP','Categoria de Projeto','Criado','Início','Prazo','Término','% Concluído','Atraso Eq (d)','Atraso Cliente (d)','Observação Prazo'];
+  const hdrP = ['ID','Nome','Recursos','Tags','Situação','Coluna','Responsáveis','Prioridade','RP','Categoria de Projeto','Relevância (ECorp)','Criado','Início','Prazo','Término','% Concluído','Atraso Eq (d)','Atraso Cliente (d)','Observação Prazo'];
   const rowsP = todos.map(p=>{
     const{eq,cl}=delInf(p);
     return [p.id, p.nome, (p.recursos||[]).join('; '), (p.tags||[]).join('; '),
       sitLabel(p), colLabel(p.col), (p.resps||[]).join('; '), p.prioridade||'',
-      p.rp||'', p.academia||'',
+      p.rp||'', p.academia||'', _relevanciaTxt(p),
       isoToBR(p.criado), isoToBR(p.inicio), isoToBR(p.prazo), isoToBR(p.termino),
       p.pct, eq, cl, p.prazObs||''];
   });
   const wsP = XLSX.utils.aoa_to_sheet([hdrP, ...rowsP]);
   // Larguras de coluna
-  wsP['!cols'] = [8,40,30,20,16,28,30,12,14,16,12,12,12,12,14,14,16,30].map(w=>({wch:w}));
+  wsP['!cols'] = [8,40,30,20,16,28,30,12,14,16,14,12,12,12,12,14,14,16,30].map(w=>({wch:w}));
   // Estilo cabeçalho (SheetJS community não suporta estilos — deixamos sem)
   XLSX.utils.book_append_sheet(wb, wsP, 'Projetos');
 
@@ -6780,6 +6874,7 @@ function exportPDFFicha(id){
     ['Prioridade',      p.prioridade ? p.prioridade.charAt(0).toUpperCase()+p.prioridade.slice(1) : '—'],
     ['RP',             p.rp||'—'],
     ['Categoria de Projeto',p.academia||'—'],
+    ...(_relevanciaTxt(p)!=='' ? [['Relevância (ECorp)', _relevanciaTxt(p)]] : []),
     ['Responsáveis',    (p.resps||[]).join(', ')||'—'],
     ['Recursos',        (p.recursos||[]).join(', ')||'—'],
     ['Data de Criação', isoToBR(p.criado)],
@@ -7749,10 +7844,10 @@ function exportPDFHomologacoes(){
 
 // ── CSV (mantido como fallback interno) ──
 function exportCSV(){
-  const hdr='ID,Nome,Recursos,Tags,Situação,Coluna,Responsáveis,RP,Categoria de Projeto,Prioridade,Criado,Início,Prazo,Término,% Concluído,Atraso Eq(d),Atraso Cl(d),Link BDOC Firjan';
+  const hdr='ID,Nome,Recursos,Tags,Situação,Coluna,Responsáveis,RP,Categoria de Projeto,Relevância (ECorp),Prioridade,Criado,Início,Prazo,Término,% Concluído,Atraso Eq(d),Atraso Cl(d)';
   const rows=activeDB().concat(cancelDB()).map(p=>{
     const{eq,cl}=delInf(p);
-    return[p.id,`"${p.nome}"`,`"${(p.recursos||[]).join('; ')}"`,`"${(p.tags||[]).join('; ')}"`,sitLabel(p),colLabel(p.col),`"${(p.resps||[]).join('; ')}"`,p.rp||'',p.academia||'',p.prioridade||'',p.criado,p.inicio||'',p.prazo||'',p.termino||'',p.pct,eq,cl,`"${p.linkBdoc||''}"`].join(',');
+    return[p.id,`"${p.nome}"`,`"${(p.recursos||[]).join('; ')}"`,`"${(p.tags||[]).join('; ')}"`,sitLabel(p),colLabel(p.col),`"${(p.resps||[]).join('; ')}"`,p.rp||'',p.academia||'',_relevanciaTxt(p),p.prioridade||'',p.criado,p.inicio||'',p.prazo||'',p.termino||'',p.pct,eq,cl].join(',');
   });
   const a=document.createElement('a');
   a.href='data:text/csv;charset=utf-8,'+encodeURIComponent('\uFEFF'+[hdr,...rows].join('\n'));
