@@ -785,17 +785,26 @@ body.dark .tenant-item.current{background:rgba(34,197,94,.12)}
 .coment-av{width:22px;height:22px;border-radius:50%;background:var(--blue);color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .coment-autor{font-weight:600;font-size:12px}
 .coment-dt{font-size:10.5px;color:var(--mu);margin-left:auto}
-.coment-txt{color:var(--txt);line-height:1.5;flex:1;min-width:0;overflow-wrap:anywhere}
+.coment-txt{color:var(--txt);line-height:1.5}
 .coment-body{display:flex;align-items:flex-start;gap:8px}
-.coment-editado{background:none;border:none;padding:0;font:inherit;color:var(--blue);text-decoration:underline dotted;cursor:pointer}
-.coment-editado:hover{text-decoration:underline}
-.coment-acoes{display:flex;gap:2px;flex-shrink:0;margin-top:-2px}
-.coment-acao{background:none;border:none;cursor:pointer;font-size:13px;padding:3px 5px;border-radius:6px;opacity:.55;transition:opacity .15s,background .15s}
-.coment-acao:hover{opacity:1;background:rgba(127,127,127,.15)}
-.coment-acao.del:hover{background:rgba(239,68,68,.12)}
-.coment-edit{flex:1;display:flex;flex-direction:column;gap:6px}
-.coment-edit .coment-ta{width:100%;box-sizing:border-box}
-.coment-edit-btns{display:flex;justify-content:flex-end;gap:6px}
+.coment-body .coment-txt{flex:1;min-width:0;word-break:break-word}
+.coment-editado{background:none;border:none;padding:0;font:inherit;color:var(--blue);cursor:pointer;text-decoration:underline;text-underline-offset:2px}
+.coment-editado:hover{opacity:.75}
+.coment-versoes{background:var(--surface);border:1px dashed var(--bdr);border-radius:7px;padding:8px 10px;margin-bottom:6px;font-size:12px}
+.coment-versoes-tit{font-size:10.5px;font-weight:700;color:var(--mu);text-transform:uppercase;letter-spacing:.4px;margin-bottom:6px}
+.coment-versao{padding:5px 0;border-top:1px solid var(--bdr)}
+.coment-versao:first-of-type{border-top:none}
+.coment-versao-dt{font-size:10.5px;color:var(--mu);margin-bottom:2px}
+.coment-versao-txt{color:var(--txt);line-height:1.45;word-break:break-word}
+.coment-actions{display:flex;gap:2px;flex-shrink:0}
+.coment-act{background:transparent;border:none;cursor:pointer;font-size:13px;padding:3px 5px;border-radius:5px;opacity:.65;transition:all .15s;line-height:1}
+.coment-act:hover{opacity:1;background:var(--bdr)}
+.coment-edit-wrap{flex:1;display:flex;flex-direction:column;gap:6px}
+.coment-edit-wrap .coment-ta{height:70px;width:100%;box-sizing:border-box}
+.coment-edit-btns{display:flex;gap:6px;justify-content:flex-end}
+/* botão remover dos Links de Apoio (mesmo estilo dos botões de comentário) */
+.coment-acao{background:transparent;border:none;cursor:pointer;font-size:13px;padding:3px 5px;border-radius:5px;opacity:.65;transition:all .15s;line-height:1}
+.coment-acao:hover{opacity:1;background:var(--bdr)}
 .link-apoio-item{display:flex;align-items:center;gap:9px;background:var(--s2);border-radius:8px;padding:8px 12px;margin-bottom:6px;font-size:12.5px}
 .link-apoio-ic{flex-shrink:0;font-size:14px}
 .link-apoio-info{flex:1;min-width:0}
@@ -4502,21 +4511,32 @@ function openDet(id){
       <div id="comentsList">
         ${(p.comentarios||[]).length===0
           ? '<div style="color:var(--mu);font-size:12px;padding:8px 0">Nenhuma anotação ainda.</div>'
-          : (p.comentarios||[]).map((cm,i)=>({cm,i})).reverse().map(({cm,i})=>`
-            <div class="coment-item" id="coment_${p.id}_${i}">
+          : (p.comentarios||[]).map((cm,idx)=>({cm,idx})).reverse().map(({cm,idx})=>{
+            const _ed=_comentEditado(cm), _vers=_versoesComent(cm);
+            return `
+            <div class="coment-item" id="coment_${p.id}_${idx}">
               <div class="coment-header">
                 <div class="coment-av">${esc(cm.autor.charAt(0).toUpperCase())}</div>
                 <span class="coment-autor">${esc(cm.autor)}</span>
-                <span class="coment-dt">${esc(cm.dt)}${cm.editadoEm?` · <button type="button" class="coment-editado" onclick="verVersoesComent(${p.id},${i})" title="Editado em ${esc(cm.editadoEm)} — clique para ver as versões anteriores">editado</button>`:''}</span>
+                <span class="coment-dt">${esc(_ed&&cm.editadoEm?cm.editadoEm:cm.dt)}${_ed?` · <button class="coment-editado" title="Postado originalmente em ${esc(cm.dt)} — ver versões anteriores" onclick="toggleVersoesComent(${p.id},${idx})">editado</button>`:''}</span>
               </div>
+              ${_ed?`<div class="coment-versoes" id="comentVers_${p.id}_${idx}" style="display:none">
+                <div class="coment-versoes-tit">🕘 Versões anteriores</div>
+                ${_vers.length
+                  ? _vers.map((v,i,arr)=>{
+                      const ate=arr[i+1]?arr[i+1].dt:(cm.editadoEm||'');
+                      return `<div class="coment-versao"><div class="coment-versao-dt">${i===0?'Postado em':'Escrita em'} ${esc(v.dt)}${ate?` · substituída em ${esc(ate)}`:''}</div><div class="coment-versao-txt">${linkify(v.txt).replace(/\n/g,'<br>')}</div></div>`;
+                    }).reverse().join('')
+                  : '<div class="coment-versao-txt" style="color:var(--mu)">Nenhuma versão anterior registrada.</div>'}
+              </div>`:''}
               <div class="coment-body">
                 <div class="coment-txt">${linkify(cm.txt).replace(/\n/g,'<br>')}</div>
-                ${_ehMeuComent(cm)?`<div class="coment-acoes">
-                  <button class="coment-acao" onclick="editarComent(${p.id},${i})" title="Editar comentário" aria-label="Editar comentário">✏️</button>
-                  <button class="coment-acao del" onclick="excluirComent(${p.id},${i})" title="Excluir comentário" aria-label="Excluir comentário">🗑️</button>
+                ${_ehMeuComent(cm)?`<div class="coment-actions">
+                  <button class="coment-act" title="Editar comentário" aria-label="Editar comentário" onclick="editarComent(${p.id},${idx})">✏️</button>
+                  <button class="coment-act" title="Excluir comentário" aria-label="Excluir comentário" onclick="excluirComent(${p.id},${idx})">🗑️</button>
                 </div>`:''}
               </div>
-            </div>`).join('')
+            </div>`;}).join('')
         }
       </div>
       <div class="coment-input-area">
@@ -4582,76 +4602,55 @@ function _ehMeuComent(cm){
   return cm.autor===nomeUsuarioAtual();
 }
 
-function editarComent(pid,i){
-  const p=DB.find(x=>x.id===pid);
-  const cm=p?.comentarios?.[i];
-  if(!_ehMeuComent(cm)){showToast('⚠️ Você só pode editar seus próprios comentários');return;}
-  const body=document.querySelector(`#coment_${pid}_${i} .coment-body`);
-  if(!body) return;
-  body.innerHTML=`
-    <div class="coment-edit">
-      <textarea class="coment-ta" id="comentEditTa_${pid}_${i}"></textarea>
-      <div class="coment-edit-btns">
-        <button class="btn bg2 bsm" onclick="openDet(${pid})">Cancelar</button>
-        <button class="btn br bsm" onclick="salvarEdicaoComent(${pid},${i})">💾 Salvar</button>
-      </div>
-    </div>`;
-  const ta=document.getElementById(`comentEditTa_${pid}_${i}`);
-  ta.value=cm.txt;
-  ta.focus();
-  ta.setSelectionRange(ta.value.length,ta.value.length);
+// Comentário editado? (formato do sistema Petrobras: cm.editado; versões antigas da Transpetro: cm.editadoEm)
+function _comentEditado(cm){ return !!(cm && (cm.editado || cm.editadoEm)); }
+
+// Versões anteriores do comentário, da mais antiga (original) para a mais recente.
+// Usa cm.versoes (mesmo formato da Petrobras) e aceita cm.historico de edições feitas antes da padronização.
+function _versoesComent(cm){
+  if(Array.isArray(cm?.versoes)) return cm.versoes;
+  if(Array.isArray(cm?.historico)) return cm.historico;
+  return [];
 }
 
-function salvarEdicaoComent(pid,i){
+function editarComent(pid,idx){
   const p=DB.find(x=>x.id===pid);
-  const cm=p?.comentarios?.[i];
-  if(!_ehMeuComent(cm)){showToast('⚠️ Você só pode editar seus próprios comentários');return;}
-  const txt=(document.getElementById(`comentEditTa_${pid}_${i}`)?.value||'').trim();
+  const cm=p?.comentarios?.[idx];
+  if(!_ehMeuComent(cm)){showToast('⚠️ Você só pode alterar os seus próprios comentários');return;}
+  const body=document.querySelector(`#coment_${pid}_${idx} .coment-body`);if(!body)return;
+  body.innerHTML=`<div class="coment-edit-wrap">
+    <textarea class="coment-ta" id="comentEdit_${pid}_${idx}"></textarea>
+    <div class="coment-edit-btns">
+      <button class="btn bg2 bsm" onclick="openDet(${pid})">Cancelar</button>
+      <button class="btn bb bsm" onclick="salvarEdicaoComent(${pid},${idx})">Salvar</button>
+    </div>
+  </div>`;
+  const ta=document.getElementById(`comentEdit_${pid}_${idx}`);
+  ta.value=cm.txt;ta.focus();
+}
+
+function salvarEdicaoComent(pid,idx){
+  const p=DB.find(x=>x.id===pid);
+  const cm=p?.comentarios?.[idx];
+  if(!_ehMeuComent(cm)){showToast('⚠️ Você só pode alterar os seus próprios comentários');return;}
+  const txt=(document.getElementById(`comentEdit_${pid}_${idx}`)?.value||'').trim();
   if(!txt){showToast('⚠️ O comentário não pode ficar vazio');return;}
   if(txt!==cm.txt){
-    // Guarda a versão que está sendo substituída (texto + quando ela foi escrita)
-    if(!Array.isArray(cm.historico)) cm.historico=[];
-    cm.historico.push({txt:cm.txt, dt:cm.editadoEm||cm.dt});
-    cm.txt=txt;
-    cm.editadoEm=_dtAgora();
+    // Guarda a versão substituída (texto + quando ela foi escrita), no mesmo formato da Petrobras
+    if(!Array.isArray(cm.versoes)) cm.versoes=[..._versoesComent(cm)];
+    delete cm.historico;
+    cm.versoes.push({txt:cm.txt,dt:cm.editadoEm||cm.dt});
+    cm.txt=txt;cm.editado=true;cm.editadoEm=_dtAgora();
     fbSalvarProjeto(p);
-    showToast('✏️ Comentário editado!');
   }
   openDet(pid);
+  showToast('✏️ Comentário atualizado!');
 }
 
-// Mostra as versões de um comentário editado (atual primeiro, depois as anteriores)
-function verVersoesComent(pid,i){
-  const p=DB.find(x=>x.id===pid);
-  const cm=p?.comentarios?.[i];
-  if(!cm) return;
-  const hist=Array.isArray(cm.historico)?cm.historico:[];
-  const total=hist.length+1;
-  const bloco=(rotulo,dt,txt,atual)=>`
-    <div style="border:1px solid var(--bdr);border-radius:8px;padding:10px 12px;margin-bottom:8px;background:${atual?'var(--s2)':'transparent'}">
-      <div style="display:flex;justify-content:space-between;gap:8px;font-size:11px;color:var(--mu);margin-bottom:5px">
-        <strong style="color:${atual?'var(--blue)':'var(--txt)'}">${rotulo}</strong><span>${esc(dt||'—')}</span>
-      </div>
-      <div style="font-size:12.5px;line-height:1.5;color:var(--txt);overflow-wrap:anywhere">${linkify(txt||'').replace(/\n/g,'<br>')}</div>
-    </div>`;
-  const anteriores=hist.map((h,k)=>({h,n:k+1})).reverse()
-    .map(({h,n})=>bloco(n===1?`Versão 1 (original)`:`Versão ${n}`,h.dt,h.txt,false)).join('');
-  document.getElementById('comentVersoesModal')?.remove();
-  const div=document.createElement('div');
-  div.id='comentVersoesModal';
-  div.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:9999;display:flex;align-items:center;justify-content:center;padding:16px';
-  div.innerHTML=`
-    <div role="dialog" aria-modal="true" aria-label="Histórico de edições" style="background:var(--surface);color:var(--txt);border-radius:14px;padding:22px;width:100%;max-width:520px;max-height:80vh;overflow:auto;box-shadow:0 8px 32px rgba(0,0,0,.18)">
-      <div style="font-size:15px;font-weight:700;margin-bottom:4px">🕘 Histórico de edições</div>
-      <div style="font-size:12px;color:var(--mu);margin-bottom:14px">Comentário de ${esc(cm.autor)} · ${total} versõ${total!==1?'es':'o'}</div>
-      ${bloco(`Versão ${total} (atual)`,cm.editadoEm||cm.dt,cm.txt,true)}
-      ${anteriores||'<div style="font-size:12px;color:var(--mu);padding:6px 2px">As versões anteriores não foram registradas — este comentário foi editado antes do histórico existir.</div>'}
-      <div style="display:flex;justify-content:flex-end;margin-top:6px">
-        <button class="btn bg2 bsm" onclick="document.getElementById('comentVersoesModal').remove()">Fechar</button>
-      </div>
-    </div>`;
-  div.addEventListener('click',e=>{if(e.target===div)div.remove();});
-  document.body.appendChild(div);
+// Clicar em "editado" abre/fecha o painel "🕘 Versões anteriores"
+function toggleVersoesComent(pid,idx){
+  const el=document.getElementById(`comentVers_${pid}_${idx}`);
+  if(el) el.style.display = el.style.display==='none' ? 'block' : 'none';
 }
 
 // ── LINKS DE APOIO ──
@@ -4699,12 +4698,12 @@ function removerLinkApoio(pid,i){
 function excluirComent(pid,i){
   const p=DB.find(x=>x.id===pid);
   const cm=p?.comentarios?.[i];
-  if(!_ehMeuComent(cm)){showToast('⚠️ Você só pode excluir seus próprios comentários');return;}
+  if(!_ehMeuComent(cm)){showToast('⚠️ Você só pode alterar os seus próprios comentários');return;}
   if(!confirm('Excluir este comentário?')) return;
   p.comentarios.splice(i,1);
   fbSalvarProjeto(p);
   openDet(pid);
-  showToast('🗑️ Comentário excluído!');
+  showToast('🗑️ Comentário excluído');
 }
 
 let _motivoPid=null, _motivoIdx=null;
