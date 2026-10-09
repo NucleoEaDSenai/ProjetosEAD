@@ -4574,12 +4574,15 @@ function openDet(id){
               <div class="coment-header">
                 <div class="coment-av">${esc(cm.autor.charAt(0).toUpperCase())}</div>
                 <span class="coment-autor">${esc(cm.autor)}</span>
-                <span class="coment-dt">${esc(cm.dt)}${cm.editado?` · <button class="coment-editado" title="${cm.editadoEm?'Editado em '+esc(cm.editadoEm)+' — ':''}ver versões anteriores" onclick="toggleVersoesComent(${p.id},${idx})">editado</button>`:''}</span>
+                <span class="coment-dt">${esc(cm.editado&&cm.editadoEm?cm.editadoEm:cm.dt)}${cm.editado?` · <button class="coment-editado" title="Postado originalmente em ${esc(cm.dt)} — ver versões anteriores" onclick="toggleVersoesComent(${p.id},${idx})">editado</button>`:''}</span>
               </div>
               ${cm.editado?`<div class="coment-versoes" id="comentVers_${p.id}_${idx}" style="display:none">
                 <div class="coment-versoes-tit">🕘 Versões anteriores</div>
                 ${(cm.versoes||[]).length
-                  ? (cm.versoes||[]).slice().reverse().map(v=>`<div class="coment-versao"><div class="coment-versao-dt">${esc(v.dt)}</div><div class="coment-versao-txt">${linkify(v.txt).replace(/\n/g,'<br>')}</div></div>`).join('')
+                  ? (cm.versoes||[]).map((v,i,arr)=>{
+                      const ate=arr[i+1]?arr[i+1].dt:(cm.editadoEm||'');
+                      return `<div class="coment-versao"><div class="coment-versao-dt">${i===0?'Postado em':'Escrita em'} ${esc(v.dt)}${ate?` · substituída em ${esc(ate)}`:''}</div><div class="coment-versao-txt">${linkify(v.txt).replace(/\n/g,'<br>')}</div></div>`;
+                    }).reverse().join('')
                   : '<div class="coment-versao-txt" style="color:var(--mu)">Nenhuma versão anterior registrada.</div>'}
               </div>`:''}
               <div class="coment-body">
