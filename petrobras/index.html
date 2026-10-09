@@ -788,6 +788,14 @@ body.dark .tenant-item.current{background:rgba(34,197,94,.12)}
 .coment-txt{color:var(--txt);line-height:1.5}
 .coment-body{display:flex;align-items:flex-start;gap:8px}
 .coment-body .coment-txt{flex:1;min-width:0;word-break:break-word}
+.coment-editado{background:none;border:none;padding:0;font:inherit;color:var(--blue);cursor:pointer;text-decoration:underline;text-underline-offset:2px}
+.coment-editado:hover{opacity:.75}
+.coment-versoes{background:var(--surface);border:1px dashed var(--bdr);border-radius:7px;padding:8px 10px;margin-bottom:6px;font-size:12px}
+.coment-versoes-tit{font-size:10.5px;font-weight:700;color:var(--mu);text-transform:uppercase;letter-spacing:.4px;margin-bottom:6px}
+.coment-versao{padding:5px 0;border-top:1px solid var(--bdr)}
+.coment-versao:first-of-type{border-top:none}
+.coment-versao-dt{font-size:10.5px;color:var(--mu);margin-bottom:2px}
+.coment-versao-txt{color:var(--txt);line-height:1.45;word-break:break-word}
 .coment-actions{display:flex;gap:2px;flex-shrink:0}
 .coment-act{background:transparent;border:none;cursor:pointer;font-size:13px;padding:3px 5px;border-radius:5px;opacity:.65;transition:all .15s;line-height:1}
 .coment-act:hover{opacity:1;background:var(--bdr)}
@@ -4566,8 +4574,14 @@ function openDet(id){
               <div class="coment-header">
                 <div class="coment-av">${esc(cm.autor.charAt(0).toUpperCase())}</div>
                 <span class="coment-autor">${esc(cm.autor)}</span>
-                <span class="coment-dt">${esc(cm.dt)}${cm.editado?' · editado':''}</span>
+                <span class="coment-dt">${esc(cm.dt)}${cm.editado?` · <button class="coment-editado" title="${cm.editadoEm?'Editado em '+esc(cm.editadoEm)+' — ':''}ver versões anteriores" onclick="toggleVersoesComent(${p.id},${idx})">editado</button>`:''}</span>
               </div>
+              ${cm.editado?`<div class="coment-versoes" id="comentVers_${p.id}_${idx}" style="display:none">
+                <div class="coment-versoes-tit">🕘 Versões anteriores</div>
+                ${(cm.versoes||[]).length
+                  ? (cm.versoes||[]).slice().reverse().map(v=>`<div class="coment-versao"><div class="coment-versao-dt">${esc(v.dt)}</div><div class="coment-versao-txt">${linkify(v.txt).replace(/\n/g,'<br>')}</div></div>`).join('')
+                  : '<div class="coment-versao-txt" style="color:var(--mu)">Nenhuma versão anterior registrada.</div>'}
+              </div>`:''}
               <div class="coment-body">
                 <div class="coment-txt">${linkify(cm.txt).replace(/\n/g,'<br>')}</div>
                 ${cm.autor===nomeUsuarioAtual()?`<div class="coment-actions">
@@ -4650,9 +4664,20 @@ function salvarEdicaoComent(pid,idx){
   const r=_comentDoUsuario(pid,idx);if(!r)return;
   const txt=(document.getElementById(`comentEdit_${pid}_${idx}`)?.value||'').trim();
   if(!txt){showToast('⚠️ O comentário não pode ficar vazio');return;}
-  if(txt!==r.cm.txt){r.cm.txt=txt;r.cm.editado=true;fbSalvarProjeto(r.p);}
+  if(txt!==r.cm.txt){
+    const agora=new Date();
+    const dtEdit=agora.toLocaleDateString('pt-BR')+' '+agora.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+    if(!r.cm.versoes) r.cm.versoes=[];
+    r.cm.versoes.push({txt:r.cm.txt,dt:r.cm.editadoEm||r.cm.dt});
+    r.cm.txt=txt;r.cm.editado=true;r.cm.editadoEm=dtEdit;
+    fbSalvarProjeto(r.p);
+  }
   openDet(pid);
   showToast('✏️ Comentário atualizado!');
+}
+function toggleVersoesComent(pid,idx){
+  const el=document.getElementById(`comentVers_${pid}_${idx}`);
+  if(el) el.style.display = el.style.display==='none' ? 'block' : 'none';
 }
 function excluirComent(pid,idx){
   const r=_comentDoUsuario(pid,idx);if(!r)return;
