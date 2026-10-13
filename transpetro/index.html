@@ -2128,7 +2128,7 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
 // ══════════════════════════════════════════════
 //  CONSTANTS
 // ══════════════════════════════════════════════
-const NOMES = ['Tatiana','Ana Paula','Amanda','Gabriel','Liderança Flavia','RPCI - Cristina (DI)','RPCI - Carla (DI)','RPCI - Leo (DM)','RPCI - Rafael (DM)','RPCI - Rubio (RT)','RPCI - Débora (RT)'];
+const NOMES = ['Tatiana','Ana Paula','Amanda','Gabriel','Pedro','Maycon','Liderança Flavia','Liderança Julia','Liderança Maria Emilia','RPCI - Cristina (DI)','RPCI - Carla (DI)','RPCI - Leo (DM)','RPCI - Rafael (DM)','RPCI - Rubio (RT)','RPCI - Débora (RT)'];
 
 // Categorias de Projetos da Transpetro (campo "academia" no banco)
 const CATEGORIAS_PROJETO = ['ECorp','PQDT','PQTM'];
@@ -8756,8 +8756,8 @@ function buildHomologCard(p){
       ${h.dtInstalacao  ? `<span class="hom-resumo-item"><span class="hom-resumo-label">Instalação:</span><span class="hom-resumo-val" style="color:var(--blue);font-weight:700">${h.dtInstalacao.split('-').reverse().join('/')}</span></span>` : ''}
     </div>` : '';
 
-  const SOLICITANTES = ['','Tatiana','Thiago','Simone','Mariana','Mateus','Julia','Liderança Julia','Liderança Maria Emilia','Liderança Marise','Fatima','Liderança Fabiana','Daniel','Claudio','Ana Paula','Patricia','RPCI - Cristina (DI)','RPCI - Fátima (DI)','RPCI - Sheila (DI)','RPCI - Carla (DI)','RPCI Dedicado - Daniela (DI)','RPCI Dedicado - Leonidas (DI)','RPCI Dedicado - Haline (DI)','RPCI - Alex (DM)','RPCI - Leo (DM)','RPCI - Rafael (DM)','RPCI Dedicado - Wagner (DM)','RPCI - Patricia (RT)','RPCI - Rubio (RT)'];
-  const ENVIADA_POR  = ['','Tatiana','Thiago','Simone','Mariana','Mateus','Julia','Liderança Julia','Liderança Maria Emilia','Liderança Marise','Fatima','Liderança Fabiana','Daniel','Claudio','Ana Paula','Patricia','RPCI - Cristina (DI)','RPCI - Fátima (DI)','RPCI - Sheila (DI)','RPCI - Carla (DI)','RPCI Dedicado - Daniela (DI)','RPCI Dedicado - Leonidas (DI)','RPCI Dedicado - Haline (DI)','RPCI - Alex (DM)','RPCI - Leo (DM)','RPCI - Rafael (DM)','RPCI Dedicado - Wagner (DM)','RPCI - Patricia (RT)','RPCI - Rubio (RT)'];
+  const SOLICITANTES = ['', ...NOMES];  // equipe da Transpetro
+  const ENVIADA_POR  = ['', ...NOMES];  // equipe da Transpetro
   const CONCLUSAO    = ['','Navegação','Avaliação'];
   const NOVO_MANUT   = ['','Novo','Manutenção'];
   const SERVICOS     = ['','Básico','Intermediário','Avançado','Encapsulamento','Manutenção','Autoria Digital','Versionamento'];
@@ -9047,12 +9047,10 @@ function rHomologacoes(){
   // Estatísticas sempre do total (sem filtro)
   const cntPendente   = listaTotal.filter(p => !(p.homolog?.dtHomolog) && !(p.homolog?.dtAutorizacao) && !(p.homolog?.dtInstalacao)).length;
   const cntHomologado = listaTotal.filter(p =>  !!(p.homolog?.dtHomolog) && !(p.homolog?.dtAutorizacao) && !(p.homolog?.dtInstalacao)).length;
-  const cntAutorizado = listaTotal.filter(p =>  !!(p.homolog?.dtAutorizacao) && !(p.homolog?.dtInstalacao)).length;
-  const cntInstalado  = listaTotal.filter(p =>  !!(p.homolog?.dtInstalacao)).length;
 
   const statsEl = document.getElementById('homologStats');
   if(statsEl){
-    statsEl.style.gridTemplateColumns = 'repeat(4,1fr)';
+    statsEl.style.gridTemplateColumns = 'repeat(2,1fr)';
     statsEl.innerHTML = `
       <div class="sc" style="border-left:4px solid var(--red)">
         <div class="sc-l">⏳ Pendentes</div><div class="sc-v">${cntPendente}</div>
@@ -9061,14 +9059,6 @@ function rHomologacoes(){
       <div class="sc" style="border-left:4px solid var(--yel)">
         <div class="sc-l">🔖 Homologados</div><div class="sc-v">${cntHomologado}</div>
         <div class="sc-s">aguardando autorização</div><div class="sc-i">🔖</div>
-      </div>
-      <div class="sc" style="border-left:4px solid var(--blue)">
-        <div class="sc-l">🔓 Autorizados</div><div class="sc-v">${cntAutorizado}</div>
-        <div class="sc-s">aguardando instalação SIRH</div><div class="sc-i">🔓</div>
-      </div>
-      <div class="sc" style="border-left:4px solid var(--green)">
-        <div class="sc-l">✅ Instalados</div><div class="sc-v">${cntInstalado}</div>
-        <div class="sc-s">com data de instalação</div><div class="sc-i">✅</div>
       </div>`;
   }
 
