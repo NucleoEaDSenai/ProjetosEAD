@@ -2030,16 +2030,14 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
         <div class="fg"><label class="fl">Data de Criação do Card</label><div style="display:flex;gap:5px;align-items:center"><input class="fi" type="number" id="fcr_d" placeholder="DD" min="1" max="31" style="width:58px"><input class="fi" type="number" id="fcr_m" placeholder="MM" min="1" max="12" style="width:58px"><input class="fi" type="number" id="fcr_a" placeholder="AAAA" min="2020" max="2099" style="width:80px"><button type="button" class="mcal-btn" title="Abrir calendário" onclick="_abrirMcalTriplet('fcr')">📅</button></div></div>
         <div class="fg"><label class="fl">Coluna Inicial</label>
           <select class="fs" id="fcol">
-            <option value="0">Aguardando Reunião Inicial</option>
-            <option value="1">Aguardando Material Base</option>
-            <option value="3">Projeto Instrucional (PI)</option>
-            <option value="4">Validação - PI</option>
-            <option value="5">Fila de Espera - Produção</option>
-            <option value="6">Desenvolvimento</option>
-            <option value="7">Validação - Desenvolvimento</option>
-            <option value="8">Revisão Textual/Tradução</option>
+            <option value="0">Diagnóstico</option>
+            <option value="1">Análise</option>
+            <option value="3">Desenho</option>
+            <option value="6">Produção</option>
+            <option value="7">Entrega</option>
+            <option value="8">Avaliação</option>
             <option value="11">Homologação</option>
-            <option value="12">Pré-Medição</option>
+            <option value="12">Pré-medição</option>
             <option value="13">Upload SharePoint - Arquivos</option>
             <option value="14">Projetos Concluídos</option>
           </select>
@@ -2138,24 +2136,27 @@ const CATEGORIAS_PROJETO = ['ECorp','PQDT','PQTM'];
 const RECURSOS = ['Acomp pedagógico - Exerc fixação e Aval','Acompanhamento pedagógico - apostila','Acompanhamento pedagógico - PPT','Animação 2D','Animação 3D','Atualização do Game 2D','Cursos alta comp até 40 mim até 20 telas','Cursos alta comp até 60 mim até 40 telas','Cursos alta comp até 90 mim até 60 telas','Cursos baix comp até 40 mim até 20 telas','Cursos baix comp até 60 mim até 40 telas','Cursos baix comp até 90 mim até 60 telas','Cursos de alta complexidade até 20 mim','Cursos de baixa complexidade até 20 mim','Editoração das apostilas','Game 2D','Game 3D','Gestão do projeto','Manutenção mensal do projeto','Objeto interativo 2D','Objeto interativo 3D','One Page - Web Content até 30 mim','Personagem','Planejamento e Estruturação do Projeto','Plano Instrucional e Plano de Identidade Visual (PICV)','Pós-produção de Vídeo até 10 mim','Pós-produção de Vídeo até 2 horas','Reprodução de apostila/ Pencard','Roteiro (Storyboard)','Vídeo Aula - edição','Vídeo Aula - gravação','Vídeo Instrucional 10 min','Vídeo Instrucional 5 mim','Vídeo Interativo','Workshop com especialistas da Transpetro'];
 
 const COLUNAS = [
-  {k:0,  l:'Aguardando Reunião Inicial',      dot:'#94A3B8'},
-  {k:1,  l:'Aguardando Material Base',         dot:'#64748B'},
-  {k:2,  l:'Fazer Cronograma',                 dot:'#6366F1'},
-  {k:3,  l:'Projeto Instrucional (PI)',         dot:'#8B5CF6'},
-  {k:4,  l:'Validação - PI',                   dot:'#EC4899'},
-  {k:5,  l:'Fila de Espera - Produção',        dot:'#F59E0B'},
-  {k:6,  l:'Desenvolvimento',                  dot:'#003DA5'},
-  {k:7,  l:'Validação - Desenvolvimento',      dot:'#0891B2'},
-  {k:8,  l:'Revisão Textual/Tradução',         dot:'#10B981'},
-  {k:9,  l:'PELD',                             dot:'#14B8A6'},
-  {k:10, l:'Autoria Digital',                  dot:'#F97316'},
+  {k:0,  l:'Diagnóstico',                     dot:'#94A3B8'},
+  {k:1,  l:'Análise',                         dot:'#64748B'},
+  {k:2,  l:'Fazer Cronograma',                 dot:'#6366F1'},  // oculta
+  {k:3,  l:'Desenho',                         dot:'#8B5CF6'},
+  {k:4,  l:'Validação - PI',                   dot:'#EC4899'},  // oculta
+  {k:5,  l:'Fila de Espera - Produção',        dot:'#F59E0B'},  // oculta
+  {k:6,  l:'Produção',                        dot:'#003DA5'},
+  {k:7,  l:'Entrega',                         dot:'#0891B2'},
+  {k:8,  l:'Avaliação',                       dot:'#10B981'},
+  {k:9,  l:'PELD',                             dot:'#14B8A6'},  // oculta
+  {k:10, l:'Autoria Digital',                  dot:'#F97316'},  // oculta
   {k:11, l:'Homologação',           dot:'#84CC16'},
-  {k:12, l:'Pré-Medição',                      dot:'#22C55E'},
+  {k:12, l:'Pré-medição',                      dot:'#22C55E'},
   {k:13, l:'Upload SharePoint - Arquivos',      dot:'#1A8A4A'},
   {k:14, l:'Projetos Concluídos',                 dot:'#7C3AED'},
 ];
-// Colunas ocultas no Kanban (existem no sistema mas não são exibidas)
-const COLUNAS_OCULTAS = new Set([2, 9, 10]); // 2: Fazer Cronograma (automático) · 9: PELD e 10: Autoria Digital (não usadas na Transpetro)
+// Colunas ocultas no Kanban: continuam existindo só para manter a numeração das demais
+// (11 Homologação, 12 Pré-medição, 13 Upload, 14 Concluídos são usadas em regras do sistema).
+const COLUNAS_OCULTAS = new Set([2, 4, 5, 9, 10]);
+// Projeto gravado em coluna oculta é levado para a coluna visível equivalente
+const COLUNA_REMAP = {2:1, 4:3, 5:6, 9:8, 10:8};
 
 const ETPS_DEF = [
   {lb:'Reunião Inicial',               r:'cl'},  // Cliente
@@ -4507,10 +4508,10 @@ function openDet(id){
         <button class="btn br bsm" onclick="adicionarLinkApoio(${p.id})">➕ Adicionar</button>
       </div>
       <hr class="dv" style="margin:18px 0 14px">
-      <div class="coments-title">💬 Anotações e Comentários <span style="font-weight:400;font-size:11px;color:var(--mu)">${(p.comentarios||[]).length} comentário(s)</span></div>
+      <div class="coments-title">💬 Comentários <span style="font-weight:400;font-size:11px;color:var(--mu)">${(p.comentarios||[]).length} comentário(s)</span></div>
       <div id="comentsList">
         ${(p.comentarios||[]).length===0
-          ? '<div style="color:var(--mu);font-size:12px;padding:8px 0">Nenhuma anotação ainda.</div>'
+          ? '<div style="color:var(--mu);font-size:12px;padding:8px 0">Nenhum comentário ainda.</div>'
           : (p.comentarios||[]).map((cm,idx)=>({cm,idx})).reverse().map(({cm,idx})=>{
             const _ed=_comentEditado(cm), _vers=_versoesComent(cm);
             return `
@@ -4540,7 +4541,7 @@ function openDet(id){
         }
       </div>
       <div class="coment-input-area">
-        <textarea class="coment-ta" id="comentTa" placeholder="Escreva uma anotação..."></textarea>
+        <textarea class="coment-ta" id="comentTa" placeholder="Escreva um comentário..."></textarea>
         <button class="btn br bsm" onclick="adicionarComent(${p.id})" style="padding:8px 14px;height:64px">💬<br>Enviar</button>
       </div>
     </div>
@@ -4942,13 +4943,13 @@ const TEMPLATES = {
 
 // Gatilhos do fluxo PADRÃO (recursos sem template específico)
 const ETAPA_COL_MAP_PADRAO = [
-  {nome:'reunião inicial',          col:1},
-  {nome:'entrega do pi ao cliente', col:4},
-  {nome:'validação do pi',          col:6},
-  {nome:'validação di',             col:6},
-  {nome:'entrega do review',        col:7},
-  {nome:'implementação de ajuste',  col:8},   // → Revisão Textual/Tradução (PELD não é usada na Transpetro)
-  {nome:'validação final',          col:11},
+  {nome:'reunião inicial',          col:1},   // → Análise
+  {nome:'entrega do pi ao cliente', col:3},   // → Desenho
+  {nome:'validação do pi',          col:6},   // → Produção
+  {nome:'validação di',             col:6},   // → Produção
+  {nome:'entrega do review',        col:7},   // → Entrega
+  {nome:'implementação de ajuste',  col:8},   // → Avaliação
+  {nome:'validação final',          col:11},  // → Homologação
   {nome:'instalação no sirh',       col:12},  // → Pré-Medição
   {nome:'upload arquivos',           col:14},
 ];
@@ -9364,7 +9365,7 @@ function normalizar(p){
   p.recursos       = [...new Set((p.recursos || []).map(r => (r==='Plano Instrucional'||r==='Plano de Identidade Visual') ? 'Plano Instrucional e Plano de Identidade Visual (PICV)' : r))];  // recursos unificados no PICV
   p.etapas         = (p.etapas || []).map(e => ({...e, r: _migrarNome(e.r||'')}));
   p.col            = typeof p.col === 'string' ? parseInt(p.col) : (p.col || 0);
-  if(p.col === 9 || p.col === 10) p.col = 8;  // PELD/Autoria Digital foram removidas → Revisão Textual/Tradução
+  if(COLUNA_REMAP[p.col] !== undefined) p.col = COLUNA_REMAP[p.col];  // colunas ocultas → coluna visível equivalente
   p.cancelado      = !!p.cancelado;
   p.enviadoMedicao = p.enviadoMedicao || null;
   p.medicaoFeita   = !!p.medicaoFeita;
