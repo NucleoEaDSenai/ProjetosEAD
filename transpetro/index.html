@@ -4942,7 +4942,7 @@ const TEMPLATES = {
   // ── TRANSPETRO ──────────────────────────────────────────────────────────────
   'Plano Instrucional e Plano de Identidade Visual (PICV)': {
     colInicial: 0,                    // nasce em Diagnóstico
-    concluiAoEnviarPreMedicao: true,  // fica em Pré-medição até clicarem "Enviar Medição" → Projetos Concluídos
+    // fica em Pré-medição até a medição ser confirmada → Projetos Concluídos (regra geral em _colComMedicao)
     etapas: [
       {lb:'Entrega do conteúdo bruto',                         r:'cl'},
       {lb:'Realização do kickoff',                             r:'eq'},
@@ -5025,13 +5025,7 @@ function calcColIdeal(p){
         if(etapaDone(etapas, g.nome, g.exato || false)) melhorCol = Math.max(melhorCol, g.col);
       }
     }
-    // Modelos que concluem ao "Enviar Medição": em Pré-medição até o envio; depois, Projetos Concluídos
-    if(tmpl.concluiAoEnviarPreMedicao){
-      return (p.enviadoMedicao && melhorCol >= 12) ? 14 : Math.min(melhorCol, 12);
-    }
-    // Bloqueia acima de col 12 até medição confirmada
-    if(!p.medicaoFeita) melhorCol = Math.min(melhorCol, 12);
-    return melhorCol;
+    return _colComMedicao(p, melhorCol);
 
   } else {
     // ── Fluxo padrão ──
@@ -5040,8 +5034,15 @@ function calcColIdeal(p){
       if(etapaDone(etapas, map.nome)) melhorCol = Math.max(melhorCol, map.col);
     }
     if(melhorCol === 0 && etapas.some(e => e.done)) return p.col;
-    return melhorCol;
+    return _colComMedicao(p, melhorCol);
   }
+}
+
+// Regra da Medição (vale para todos os projetos): o card fica em Pré-medição (12) até a
+// medição ser confirmada; depois de confirmada, vai para Projetos Concluídos (14).
+function _colComMedicao(p, col){
+  if(col < 12) return col;
+  return p.medicaoFeita ? 14 : 12;
 }
 
 function avancarColuna(p){
@@ -7941,20 +7942,10 @@ function enviarMedicao(id){
   p.medicaoFeita   = false;
   p.medicaoFeitaEm = null;
   registrarHistorico(p, 'enviou medição', 'Projeto enviado para fila de Medição');
-  // Modelos como o PICV terminam aqui: o envio da pré-medição leva o card para Projetos Concluídos
-  const _tmplEnv = getTemplate(p);
-  if(_tmplEnv?.concluiAoEnviarPreMedicao && p.col === 12){
-    p.col = 14;
-    if(!p.termino) p.termino = td();
-    registrarHistorico(p, 'moveu coluna', `Movido para "${colLabel(14)}"`);
-    fbSalvarProjeto(p);
-    renderAll();
-    showToast('📐 Medição enviada — projeto movido para Projetos Concluídos!');
-    return;
-  }
+  // O card continua em Pré-medição até a liderança confirmar a medição
   fbSalvarProjeto(p);
   renderAll();
-  showToast('📐 Projeto enviado para Medição!');
+  showToast('📐 Projeto enviado para Medição! Ele fica em Pré-medição até a medição ser confirmada.');
 }
 
 function confirmarMedicao(id){
@@ -7969,10 +7960,7 @@ function confirmarMedicao(id){
     p.medicaoFeita          = false;
     p.medicaoFeitaEm        = null;
     p.medicaoConfirmadaPor  = null;
-    const ehApostilaDesm = (p.recursos||[]).includes('Produção Apostila/E-book');
-    // PICV já está concluído desde o envio da pré-medição: não muda de coluna
-    if(!getTemplate(p)?.concluiAoEnviarPreMedicao)
-      p.col = 12; // volta para Pré-medição
+    if(p.col === 14) p.col = 12; // volta para Pré-medição
     const _colVolta = colLabel(p.col);
     registrarHistorico(p, 'desmarcou medição', 'Medição desmarcada — retornou para ' + _colVolta);
     fbSalvarProjeto(p);
@@ -7984,12 +7972,12 @@ function confirmarMedicao(id){
   p.medicaoFeita          = true;
   p.medicaoFeitaEm        = td();
   p.medicaoConfirmadaPor  = nomeUsuarioAtual();
-  const _jaConcluido = !!getTemplate(p)?.concluiAoEnviarPreMedicao;  // PICV: já está em Projetos Concluídos
-  if(!_jaConcluido){ p.col = 14; if(!p.termino) p.termino = td(); }  // medição confirmada → Projetos Concluídos
+  p.col = 14; if(!p.termino) p.termino = td();  // medição confirmada → Projetos Concluídos
   registrarHistorico(p, 'confirmou medição', `Medição confirmada por ${p.medicaoConfirmadaPor}`);
+  registrarHistorico(p, 'moveu coluna', `Movido para "${colLabel(14)}"`);
   fbSalvarProjeto(p);
   renderAll();
-  showToast(_jaConcluido ? '🎉 Medição confirmada!' : '🎉 Medição confirmada! Projeto movido para Projetos Concluídos.');
+  showToast('🎉 Medição confirmada! Projeto movido para Projetos Concluídos.');
 }
 
 function _buildMedRow(p){
