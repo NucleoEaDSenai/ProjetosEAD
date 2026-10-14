@@ -2034,11 +2034,10 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
             <option value="1">Análise</option>
             <option value="3">Desenho</option>
             <option value="6">Produção</option>
-            <option value="7">Entrega</option>
+            <option value="7">Entrega (Upload Arquivos SharePoint)</option>
             <option value="8">Avaliação</option>
             <option value="11">Homologação</option>
             <option value="12">Pré-medição</option>
-            <option value="13">Upload SharePoint - Arquivos</option>
             <option value="14">Projetos Concluídos</option>
           </select>
         </div>
@@ -2143,20 +2142,20 @@ const COLUNAS = [
   {k:4,  l:'Validação - PI',                   dot:'#EC4899'},  // oculta
   {k:5,  l:'Fila de Espera - Produção',        dot:'#F59E0B'},  // oculta
   {k:6,  l:'Produção',                        dot:'#003DA5'},
-  {k:7,  l:'Entrega',                         dot:'#0891B2'},
+  {k:7,  l:'Entrega (Upload Arquivos SharePoint)', dot:'#0891B2'},
   {k:8,  l:'Avaliação',                       dot:'#10B981'},
   {k:9,  l:'PELD',                             dot:'#14B8A6'},  // oculta
   {k:10, l:'Autoria Digital',                  dot:'#F97316'},  // oculta
   {k:11, l:'Homologação',           dot:'#84CC16'},
   {k:12, l:'Pré-medição',                      dot:'#22C55E'},
-  {k:13, l:'Upload SharePoint - Arquivos',      dot:'#1A8A4A'},
+  {k:13, l:'Upload SharePoint - Arquivos',      dot:'#1A8A4A'},  // oculta
   {k:14, l:'Projetos Concluídos',                 dot:'#7C3AED'},
 ];
 // Colunas ocultas no Kanban: continuam existindo só para manter a numeração das demais
 // (11 Homologação, 12 Pré-medição, 13 Upload, 14 Concluídos são usadas em regras do sistema).
-const COLUNAS_OCULTAS = new Set([2, 4, 5, 9, 10]);
+const COLUNAS_OCULTAS = new Set([2, 4, 5, 9, 10, 13]);
 // Projeto gravado em coluna oculta é levado para a coluna visível equivalente
-const COLUNA_REMAP = {2:1, 4:3, 5:6, 9:8, 10:8};
+const COLUNA_REMAP = {2:1, 4:3, 5:6, 9:8, 10:8, 13:14};  // 13 (Upload SharePoint) foi removida → Projetos Concluídos
 
 const ETPS_DEF = [
   {lb:'Reunião Inicial',               r:'cl'},  // Cliente
@@ -2798,11 +2797,11 @@ function rKanban(){
               return `<button class="btn-medicao" style="background:linear-gradient(135deg,#003DA5,#0060CC)" onclick="event.stopPropagation();irParaCardHomologacao(${p.id})">🔖 Abrir na aba Homologações</button>`;
             }
 
-            // ── BOTÃO ENVIAR PRÉ-MEDIÇÃO ─────────────────────────────────────
+            // ── BOTÃO ENVIAR MEDIÇÃO ──────────────────────────────────────────
             // Todo projeto na coluna Pré-Medição pode ser enviado para a fila da aba Medição,
             // sem depender da conclusão de etapas.
             if(p.col === 12 && !p.enviadoMedicao){
-              return `<button class="btn-medicao" onclick="event.stopPropagation();enviarMedicao(${p.id})">📐 Enviar pré-medição</button>`;
+              return `<button class="btn-medicao" onclick="event.stopPropagation();enviarMedicao(${p.id})">📐 Enviar Medição</button>`;
             }
 
             // ── BOTÃO MEDIÇÃO ────────────────────────────────────────────────
@@ -4934,8 +4933,33 @@ const TEMPLATES = {
     ],
     gatilhos: [
       {nome:'reunião inicial', col:6},    // → Desenvolvimento (PELD não é usada na Transpetro)
-      {nome:'validação final',  col:13},  // → Upload SharePoint - Arquivos (última etapa antes do upload)
+      {nome:'validação final',  col:12},  // → Pré-medição (coluna Upload SharePoint foi removida)
       {nome:'upload bdoc',      col:14},  // → Projetos Concluídos
+    ],
+    fimCol: 14,
+  },
+
+  // ── TRANSPETRO ──────────────────────────────────────────────────────────────
+  'Plano Instrucional e Plano de Identidade Visual (PICV)': {
+    colInicial: 0,                    // nasce em Diagnóstico
+    concluiAoEnviarPreMedicao: true,  // fica em Pré-medição até clicarem "Enviar Medição" → Projetos Concluídos
+    etapas: [
+      {lb:'Entrega do conteúdo bruto',                         r:'cl'},
+      {lb:'Realização do kickoff',                             r:'eq'},
+      {lb:'Análise do conteúdo',                               r:'eq'},
+      {lb:'Criação do PICV',                                   r:'eq'},
+      {lb:'Controle de qualidade do PICV',                     r:'eq'},
+      {lb:'Aplicação de ajustes no PICV',                      r:'eq'},
+      {lb:'Validação 1 do PICV pelo cliente',                  r:'cl'},
+      {lb:'Aplicação de ajustes no PICV pós-validação 1',      r:'eq'},
+      {lb:'Validação 2 do PICV pelo cliente',                  r:'cl'},
+      {lb:'Aplicação de ajustes no PICV pós-validação 2',      r:'eq'},
+      {lb:'Disponibilização do PICV em PPT/PDF para o cliente', r:'eq'},
+    ],
+    gatilhos: [
+      {multi:['entrega do conteúdo bruto','realização do kickoff'], col:1},  // → Análise
+      {todasExceto:['disponibilização do picv'],                     col:7},  // todas as anteriores concluídas → Entrega
+      {nome:'disponibilização do picv',                              col:12}, // → Pré-medição
     ],
     fimCol: 14,
   },
@@ -4986,13 +5010,24 @@ function calcColIdeal(p){
     // ── Template específico ──
     let melhorCol = tmpl.colInicial;
     for(const g of tmpl.gatilhos){
-      if(g.multi){
+      if(g.todas){
+        // todas as etapas do projeto concluídas
+        if(etapas.every(e => e.done)) melhorCol = Math.max(melhorCol, g.col);
+      } else if(g.todasExceto){
+        // todas as etapas concluídas, ignorando as que contêm algum dos fragmentos informados
+        const resto = etapas.filter(e => !g.todasExceto.some(f => (e.lb||'').toLowerCase().includes(f)));
+        if(resto.length && resto.every(e => e.done)) melhorCol = Math.max(melhorCol, g.col);
+      } else if(g.multi){
         // multi sempre usa match por fragmento (contains)
         const todosDone = g.multi.every(frag => etapaDone(etapas, frag, false));
         if(todosDone) melhorCol = Math.max(melhorCol, g.col);
       } else {
         if(etapaDone(etapas, g.nome, g.exato || false)) melhorCol = Math.max(melhorCol, g.col);
       }
+    }
+    // Modelos que concluem ao "Enviar Medição": em Pré-medição até o envio; depois, Projetos Concluídos
+    if(tmpl.concluiAoEnviarPreMedicao){
+      return (p.enviadoMedicao && melhorCol >= 12) ? 14 : Math.min(melhorCol, 12);
     }
     // Bloqueia acima de col 12 até medição confirmada
     if(!p.medicaoFeita) melhorCol = Math.min(melhorCol, 12);
@@ -7906,6 +7941,17 @@ function enviarMedicao(id){
   p.medicaoFeita   = false;
   p.medicaoFeitaEm = null;
   registrarHistorico(p, 'enviou medição', 'Projeto enviado para fila de Medição');
+  // Modelos como o PICV terminam aqui: o envio da pré-medição leva o card para Projetos Concluídos
+  const _tmplEnv = getTemplate(p);
+  if(_tmplEnv?.concluiAoEnviarPreMedicao && p.col === 12){
+    p.col = 14;
+    if(!p.termino) p.termino = td();
+    registrarHistorico(p, 'moveu coluna', `Movido para "${colLabel(14)}"`);
+    fbSalvarProjeto(p);
+    renderAll();
+    showToast('📐 Medição enviada — projeto movido para Projetos Concluídos!');
+    return;
+  }
   fbSalvarProjeto(p);
   renderAll();
   showToast('📐 Projeto enviado para Medição!');
@@ -7924,7 +7970,9 @@ function confirmarMedicao(id){
     p.medicaoFeitaEm        = null;
     p.medicaoConfirmadaPor  = null;
     const ehApostilaDesm = (p.recursos||[]).includes('Produção Apostila/E-book');
-    p.col = ehApostilaDesm ? 13 : 12; // Apostila volta p/ Upload SharePoint - Arquivos; demais p/ Pré-Medição
+    // PICV já está concluído desde o envio da pré-medição: não muda de coluna
+    if(!getTemplate(p)?.concluiAoEnviarPreMedicao)
+      p.col = 12; // volta para Pré-medição
     const _colVolta = colLabel(p.col);
     registrarHistorico(p, 'desmarcou medição', 'Medição desmarcada — retornou para ' + _colVolta);
     fbSalvarProjeto(p);
@@ -7936,11 +7984,12 @@ function confirmarMedicao(id){
   p.medicaoFeita          = true;
   p.medicaoFeitaEm        = td();
   p.medicaoConfirmadaPor  = nomeUsuarioAtual();
-  p.col = 13; // move para Upload SharePoint - Arquivos — aguarda Upload Arquivos para concluir
+  const _jaConcluido = !!getTemplate(p)?.concluiAoEnviarPreMedicao;  // PICV: já está em Projetos Concluídos
+  if(!_jaConcluido){ p.col = 14; if(!p.termino) p.termino = td(); }  // medição confirmada → Projetos Concluídos
   registrarHistorico(p, 'confirmou medição', `Medição confirmada por ${p.medicaoConfirmadaPor}`);
   fbSalvarProjeto(p);
   renderAll();
-  showToast('🎉 Medição confirmada! Faça o upload dos arquivos para concluir.');
+  showToast(_jaConcluido ? '🎉 Medição confirmada!' : '🎉 Medição confirmada! Projeto movido para Projetos Concluídos.');
 }
 
 function _buildMedRow(p){
