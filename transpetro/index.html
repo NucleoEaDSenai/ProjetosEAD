@@ -153,10 +153,11 @@ tr:hover td{background:#FAFAF9}
 .kc-t{font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:8px;text-transform:uppercase;letter-spacing:.5px;display:flex;align-items:center;gap:5px;line-height:1.3}
 .kc-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
 .kc-n{background:var(--bdr);color:var(--mu);font-size:10px;font-weight:700;padding:1px 6px;border-radius:12px;flex-shrink:0}
-.kcard{background:#fff;border-radius:8px;padding:10px;margin-bottom:8px;border:1px solid var(--bdr);cursor:grab;transition:all .18s;box-shadow:var(--sh)}
+.kcard{background:#fff;border-radius:8px;padding:10px;margin-bottom:8px;border:1px solid var(--bdr);cursor:grab;transition:all .18s;box-shadow:var(--sh);min-width:0;overflow:hidden}
 .kcard:hover{transform:translateY(-2px);box-shadow:0 6px 18px rgba(0,0,0,.09)}
 .kcard.dragging{opacity:.3;transform:rotate(2deg) scale(.96);pointer-events:none}
-.kcard-t{font-weight:600;font-size:11.5px;margin:5px 0 6px;line-height:1.35}
+.kcard-t{font-weight:600;font-size:11.5px;margin:5px 0 6px;line-height:1.35;overflow-wrap:anywhere;word-break:break-word;hyphens:auto}
+.kcard-t:first-of-type{margin-top:0}
 .kdates{font-size:10px;color:var(--mu);display:flex;flex-direction:column;gap:2px;margin-bottom:6px}
 .kdates .ov{color:var(--red);font-weight:700}
 .kdates .wc{color:var(--org);font-weight:700}
@@ -583,7 +584,7 @@ tr.canc-row td{opacity:.55}
 .rec-chip{display:inline-flex;align-items:center;gap:3px;padding:4px 10px;border-radius:20px;font-size:12px;font-weight:500;border:1px solid var(--bdr);background:var(--s2);cursor:pointer;transition:all .15s;user-select:none;line-height:1.2}
 .rec-chip.sel{background:var(--blue);color:#fff;border-color:var(--blue)}
 /* TAG recursos */
-.rec-tag{display:inline-block;padding:1px 6px;border-radius:4px;font-size:10px;font-weight:600;background:#E0F2FE;color:#075985;margin:1px}
+.rec-tag{display:inline-block;padding:1px 6px;border-radius:4px;font-size:10px;font-weight:600;background:#E0F2FE;color:#075985;margin:1px;max-width:100%;white-space:normal;overflow-wrap:anywhere;vertical-align:top}
 @media(max-width:1300px){.sts{grid-template-columns:repeat(3,1fr)}.kg{grid-template-columns:1fr 1fr}}
 /* FIREBASE STATUS */
 .fb-bar{position:fixed;top:0;left:0;right:0;height:3px;background:var(--bdr);z-index:9999}
@@ -2035,7 +2036,6 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
             <option value="3">Desenho</option>
             <option value="6">Produção</option>
             <option value="7">Entrega (Upload Arquivos SharePoint)</option>
-            <option value="8">Avaliação</option>
             <option value="11">Homologação</option>
             <option value="12">Pré-medição</option>
             <option value="14">Projetos Concluídos</option>
@@ -2196,7 +2196,7 @@ const COLUNAS = [
   {k:5,  l:'Fila de Espera - Produção',        dot:'#F59E0B'},  // oculta
   {k:6,  l:'Produção',                        dot:'#003DA5'},
   {k:7,  l:'Entrega (Upload Arquivos SharePoint)', dot:'#0891B2'},
-  {k:8,  l:'Avaliação',                       dot:'#10B981'},
+  {k:8,  l:'Avaliação',                       dot:'#10B981'},  // oculta
   {k:9,  l:'PELD',                             dot:'#14B8A6'},  // oculta
   {k:10, l:'Autoria Digital',                  dot:'#F97316'},  // oculta
   {k:11, l:'Homologação',           dot:'#84CC16'},
@@ -2206,9 +2206,9 @@ const COLUNAS = [
 ];
 // Colunas ocultas no Kanban: continuam existindo só para manter a numeração das demais
 // (11 Homologação, 12 Pré-medição, 13 Upload, 14 Concluídos são usadas em regras do sistema).
-const COLUNAS_OCULTAS = new Set([2, 4, 5, 9, 10, 13]);
+const COLUNAS_OCULTAS = new Set([2, 4, 5, 8, 9, 10, 13]);
 // Projeto gravado em coluna oculta é levado para a coluna visível equivalente
-const COLUNA_REMAP = {2:1, 4:3, 5:6, 9:8, 10:8, 13:14};  // 13 (Upload SharePoint) foi removida → Projetos Concluídos
+const COLUNA_REMAP = {2:1, 4:3, 5:6, 8:7, 9:7, 10:7, 13:14};  // 8 (Avaliação) → Entrega · 13 (Upload SharePoint) → Projetos Concluídos
 
 const ETPS_DEF = [
   {lb:'Reunião Inicial',               r:'cl'},  // Cliente
@@ -2810,21 +2810,15 @@ function rKanban(){
           aria-label="${esc(p.nome)}${p.prioridade?' — '+PRIO_MAP[p.prioridade]?.label.replace(/./u,'').trim():''}"
           onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openDet(${p.id})}"
           ondragstart="onDragStart(event,${p.id})" ondragend="onDragEnd()" onclick="cardClick(event,${p.id})">
-          <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:4px;margin-bottom:4px">
-            ${recTags(p.recursos)}
-            <div style="display:flex;gap:4px;align-items:center;flex-wrap:wrap">
-              ${relevanciaBadge(p)}
-              ${prioBadge(p.prioridade)}
-              ${prazoBadge(p.prazo,sit)}
-            </div>
-          </div>
+          <!-- Ordem: 1) nome · 2) relevância e urgência · 3) recursos -->
           <div class="kcard-t">${esc(p.nome)}</div>
-          <div style="font-size:10px;color:var(--mu);margin-bottom:2px">
-            ${p.idCurso
-              ? `<span style="background:var(--s2);border:1px solid var(--bdr);border-radius:4px;padding:1px 5px;font-weight:600">${esc(p.idCurso)}</span>`
-              : '<span style="color:#CBD5E1;font-style:italic">Sem ID</span>'
-            }
-          </div>
+          ${(relevanciaBadge(p)||prioBadge(p.prioridade)||prazoBadge(p.prazo,sit))?`<div style="display:flex;gap:4px;align-items:center;flex-wrap:wrap;margin-bottom:4px">
+            ${relevanciaBadge(p)}
+            ${prioBadge(p.prioridade)}
+            ${prazoBadge(p.prazo,sit)}
+          </div>`:''}
+          <div style="margin-bottom:4px">${recTags(p.recursos)}</div>
+          ${p.idCurso?`<div style="font-size:10px;color:var(--mu);margin-bottom:2px"><span style="background:var(--s2);border:1px solid var(--bdr);border-radius:4px;padding:1px 5px;font-weight:600">${esc(p.idCurso)}</span></div>`:''}
           <div class="kdates">
             <span>Criado: ${fd(p.criado)}</span>
             ${p.inicio?`<span>Início ${fd(p.inicio)}</span>`:''}
@@ -4883,7 +4877,7 @@ const TEMPLATES = {
       {nome:'entrega do picv ao cliente',            col:4,  exato:true},  // → Validação - PI
       {nome:'validação final do picv',               col:6,  exato:true},  // → Desenvolvimento
       {nome:'entrega do review ao cliente',          col:7,  exato:true},  // → Validação - Desenvolvimento
-      {nome:'validação final do review',             col:8,  exato:true},  // → Revisão Textual/Tradução
+      {nome:'validação final do review',             col:7,  exato:true},  // → Entrega (Avaliação foi removida)
       {nome:'revisão textual do review',             col:11, exato:true},  // → Homologação
       {multi:['homologação','instalação no sirh'],   col:12},              // → Pré-Medição
       {nome:'upload arquivos bdoc',                  col:14, exato:true},  // → Projetos Concluídos
@@ -4925,7 +4919,7 @@ const TEMPLATES = {
       {nome:'entrega do picv ao cliente',            col:4,  exato:true},  // → Validação - PI
       {nome:'validação final do picv',               col:6,  exato:true},  // → Desenvolvimento
       {nome:'entrega do review ao cliente',          col:7,  exato:true},  // → Validação - Desenvolvimento
-      {nome:'validação final do review',             col:8,  exato:true},  // → Revisão Textual/Tradução
+      {nome:'validação final do review',             col:7,  exato:true},  // → Entrega (Avaliação foi removida)
       {nome:'revisão textual do review',             col:11, exato:true},  // → Homologação
       {multi:['homologação','instalação no sirh'],   col:12},              // → Pré-Medição
       {nome:'upload arquivos bdoc',                  col:14, exato:true},  // → Projetos Concluídos
@@ -4967,7 +4961,7 @@ const TEMPLATES = {
       {nome:'entrega do picv ao cliente',            col:4,  exato:true},  // → Validação - PI
       {nome:'validação final do picv',               col:6,  exato:true},  // → Desenvolvimento
       {nome:'entrega do review ao cliente',          col:7,  exato:true},  // → Validação - Desenvolvimento
-      {nome:'validação final do review',             col:8,  exato:true},  // → Revisão Textual/Tradução
+      {nome:'validação final do review',             col:7,  exato:true},  // → Entrega (Avaliação foi removida)
       {nome:'revisão textual do review',             col:11, exato:true},  // → Homologação
       {multi:['homologação','instalação no sirh'],   col:12},              // → Pré-Medição
       {nome:'upload arquivos bdoc',                  col:14, exato:true},  // → Projetos Concluídos
@@ -5034,7 +5028,7 @@ const ETAPA_COL_MAP_PADRAO = [
   {nome:'validação do pi',          col:6},   // → Produção
   {nome:'validação di',             col:6},   // → Produção
   {nome:'entrega do review',        col:7},   // → Entrega
-  {nome:'implementação de ajuste',  col:8},   // → Avaliação
+  {nome:'implementação de ajuste',  col:7},   // → Entrega (Avaliação foi removida)
   {nome:'validação final',          col:11},  // → Homologação
   {nome:'instalação no sirh',       col:12},  // → Pré-Medição
   {nome:'upload arquivos',           col:14},
@@ -10577,10 +10571,10 @@ function _buildCargaProjCard(p, nome){
           <span class="lbl">▶️ Etapa atual</span>
           <span class="val">${etAtual ? etAtual.lb : (sit==='concluido'?'Concluído':'—')}</span>
         </div>
-        <div class="carga-proj-detail-item">
+        ${p.idCurso?`<div class="carga-proj-detail-item">
           <span class="lbl">🆔 ID do Curso</span>
-          <span class="val">${p.idCurso || '<span style="color:var(--mu);font-style:italic;font-weight:400">Sem ID</span>'}</span>
-        </div>
+          <span class="val">${esc(p.idCurso)}</span>
+        </div>`:''}
         <div class="carga-proj-detail-item">
           <span class="lbl">🏷️ Categoria de Projeto</span>
           <span class="val">${p.academia || '<span style="color:var(--mu);font-style:italic;font-weight:400">—</span>'}</span>
