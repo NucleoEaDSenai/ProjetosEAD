@@ -2134,6 +2134,59 @@ const CATEGORIAS_PROJETO = ['ECorp','PQDT','PQTM'];
 
 const RECURSOS = ['Acomp pedagógico - Exerc fixação e Aval','Acompanhamento pedagógico - apostila','Acompanhamento pedagógico - PPT','Animação 2D','Animação 3D','Atualização do Game 2D','Cursos alta comp até 40 mim até 20 telas','Cursos alta comp até 60 mim até 40 telas','Cursos alta comp até 90 mim até 60 telas','Cursos baix comp até 40 mim até 20 telas','Cursos baix comp até 60 mim até 40 telas','Cursos baix comp até 90 mim até 60 telas','Cursos de alta complexidade até 20 mim','Cursos de baixa complexidade até 20 mim','Editoração das apostilas','Game 2D','Game 3D','Gestão do projeto','Manutenção mensal do projeto','Objeto interativo 2D','Objeto interativo 3D','One Page - Web Content até 30 mim','Personagem','Planejamento e Estruturação do Projeto','Plano Instrucional e Plano de Identidade Visual (PICV)','Pós-produção de Vídeo até 10 mim','Pós-produção de Vídeo até 2 horas','Reprodução de apostila/ Pencard','Roteiro (Storyboard)','Vídeo Aula - edição','Vídeo Aula - gravação','Vídeo Instrucional 10 min','Vídeo Instrucional 5 mim','Vídeo Interativo','Workshop com especialistas da Transpetro'];
 
+// ── TABELA DE PREÇOS DO CONTRATO TRANSPETRO (planilha de serviços) ──────────
+// linha · descrição · UN · QTD contratada · preço unitário (R$)
+const SERVICOS_CONTRATO = [
+  {linha:1,  desc:'Planejamento e Estruturação do Projeto',   un:'UN',  qtdContrato:1,      preco:11193.23},
+  {linha:2,  desc:'Workshop com especialistas da Transpetro', un:'UN',  qtdContrato:10,     preco:725.75},
+  {linha:3,  desc:'Acompanhamento pedagógico - apostila',     un:'PG',  qtdContrato:5200,   preco:41.67},
+  {linha:4,  desc:'Acomp pedagógico - Exerc fixação e Aval',  un:'PG',  qtdContrato:500,    preco:41.66},
+  {linha:5,  desc:'Acompanhamento pedagógico - PPT',          un:'UN',  qtdContrato:50,     preco:2312.87},
+  {linha:6,  desc:'Editoração das apostilas',                 un:'PG',  qtdContrato:5000,   preco:138.05},
+  {linha:7,  desc:'Animação 2D',                              un:'UN',  qtdContrato:30,     preco:3238.52},
+  {linha:8,  desc:'Animação 3D',                              un:'UN',  qtdContrato:5,      preco:4047.89},
+  {linha:9,  desc:'Objeto interativo 2D',                     un:'UN',  qtdContrato:15,     preco:3643.04},
+  {linha:10, desc:'Objeto interativo 3D',                     un:'UN',  qtdContrato:10,     preco:4371.64},
+  {linha:11, desc:'Game 2D',                                  un:'UN',  qtdContrato:5,      preco:18501.40},
+  {linha:12, desc:'Atualização do Game 2D',                   un:'UN',  qtdContrato:800,    preco:1174.34},
+  {linha:13, desc:'Game 3D',                                  un:'UN',  qtdContrato:2,      preco:46863.53},
+  {linha:14, desc:'Reprodução de apostila/ Pencard',          un:'PG',  qtdContrato:150000, preco:1.35},
+  {linha:15, desc:'Plano Instrucional',                       un:'UN',  qtdContrato:15,     preco:1015.99},
+  {linha:16, desc:'Plano de Identidade Visual',               un:'UN',  qtdContrato:5,      preco:2357.47},
+  {linha:17, desc:'Personagem',                               un:'UN',  qtdContrato:10,     preco:745.26},
+  {linha:18, desc:'Roteiro (Storyboard)',                     un:'UN',  qtdContrato:15,     preco:4272.27},
+  {linha:19, desc:'Cursos de alta complexidade até 20 mim',   un:'UN',  qtdContrato:5,      preco:5460.73},
+  {linha:20, desc:'Cursos alta comp até 40 mim até 20 telas', un:'UN',  qtdContrato:5,      preco:10747.88},
+  {linha:21, desc:'Cursos alta comp até 60 mim até 40 telas', un:'UN',  qtdContrato:10,     preco:21511.78},
+  {linha:22, desc:'Cursos alta comp até 90 mim até 60 telas', un:'UN',  qtdContrato:5,      preco:31640.32},
+  {linha:23, desc:'Cursos de baixa complexidade até 20 mim',  un:'UN',  qtdContrato:10,     preco:2739.68},
+  {linha:24, desc:'Cursos baix comp até 40 mim até 20 telas', un:'UN',  qtdContrato:5,      preco:6160.90},
+  {linha:25, desc:'Cursos baix comp até 60 mim até 40 telas', un:'UN',  qtdContrato:10,     preco:11929.59},
+  {linha:26, desc:'Cursos baix comp até 90 mim até 60 telas', un:'UN',  qtdContrato:5,      preco:18417.89},
+  {linha:27, desc:'One Page - Web Content até 30 mim',        un:'UN',  qtdContrato:40,     preco:6577.99},
+  {linha:28, desc:'Vídeo Interativo',                         un:'UN',  qtdContrato:4,      preco:4003.99},
+  {linha:29, desc:'Pós-produção de Vídeo até 10 mim',         un:'UN',  qtdContrato:10,     preco:306.55},
+  {linha:30, desc:'Pós-produção de Vídeo até 2 horas',        un:'UN',  qtdContrato:5,      preco:3390.55},
+  {linha:31, desc:'Vídeo Aula - gravação',                    un:'UN',  qtdContrato:40,     preco:1131.07},
+  {linha:32, desc:'Vídeo Aula - edição',                      un:'UN',  qtdContrato:40,     preco:4842.45},
+  {linha:33, desc:'Vídeo Instrucional 5 mim',                 un:'UN',  qtdContrato:10,     preco:1629.15},
+  {linha:34, desc:'Vídeo Instrucional 10 min',                un:'UN',  qtdContrato:10,     preco:3257.00},
+  {linha:35, desc:'Gestão do projeto',                        un:'MES', qtdContrato:60,     preco:7080.89},
+  {linha:36, desc:'Manutenção mensal do projeto',             un:'MES', qtdContrato:60,     preco:13289.87},
+];
+// Recursos que correspondem a mais de uma linha do contrato
+const RECURSO_LINHAS_ESPECIAIS = {
+  'Plano Instrucional e Plano de Identidade Visual (PICV)': [15, 16],
+};
+// Linhas do contrato correspondentes a um recurso
+function linhasDoRecurso(recurso){
+  if(RECURSO_LINHAS_ESPECIAIS[recurso])
+    return RECURSO_LINHAS_ESPECIAIS[recurso].map(n => SERVICOS_CONTRATO.find(s => s.linha === n)).filter(Boolean);
+  const s = SERVICOS_CONTRATO.find(s => s.desc === recurso);
+  return s ? [s] : [];
+}
+function fmtBRL(v){ return (Number(v)||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'}); }
+
 const COLUNAS = [
   {k:0,  l:'Diagnóstico',                     dot:'#94A3B8'},
   {k:1,  l:'Análise',                         dot:'#64748B'},
@@ -4485,6 +4538,15 @@ function openDet(id){
     <table class="et"><thead><tr><th>Etapa</th><th>Responsável</th><th>Prazo da Etapa</th><th>Término Real</th><th>Situação</th><th>Obs.</th></tr></thead>
     <tbody>${eRows}</tbody></table></div>
     <div class="coments-area">
+      ${(p.medicaoItens||[]).length ? `
+      <hr class="dv" style="margin:18px 0 14px">
+      <div class="coments-title">📐 Itens da Medição <span style="font-weight:400;font-size:11px;color:var(--mu)">${p.medicaoFeita?'medição confirmada':'aguardando confirmação'}</span>
+        ${!p.medicaoFeita?`<button class="coment-act" style="font-size:11px" onclick="editarItensMedicao(${p.id})">✏️ Editar QTD</button>`:''}</div>
+      <div style="overflow-x:auto"><table class="et" style="width:100%;font-size:12px">
+        <thead><tr><th>Linha</th><th style="text-align:left">Descrição dos serviços</th><th>UN</th><th>QTD</th><th style="text-align:right">Preço unitário</th><th style="text-align:right">Preço parcial</th></tr></thead>
+        <tbody>${p.medicaoItens.map(it=>`<tr><td style="text-align:center">${it.linha}</td><td>${esc(it.desc)}</td><td style="text-align:center">${it.un}</td><td style="text-align:center">${Number(it.qtd).toLocaleString('pt-BR')}</td><td style="text-align:right;white-space:nowrap">${fmtBRL(it.precoUnit)}</td><td style="text-align:right;white-space:nowrap">${fmtBRL(it.precoParcial)}</td></tr>`).join('')}</tbody>
+        <tfoot><tr><td colspan="5" style="text-align:right;font-weight:700">Total</td><td style="text-align:right;font-weight:800;color:var(--blue);white-space:nowrap">${fmtBRL(p.medicaoTotal)}</td></tr></tfoot>
+      </table></div>` : ''}
       <hr class="dv" style="margin:18px 0 14px">
       <div class="coments-title">🔗 Links de Apoio <span style="font-weight:400;font-size:11px;color:var(--mu)">${(p.linksApoio||[]).length} link(s)</span></div>
       <div class="links-apoio-list">
@@ -6388,6 +6450,8 @@ function salvar(){
     homologPassou:projAnterior?.homologPassou||false,
     medicaoQuinzena:projAnterior?.medicaoQuinzena||'',
     medicaoMes:projAnterior?.medicaoMes||'',
+    medicaoItens:projAnterior?.medicaoItens||[],
+    medicaoTotal:projAnterior?.medicaoTotal||0,
     historico:projAnterior?.historico||[],
     etapas,
     etapasCustomizadas: _efEtapasCustomizadas || projAnterior?.etapasCustomizadas || false,  // persiste flag
@@ -6879,7 +6943,7 @@ function exportXLSX(){
   XLSX.utils.book_append_sheet(wb, wsH, 'Homologações');
 
   // ── Aba 5: Medição ──
-  const hdrM = ['Projeto','Situação','Responsáveis','Recursos','Coluna Atual','Enviado p/ Medição em','Medição Feita?','Medição Concluída em'];
+  const hdrM = ['Projeto','Situação','Responsáveis','Recursos','Coluna Atual','Enviado p/ Medição em','Medição Feita?','Medição Concluída em','Valor Total (R$)'];
   const rowsM = todosTodos
     .filter(p => p.enviadoMedicao)
     .sort((a,b) => (a.medicaoFeita===b.medicaoFeita) ? 0 : a.medicaoFeita ? 1 : -1)
@@ -6889,15 +6953,27 @@ function exportXLSX(){
       colLabel(p.col),
       isoToBR(p.enviadoMedicao),
       p.medicaoFeita ? 'Sim' : 'Não',
-      isoToBR(p.medicaoFeitaEm)
+      isoToBR(p.medicaoFeitaEm),
+      p.medicaoTotal||0
     ]);
   if(rowsM.length === 0) rowsM.push(['Nenhum projeto enviado para medição']);
   const wsM = XLSX.utils.aoa_to_sheet([hdrM, ...rowsM]);
-  wsM['!cols'] = [44,16,30,30,28,22,14,22].map(w=>({wch:w}));
+  wsM['!cols'] = [44,16,30,30,28,22,14,22,16].map(w=>({wch:w}));
   XLSX.utils.book_append_sheet(wb, wsM, 'Medição');
 
+  // ── Aba 6: Itens da Medição (linhas do contrato, QTD e valores) ──
+  const hdrI = ['Projeto','Linha','Descrição dos Serviços','UN','QTD','Preço Unitário (R$)','Preço Parcial (R$)','Enviado p/ Medição em','Medição Feita?','Mês de Medição'];
+  const rowsI = [];
+  todosTodos.filter(p => p.enviadoMedicao).forEach(p => (p.medicaoItens||[]).forEach(it => rowsI.push([
+    p.nome, it.linha, it.desc, it.un, it.qtd, it.precoUnit, it.precoParcial,
+    isoToBR(p.enviadoMedicao), p.medicaoFeita ? 'Sim' : 'Não', p.medicaoFeita ? _fmtMedicao(_medicaoDoProjeto(p)) : ''
+  ])));
+  const wsI = XLSX.utils.aoa_to_sheet([hdrI, ...rowsI]);
+  wsI['!cols'] = [44,7,42,6,10,18,18,20,14,24].map(w=>({wch:w}));
+  XLSX.utils.book_append_sheet(wb, wsI, 'Itens da Medição');
+
   XLSX.writeFile(wb, `projetos-ead-${td()}.xlsx`);
-  showToast('📊 XLSX exportado com 5 abas!');
+  showToast('📊 XLSX exportado com 6 abas!');
 }
 
 // ── PDF FICHA DO PROJETO ──────────────────────────────────────────────────────
@@ -7935,17 +8011,116 @@ function showToast(msg){const t=document.getElementById('toast');t.textContent=m
 // ── RENDER ALL ──
 // ── MEDIÇÃO ──────────────────────────────────────────────────────────────────
 
-function enviarMedicao(id){
+// ── ENVIAR MEDIÇÃO: janela com os itens do contrato (UN, QTD, preço unitário, preço parcial) ──
+// A QTD de cada item precisa ser informada antes do envio.
+function enviarMedicao(id){ abrirModalMedicao(id, false); }
+function editarItensMedicao(id){ abrirModalMedicao(id, true); }
+
+// Quantidade já usada de uma linha do contrato em outros projetos enviados para medição
+function _qtdUsadaContrato(linha, exceto){
+  return DB.reduce((s,p)=>{
+    if(p.id===exceto || !p.enviadoMedicao || p.cancelado) return s;
+    return s + (p.medicaoItens||[]).filter(it=>it.linha===linha).reduce((a,it)=>a+(Number(it.qtd)||0),0);
+  },0);
+}
+
+function abrirModalMedicao(id, edicao){
   const p = DB.find(x=>x.id===id); if(!p) return;
-  if(!confirm(`Enviar "${p.nome}" para a fila de Medição?`)) return;
-  p.enviadoMedicao = td();
-  p.medicaoFeita   = false;
-  p.medicaoFeitaEm = null;
-  registrarHistorico(p, 'enviou medição', 'Projeto enviado para fila de Medição');
+  // Itens: um por linha do contrato ligada aos recursos do projeto (sem repetir linhas)
+  const linhas = [];
+  (p.recursos||[]).forEach(r => linhasDoRecurso(r).forEach(s => { if(!linhas.some(l=>l.linha===s.linha)) linhas.push(s); }));
+  const semPreco = (p.recursos||[]).filter(r => !linhasDoRecurso(r).length);
+  const anteriores = p.medicaoItens || [];
+
+  document.getElementById('medItensModal')?.remove();
+  const div = document.createElement('div');
+  div.id = 'medItensModal';
+  div.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:9999;display:flex;align-items:center;justify-content:center;padding:16px';
+  const linhasHtml = linhas.map(s => {
+    const qtdAnt = anteriores.find(it=>it.linha===s.linha)?.qtd ?? '';
+    const usada  = _qtdUsadaContrato(s.linha, p.id);
+    const saldo  = s.qtdContrato - usada;
+    return `<tr data-linha="${s.linha}">
+      <td style="text-align:center;color:var(--mu)">${s.linha}</td>
+      <td>${esc(s.desc)}<div style="font-size:10.5px;color:${saldo<=0?'var(--red)':'var(--mu)'}">Saldo do contrato: ${saldo.toLocaleString('pt-BR')} de ${s.qtdContrato.toLocaleString('pt-BR')} ${s.un}</div></td>
+      <td style="text-align:center">${s.un}</td>
+      <td style="text-align:center"><input type="number" class="fi med-qtd" min="1" step="1" value="${qtdAnt}" data-saldo="${saldo}" oninput="_recalcMedItens()" aria-label="Quantidade de ${esc(s.desc)}" style="width:90px;text-align:right;padding:6px 8px"></td>
+      <td style="text-align:right;white-space:nowrap">${fmtBRL(s.preco)}</td>
+      <td style="text-align:right;white-space:nowrap;font-weight:600" class="med-parcial">—</td>
+    </tr>`;
+  }).join('');
+  div.innerHTML = `
+    <div role="dialog" aria-modal="true" aria-label="Enviar Medição" style="background:var(--surface);color:var(--txt);border-radius:14px;padding:22px;width:100%;max-width:860px;max-height:88vh;overflow:auto;box-shadow:0 8px 32px rgba(0,0,0,.18)">
+      <div style="font-size:15px;font-weight:700;margin-bottom:4px">📐 ${edicao?'Itens da Medição':'Enviar Medição'}</div>
+      <div style="font-size:12px;color:var(--mu);margin-bottom:14px">${esc(p.nome)} — informe a quantidade (QTD) de cada item${edicao?'':' antes de enviar'}.</div>
+      ${linhas.length ? `
+      <div style="overflow-x:auto"><table class="et" style="width:100%;font-size:12.5px">
+        <thead><tr><th>Linha</th><th style="text-align:left">Descrição dos serviços</th><th>UN</th><th>QTD</th><th style="text-align:right">Preço unitário</th><th style="text-align:right">Preço parcial</th></tr></thead>
+        <tbody id="medItensBody">${linhasHtml}</tbody>
+        <tfoot><tr><td colspan="5" style="text-align:right;font-weight:700;padding-top:8px">Total da medição</td><td id="medItensTotal" style="text-align:right;font-weight:800;color:var(--blue);padding-top:8px;white-space:nowrap">—</td></tr></tfoot>
+      </table></div>` : `<div style="padding:12px;color:var(--red);font-size:12.5px">Nenhum recurso deste projeto está na tabela de preços do contrato. Ajuste os recursos em ✏️ Editar antes de enviar.</div>`}
+      ${semPreco.length ? `<div style="font-size:11.5px;color:var(--yel);margin-top:8px">⚠️ Sem preço no contrato: ${semPreco.map(esc).join(', ')}</div>` : ''}
+      <div id="medItensAviso" style="font-size:11.5px;color:var(--red);margin-top:8px;min-height:14px"></div>
+      <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:10px">
+        <button class="btn bg2 bsm" onclick="document.getElementById('medItensModal').remove()">Cancelar</button>
+        ${linhas.length ? `<button class="btn bb bsm" onclick="_salvarMedItens(${p.id},${edicao?'true':'false'})">${edicao?'💾 Salvar itens':'📐 Enviar Medição'}</button>` : ''}
+      </div>
+    </div>`;
+  div.addEventListener('click', e => { if(e.target===div) div.remove(); });
+  document.body.appendChild(div);
+  _recalcMedItens();
+  div.querySelector('.med-qtd')?.focus();
+}
+
+function _recalcMedItens(){
+  let total = 0, excede = [];
+  document.querySelectorAll('#medItensBody tr').forEach(tr => {
+    const s = SERVICOS_CONTRATO.find(x=>x.linha===Number(tr.dataset.linha));
+    const inp = tr.querySelector('.med-qtd');
+    const q = Number(inp.value)||0;
+    const parcial = q>0 ? q*s.preco : 0;
+    total += parcial;
+    tr.querySelector('.med-parcial').textContent = q>0 ? fmtBRL(parcial) : '—';
+    if(q > Number(inp.dataset.saldo)) excede.push(s.linha);
+  });
+  const tEl = document.getElementById('medItensTotal'); if(tEl) tEl.textContent = fmtBRL(total);
+  const aviso = document.getElementById('medItensAviso');
+  if(aviso) aviso.textContent = excede.length ? `⚠️ A quantidade passa do saldo do contrato na(s) linha(s) ${excede.join(', ')}.` : '';
+}
+
+function _salvarMedItens(id, edicao){
+  const p = DB.find(x=>x.id===id); if(!p) return;
+  const itens = [];
+  let faltando = false;
+  document.querySelectorAll('#medItensBody tr').forEach(tr => {
+    const s = SERVICOS_CONTRATO.find(x=>x.linha===Number(tr.dataset.linha));
+    const inp = tr.querySelector('.med-qtd');
+    const q = Number(inp.value);
+    if(!(q > 0)){ faltando = true; inp.style.borderColor = 'var(--red)'; return; }
+    inp.style.borderColor = '';
+    itens.push({linha:s.linha, desc:s.desc, un:s.un, qtd:q, precoUnit:s.preco, precoParcial:Math.round(q*s.preco*100)/100});
+  });
+  if(faltando){ showToast('⚠️ Informe a quantidade (QTD) de todos os itens'); return; }
+  const saldoLinha = l => SERVICOS_CONTRATO.find(x=>x.linha===l).qtdContrato - _qtdUsadaContrato(l, p.id);
+  const excede = itens.filter(it => it.qtd > saldoLinha(it.linha));
+  if(excede.length && !confirm(`A quantidade passa do saldo do contrato na(s) linha(s) ${excede.map(i=>i.linha).join(', ')}. Continuar mesmo assim?`)) return;
+
+  p.medicaoItens = itens;
+  p.medicaoTotal = Math.round(itens.reduce((a,it)=>a+it.precoParcial,0)*100)/100;
+  const resumo = itens.map(it=>`L${it.linha} ${it.qtd} ${it.un}`).join('; ');
+  if(edicao){
+    registrarHistorico(p, 'editou itens da medição', `${resumo} — total ${fmtBRL(p.medicaoTotal)}`);
+  } else {
+    p.enviadoMedicao = td();
+    p.medicaoFeita   = false;
+    p.medicaoFeitaEm = null;
+    registrarHistorico(p, 'enviou medição', `Projeto enviado para fila de Medição — ${resumo} — total ${fmtBRL(p.medicaoTotal)}`);
+  }
   // O card continua em Pré-medição até a liderança confirmar a medição
   fbSalvarProjeto(p);
+  document.getElementById('medItensModal')?.remove();
   renderAll();
-  showToast('📐 Projeto enviado para Medição! Ele fica em Pré-medição até a medição ser confirmada.');
+  showToast(edicao ? '💾 Itens da medição atualizados!' : `📐 Medição enviada (${fmtBRL(p.medicaoTotal)})! O projeto fica em Pré-medição até a confirmação.`);
 }
 
 function confirmarMedicao(id){
@@ -7980,6 +8155,18 @@ function confirmarMedicao(id){
   showToast('🎉 Medição confirmada! Projeto movido para Projetos Concluídos.');
 }
 
+// Itens medidos (linha · QTD · UN · preço parcial) + total; botão para ajustar enquanto não confirmada
+function _medItensResumo(p){
+  const itens = p.medicaoItens || [];
+  const editar = !p.medicaoFeita
+    ? `<button class="coment-act" style="font-size:11px;opacity:.8" onclick="editarItensMedicao(${p.id})" title="${itens.length?'Editar quantidades':'Informar quantidades'}">✏️ ${itens.length?'Editar':'Informar QTD'}</button>`
+    : '';
+  if(!itens.length) return `<span style="color:var(--mu);font-style:italic">Sem itens</span> ${editar}`;
+  return itens.map(it =>
+    `<div title="${esc(it.desc)} — ${it.qtd} ${it.un} × ${fmtBRL(it.precoUnit)}"><span style="color:var(--mu)">L${it.linha}</span> ${esc(it.desc.length>26?it.desc.slice(0,25)+'…':it.desc)} · <strong>${it.qtd.toLocaleString('pt-BR')} ${it.un}</strong> · ${fmtBRL(it.precoParcial)}</div>`
+  ).join('') + `<div style="margin-top:3px;font-weight:800;color:var(--blue)">Total: ${fmtBRL(p.medicaoTotal)} ${editar}</div>`;
+}
+
 function _buildMedRow(p){
   return `<tr style="${p.medicaoFeita?'opacity:.75':''}">
     <td>
@@ -7988,6 +8175,7 @@ function _buildMedRow(p){
     </td>
     <td>${avList(p.resps)}</td>
     <td>${recTags(p.recursos)}</td>
+    <td style="font-size:11.5px;min-width:190px">${_medItensResumo(p)}</td>
     <td style="white-space:nowrap">${fd(p.termino||p.enviadoMedicao)}</td>
     <td style="white-space:nowrap">${fd(p.enviadoMedicao)}</td>
     <td style="text-align:center">
@@ -8027,6 +8215,7 @@ function _buildMedTabela(projetos){
         <th style="cursor:pointer;white-space:nowrap" onclick="toggleMedSort('nome')">Projeto <span class="medSI" data-c="nome" style="font-size:10px;color:var(--mu)"></span></th>
         <th style="cursor:pointer;white-space:nowrap" onclick="toggleMedSort('resp')">Responsáveis <span class="medSI" data-c="resp" style="font-size:10px;color:var(--mu)"></span></th>
         <th style="cursor:pointer;white-space:nowrap" onclick="toggleMedSort('rec')">Recursos <span class="medSI" data-c="rec" style="font-size:10px;color:var(--mu)"></span></th>
+        <th style="cursor:pointer;white-space:nowrap" onclick="toggleMedSort('valor')">Itens · Valor <span class="medSI" data-c="valor" style="font-size:10px;color:var(--mu)"></span></th>
         <th style="cursor:pointer;white-space:nowrap" onclick="toggleMedSort('concl')">Concluído em <span class="medSI" data-c="concl" style="font-size:10px;color:var(--mu)"></span></th>
         <th style="cursor:pointer;white-space:nowrap" onclick="toggleMedSort('env')">Enviado para Medição em <span class="medSI" data-c="env" style="font-size:10px;color:var(--mu)"></span></th>
         <th style="cursor:pointer;white-space:nowrap;text-align:center" onclick="toggleMedSort('stat')">Medição Feita <span class="medSI" data-c="stat" style="font-size:10px;color:var(--mu)"></span></th>
@@ -8217,6 +8406,7 @@ function rMedicao(){
       case 'env':   return D(a.enviadoMedicao).localeCompare(D(b.enviadoMedicao))*d;
       case 'stat':  return ((a.medicaoFeita?1:0)-(b.medicaoFeita?1:0))*d;
       case 'conf':  return S(a.medicaoConfirmadaPor).localeCompare(S(b.medicaoConfirmadaPor))*d;
+      case 'valor': return ((a.medicaoTotal||0)-(b.medicaoTotal||0))*d;
       default:      return 0;
     }
   };
@@ -10447,7 +10637,7 @@ function duplicarProjeto(id){
   novo.comentarios = [];
   novo.criadoPor = usuario; novo.editadoPor = null;
   novo.enviadoMedicao = null; novo.medicaoFeita = false; novo.medicaoFeitaEm = null; novo.medicaoConfirmadaPor = null;
-  novo.medicaoMes = ''; novo.medicaoQuinzena = '';
+  novo.medicaoMes = ''; novo.medicaoQuinzena = ''; novo.medicaoItens = []; novo.medicaoTotal = 0;
   novo.tags = orig.tags ? [...orig.tags] : [];
   novo.historico = [{usuario, acao:'duplicou', dt:dtAgora(), desc:`Duplicado de "${orig.nome}"`}];
   novo.etapas = (orig.etapas||[]).map(e => ({...e, done:false, fim:null, atrasoMotivo:null, diasCl:null}));
