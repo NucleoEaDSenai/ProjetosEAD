@@ -5091,7 +5091,55 @@ const TEMPLATES = {
   // Vídeo Instrucional (5 min e 10 min usam o mesmo fluxo)
   'Vídeo Instrucional 5 min':  _tmplVideoInstrucional(),
   'Vídeo Instrucional 10 min': _tmplVideoInstrucional(),
+
+  'Editoração das apostilas': _tmplEditoracaoApostilas(),
 };
+
+// Fluxo padrão Transpetro em 4 fases, sempre cumulativo:
+// nasce em Desenho → roteiro concluído: Produção → + produção: Entrega →
+// + Upload: Homologação → + testes/aprovação: Pré-medição (até a medição ser confirmada)
+function _tmplFluxoTranspetro(roteiro, producao){
+  const upload = 'Upload do(s) arquivo(s) para o SharePoint do cliente';
+  const testes = 'Realização de testes e aprovação técnica pelo cliente';
+  const resp = lb => /pelo cliente/i.test(lb) ? 'cl' : 'eq';
+  return {
+    colInicial: 3,
+    etapas: [...roteiro, ...producao, upload, testes].map(lb => ({lb, r:resp(lb)})),
+    gatilhos: [
+      {grupo:roteiro,                                   col:6},   // → Produção
+      {grupo:[...roteiro, ...producao],                 col:7},   // → Entrega
+      {grupo:[...roteiro, ...producao, upload],         col:11},  // → Homologação
+      {grupo:[...roteiro, ...producao, upload, testes], col:12},  // → Pré-medição
+    ],
+    fimCol: 14,
+  };
+}
+
+function _tmplEditoracaoApostilas(){
+  return _tmplFluxoTranspetro([
+    'Roteirização dos impressos',
+    'Validação técnica da roteirização dos impressos',
+    'Aplicação de ajustes nos roteiros dos impressos pós-validação técnica',
+    'Validação dos roteiros dos impressos pelo cliente',
+    'Aplicação de ajustes nos roteiros dos impressos pós-validação do cliente',
+    'Revisão textual dos roteiros dos impressos',
+    'Aplicação de ajustes nos roteiros dos impressos pós-revisão textual',
+  ], [
+    'Diagramação dos impressos',
+    'Validação técnica da diagramação dos impressos',
+    'Aplicação de ajustes pós-validação técnica dos impressos',
+    'Impressão das bonecas dos impressos',
+    'Aplicação de ajustes pós-impressão das bonecas',
+    'Validação da diagramação dos impressos pelo cliente',
+    'Aplicação de ajustes pós-validação da diagramação dos impressos',
+    'Revisão textual dos impressos',
+    'Aplicação de ajustes pós-revisão textual dos impressos',
+    'Validação técnica final da diagramação dos impressos',
+    'Aplicação de ajustes pós-controle de qualidade da diagramação dos impressos',
+    'Disponibilização dos cartazes digitais para impressão da Transpetro',
+    'Impressão',
+  ]);
+}
 
 function _tmplVideoInstrucional(){
   // Fase 1 — Desenho (roteiro)
@@ -5120,20 +5168,7 @@ function _tmplVideoInstrucional(){
     'Revisão textual do vídeo',
     'Aplicação de ajustes do vídeo pós-revisão textual',
   ];
-  const upload = 'Upload do(s) arquivo(s) para o SharePoint do cliente';
-  const testes = 'Realização de testes e aprovação técnica pelo cliente';
-  const resp = lb => /pelo cliente/i.test(lb) ? 'cl' : 'eq';
-  return {
-    colInicial: 3,                    // nasce em Desenho
-    etapas: [...roteiro, ...producao, upload, testes].map(lb => ({lb, r:resp(lb)})),
-    gatilhos: [
-      {grupo:roteiro,                                 col:6},   // roteiro concluído → Produção
-      {grupo:[...roteiro, ...producao],               col:7},   // + produção → Entrega
-      {grupo:[...roteiro, ...producao, upload],       col:11},  // + Upload → Homologação
-      {grupo:[...roteiro, ...producao, upload, testes], col:12}, // + testes/aprovação → Pré-medição
-    ],
-    fimCol: 14,
-  };
+  return _tmplFluxoTranspetro(roteiro, producao);
 }
 
 // Gatilhos do fluxo PADRÃO (recursos sem template específico)
