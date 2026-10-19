@@ -4566,6 +4566,10 @@ function openDet(id){
     <div class="coments-area">
       <hr class="dv" style="margin:18px 0 14px">
       <div class="coments-title">💬 Anotações e Comentários <span style="font-weight:400;font-size:11px;color:var(--mu)">${(p.comentarios||[]).length} comentário(s)</span></div>
+      <div class="coment-input-area" style="margin:0 0 14px">
+        <textarea class="coment-ta" id="comentTa" placeholder="Escreva uma anotação..."></textarea>
+        <button class="btn br bsm" onclick="adicionarComent(${p.id})" style="padding:8px 14px;height:64px">💬<br>Enviar</button>
+      </div>
       <div id="comentsList">
         ${(p.comentarios||[]).length===0
           ? '<div style="color:var(--mu);font-size:12px;padding:8px 0">Nenhuma anotação ainda.</div>'
@@ -4594,10 +4598,6 @@ function openDet(id){
               </div>
             </div>`).join('')
         }
-      </div>
-      <div class="coment-input-area">
-        <textarea class="coment-ta" id="comentTa" placeholder="Escreva uma anotação..."></textarea>
-        <button class="btn br bsm" onclick="adicionarComent(${p.id})" style="padding:8px 14px;height:64px">💬<br>Enviar</button>
       </div>
     </div>
   `;
