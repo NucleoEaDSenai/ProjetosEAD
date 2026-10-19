@@ -4210,7 +4210,7 @@ function rAtrasos(){
         // Filtro específico de responsável da etapa (multi)
         if(filtRespEtapa.length){
           const respNome = e.r === 'cl' ? 'cl' : e.r === 'eq' ? 'Equipe' : e.r;
-          if(!filtRespEtapa.includes(respNome)) return;
+          if(!filtRespEtapa.includes(respNome) && !(e.rExtras||[]).some(n=>filtRespEtapa.includes(n))) return;
         }
         // Filtro de prazo (multi)
         if(filtPrazo.length && !filtPrazo.includes(tipoAtraso)) return;
@@ -4218,7 +4218,7 @@ function rAtrasos(){
 
       resultado.push({
         projId: p.id, proj: p.nome, sitProjeto: sitP, cancelado: p.cancelado,
-        etapa: e.lb, r: e.r, prazo: e.prazo, antFim, diasAtraso, statusEtapa:'aberta_atraso',
+        etapa: e.lb, r: e.r, rExtras: e.rExtras||[], prazo: e.prazo, antFim, diasAtraso, statusEtapa:'aberta_atraso',
         fim: e.fim||null, motivo: e.atrasoMotivo||null, diasCl: e.diasCl||null,
         resp: (p.resps||[]).join(', '), prazoProjVencido, tipoAtraso,
       });
@@ -4321,7 +4321,7 @@ function rAtrasos(){
     const etapasHtml = pg.etapas.map((r,ei) => {
       const respBdg = r.r==='cl'
         ? '<span class="db dcl" style="font-size:11px">🏢 Cliente</span>'
-        : `<span class="db deq" style="font-size:11px">👤 ${r.r==='eq'?'Equipe':r.r}</span>`;
+        : `<span class="db deq" style="font-size:11px">👤 ${esc(_respEtapaTxt(r))}</span>`;
       const diasColor = r.diasAtraso > 10 ? 'var(--red)' : r.diasAtraso > 5 ? 'var(--yel)' : 'var(--org)';
       return `<div class="atraso-etapa-row">
         <div style="min-width:0">
@@ -4441,6 +4441,7 @@ function openDet(id){
         <select class="iis" onchange="setER(${id},${i},this.value)">
           ${detRespOpts(p.resps||[], e.r)}
         </select>
+        ${_etapaRespExtrasHtml(p, e, i)}
       </td>
       <td>
         <div style="display:flex;gap:3px;align-items:center">
@@ -5499,10 +5500,54 @@ function setEObs(pid,idx,v){
   fbSalvarProjeto(p);
 }
 
+// ── MAIS DE UM RESPONSÁVEL POR ETAPA ──
+// e.r continua sendo o responsável principal ('eq', 'cl' ou um nome);
+// e.rExtras guarda os responsáveis adicionais (nomes da equipe).
+function _respsEtapa(e){
+  const lista = [];
+  if(e?.r && e.r!=='eq' && e.r!=='cl') lista.push(e.r);
+  (e?.rExtras||[]).forEach(n => { if(n && !lista.includes(n)) lista.push(n); });
+  return lista;
+}
+// Texto do responsável para exibição/exportação: "Cliente", "Equipe" ou "Ana, Pedro"
+function _respEtapaTxt(e){
+  const nomes = _respsEtapa(e);
+  if(e?.r==='cl') return nomes.length ? 'Cliente + ' + nomes.join(', ') : 'Cliente';
+  return nomes.length ? nomes.join(', ') : 'Equipe';
+}
+function _etapaRespExtrasHtml(p, e, i){
+  const extras = (e.rExtras||[]).filter(n => n !== e.r);
+  const disponiveis = (p.resps||[]).filter(n => n !== e.r && !extras.includes(n));
+  const chips = extras.map(n => `<span style="display:inline-flex;align-items:center;gap:3px;background:var(--s2);border:1px solid var(--bdr);border-radius:10px;padding:1px 4px 1px 7px;font-size:10.5px;margin:2px 3px 0 0">👤 ${esc(n)}<button type="button" onclick="remERx(${p.id},${i},'${esc(n).replace(/'/g,"\\'")}')" title="Remover ${esc(n)} desta etapa" aria-label="Remover ${esc(n)}" style="background:none;border:none;cursor:pointer;color:var(--mu);font-size:11px;padding:0 2px;line-height:1">×</button></span>`).join('');
+  const add = disponiveis.length
+    ? `<select class="iis" style="margin-top:3px;font-size:10.5px;color:var(--mu)" onchange="if(this.value)addERx(${p.id},${i},this.value)" aria-label="Adicionar responsável">
+         <option value="">➕ Adicionar responsável</option>
+         ${disponiveis.map(n=>`<option value="${esc(n)}">👤 ${esc(n)}</option>`).join('')}
+       </select>`
+    : '';
+  return (chips ? `<div style="margin-top:2px">${chips}</div>` : '') + add;
+}
+function addERx(pid,idx,nome){
+  const p=DB.find(x=>x.id===pid);if(!p)return;
+  const e=p.etapas[idx]; if(!e||!nome) return;
+  e.rExtras = [...new Set([...(e.rExtras||[]), nome])].filter(n => n !== e.r);
+  registrarHistorico(p, 'alterou responsável', `"${e.lb}": adicionou ${nome}`);
+  fbSalvarProjeto(p);renderAll();openDet(pid);
+}
+function remERx(pid,idx,nome){
+  const p=DB.find(x=>x.id===pid);if(!p)return;
+  const e=p.etapas[idx]; if(!e) return;
+  e.rExtras = (e.rExtras||[]).filter(n => n !== nome);
+  registrarHistorico(p, 'alterou responsável', `"${e.lb}": removeu ${nome}`);
+  fbSalvarProjeto(p);renderAll();openDet(pid);
+}
+
 function setER(pid,idx,v){
   const p=DB.find(x=>x.id===pid);if(!p)return;
   const rAnt = p.etapas[idx].r;
   p.etapas[idx].r=v;
+  // quem virou principal sai da lista de adicionais
+  if(p.etapas[idx].rExtras) p.etapas[idx].rExtras = p.etapas[idx].rExtras.filter(n => n !== v);
   const fmt = r => r==='cl'?'Cliente':r==='eq'?'Equipe':r;
   if(rAnt !== v)
     registrarHistorico(p, 'alterou responsável', `"${p.etapas[idx].lb}": "${fmt(rAnt)}" → "${fmt(v)}"`);
@@ -5940,9 +5985,31 @@ function toggleRec(el, recurso){
   // Data de início preenchida no formulário
   const dataInicio = getDateField('fi');
 
-  // Projeto EXISTENTE (editando): nunca sobrescrever etapas ao trocar recurso
-  // Só aplica datas se cronograma estiver ligado
+  // Projeto EXISTENTE (editando): ao trocar o recurso, oferece trocar as etapas pelas do novo recurso.
+  // Etapas com o mesmo nome mantêm o que já foi feito (concluída, datas, responsável, observações).
   if(editId !== null && _efEtapas.length > 0){
+    if(selecionados.length){
+      const alvo = tmplRecurso ? TEMPLATES[tmplRecurso].etapas : ETPS_DEF;
+      const mesmas = alvo.length === _efEtapas.length &&
+        alvo.every((te,i) => (_efEtapas[i]?.lb||'').toLowerCase() === te.lb.toLowerCase());
+      if(!mesmas){
+        const nomeModelo = tmplRecurso ? `"${tmplRecurso}"` : 'padrão';
+        const manter = alvo.filter(te => _efEtapas.some(e => (e.lb||'').toLowerCase() === te.lb.toLowerCase())).length;
+        if(confirm(`Trocar as etapas deste projeto pelas etapas do recurso ${nomeModelo}?\n\n`
+          + `• ${alvo.length} etapa(s) no novo modelo\n`
+          + `• ${manter} etapa(s) com o mesmo nome mantêm o que já foi feito (concluída, datas, responsável)\n`
+          + `• As demais etapas atuais serão removidas\n\nClique em Cancelar para manter as etapas atuais.`)){
+          const antigas = _efEtapas;
+          buildEF(alvo.map(te => {
+            const old = antigas.find(e => (e.lb||'').toLowerCase() === te.lb.toLowerCase());
+            return old ? {...old, lb:te.lb} : {...te, prazo:null, done:false, fim:null};
+          }));
+          _efEtapasCustomizadas = false;   // passa a seguir o modelo do recurso
+          _efTemplateTrocado = true;       // ao salvar, recalcula a coluna do card
+          showToast(`🔄 Etapas trocadas pelo modelo ${nomeModelo}`);
+        }
+      }
+    }
     if(_efCascataAtiva){
       const recursoParaCron = tmplRecurso || cronRecurso;
       if(recursoParaCron && dataInicio) aplicarCronograma(recursoParaCron, dataInicio);
@@ -6040,6 +6107,7 @@ let _efEtapas = [];
 let _efCascataAtiva = false;  // flag: cascateamento automático de datas (default: desligado)
 let _efEtapasLockadas = false; // flag: etapas bloqueadas contra regravação pelo template
 let _efEtapasCustomizadas = false; // flag: usuário modificou etapas manualmente (add/del/mover) — persiste no banco
+let _efTemplateTrocado = false;   // flag: etapas trocadas pelo modelo de outro recurso durante a edição
 
 // Gera as <option> do select de responsável por etapa
 // com base nos responsáveis alocados no projeto (lidos dos chips selecionados)
@@ -6429,6 +6497,7 @@ function getEtapasDoForm(projAnterior){
       done:  (e.done !== undefined ? e.done : ant.done) || false,
       atrasoMotivo: (e.atrasoMotivo !== undefined ? e.atrasoMotivo : ant.atrasoMotivo) || null,
       diasCl: (e.diasCl !== undefined ? e.diasCl : ant.diasCl) || null,
+      rExtras: (e.rExtras !== undefined ? e.rExtras : ant.rExtras) || [],   // responsáveis adicionais da etapa
     };
   });
 }
@@ -6501,6 +6570,7 @@ function openNew(){
   buildRespChips([]);
   _efEtapasLockadas = false;
   _efEtapasCustomizadas = false;  // ← projeto novo: nunca customizado ainda
+  _efTemplateTrocado = false;
   buildEF(ETPS_DEF.map(e=>({...e,prazo:null})));
   document.getElementById('ovNew').classList.add('on');
   setTimeout(()=>{const f=document.querySelector('#ovNew .fi');if(f)f.focus();},80);
@@ -6542,6 +6612,7 @@ function openEdit(id){
   // As etapas salvas são a fonte de verdade e não devem ser sobrescritas por template,
   // mesmo em projetos antigos que nunca tiveram a flag etapasCustomizadas gravada.
   _efEtapasCustomizadas = !!p.etapasCustomizadas || !!(p.etapas && p.etapas.length > 0);
+  _efTemplateTrocado = false;
   buildEF(p.etapas||ETPS_DEF.map(e=>({...e,prazo:null})));
   document.getElementById('ovNew').classList.add('on');
 }
@@ -6599,11 +6670,21 @@ function salvar(){
     medicaoMes:projAnterior?.medicaoMes||'',
     medicaoItens:projAnterior?.medicaoItens||[],
     medicaoTotal:projAnterior?.medicaoTotal||0,
+    enviadoMedicao:projAnterior?.enviadoMedicao||null,
+    medicaoFeita:!!projAnterior?.medicaoFeita,
+    medicaoFeitaEm:projAnterior?.medicaoFeitaEm||null,
+    medicaoConfirmadaPor:projAnterior?.medicaoConfirmadaPor||null,
     historico:projAnterior?.historico||[],
     etapas,
-    etapasCustomizadas: _efEtapasCustomizadas || projAnterior?.etapasCustomizadas || false,  // persiste flag
+    etapasCustomizadas: _efTemplateTrocado ? false : (_efEtapasCustomizadas || projAnterior?.etapasCustomizadas || false),  // persiste flag (zera ao trocar pelo modelo do recurso)
   };
 
+  // Etapas trocadas pelo modelo de outro recurso: recalcula a coluna conforme as etapas já concluídas
+  if(_efTemplateTrocado){
+    const _et = proj.etapas||[];
+    if(_et.length){ proj.pct = Math.round(_et.filter(e=>e.done).length/_et.length*100); if(proj.pct===100){ if(!proj.termino) proj.termino=td(); } else proj.termino=''; }
+    avancarColuna(proj); _efTemplateTrocado = false;
+  }
   if(editId){DB=DB.map(p=>p.id===editId?proj:p);}else{DB.push(proj);}
   // Registrar histórico detalhado
   if(editId && projAnterior){
@@ -7031,7 +7112,7 @@ function exportXLSX(){
       }
       rowsE.push([
         p.nome, sitLabel(p), e.lb, i+1,
-        e.r==='cl'?'🏢 Cliente':`👤 ${e.r==='eq'?'Equipe':e.r}`,
+        e.r==='cl'?'🏢 '+_respEtapaTxt(e):`👤 ${_respEtapaTxt(e)}`,
         isoToBR(e.prazo), isoToBR(e.fim),
         e.done?'Sim':'Não',
         diasAt||'', e.atrasoMotivo||''
@@ -7060,7 +7141,7 @@ function exportXLSX(){
         statusEt='Em aberto — atrasada';
       } else return;
       rowsA.push([p.nome, sitLabel(p), e.lb,
-        e.r==='cl'?'Cliente':(e.r==='eq'?'Equipe':e.r),
+        _respEtapaTxt(e),
         isoToBR(e.prazo), diasAt, statusEt, e.atrasoMotivo||'—']);
     });
   });
@@ -7208,7 +7289,7 @@ function exportPDFFicha(id){
       if(e.done&&e.fim&&e.prazo&&e.fim>e.prazo) diasAt=Math.round((new Date(e.fim)-new Date(e.prazo))/864e5)+'d';
       else if(!e.done&&e.prazo&&new Date(e.prazo)<new Date()) diasAt=Math.round((new Date()-new Date(e.prazo))/864e5)+'d';
     }
-    return [i+1, e.lb, e.r==='cl'?'Cliente':(e.r==='eq'?'Equipe':e.r), isoToBR(e.prazo), isoToBR(e.fim), e.done?'✓':'', diasAt, e.atrasoMotivo||''];
+    return [i+1, e.lb, _respEtapaTxt(e), isoToBR(e.prazo), isoToBR(e.fim), e.done?'✓':'', diasAt, e.atrasoMotivo||''];
   });
   doc.autoTable({
     head: etHdr, body: etRows, startY: y,
@@ -10380,6 +10461,7 @@ function _cargaStatusProj(p){
 function _etapaAtualEhDaPessoa(p, nome){
   const et = etapaAtual(p);
   if(!et) return false;            // sem etapa em aberto
+  if((et.rExtras||[]).includes(nome)) return true;  // responsável adicional da etapa
   if(et.r === 'cl') return false;  // etapa com cliente
   if(et.r === 'eq' || !et.r){      // etapa genérica para a equipe
     return (p.resps||[]).includes(nome);
