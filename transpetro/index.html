@@ -158,6 +158,13 @@ tr:hover td{background:#FAFAF9}
 .kcard.dragging{opacity:.3;transform:rotate(2deg) scale(.96);pointer-events:none}
 .kcard-t{font-weight:600;font-size:11.5px;margin:5px 0 6px;line-height:1.35;overflow-wrap:anywhere;word-break:break-word;hyphens:auto}
 .kcard-t:first-of-type{margin-top:0}
+.kcard-proj{font-weight:700;font-size:11.5px;line-height:1.3;margin:0 0 2px;overflow-wrap:anywhere;word-break:break-word}
+.kcard-proj + .kcard-t{font-weight:400;margin-top:0}
+.rec-grupo{width:100%;font-size:10.5px;font-weight:700;color:var(--mu);text-transform:uppercase;letter-spacing:.4px;margin:9px 0 1px}
+.rec-grupo:first-child{margin-top:0}
+.proj-ro{background:var(--s2);border:1px solid var(--bdr);border-radius:7px;padding:8px 10px;font-size:12.5px;color:var(--txt);min-height:36px;white-space:pre-wrap;word-break:break-word}
+.proj-ro.vazio{color:var(--mu);font-style:italic}
+.cadproj-txt{font-size:12px;color:var(--mu);max-width:240px;white-space:pre-wrap;word-break:break-word;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
 .kdates{font-size:10px;color:var(--mu);display:flex;flex-direction:column;gap:2px;margin-bottom:6px}
 .kdates .ov{color:var(--red);font-weight:700}
 .kdates .wc{color:var(--org);font-weight:700}
@@ -1162,7 +1169,8 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
   </div>
   <nav class="sb-nav">
     <div class="sb-sec">Ações</div>
-    <div class="si" role="menuitem" tabindex="0" aria-label="Novo Projeto" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openNew()}"" onclick="openNew()"><span class="si-ic">➕</span><span>Novo Projeto</span></div>
+    <div class="si" role="menuitem" tabindex="0" aria-label="Novo Produto" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openNew()}" onclick="openNew()"><span class="si-ic">➕</span><span>Novo Produto</span></div>
+    <div class="si" role="menuitem" tabindex="0" aria-label="Novo Projeto" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openNovoCadProj()}" onclick="openNovoCadProj()"><span class="si-ic">📁</span><span>Novo Projeto</span></div>
 
     <!-- Grupo Principal -->
     <div class="sb-group" id="sbg-principal">
@@ -1172,6 +1180,7 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
       </div>
       <div class="sb-group-items">
         <div class="si" role="menuitem" tabindex="0" aria-label="Kanban — Quadro de projetos" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();nav('kanban')}" onclick="nav('kanban')"><span class="si-ic">🗂️</span><span>Kanban</span></div>
+        <div class="si" role="menuitem" tabindex="0" aria-label="Projetos cadastrados" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();nav('cadprojetos')}" onclick="nav('cadprojetos')"><span class="si-ic">📁</span><span>Projetos</span></div>
         <div class="si" role="menuitem" tabindex="0" aria-label="Homologações" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();nav('homologacoes')}" onclick="nav('homologacoes')"><span class="si-ic">🔖</span><span>Homologações</span><span class="si-badge" id="badgeHomolog" style="display:none"></span></div>
         <div class="si" role="menuitem" tabindex="0" aria-label="Lista de Projetos" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();nav('projetos')}" onclick="nav('projetos')"><span class="si-ic">📋</span><span>Lista de Projetos</span></div>
         <div class="si" role="menuitem" tabindex="0" aria-label="Cronograma" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();nav('timeline')}" onclick="nav('timeline')"><span class="si-ic">📅</span><span>Cronograma</span></div>
@@ -1324,7 +1333,7 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
         <div class="user-av" id="userAv">?</div>
         <span id="userNome">...</span>
       </div>
-      <button class="btn br" onclick="openNew()" aria-label="Criar novo projeto">+ Novo Projeto</button>
+      <button class="btn br" onclick="openNew()" aria-label="Criar novo produto">+ Novo Produto</button>
     </div>
   </div>
 
@@ -1336,6 +1345,15 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
       <div class="sh"><div class="st">Quadro Kanban — Fluxo de Produção EAD</div></div>
       <div class="fbox">
         <div class="fbox-row">
+          <div class="fg-sm"><label class="fl-sm">Projeto</label>
+            <div class="ms-wrap" id="msWrap_kProj">
+              <button class="ms-btn" id="msBtn_kProj" onclick="_msToggle('kProj')">Todos</button>
+              <div class="ms-dropdown" id="msDd_kProj">
+                <div class="ms-search-wrap"><input type="text" class="ms-search-input" placeholder="🔍 Buscar projeto..." oninput="_msFilterOpts('kProj',this.value)" onclick="event.stopPropagation()"></div>
+                <div id="msOpts_kProj"></div>
+              </div>
+            </div>
+          </div>
           <div class="fg-sm"><label class="fl-sm">Responsável</label>
             <div class="ms-wrap" id="msWrap_kResp">
               <button class="ms-btn" id="msBtn_kResp" onclick="_msToggle('kResp')">Todos</button>
@@ -1413,6 +1431,15 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
       <div class="sh" style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap"><div class="st">Lista de Projetos</div><div id="listCount" style="font-size:12px;color:var(--mu);font-weight:600"></div></div>
       <div class="fbox">
         <div class="fbox-row" style="flex-wrap:wrap;gap:10px;align-items:flex-end">
+          <div class="fg-sm"><label class="fl-sm">Projeto</label>
+            <div class="ms-wrap" id="msWrap_lProj">
+              <button class="ms-btn" id="msBtn_lProj" onclick="_msToggle('lProj')">Todos</button>
+              <div class="ms-dropdown" id="msDd_lProj">
+                <div class="ms-search-wrap"><input type="text" class="ms-search-input" placeholder="🔍 Buscar projeto..." oninput="_msFilterOpts('lProj',this.value)" onclick="event.stopPropagation()"></div>
+                <div id="msOpts_lProj"></div>
+              </div>
+            </div>
+          </div>
           <div class="fg-sm"><label class="fl-sm">Responsável</label>
             <div class="ms-wrap" id="msWrap_lResp">
               <button class="ms-btn" id="msBtn_lResp" onclick="_msToggle('lResp')">Todos</button>
@@ -1788,6 +1815,19 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
       </table></div>
     </div>
 
+    <!-- PROJETOS CADASTRADOS (cada projeto agrupa vários produtos/cards) -->
+    <div class="view" id="view-cadprojetos">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:6px">
+        <div class="st">📁 Projetos</div>
+        <button class="btn br" onclick="openNovoCadProj()">+ Novo Projeto</button>
+      </div>
+      <div style="font-size:12.5px;color:var(--mu);margin-bottom:16px">Projetos cadastrados e os produtos vinculados a cada um. Só é possível excluir um projeto sem produtos, e apenas <strong>lideranças</strong> podem excluir.</div>
+      <div class="tw"><table>
+        <thead><tr><th>Projeto</th><th>Descrição</th><th>Objetivo</th><th>Público-Alvo</th><th>Produtos</th><th></th></tr></thead>
+        <tbody id="cadProjTbl"></tbody>
+      </table></div>
+    </div>
+
     <!-- HISTÓRICO DE PROJETOS DELETADOS -->
     <div class="view" id="view-lixeira">
       <div class="st" style="margin-bottom:6px">🗑️ Cards Deletados</div>
@@ -1824,6 +1864,13 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
           <th style="cursor:pointer;white-space:nowrap" onclick="toggleLixSort('motivo')">Motivo da exclusão <span id="lixSI_motivo" style="font-size:10px;color:var(--mu)"></span></th>
         </tr></thead>
         <tbody id="lixeiraTbl"></tbody>
+      </table></div>
+      <!-- Projetos cadastrados excluídos (log_delecoes com acao "excluiu projeto cadastrado") -->
+      <div class="st" style="margin:26px 0 6px">📁 Projetos excluídos</div>
+      <div style="font-size:12.5px;color:var(--mu);margin-bottom:12px">Cadastros de projeto excluídos por lideranças.</div>
+      <div class="tw"><table>
+        <thead><tr><th>Projeto</th><th>Excluído em</th><th>Excluído por</th></tr></thead>
+        <tbody id="cadProjExclTbl"></tbody>
       </table></div>
     </div>
 
@@ -1963,7 +2010,7 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
 <div class="ov2" id="ovNew" role="dialog" aria-modal="true" aria-labelledby="mNewTitle">
 <div class="modal">
   <div class="mhd">
-    <div class="mt" id="mNewTitle">Novo Projeto EAD</div>
+    <div class="mt" id="mNewTitle">Novo Produto</div>
     <button class="mcl" onclick="cm('ovNew')">✕</button>
   </div>
   <div class="mbody">
@@ -1975,7 +2022,14 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
     <!-- TAB 0 -->
     <div id="tab0">
       <div class="fg2">
-        <div class="fg ff"><label class="fl">Nome do Projeto / Curso *</label><input class="fi" id="fn" placeholder="Ex: Segurança do Trabalho — Módulo 3" aria-required="true" aria-label="Nome do projeto"></div>
+        <div class="fg ff">
+          <label class="fl" for="fProj">Nome do Projeto *</label>
+          <div style="display:flex;gap:6px;align-items:center">
+            <select class="fs" id="fProj" style="flex:1;min-width:0" onchange="onChangeProjSel()" aria-required="true" aria-label="Projeto do produto"></select>
+            <button type="button" class="btn bg2 bsm" onclick="openNovoCadProj(true)" title="Cadastrar um novo projeto">+ novo</button>
+          </div>
+        </div>
+        <div class="fg ff"><label class="fl" for="fn">Nome do Produto *</label><input class="fi" id="fn" placeholder="Ex: Vídeo de abertura — Módulo 3" aria-required="true" aria-label="Nome do produto"></div>
         <div class="fg2" style="grid-template-columns:1fr 1fr 1fr;gap:10px">
           <div class="fg">
             <label class="fl" for="fPrio">Prioridade</label>
@@ -2021,7 +2075,10 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
           <label class="fl">Tipos de Recurso — selecione um ou mais</label>
           <div class="rec-wrap" id="recChips"></div>
         </div>
-        <div class="fg ff"><label class="fl">Descrição / Objetivo</label><textarea class="fta" id="fd" placeholder="Objetivo, público-alvo, contexto..."></textarea></div>
+        <!-- Descrição, Objetivo e Público-Alvo vêm do projeto selecionado (só leitura) -->
+        <div class="fg ff"><label class="fl">Descrição <span style="font-weight:400;text-transform:none;color:var(--mu)">(do projeto — edite na tela Projetos)</span></label><div class="proj-ro" id="fProjDesc"></div></div>
+        <div class="fg ff"><label class="fl">Objetivo</label><div class="proj-ro" id="fProjObj"></div></div>
+        <div class="fg ff"><label class="fl">Público-Alvo</label><div class="proj-ro" id="fProjPub"></div></div>
 
       </div>
     </div>
@@ -2063,7 +2120,29 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
   </div>
   <div class="mft">
     <button class="btn bg2" onclick="cm('ovNew')">Cancelar</button>
-    <button class="btn br" onclick="salvar()">💾 Salvar Projeto</button>
+    <button class="btn br" onclick="salvar()">💾 Salvar Produto</button>
+  </div>
+</div>
+</div>
+
+<!-- MODAL: NOVO / EDITAR PROJETO (cadastro que agrupa os produtos) -->
+<div class="ov2" id="ovCadProj" role="dialog" aria-modal="true" aria-labelledby="cadProjTitle">
+<div class="modal" style="width:620px">
+  <div class="mhd">
+    <div class="mt" id="cadProjTitle">Novo Projeto</div>
+    <button class="mcl" onclick="cm('ovCadProj')">✕</button>
+  </div>
+  <div class="mbody">
+    <div class="fg2">
+      <div class="fg ff"><label class="fl" for="cpNome">Nome *</label><input class="fi" id="cpNome" placeholder="Ex: Segurança do Trabalho" aria-required="true" maxlength="200"></div>
+      <div class="fg ff"><label class="fl" for="cpDesc">Descrição</label><textarea class="fta" id="cpDesc" placeholder="Contexto e escopo do projeto..."></textarea></div>
+      <div class="fg ff"><label class="fl" for="cpObj">Objetivo</label><textarea class="fta" id="cpObj" placeholder="O que o projeto deve alcançar..."></textarea></div>
+      <div class="fg ff"><label class="fl" for="cpPub">Público-Alvo</label><textarea class="fta" id="cpPub" placeholder="Quem vai usar os produtos deste projeto..."></textarea></div>
+    </div>
+  </div>
+  <div class="mft">
+    <button class="btn bg2" onclick="cm('ovCadProj')">Cancelar</button>
+    <button class="btn br" id="cpSalvarBtn" onclick="salvarCadProj()">💾 Salvar Projeto</button>
   </div>
 </div>
 </div>
@@ -2113,6 +2192,21 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
 </div>
 </div>
 
+<!-- MODAL: CONFIRMAR EXCLUSÃO DE PROJETO CADASTRADO (só lideranças) -->
+<div class="ov2" id="ovDelCadProj" role="dialog" aria-modal="true" aria-labelledby="delCadProjTitle">
+<div class="modal" style="width:440px">
+  <div class="mhd"><div class="mt" id="delCadProjTitle">🗑️ Excluir Projeto</div><button class="mcl" onclick="cm('ovDelCadProj')">✕</button></div>
+  <div class="mbody">
+    <p style="margin-bottom:10px;font-size:13px">Tem certeza que deseja excluir o projeto <strong id="delCadProjNome"></strong>?</p>
+    <p style="color:var(--mu);font-size:12.5px">Ele deixará de aparecer na seleção de projetos do Novo Produto. Esta ação não pode ser desfeita.</p>
+  </div>
+  <div class="mft">
+    <button class="btn bg2" onclick="cm('ovDelCadProj')">Voltar</button>
+    <button class="btn bd" onclick="confirmarExcluirCadProj()">🗑️ Confirmar Exclusão</button>
+  </div>
+</div>
+</div>
+
 <!-- Firebase status bar -->
 <div class="fb-bar"><div class="fb-bar-fill" id="fbBarFill"></div></div>
 <div class="fb-status" id="fbStatus" style="opacity:0">
@@ -2133,6 +2227,17 @@ const NOMES = ['Tatiana','Ana Paula','Amanda','Gabriel','Pedro','Maycon','Lidera
 const CATEGORIAS_PROJETO = ['ECorp','PQDT','PQTM'];
 
 const RECURSOS = ['Acomp pedagógico - Exerc fixação e Aval','Acompanhamento pedagógico - apostila','Acompanhamento pedagógico - PPT','Animação 2D','Animação 3D','Atualização do Game 2D','Cursos alta comp até 40 min até 20 telas','Cursos alta comp até 60 min até 40 telas','Cursos alta comp até 90 min até 60 telas','Cursos baix comp até 40 min até 20 telas','Cursos baix comp até 60 min até 40 telas','Cursos baix comp até 90 min até 60 telas','Cursos de alta complexidade até 20 min','Cursos de baixa complexidade até 20 min','Editoração das apostilas','Game 2D','Game 3D','Gestão do projeto','Manutenção mensal do projeto','Objeto interativo 2D','Objeto interativo 3D','One Page - Web Content até 30 min','Personagem','Planejamento e Estruturação do Projeto','Plano Instrucional e Plano de Identidade Visual (PICV)','Pós-produção de Vídeo até 10 min','Pós-produção de Vídeo até 2 horas','Reprodução de apostila/ Pencard','Roteiro (Storyboard)','Vídeo Aula - edição','Vídeo Aula - gravação','Vídeo Instrucional 10 min','Vídeo Instrucional 5 min','Vídeo Interativo','Workshop com especialistas da Transpetro'];
+
+// Grupos exibidos no formulário do produto (todo item de RECURSOS deve estar em um grupo;
+// o que ficar de fora aparece em "Outros")
+const RECURSO_GRUPOS = [
+  {titulo:'📋 Planejamento e Gestão', recursos:['Planejamento e Estruturação do Projeto','Gestão do projeto','Manutenção mensal do projeto','Workshop com especialistas da Transpetro','Plano Instrucional e Plano de Identidade Visual (PICV)','Roteiro (Storyboard)']},
+  {titulo:'🎓 Acompanhamento Pedagógico', recursos:['Acomp pedagógico - Exerc fixação e Aval','Acompanhamento pedagógico - apostila','Acompanhamento pedagógico - PPT']},
+  {titulo:'💻 Cursos e Web', recursos:['Cursos de alta complexidade até 20 min','Cursos alta comp até 40 min até 20 telas','Cursos alta comp até 60 min até 40 telas','Cursos alta comp até 90 min até 60 telas','Cursos de baixa complexidade até 20 min','Cursos baix comp até 40 min até 20 telas','Cursos baix comp até 60 min até 40 telas','Cursos baix comp até 90 min até 60 telas','One Page - Web Content até 30 min']},
+  {titulo:'🎬 Vídeo', recursos:['Pós-produção de Vídeo até 10 min','Pós-produção de Vídeo até 2 horas','Vídeo Aula - gravação','Vídeo Aula - edição','Vídeo Instrucional 5 min','Vídeo Instrucional 10 min','Vídeo Interativo']},
+  {titulo:'🎮 Animação, Interativos e Games', recursos:['Animação 2D','Animação 3D','Objeto interativo 2D','Objeto interativo 3D','Personagem','Game 2D','Atualização do Game 2D','Game 3D']},
+  {titulo:'📚 Material Impresso', recursos:['Editoração das apostilas','Reprodução de apostila/ Pencard']},
+];
 
 // ── TABELA DE PREÇOS DO CONTRATO TRANSPETRO (planilha de serviços) ──────────
 // linha · descrição · UN · QTD contratada · preço unitário (R$)
@@ -2739,9 +2844,14 @@ function mkE(dones,prazos){
 // ── DATA ──
 let DB=[];
 let NXT=1, editId=null, cancId=null, dragId=null;
+// Projetos cadastrados (transpetro/cadprojetos): cada card (produto) aponta para um
+// deles via p.projCadId — a chave do push() do Firebase, sempre string
+let CADPROJ=[];
+function projDoCard(p){ return (p && p.projCadId) ? (CADPROJ.find(c => c.id === p.projCadId) || null) : null; }
+function nomeCompleto(p){ const pr = projDoCard(p); return pr ? pr.nome + ' — ' + p.nome : p.nome; }
 
 // ── NAV ──
-const PT={kanban:'Quadro Kanban',homologacoes:'Homologações',projetos:'Lista de Projetos',timeline:'Cronograma',kpis:'KPIs & Indicadores',atrasos:'Relatório de Atrasos',cancelados:'Projetos Cancelados',medicao:'Medição',carga:'Carga da Equipe',historico:'Histórico de Edições',lixeira:'Cards Deletados'};
+const PT={kanban:'Quadro Kanban',cadprojetos:'Projetos',homologacoes:'Homologações',projetos:'Lista de Projetos',timeline:'Cronograma',kpis:'KPIs & Indicadores',atrasos:'Relatório de Atrasos',cancelados:'Projetos Cancelados',medicao:'Medição',carga:'Carga da Equipe',historico:'Histórico de Edições',lixeira:'Cards Deletados'};
 function nav(id){
   document.querySelectorAll('.view').forEach(v=>v.classList.remove('on'));
   document.getElementById('view-'+id).classList.add('on');
@@ -2807,10 +2917,11 @@ function rKanban(){
         const{eq,cl}=delInf(p);
         return`<div class="kcard" draggable="true" data-id="${p.id}"
           role="article" tabindex="0"
-          aria-label="${esc(p.nome)}${p.prioridade?' — '+PRIO_MAP[p.prioridade]?.label.replace(/./u,'').trim():''}"
+          aria-label="${esc(nomeCompleto(p))}${p.prioridade?' — '+PRIO_MAP[p.prioridade]?.label.replace(/./u,'').trim():''}"
           onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openDet(${p.id})}"
           ondragstart="onDragStart(event,${p.id})" ondragend="onDragEnd()" onclick="cardClick(event,${p.id})">
-          <!-- Ordem: 1) nome · 2) relevância e urgência (recursos não aparecem no card do Kanban) -->
+          <!-- Ordem: 1) projeto (negrito) + produto · 2) relevância e urgência (recursos não aparecem no card do Kanban) -->
+          ${projDoCard(p)?`<div class="kcard-proj">${esc(projDoCard(p).nome)}</div>`:''}
           <div class="kcard-t">${esc(p.nome)}</div>
           ${(relevanciaBadge(p)||prioBadge(p.prioridade)||prazoBadge(p.prazo,sit))?`<div style="display:flex;gap:4px;align-items:center;flex-wrap:wrap;margin-bottom:4px">
             ${relevanciaBadge(p)}
@@ -2899,6 +3010,19 @@ function populateFiltSelects(){
     _ddKAcad.innerHTML = _kAcadItems + _kSemAcad + '<div class="ms-sep"></div><div class="ms-clear" data-ms-clear="kAcad">✕ Limpar</div>';
     _msUpdateBtn('kAcad');
   }
+
+  // ── Multi-select Projeto (Kanban e Lista) — inclui "Sem projeto" para os cards antigos ──
+  ['kProj','lProj'].forEach(id=>{
+    const box=document.getElementById('msOpts_'+id);
+    if(!box) return;
+    const sel=_msGetVals(id);
+    const opt=(v,txt)=>`<label class="ms-opt"><input type="checkbox" value="${esc(v)}" onchange="_msChange('${id}')"${sel.includes(v)?' checked':''}> ${txt}</label>`;
+    box.innerHTML=[...CADPROJ].sort((a,b)=>a.nome.localeCompare(b.nome,'pt-BR')).map(c=>opt(c.id,'📁 '+esc(c.nome))).join('')
+      + opt('__sem_projeto__','— Sem projeto —')
+      + `<div class="ms-sep"></div><div class="ms-clear" data-ms-clear="${id}">✕ Limpar</div>`;
+    _msUpdateBtn(id);
+    _msReapplySearch(id);
+  });
 
   // ── Multi-select Relevância ECorp (Kanban e Lista) ──
   ['kRel','lRel'].forEach(id=>{
@@ -3068,6 +3192,7 @@ function _msReapplySearch(id){
 
 function getKFilts(){
   return{
+    projs:      _msGetVals('kProj'),
     resps:      _msGetVals('kResp'),
     sits:       _msGetVals('kSit'),
     acads:      _msGetVals('kAcad'),
@@ -3116,10 +3241,10 @@ function _msUpdateBtn(id){
   const btn=document.getElementById('msBtn_'+id);
   if(!btn) return;
   const labels={
-    'lResp':'Todos','lSit':'Todas','lRec':'Todos','lPrio':'Todas','lAcad':'Todas','lRel':'Todas','lCol':'Todas','lPrazo':'Todas','lPrazoEt':'Todas',
+    'lProj':'Todos','lResp':'Todos','lSit':'Todas','lRec':'Todos','lPrio':'Todas','lAcad':'Todas','lRel':'Todas','lCol':'Todas','lPrazo':'Todas','lPrazoEt':'Todas',
     'medConf':'Todos','medResp':'Todos','medRec':'Todos','medStat':'Todos',
     'cargaResp':'Todos','cargaStat':'Todos','cargaRec':'Todos','cargaPrio':'Todas',
-    'kResp':'Todos','kSit':'Todas','kAcad':'Todas','kRel':'Todas','kCol':'Todas','kPrazo':'Todas','kPrazoEt':'Todas',
+    'kProj':'Todos','kResp':'Todos','kSit':'Todas','kAcad':'Todas','kRel':'Todas','kCol':'Todas','kPrazo':'Todas','kPrazoEt':'Todas',
     'aTipo':'Todos','aRespGeral':'Todos','aRespEt':'Todos',
     'homSol':'Todos','homEnv':'Todos','homMed':'Todos'
   };
@@ -3135,6 +3260,7 @@ document.addEventListener('click', e=>{
 
 function getLFilts(){
   return{
+    projs:      _msGetVals('lProj'),
     resps:      _msGetVals('lResp'),
     sits:       _msGetVals('lSit'),
     recs:       _msGetVals('lRec'),
@@ -3150,6 +3276,7 @@ function getLFilts(){
 }
 function applyFilt(data,f){
   let r=data;
+  if(f.projs&&f.projs.length) r=r.filter(p=>f.projs.includes(projDoCard(p)?p.projCadId:'__sem_projeto__'));
   if(f.resps&&f.resps.length) r=r.filter(p=>f.resps.some(rv=>(p.resps||[]).includes(rv)));
   if(f.sits &&f.sits.length)  r=r.filter(p=>f.sits.includes(calcSit(p)));
   if(f.recs &&f.recs.length)  r=r.filter(p=>f.recs.some(rv=>(p.recursos||[]).includes(rv)));
@@ -3174,7 +3301,7 @@ function _kbUpdateFades(){
 function applyKFilts(){rKanban();}
 function applyLFilts(){rList();}
 function limparKFilts(){
-  ['kResp','kSit','kAcad','kRel','kCol','kPrazo','kPrazoEt'].forEach(id=>{
+  ['kProj','kResp','kSit','kAcad','kRel','kCol','kPrazo','kPrazoEt'].forEach(id=>{
     const dd=document.getElementById('msDd_'+id);
     if(dd) dd.querySelectorAll('input[type=checkbox]').forEach(cb=>cb.checked=false);
     _msUpdateBtn(id);
@@ -3183,7 +3310,7 @@ function limparKFilts(){
   rKanban();
 }
 function limparLFilts(){
-  ['lResp','lSit','lRec','lPrio','lAcad','lRel','lCol','lPrazo','lPrazoEt'].forEach(id=>_msClear(id));
+  ['lProj','lResp','lSit','lRec','lPrio','lAcad','lRel','lCol','lPrazo','lPrazoEt'].forEach(id=>_msClear(id));
   ['lFiltDe','lFiltAte'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
   _listSortCol=''; _listSortDir=1;
   rList();
@@ -3352,7 +3479,7 @@ function rList(){
     const{eq,cl}=delInf(p);
     const _area=p.area?'<br><small style="color:var(--mu)">'+p.area+'</small>':'';
     return`<tr>
-      <td><span style="font-weight:600;cursor:pointer" onclick="openDet(${p.id})">${esc(p.nome)}</span>${_area}${p.prioridade?'<div style="margin-top:3px">'+prioBadge(p.prioridade)+'</div>':''}</td>
+      <td>${projDoCard(p)?`<div style="font-weight:700;font-size:11px;color:var(--mu)">📁 ${esc(projDoCard(p).nome)}</div>`:''}<span style="font-weight:600;cursor:pointer" onclick="openDet(${p.id})">${esc(p.nome)}</span>${_area}${p.prioridade?'<div style="margin-top:3px">'+prioBadge(p.prioridade)+'</div>':''}</td>
       <td style="text-align:center">${_relevanciaTxt(p)!==''?`<span class="prio-badge" style="background:rgba(0,61,165,.1);color:var(--blue)" title="Relevância ECorp (0 = mais importante)">⭐ ${_relevanciaTxt(p)}</span>`:'<span style="color:var(--mu)">—</span>'}</td>
       <td>${recTags(p.recursos)}</td>
       <td>${avList(p.resps)}</td>
@@ -4423,7 +4550,8 @@ function sitEtapa(e, p){
 
 function openDet(id){
   const p=DB.find(x=>x.id===id);if(!p)return;
-  document.getElementById('detTitle').textContent=p.nome;
+  const _prDet=projDoCard(p);
+  document.getElementById('detTitle').innerHTML=(_prDet?`<div style="font-size:11px;font-weight:700;color:var(--blue);text-transform:uppercase;letter-spacing:.4px;margin-bottom:2px">📁 ${esc(_prDet.nome)}</div>`:'')+esc(p.nome);
 
   const{eq,cl}=delInf(p);
   const eRows=(p.etapas||[]).map((e,i)=>{
@@ -4531,7 +4659,7 @@ function openDet(id){
       ${!_aguardandoMaterialBase(p) && cl>0?`<span class="db dcl" style="font-size:12px;padding:4px 11px">⏳ Aguard. Cliente: ${cl} dias</span>`:''}
       ${!eq&&!cl?`<span class="db dok" style="font-size:12px;padding:4px 11px">✅ Em dia</span>`:''}
     </div>
-    ${p.desc?`<div style="background:var(--s2);border-radius:8px;padding:11px;font-size:12.5px;color:var(--mu);margin-bottom:14px;white-space:pre-wrap;word-break:break-word">${linkify(p.desc)}</div>`:''}
+    ${_blocoProjetoDet(p)}
     <hr class="dv">
     <div style="font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:13px;margin-bottom:9px">
       Etapas de Desenvolvimento
@@ -5618,8 +5746,13 @@ function stab(n,el){
 }
 
 function buildRecChips(selected){
-  document.getElementById('recChips').innerHTML=RECURSOS.map(r=>`
-    <div class="rec-chip ${(selected||[]).includes(r)?'sel':''}" onclick="toggleRec(this,'${r}')">${r}</div>
+  const agrupados = new Set(RECURSO_GRUPOS.flatMap(g => g.recursos));
+  const outros = RECURSOS.filter(r => !agrupados.has(r));
+  const grupos = outros.length ? [...RECURSO_GRUPOS, {titulo:'Outros', recursos:outros}] : RECURSO_GRUPOS;
+  document.getElementById('recChips').innerHTML=grupos.map(g=>`
+    <div class="rec-grupo">${g.titulo}</div>
+    ${g.recursos.filter(r=>RECURSOS.includes(r)).map(r=>`
+    <div class="rec-chip ${(selected||[]).includes(r)?'sel':''}" onclick="toggleRec(this,'${r}')">${r}</div>`).join('')}
   `).join('');
 }
 // Atualiza visual e estado readonly do campo Prazo conforme recurso selecionado
@@ -6586,10 +6719,184 @@ function toggleIdCursoInput(){
   if(tipo !== 'manual') inp.value = '';
 }
 
+// ══════════════════════════════════════════════
+//  PROJETOS CADASTRADOS (agrupam os produtos)
+// ══════════════════════════════════════════════
+let _cadProjEditId = null;    // id em edição no modal ovCadProj (null = novo)
+let _cadProjDoProduto = false; // aberto pelo "+ novo" do formulário do produto?
+let _delCadProjId = null;     // projeto aguardando confirmação no pop-up ovDelCadProj
+
+function buildProjSelect(selId){
+  const ordenados = [...CADPROJ].sort((a,b) => a.nome.localeCompare(b.nome, 'pt-BR'));
+  // Produto ligado a um projeto que já foi excluído: obriga escolher outro
+  const orfao = selId && !CADPROJ.some(c => c.id === selId);
+  document.getElementById('fProj').innerHTML =
+    (orfao ? `<option value="" selected>⚠️ Projeto removido — selecione outro</option>`
+           : `<option value="">— Selecione o projeto —</option>`) +
+    ordenados.map(c => `<option value="${esc(c.id)}" ${c.id===selId?'selected':''}>${esc(c.nome)}</option>`).join('');
+}
+
+// Preenche Descrição/Objetivo/Público-Alvo (só leitura) com os dados do projeto escolhido
+function onChangeProjSel(){
+  const id = document.getElementById('fProj').value || null;
+  const pr = CADPROJ.find(c => c.id === id);
+  // Card antigo sem projeto: mostra a descrição que ele já tinha
+  const descAntiga = !pr && editId ? (DB.find(x => x.id === editId)?.desc || '') : '';
+  const preencher = (elId, txt) => {
+    const el = document.getElementById(elId);
+    el.textContent = txt || (pr || descAntiga ? '—' : 'Selecione um projeto');
+    el.classList.toggle('vazio', !txt);
+  };
+  preencher('fProjDesc', pr ? pr.descricao : descAntiga);
+  preencher('fProjObj',  pr?.objetivo);
+  preencher('fProjPub',  pr?.publico);
+}
+
+function openNovoCadProj(doProduto){
+  _cadProjEditId = null;
+  _cadProjDoProduto = !!doProduto;
+  document.getElementById('cadProjTitle').textContent = 'Novo Projeto';
+  ['cpNome','cpDesc','cpObj','cpPub'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('ovCadProj').classList.add('on');
+  setTimeout(() => document.getElementById('cpNome').focus(), 80);
+}
+
+function openEditCadProj(id){
+  const pr = CADPROJ.find(c => c.id === id); if(!pr) return;
+  _cadProjEditId = id;
+  _cadProjDoProduto = false;
+  document.getElementById('cadProjTitle').textContent = 'Editar Projeto';
+  document.getElementById('cpNome').value = pr.nome || '';
+  document.getElementById('cpDesc').value = pr.descricao || '';
+  document.getElementById('cpObj').value  = pr.objetivo || '';
+  document.getElementById('cpPub').value  = pr.publico || '';
+  document.getElementById('ovCadProj').classList.add('on');
+}
+
+function salvarCadProj(){
+  const nome = document.getElementById('cpNome').value.trim();
+  if(!nome){ showToast('❌ Informe o nome do projeto'); return; }
+  const duplicado = CADPROJ.some(c => c.id !== _cadProjEditId && c.nome.trim().toLowerCase() === nome.toLowerCase());
+  if(duplicado){ showToast('❌ Já existe um projeto com esse nome'); return; }
+  const anterior = _cadProjEditId ? CADPROJ.find(c => c.id === _cadProjEditId) : null;
+  if(_cadProjEditId && !anterior){ showToast('❌ Este projeto foi excluído por outra pessoa'); cm('ovCadProj'); return; }
+  const pr = {
+    ...(anterior || {}),
+    nome,
+    descricao: document.getElementById('cpDesc').value.trim(),
+    objetivo:  document.getElementById('cpObj').value.trim(),
+    publico:   document.getElementById('cpPub').value.trim(),
+    criado:    anterior?.criado || td(),
+    criadoPor: anterior?.criadoPor || nomeUsuarioAtual(),
+  };
+  const doProduto = _cadProjDoProduto;
+  const btn = document.getElementById('cpSalvarBtn');
+  if(btn) btn.disabled = true;
+  // Só fecha o modal depois que o Firebase confirmar a gravação
+  fbSalvarCadProj(pr, !anterior).then(ok => {
+    if(btn) btn.disabled = false;
+    if(!ok) return;
+    CADPROJ = anterior ? CADPROJ.map(c => c.id === pr.id ? pr : c) : [...CADPROJ.filter(c => c.id !== pr.id), pr];
+    cm('ovCadProj');
+    // Veio do formulário do produto: volta para ele com o projeto novo já selecionado
+    if(doProduto){ buildProjSelect(pr.id); onChangeProjSel(); }
+    showToast(anterior ? '✅ Projeto atualizado' : '✅ Projeto "' + nome + '" criado');
+    renderAll();
+  });
+}
+
+// Só lideranças, e só projetos sem produtos vinculados.
+// As regras do Firebase garantem a parte da liderança; a de "sem produtos" é só da interface.
+function _bloqueioExcluirCadProj(pr){
+  if(!ehLideranca()) return '🔒 Apenas lideranças podem excluir projetos';
+  const n = DB.filter(p => p.projCadId === pr.id).length;
+  return n > 0 ? `❌ "${pr.nome}" tem ${n} produto(s) vinculado(s) — mova ou exclua os produtos antes` : '';
+}
+
+// Clique no 🗑️: valida e abre o pop-up de confirmação
+function excluirCadProj(id){
+  const pr = CADPROJ.find(c => c.id === id); if(!pr) return;
+  const bloqueio = _bloqueioExcluirCadProj(pr);
+  if(bloqueio){ showToast(bloqueio); return; }
+  _delCadProjId = id;
+  document.getElementById('delCadProjNome').textContent = '"' + pr.nome + '"';
+  document.getElementById('ovDelCadProj').classList.add('on');
+}
+
+function confirmarExcluirCadProj(){
+  const pr = CADPROJ.find(c => c.id === _delCadProjId);
+  cm('ovDelCadProj');
+  _delCadProjId = null;
+  if(!pr) return;
+  // Revalida: o perfil ou os produtos podem ter mudado com o pop-up aberto
+  const bloqueio = _bloqueioExcluirCadProj(pr);
+  if(bloqueio){ showToast(bloqueio); return; }
+  fbExcluirCadProj(pr).then(ok => {
+    if(!ok) return;
+    CADPROJ = CADPROJ.filter(c => c.id !== pr.id);
+    showToast('🗑️ Projeto "' + pr.nome + '" excluído');
+    renderAll();
+  });
+}
+
+// Bloco de Descrição/Objetivo/Público-Alvo no modal de detalhe do produto
+function _blocoProjetoDet(p){
+  const pr = projDoCard(p);
+  const caixa = 'background:var(--s2);border-radius:8px;padding:11px;font-size:12.5px;color:var(--mu);white-space:pre-wrap;word-break:break-word';
+  if(!pr) return p.desc ? `<div style="${caixa};margin-bottom:14px">${linkify(p.desc)}</div>` : '';
+  const itens = [['Descrição', pr.descricao], ['Objetivo', pr.objetivo], ['Público-Alvo', pr.publico]].filter(([,v]) => v);
+  if(!itens.length) return '';
+  return `<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;margin-bottom:14px">${itens.map(([lb, v]) =>
+    `<div style="${caixa}"><div class="fl" style="margin-bottom:4px">${lb}</div>${linkify(v)}</div>`).join('')}</div>`;
+}
+
+// ── TELA "PROJETOS" ──
+function rCadProjetos(){
+  const tb = document.getElementById('cadProjTbl'); if(!tb) return;
+  if(!CADPROJ.length){
+    tb.innerHTML = `<tr><td colspan="6" style="text-align:center;color:var(--mu);padding:28px">Nenhum projeto cadastrado. Clique em <strong>+ Novo Projeto</strong>.</td></tr>`;
+    return;
+  }
+  const lider = ehLideranca();
+  const txt = v => v ? `<div class="cadproj-txt" title="${esc(v)}">${esc(v)}</div>` : '<span style="color:var(--mu)">—</span>';
+  tb.innerHTML = [...CADPROJ].sort((a,b) => a.nome.localeCompare(b.nome, 'pt-BR')).map(pr => {
+    const prods = DB.filter(p => p.projCadId === pr.id);
+    const podeExcluir = lider && !prods.length;
+    const motivoBloq = !lider ? 'Apenas lideranças podem excluir projetos' : 'Projeto com produtos não pode ser excluído';
+    return `<tr>
+      <td><strong>${esc(pr.nome)}</strong><div style="font-size:11px;color:var(--mu);margin-top:2px">Criado em ${fd(pr.criado)}${pr.criadoPor?' · '+esc(pr.criadoPor):''}</div></td>
+      <td>${txt(pr.descricao)}</td>
+      <td>${txt(pr.objetivo)}</td>
+      <td>${txt(pr.publico)}</td>
+      <td>${prods.length ? prods.map(p => `<div><span style="cursor:pointer;color:var(--blue)" onclick="openDet(${p.id})">${esc(p.nome)}</span>${p.cancelado?' <span style="color:var(--mu);font-size:11px">(cancelado)</span>':''}</div>`).join('') : '<span style="color:var(--mu)">Nenhum produto</span>'}</td>
+      <td style="white-space:nowrap">
+        <button class="btn bg2 bsm" onclick="openEditCadProj('${esc(pr.id)}')" title="Editar projeto">✏️</button>
+        <button class="btn bg2 bsm" onclick="excluirCadProj('${esc(pr.id)}')" ${podeExcluir?'':'disabled style="opacity:.4;cursor:not-allowed"'} title="${podeExcluir?'Excluir projeto':motivoBloq}">${lider?'🗑️':'🔒'}</button>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+// ── TELA DELETADOS: seção "Projetos excluídos" ──
+function rCadProjExcluidos(){
+  const tb = document.getElementById('cadProjExclTbl'); if(!tb) return;
+  if(!CADPROJ_EXCLUIDOS.length){
+    tb.innerHTML = `<tr><td colspan="3" style="text-align:center;color:var(--mu);padding:20px">Nenhum projeto excluído.</td></tr>`;
+    return;
+  }
+  tb.innerHTML = [...CADPROJ_EXCLUIDOS].sort((a,b) => (b.ts||'').localeCompare(a.ts||'')).map(r => `<tr>
+      <td><strong>${esc(r.nome||'—')}</strong></td>
+      <td>${r.ts ? new Date(r.ts).toLocaleString('pt-BR') : '—'}</td>
+      <td>${esc(r.usuario||'—')}</td>
+    </tr>`).join('');
+}
+
 function openNew(){
   editId=null;
-  document.getElementById('mNewTitle').textContent='Novo Projeto EAD';
-  ['fn','fd','fpo'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('mNewTitle').textContent='Novo Produto';
+  ['fn','fpo'].forEach(id=>document.getElementById(id).value='');
+  buildProjSelect(null);
+  onChangeProjSel();
   const prioEl=document.getElementById('fPrio');if(prioEl)prioEl.value='';
   const rpEl=document.getElementById('fRP');if(rpEl)rpEl.value='';
   const acadEl=document.getElementById('fAcademia');if(acadEl)acadEl.value='';
@@ -6620,8 +6927,10 @@ function openNew(){
 
 function openEdit(id){
   const p=DB.find(x=>x.id===id);if(!p)return;
-  editId=id; document.getElementById('mNewTitle').textContent='Editar Projeto';
+  editId=id; document.getElementById('mNewTitle').textContent='Editar Produto';
   document.getElementById('fn').value=p.nome;
+  buildProjSelect(p.projCadId||null);
+  onChangeProjSel();
   const _pe=document.getElementById('fPrio');if(_pe)_pe.value=p.prioridade||'';
   const _rp=document.getElementById('fRP');if(_rp)_rp.value=p.rp||'';
   const _ac=document.getElementById('fAcademia');if(_ac)_ac.value=p.academia||'';
@@ -6638,7 +6947,6 @@ function openEdit(id){
   buildRecChips(p.recursos||[]);
   // Atualizar estado do campo prazo conforme recursos do projeto
   setTimeout(atualizarEstadoPrazo, 0);
-  document.getElementById('fd').value=p.desc||'';
   document.getElementById('fcol').value=p.col;
   iso2dma(p.criado||td(),'fcr');
   iso2dma(p.inicio||'','fi');
@@ -6660,8 +6968,21 @@ function openEdit(id){
 }
 
 function salvar(){
+  const projCadId=document.getElementById('fProj').value||null;
+  const _projAntes=editId?DB.find(x=>x.id===editId):null;
+  // Projeto é obrigatório — exceto em card antigo que ainda não tem projeto vinculado.
+  // Card com projeto que foi excluído (órfão) também precisa escolher outro.
+  if(!projCadId && (!editId || _projAntes?.projCadId)){
+    stab(0,document.querySelectorAll('.tab')[0]);
+    showToast('❌ Selecione o projeto do produto');return;
+  }
+  if(projCadId && !CADPROJ.some(c=>c.id===projCadId)){
+    stab(0,document.querySelectorAll('.tab')[0]);
+    buildProjSelect(null); onChangeProjSel();
+    showToast('❌ O projeto selecionado foi excluído — escolha outro');return;
+  }
   const nome=document.getElementById('fn').value.trim();
-  if(!nome){showToast('❌ Informe o nome do projeto');return;}
+  if(!nome){showToast('❌ Informe o nome do produto');return;}
   const resps=getSelectedResps();
   if(!resps.length){showToast('❌ Selecione ao menos um responsável');return;}
   if(document.getElementById('fAcademia')?.value==='ECorp' && _relevanciaDoForm()===null){
@@ -6683,8 +7004,8 @@ function salvar(){
   const usuarioAtual = nomeUsuarioAtual();
   const projAnterior = editId?DB.find(x=>x.id===editId):null;
   const proj={
-    id:editId||NXT++, nome,
-    recursos:getSelectedRecs(), desc:document.getElementById('fd').value,
+    id:editId||NXT++, nome, projCadId,
+    recursos:getSelectedRecs(), desc:projAnterior?.desc||'',
     col, resps,
     criado:getDateField('fcr')||td(),
     inicio, prazo, termino:getDateField('fte'),
@@ -6734,6 +7055,9 @@ function salvar(){
     // Mudança de nome
     if(projAnterior.nome !== proj.nome)
       diffs.push(`Nome: "${projAnterior.nome}" → "${proj.nome}"`);
+    // Mudança de projeto
+    if((projAnterior.projCadId||null) !== (proj.projCadId||null))
+      diffs.push(`Projeto: "${projDoCard(projAnterior)?.nome||'sem projeto'}" → "${projDoCard(proj)?.nome||'sem projeto'}"`);
     // Mudança de prioridade
     if((projAnterior.prioridade||'') !== (proj.prioridade||''))
       diffs.push(`Prioridade: "${projAnterior.prioridade||'sem'}" → "${proj.prioridade||'sem'}"`);
@@ -6988,13 +7312,14 @@ function sitLabel(p){
 function exportBackupJSON(){
   try {
     const payload = {
-      versao: '1.0',
+      versao: '1.1',
       gerado_em: new Date().toISOString(),
       sistema: 'Firjan SENAI - Gestão EAD',
       total_projetos: DB.length,
       ativos: DB.filter(p=>!p.cancelado).length,
       cancelados: DB.filter(p=>p.cancelado).length,
       DB: DB,
+      cadprojetos: CADPROJ,
     };
     const json = JSON.stringify(payload, null, 2);
     const blob = new Blob([json], {type:'application/json;charset=utf-8'});
@@ -7082,6 +7407,12 @@ function importBackupJSON(){
           • Ativos: <strong>${ativos}</strong> · Cancelados: <strong>${canc}</strong><br>
           • Gerado em: <strong>${data_gen}</strong>
         `;
+        // Backup 1.1+ traz também os projetos cadastrados (o formato antigo continua aceito)
+        const cadArr = Array.isArray(data.cadprojetos) ? data.cadprojetos
+          : (data.cadprojetos && typeof data.cadprojetos === 'object' ? Object.values(data.cadprojetos) : []);
+        window._restoreCadProj = cadArr.filter(c => c && c.id && c.nome);
+        if(window._restoreCadProj.length)
+          preview.innerHTML += `• Projetos cadastrados: <strong>${window._restoreCadProj.length}</strong>`;
         btn.disabled = false; btn.style.opacity = '1';
         window._restoreBuffer = projetosArr;
       } catch(err){
@@ -7112,6 +7443,14 @@ function confirmarRestore(){
   } else if(typeof fbSalvarProjeto === 'function'){
     try { DB.forEach(p => fbSalvarProjeto(p)); } catch(e){ console.warn(e); }
   }
+  // Projetos cadastrados do backup (se houver)
+  if(window._restoreCadProj && window._restoreCadProj.length && fbCadProjRef){
+    window._restoreCadProj.forEach(c => {
+      fbCadProjRef.child(c.id).set(JSON.parse(JSON.stringify(c, (k,v) => v === undefined ? null : v)))
+        .catch(e => { console.error(e); showToast('⚠️ Erro ao restaurar o projeto "' + c.nome + '": ' + e.message); });
+    });
+  }
+  window._restoreCadProj = null;
   document.getElementById('modalRestore').remove();
   window._restoreBuffer = null;
   renderAll();
@@ -7125,10 +7464,10 @@ function exportXLSX(){
   const wb = XLSX.utils.book_new();
 
   // ── Aba 1: Projetos (dados básicos) ──
-  const hdrP = ['ID','Nome','Recursos','Tags','Situação','Coluna','Responsáveis','Prioridade','RP','Categoria de Projeto','Relevância (ECorp)','Criado','Início','Prazo','Término','% Concluído','Atraso Eq (d)','Atraso Cliente (d)','Observação Prazo'];
+  const hdrP = ['ID','Projeto','Produto','Recursos','Tags','Situação','Coluna','Responsáveis','Prioridade','RP','Categoria de Projeto','Relevância (ECorp)','Criado','Início','Prazo','Término','% Concluído','Atraso Eq (d)','Atraso Cliente (d)','Observação Prazo'];
   const rowsP = todos.map(p=>{
     const{eq,cl}=delInf(p);
-    return [p.id, p.nome, (p.recursos||[]).join('; '), (p.tags||[]).join('; '),
+    return [p.id, projDoCard(p)?.nome||'', p.nome, (p.recursos||[]).join('; '), (p.tags||[]).join('; '),
       sitLabel(p), colLabel(p.col), (p.resps||[]).join('; '), p.prioridade||'',
       p.rp||'', p.academia||'', _relevanciaTxt(p),
       isoToBR(p.criado), isoToBR(p.inicio), isoToBR(p.prazo), isoToBR(p.termino),
@@ -7136,7 +7475,7 @@ function exportXLSX(){
   });
   const wsP = XLSX.utils.aoa_to_sheet([hdrP, ...rowsP]);
   // Larguras de coluna
-  wsP['!cols'] = [8,40,30,20,16,28,30,12,14,16,14,12,12,12,12,14,14,16,30].map(w=>({wch:w}));
+  wsP['!cols'] = [8,40,40,30,20,16,28,30,12,14,16,14,12,12,12,12,14,14,16,30].map(w=>({wch:w}));
   // Estilo cabeçalho (SheetJS community não suporta estilos — deixamos sem)
   XLSX.utils.book_append_sheet(wb, wsP, 'Projetos');
 
@@ -7297,13 +7636,16 @@ function exportPDFFicha(id){
     ['Categoria de Projeto',p.academia||'—'],
     ...(_relevanciaTxt(p)!=='' ? [['Relevância (ECorp)', _relevanciaTxt(p)]] : []),
     ['Responsáveis',    (p.resps||[]).join(', ')||'—'],
+    ['Projeto',         projDoCard(p)?.nome||'—'],
     ['Recursos',        (p.recursos||[]).join(', ')||'—'],
     ['Data de Criação', isoToBR(p.criado)],
     ['Início',          isoToBR(p.inicio)||'—'],
     ['Prazo de Entrega',isoToBR(p.prazo)||'—'],
     ['Término Real',    isoToBR(p.termino)||'—'],
     ['% Concluído',     p.pct+'%'],
-    ['Descrição',       p.desc||'—'],
+    ['Descrição',       (projDoCard(p) ? projDoCard(p).descricao : p.desc)||'—'],
+    ['Objetivo',        projDoCard(p)?.objetivo||'—'],
+    ['Público-Alvo',    projDoCard(p)?.publico||'—'],
   ];
   if(p.cancelado) campos.push(['Motivo Cancelamento', p.cancelEm ? `${p.cancelReason||'—'} (${isoToBR(p.cancelEm)})` : p.cancelReason||'—']);
   campos.forEach(([lbl,val])=>{
@@ -8265,10 +8607,10 @@ function exportPDFHomologacoes(){
 
 // ── CSV (mantido como fallback interno) ──
 function exportCSV(){
-  const hdr='ID,Nome,Recursos,Tags,Situação,Coluna,Responsáveis,RP,Categoria de Projeto,Relevância (ECorp),Prioridade,Criado,Início,Prazo,Término,% Concluído,Atraso Eq(d),Atraso Cl(d)';
+  const hdr='ID,Projeto,Produto,Recursos,Tags,Situação,Coluna,Responsáveis,RP,Categoria de Projeto,Relevância (ECorp),Prioridade,Criado,Início,Prazo,Término,% Concluído,Atraso Eq(d),Atraso Cl(d)';
   const rows=activeDB().concat(cancelDB()).map(p=>{
     const{eq,cl}=delInf(p);
-    return[p.id,`"${p.nome}"`,`"${(p.recursos||[]).join('; ')}"`,`"${(p.tags||[]).join('; ')}"`,sitLabel(p),colLabel(p.col),`"${(p.resps||[]).join('; ')}"`,p.rp||'',p.academia||'',_relevanciaTxt(p),p.prioridade||'',p.criado,p.inicio||'',p.prazo||'',p.termino||'',p.pct,eq,cl].join(',');
+    return[p.id,`"${projDoCard(p)?.nome||''}"`,`"${p.nome}"`,`"${(p.recursos||[]).join('; ')}"`,`"${(p.tags||[]).join('; ')}"`,sitLabel(p),colLabel(p.col),`"${(p.resps||[]).join('; ')}"`,p.rp||'',p.academia||'',_relevanciaTxt(p),p.prioridade||'',p.criado,p.inicio||'',p.prazo||'',p.termino||'',p.pct,eq,cl].join(',');
   });
   const a=document.createElement('a');
   a.href='data:text/csv;charset=utf-8,'+encodeURIComponent('\uFEFF'+[hdr,...rows].join('\n'));
@@ -9651,7 +9993,7 @@ function rHomologacoes(){
       const idProj = String(p.homolog?.idCurso || p.idCurso || '');
       if(!buscarFlex(idProj,buscaId)) return false;
     }
-    if(buscaNome && !buscarFlex(p.nome || '', buscaNome)) return false;
+    if(buscaNome && !buscarFlex(nomeCompleto(p) || '', buscaNome)) return false;
     return true;
   });
 
@@ -9792,7 +10134,8 @@ const VIEW_RENDERERS = {
   homologacoes:  () => rHomologacoes(),
   carga:         () => rCarga(),
   historico:     () => rHistorico(),
-  lixeira:       () => rLixeira(),
+  lixeira:       () => { rLixeira(); rCadProjExcluidos(); },
+  cadprojetos:   () => rCadProjetos(),
 };
 const _viewsDirty = new Set(Object.keys(VIEW_RENDERERS));
 
@@ -9814,8 +10157,10 @@ const FB_ROOT = 'transpetro/';
 let fbProjetos = null;   // db.ref('transpetro/projetos')
 let fbNxtRef   = null;   // db.ref('transpetro/nxt')
 let fbLogRef   = null;   // db.ref('transpetro/log_delecoes')
+let fbCadProjRef = null; // db.ref('transpetro/cadprojetos')
 let fbListening = false; // listener ativo?
 let LIXEIRA = [];        // histórico de projetos deletados (lido de log_delecoes)
+let CADPROJ_EXCLUIDOS = []; // projetos cadastrados excluídos (também em log_delecoes)
 
 // ── STATUS UI ──
 function setStatus(state, msg){
@@ -10050,6 +10395,62 @@ function fbSalvarNxt(){
   if(fbNxtRef) fbNxtRef.set(NXT);
 }
 
+// ── SALVAR UM PROJETO CADASTRADO (transpetro/cadprojetos/{pushKey}) ──
+// Resolve true quando gravou; false se falhou ou o usuário cancelou.
+function fbSalvarCadProj(pr, novo){
+  if(!fbCadProjRef){ showToast('⚠️ Sem conexão com Firebase'); return Promise.resolve(false); }
+  const versaoLocal = pr._updatedAt;  // versão que este cliente editou (base do optimistic locking)
+  const ref = novo ? fbCadProjRef.push() : fbCadProjRef.child(pr.id);
+  if(novo) pr.id = ref.key;
+  pr._updatedAt = new Date().toISOString();
+  pr._updatedBy = nomeUsuarioAtual() || '';
+  const limpo = JSON.parse(JSON.stringify(pr, (k,v) => v === undefined ? null : v));
+
+  const gravar = () => {
+    setStatus('sync','Salvando...');
+    return (novo ? ref.set(limpo) : ref.update(limpo))
+      .then(()  => { setStatus('online','Salvo ✓'); return true; })
+      .catch(e  => { setStatus('offline','Erro ao salvar: '+e.message); showToast('❌ Erro ao salvar o projeto: '+e.message); console.error(e); return false; });
+  };
+  if(novo) return gravar();
+
+  // OPTIMISTIC LOCKING: outra pessoa salvou este projeto enquanto ele estava aberto?
+  return ref.child('_updatedAt').once('value').then(snap => {
+    const remoto = snap.val();
+    if(remoto && versaoLocal && remoto > versaoLocal){
+      const ok = confirm(
+        '⚠️ Este projeto foi alterado por outra pessoa enquanto você editava.\n\n' +
+        'OK — sobrescrever com a sua versão\n' +
+        'Cancelar — descartar sua alteração e manter a versão mais recente'
+      );
+      if(!ok){ setStatus('online','Salvamento cancelado'); showToast('↩️ Alteração descartada'); return false; }
+    }
+    return gravar();
+  }).catch(() => gravar());
+}
+
+// ── EXCLUIR UM PROJETO CADASTRADO + registrar no log_delecoes ──
+// Uma única update() multi-caminho: ou as duas gravações acontecem, ou nenhuma.
+// As regras do Firebase só permitem para lideranças.
+function fbExcluirCadProj(pr){
+  if(!fbCadProjRef || !fbLogRef){ showToast('⚠️ Sem conexão com Firebase'); return Promise.resolve(false); }
+  const logKey = fbLogRef.push().key;
+  setStatus('sync','Removendo...');
+  return fbCadProjRef.parent.update({
+    ['cadprojetos/' + pr.id]: null,
+    ['log_delecoes/' + logKey]: {
+      ts:        new Date().toISOString(),
+      usuario:   nomeUsuarioAtual(),
+      acao:      'excluiu projeto cadastrado',
+      cadProjId: pr.id,
+      nome:      pr.nome || '',
+      desc:      `Projeto cadastrado "${pr.nome}" excluído`,
+    },
+  })
+    .then(()  => { setStatus('online','Removido ✓'); return true; })
+    .catch(e  => { setStatus('offline','Erro ao remover'); showToast('❌ Não foi possível excluir: '+e.message); console.error(e); return false; });
+}
+
 // ── ESCUTAR MUDANÇAS EM TEMPO REAL ──
 function escutarFirebase(db){
   if(fbListening) return;
@@ -10057,11 +10458,22 @@ function escutarFirebase(db){
   fbProjetos = db.ref(FB_ROOT + 'projetos');
   fbNxtRef   = db.ref(FB_ROOT + 'nxt');
   fbLogRef   = db.ref(FB_ROOT + 'log_delecoes');
+  fbCadProjRef = db.ref(FB_ROOT + 'cadprojetos');
+
+  // Projetos cadastrados — se as regras do Firebase não liberarem o nó, avisa em vez de falhar calado
+  fbCadProjRef.on('value', snap => {
+    CADPROJ = Object.values(snap.val() || {}).filter(c => c && c.id && c.nome);
+    renderAll();
+  }, err => {
+    console.error('cadprojetos:', err);
+    showToast('⚠️ Sem permissão para ler Projetos — verifique as regras do Firebase');
+  });
 
   // Listener do histórico de projetos deletados — lê o log_delecoes existente
   fbLogRef.on('value', snap => {
     const v = snap.val();
     LIXEIRA = v ? Object.values(v).filter(r => r && r.acao === 'deletou projeto') : [];
+    CADPROJ_EXCLUIDOS = v ? Object.values(v).filter(r => r && r.acao === 'excluiu projeto cadastrado') : [];
     renderAll();
   });
 
@@ -10258,7 +10670,7 @@ function buscarGlobal(q){
   if(!q || q.trim().length < 2){ drop.classList.remove('on'); return; }
   const todos = activeDB().concat(cancelDB());
   const res = todos.filter(p => buscarFlex(
-    [p.nome, p.desc||'', ...(p.resps||[]), ...(p.recursos||[])].join(' '), q
+    [p.nome, projDoCard(p)?.nome||'', p.desc||'', ...(p.resps||[]), ...(p.recursos||[])].join(' '), q
   )).slice(0, 8);
   // Destaca cada termo buscado individualmente (case-insensitive) — a busca em si
   // já ignora acentos e ordem via buscarFlex, aqui é só o realce visual do resultado.
