@@ -1195,8 +1195,8 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
       </div>
       <div class="sb-group-items">
         <div class="si" role="menuitem" tabindex="0" aria-label="KPIs e Indicadores" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();nav('kpis')}" onclick="nav('kpis')"><span class="si-ic">📈</span><span>KPIs &amp; Indicadores</span></div>
-        <div class="si" role="menuitem" tabindex="0" aria-label="Relatório de Atrasos" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();nav('atrasos')}" onclick="nav('atrasos')"><span class="si-ic">⚠️</span><span>Rel. de Atrasos</span><span class="si-badge" id="badgeAtrasos" style="display:none"></span></div>
-        <div class="si" role="menuitem" tabindex="0" aria-label="Medição" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();nav('medicao')}" onclick="nav('medicao')"><span class="si-ic">📐</span><span>Medição</span><span class="si-badge" id="badgeMedicao" style="display:none"></span></div>
+        <div class="si" role="menuitem" tabindex="0" aria-label="Relatório de Atrasos" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();nav('atrasos')}" onclick="nav('atrasos')"><span class="si-ic">⚠️</span><span>Atrasos</span><span class="si-badge" id="badgeAtrasos" style="display:none"></span></div>
+        <div class="si" role="menuitem" tabindex="0" aria-label="Medição" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();nav('medicao')}" onclick="nav('medicao')"><span class="si-ic">💲</span><span>Medição</span><span class="si-badge" id="badgeMedicao" style="display:none"></span></div>
         <div class="si" role="menuitem" tabindex="0" aria-label="Projetos Cancelados" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();nav('cancelados')}" onclick="nav('cancelados')"><span class="si-ic">🚫</span><span>Cancelados</span></div>
         <div class="si" role="menuitem" tabindex="0" aria-label="Histórico de Cards Deletados" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();nav('lixeira')}" onclick="nav('lixeira')"><span class="si-ic">🗑️</span><span>Deletados</span></div>
       </div>
@@ -1342,7 +1342,6 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
     <!-- KANBAN (página principal) -->
     <div class="view on" id="view-kanban">
       <div id="statsGrid" class="sts" style="margin-bottom:18px"></div>
-      <div class="sh"><div class="st">Quadro Kanban — Fluxo de Produção EAD</div></div>
       <div class="fbox">
         <div class="fbox-row">
           <div class="fg-sm"><label class="fl-sm">Projeto</label>
@@ -1817,11 +1816,6 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
 
     <!-- PROJETOS CADASTRADOS (cada projeto agrupa vários produtos/cards) -->
     <div class="view" id="view-cadprojetos">
-      <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:6px">
-        <div class="st">📁 Projetos</div>
-        <button class="btn br" onclick="openNovoCadProj()">+ Novo Projeto</button>
-      </div>
-      <div style="font-size:12.5px;color:var(--mu);margin-bottom:16px">Projetos cadastrados e os produtos vinculados a cada um. Só é possível excluir um projeto sem produtos, e apenas <strong>lideranças</strong> podem excluir.</div>
       <div class="tw"><table>
         <thead><tr><th>Projeto</th><th>Descrição</th><th>Objetivo</th><th>Público-Alvo</th><th>Produtos</th><th></th></tr></thead>
         <tbody id="cadProjTbl"></tbody>
@@ -2296,10 +2290,10 @@ const COLUNAS = [
   {k:0,  l:'Diagnóstico',                     dot:'#94A3B8'},
   {k:1,  l:'Análise',                         dot:'#64748B'},
   {k:2,  l:'Fazer Cronograma',                 dot:'#6366F1'},  // oculta
-  {k:3,  l:'Desenho',                         dot:'#8B5CF6'},
+  {k:3,  l:'Desenho (DI)',                         dot:'#8B5CF6'},
   {k:4,  l:'Validação - PI',                   dot:'#EC4899'},  // oculta
   {k:5,  l:'Fila de Espera - Produção',        dot:'#F59E0B'},  // oculta
-  {k:6,  l:'Produção',                        dot:'#003DA5'},
+  {k:6,  l:'Produção (DM)',                        dot:'#003DA5'},
   {k:7,  l:'Entrega (Upload Arquivos SharePoint)', dot:'#0891B2'},
   {k:8,  l:'Avaliação',                       dot:'#10B981'},  // oculta
   {k:9,  l:'PELD',                             dot:'#14B8A6'},  // oculta
@@ -2881,12 +2875,12 @@ function rDash(){
   const el=document.getElementById('statsGrid');
   if(!el) return;
   el.innerHTML=`
-    <div class="sc cb"><div class="sc-l">Total de Cards Criados</div><div class="sc-v">${total}</div><div class="sc-s">total de projetos</div><div class="sc-i">🗂️</div></div>
-    <div class="sc cr"><div class="sc-l">Projetos Em Andamento</div><div class="sc-v">${and}</div><div class="sc-s">em execução ou aguardando</div><div class="sc-i">🔄</div></div>
-    <div class="sc cg"><div class="sc-l">Projetos Concluídos</div><div class="sc-v">${conc}</div><div class="sc-s">projetos entregues</div><div class="sc-i">✅</div></div>
-    <div class="sc cy"><div class="sc-l">Projetos Atrasados - Equipe</div><div class="sc-v">${atq}</div><div class="sc-s">em atraso</div><div class="sc-i">⚠️</div></div>
-    <div class="sc cp"><div class="sc-l">Projetos Atrasados - Cliente</div><div class="sc-v">${waitCl}</div><div class="sc-s">em atraso</div><div class="sc-i">⏳</div></div>
-    <div class="sc cgr"><div class="sc-l">Projetos Cancelados</div><div class="sc-v">${canc}</div><div class="sc-s"><a href="#" onclick="nav('cancelados');return false" style="color:var(--mu)">ver relatório</a></div><div class="sc-i">🚫</div></div>
+    <div class="sc cb"><div class="sc-l">Total de Cards Criados</div><div class="sc-v">${total}</div><div class="sc-s">total de produtos</div><div class="sc-i">🗂️</div></div>
+    <div class="sc cr"><div class="sc-l">Produtos Em Andamento</div><div class="sc-v">${and}</div><div class="sc-s">em execução ou aguardando</div><div class="sc-i">🔄</div></div>
+    <div class="sc cg"><div class="sc-l">Produtos Concluídos</div><div class="sc-v">${conc}</div><div class="sc-s">produtos entregues</div><div class="sc-i">✅</div></div>
+    <div class="sc cy"><div class="sc-l">Produtos Atrasados - Equipe</div><div class="sc-v">${atq}</div><div class="sc-s">em atraso</div><div class="sc-i">⚠️</div></div>
+    <div class="sc cp"><div class="sc-l">Produtos Atrasados - Cliente</div><div class="sc-v">${waitCl}</div><div class="sc-s">em atraso</div><div class="sc-i">⏳</div></div>
+    <div class="sc cgr"><div class="sc-l">Produtos Cancelados</div><div class="sc-v">${canc}</div><div class="sc-s"><a href="#" onclick="nav('cancelados');return false" style="color:var(--mu)">ver relatório</a></div><div class="sc-i">🚫</div></div>
   `;
 }
 
