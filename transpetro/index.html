@@ -2940,7 +2940,6 @@ function rKanban(){
           </div>
           <div class="pbar"><div class="pf" style="width:${p.pct}%;background:${p.pct===100?'var(--green)':sit==='atrasado'?'var(--red)':'var(--blue)'}"></div></div>
           <div style="display:flex;align-items:center;justify-content:space-between;margin-top:6px">
-            ${avList(p.resps)}
             <span style="font-size:10.5px;font-weight:600;color:var(--mu)">${p.pct}%</span>
           </div>
           ${p.criadoPor?`<div class="kcard-autoria"><span>✏️ ${esc(p.criadoPor)}</span>${p.editadoPor&&p.editadoPor!==p.criadoPor?`<span>· editado: ${esc(p.editadoPor)}</span>`:''}</div>`:''}
