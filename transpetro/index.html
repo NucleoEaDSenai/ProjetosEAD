@@ -2053,7 +2053,7 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
         <div class="resp-wrap" id="respChips"></div>
       </div>
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;flex-wrap:wrap;gap:8px">
-        <div style="font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:11px;color:var(--mu);text-transform:uppercase;letter-spacing:.5px">Etapas de Produção</div>
+        <div style="font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:11px;color:var(--mu);text-transform:uppercase;letter-spacing:.5px">Etapas de Desenvolvimento</div>
         <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
 
         </div>
@@ -2810,14 +2810,13 @@ function rKanban(){
           aria-label="${esc(p.nome)}${p.prioridade?' — '+PRIO_MAP[p.prioridade]?.label.replace(/./u,'').trim():''}"
           onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openDet(${p.id})}"
           ondragstart="onDragStart(event,${p.id})" ondragend="onDragEnd()" onclick="cardClick(event,${p.id})">
-          <!-- Ordem: 1) nome · 2) relevância e urgência · 3) recursos -->
+          <!-- Ordem: 1) nome · 2) relevância e urgência (recursos não aparecem no card do Kanban) -->
           <div class="kcard-t">${esc(p.nome)}</div>
           ${(relevanciaBadge(p)||prioBadge(p.prioridade)||prazoBadge(p.prazo,sit))?`<div style="display:flex;gap:4px;align-items:center;flex-wrap:wrap;margin-bottom:4px">
             ${relevanciaBadge(p)}
             ${prioBadge(p.prioridade)}
             ${prazoBadge(p.prazo,sit)}
           </div>`:''}
-          <div style="margin-bottom:4px">${recTags(p.recursos)}</div>
           ${p.idCurso?`<div style="font-size:10px;color:var(--mu);margin-bottom:2px"><span style="background:var(--s2);border:1px solid var(--bdr);border-radius:4px;padding:1px 5px;font-weight:600">${esc(p.idCurso)}</span></div>`:''}
           <div class="kdates">
             <span>Criado: ${fd(p.criado)}</span>
@@ -4444,6 +4443,15 @@ function openDet(id){
         ${_etapaRespExtrasHtml(p, e, i)}
       </td>
       <td>
+        <input type="date" class="ii" value="${e.dataInicial||''}" onchange="setEIni(${id},${i},this.value)"
+          aria-label="Data inicial de ${esc(e.lb)}" style="padding:3px 5px;font-size:11px;width:122px">
+      </td>
+      <td style="text-align:center">
+        <input type="number" class="ii" min="1" step="1" value="${_duracaoEtapaDU(e)||''}" placeholder="—"
+          onchange="setEDur(${id},${i},this.value)" ${e.dataInicial?'':'disabled title="Informe a data inicial primeiro"'}
+          aria-label="Duração em dias úteis de ${esc(e.lb)}" style="padding:3px 5px;font-size:11px;width:58px;text-align:center">
+      </td>
+      <td>
         <div style="display:flex;gap:3px;align-items:center">
           ${ETAPAS_SEM_PRAZO_AUTO.has(e.lb)
             ? '<i style="color:#CBD5E1;font-size:11px">sem data definida</i>'
@@ -4526,11 +4534,11 @@ function openDet(id){
     ${p.desc?`<div style="background:var(--s2);border-radius:8px;padding:11px;font-size:12.5px;color:var(--mu);margin-bottom:14px;white-space:pre-wrap;word-break:break-word">${linkify(p.desc)}</div>`:''}
     <hr class="dv">
     <div style="font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:13px;margin-bottom:9px">
-      Etapas de Produção
+      Etapas de Desenvolvimento
       <span style="font-weight:400;font-size:11px;color:var(--mu);margin-left:8px">Marque ✓ para concluir · Ajuste responsável e prazo por etapa</span>
     </div>
     <div style="overflow-x:auto">
-    <table class="et"><thead><tr><th>Etapa</th><th>Responsável</th><th>Prazo da Etapa</th><th>Término Real</th><th>Situação</th><th>Obs.</th></tr></thead>
+    <table class="et"><thead><tr><th>Etapa</th><th>Responsável</th><th>Data Inicial</th><th title="Dias úteis da data inicial até o prazo (contando os dois dias)">Duração - Dias Úteis</th><th>Prazo da Etapa</th><th>Término Real</th><th>Situação</th><th>Obs.</th></tr></thead>
     <tbody>${eRows}</tbody></table></div>
     <div class="coments-area">
       ${(p.medicaoItens||[]).length ? `
@@ -5409,6 +5417,39 @@ function _editarPrazoEtapa(pid, idx, btn){
   if(txt) txt.style.display = aberto ? '' : 'none';
   btn.textContent = aberto ? '✏️' : '✕';
   if(!aberto) document.getElementById(`ep_d_${pid}_${idx}`)?.focus();
+}
+
+// ── DATA INICIAL E DURAÇÃO (DIAS ÚTEIS) DA ETAPA ──
+// Duração conta a data inicial e o prazo (ex.: começa e termina no mesmo dia útil = 1).
+function _primeiroDiaUtil(iso){
+  const d = new Date(iso+'T12:00:00');
+  while(!isDiaUtil(d)) d.setDate(d.getDate()+1);
+  return d.toISOString().slice(0,10);
+}
+function _duracaoEtapaDU(e){
+  if(!e?.dataInicial || !e?.prazo || e.prazo < e.dataInicial) return null;
+  const ini = new Date(e.dataInicial+'T12:00:00');
+  return (isDiaUtil(ini)?1:0) + diasUteisTotais(e.dataInicial, e.prazo);
+}
+function setEIni(pid,idx,v){
+  const p=DB.find(x=>x.id===pid); if(!p||!p.etapas[idx]) return;
+  const e=p.etapas[idx], ant=e.dataInicial||null;
+  const durAnt=_duracaoEtapaDU(e);
+  e.dataInicial = v||null;
+  if(ant !== e.dataInicial)
+    registrarHistorico(p, 'alterou data inicial', `"${e.lb}": "${fd(ant)||'—'}" → "${fd(e.dataInicial)||'—'}"`);
+  // Já havia duração: mantém a duração e recalcula o prazo a partir da nova data inicial
+  if(e.dataInicial && durAnt){ setEP(pid, idx, addDiasUteis(_primeiroDiaUtil(e.dataInicial), durAnt-1)); return; }
+  fbSalvarProjeto(p); renderAll(); openDet(pid);
+}
+function setEDur(pid,idx,v){
+  const p=DB.find(x=>x.id===pid); if(!p||!p.etapas[idx]) return;
+  const e=p.etapas[idx];
+  const dur=parseInt(v,10);
+  if(!e.dataInicial){ showToast('⚠️ Informe a data inicial da etapa primeiro'); return; }
+  if(!(dur>0)){ showToast('⚠️ A duração deve ser de pelo menos 1 dia útil'); openDet(pid); return; }
+  // Prazo = data inicial + (duração − 1) dias úteis
+  setEP(pid, idx, addDiasUteis(_primeiroDiaUtil(e.dataInicial), dur-1));
 }
 
 function setEPdma(pid,idx){
@@ -6498,6 +6539,7 @@ function getEtapasDoForm(projAnterior){
       atrasoMotivo: (e.atrasoMotivo !== undefined ? e.atrasoMotivo : ant.atrasoMotivo) || null,
       diasCl: (e.diasCl !== undefined ? e.diasCl : ant.diasCl) || null,
       rExtras: (e.rExtras !== undefined ? e.rExtras : ant.rExtras) || [],   // responsáveis adicionais da etapa
+      dataInicial: (e.dataInicial !== undefined ? e.dataInicial : ant.dataInicial) || null,  // data inicial informada no card
     };
   });
 }
@@ -7280,7 +7322,7 @@ function exportPDFFicha(id){
   doc.setFillColor(0,61,165); doc.setTextColor(255,255,255);
   doc.setFont('helvetica','bold'); doc.setFontSize(10);
   doc.rect(ML, y-4, TW, 8, 'F');
-  doc.text('Etapas de Produção', ML+2, y+0.5); y+=10;
+  doc.text('Etapas de Desenvolvimento', ML+2, y+0.5); y+=10;
 
   const etHdr = [['#','Etapa','Resp.','Prazo','Conclusão','✓','Atraso','Motivo']];
   const etRows = (p.etapas||[]).map((e,i)=>{
@@ -8396,8 +8438,10 @@ function _medItensResumo(p){
 }
 
 function _buildMedRow(p){
+  const _podeMover = p.medicaoFeita && ehLideranca();
   return `<tr style="${p.medicaoFeita?'opacity:.75':''}">
     <td>
+      ${_podeMover?`<input type="checkbox" ${_medSelecionados.has(p.id)?'checked':''} onchange="_toggleSelMed(${p.id},this.checked)" title="Selecionar para mover de RAMP" aria-label="Selecionar ${esc(p.nome)}" style="margin-right:6px;vertical-align:middle;cursor:pointer">`:''}
       <span style="font-weight:600;cursor:pointer;color:var(--blue)" onclick="openDet(${p.id})">${esc(p.nome)}</span>
       ${p.cancelado?'<span style="font-size:10px;color:var(--mu);margin-left:6px">(cancelado)</span>':''}
     </td>
@@ -8426,10 +8470,10 @@ function _buildMedRow(p){
         title="${p.medicaoFeita?'Desmarcar medição':'Confirmar medição feita'}">
         ${p.medicaoFeita ? '↩️ Desmarcar' : '✅ Confirmar'}
       </button>
-      ${p.medicaoFeita
-        ? `<button onclick="abrirSeletorQuinzena(${p.id})"
-             title="Alterar mês de medição (RAMP)"
-             style="padding:5px 8px;border:1.5px solid #CBD5E1;border-radius:6px;background:#F8FAFC;cursor:pointer;font-size:12px;margin-left:4px">📅</button>`
+      ${p.medicaoFeita && ehLideranca()
+        ? `<button onclick="abrirMoverRamp([${p.id}])"
+             title="Mover este projeto para outro RAMP"
+             style="padding:5px 9px;border:1.5px solid var(--bdr);border-radius:6px;background:var(--s2);color:var(--txt);cursor:pointer;font-size:11.5px;font-weight:600;margin-left:4px;white-space:nowrap">↔️ Mover RAMP</button>`
         : ''}
     </td>
   </tr>`;
@@ -8455,11 +8499,16 @@ function _buildMedTabela(projetos){
   </div>`;
 }
 
-// Gera opções de mês de medição (RAMP): 3 meses à frente até 12 meses para trás, mais recente primeiro
+// Todos os meses de medição do RAMP 1 (Jul/2025) até `ate` (chave "AAAA-MM"), em ordem cronológica
+function _todosRamps(ate){
+  const lista = [];
+  for(let k = _RAMP_PRIMEIRO; k <= ate; k = _somaMesMedicao(k, 1)) lista.push(k);
+  return lista;
+}
+
+// Opções de mês de medição (RAMP): todos, do RAMP 1 até 3 meses à frente, mais recente primeiro
 function _opcoesQuinzena(atual){
-  const base = _medicaoAtual();
-  const opts = [];
-  for(let delta = 3; delta >= -12; delta--) opts.push(_somaMesMedicao(base, delta));
+  const opts = _todosRamps(_somaMesMedicao(_medicaoAtual(), 3));
   if(_ehChaveMedicao(atual) && !opts.includes(atual)) opts.push(atual);
   return opts.sort((a,b)=>b.localeCompare(a));
 }
@@ -8469,46 +8518,84 @@ function _fmtQuinzena(label){
   return _fmtMedicao(label);
 }
 
-function abrirSeletorQuinzena(pid){
-  const p = DB.find(x=>x.id===pid); if(!p) return;
-  const atual = _medicaoDoProjeto(p);
-  const opts = _opcoesQuinzena(atual);
+// ── MOVER PROJETOS ENTRE RAMPs ───────────────────────────────────────────────
+// Individual (botão ↔️ na linha) ou em lote (caixas de seleção + barra "Mover selecionados").
+// Só a liderança pode mover; cada movimentação pede confirmação e fica no histórico do projeto.
+const _medSelecionados = new Set();
 
-  // Criar modal inline
-  const existing = document.getElementById('quinzenaModal');
-  if(existing) existing.remove();
+function abrirSeletorQuinzena(pid){ abrirMoverRamp([pid]); }
 
+function abrirMoverRamp(pids){
+  if(!ehLideranca()){ showToast('🚫 Apenas a Liderança pode mover projetos entre RAMPs'); return; }
+  const projs = pids.map(id => DB.find(x=>x.id===id)).filter(p => p && p.medicaoFeita);
+  if(!projs.length){ showToast('⚠️ Selecione projetos com medição confirmada'); return; }
+  const atuais = [...new Set(projs.map(_medicaoDoProjeto))];
+  const atual  = atuais.length === 1 ? atuais[0] : '';
+  const opts   = _opcoesQuinzena(atual);
+
+  document.getElementById('quinzenaModal')?.remove();
   const div = document.createElement('div');
   div.id = 'quinzenaModal';
-  div.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:9999;display:flex;align-items:center;justify-content:center';
+  div.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:9999;display:flex;align-items:center;justify-content:center;padding:16px';
   div.innerHTML = `
-    <div style="background:#fff;border-radius:14px;padding:28px;min-width:320px;box-shadow:0 8px 32px rgba(0,0,0,.18)">
-      <div style="font-size:15px;font-weight:700;margin-bottom:6px">📅 Mês de Medição (RAMP)</div>
-      <div style="font-size:12px;color:#64748B;margin-bottom:18px">${p.nome.length>55?p.nome.slice(0,53)+'…':p.nome}</div>
-      <select id="quinzenaSelect" style="width:100%;padding:9px 12px;border:1.5px solid #CBD5E1;border-radius:8px;font-size:13px;font-family:'Plus Jakarta Sans',sans-serif;background:#F8FAFC;margin-bottom:20px">
-        ${opts.map(o=>`<option value="${o}" ${o===atual?'selected':''}>${_fmtQuinzena(o)}</option>`).join('')}
+    <div role="dialog" aria-modal="true" aria-label="Mover para outro RAMP" style="background:var(--surface);color:var(--txt);border-radius:14px;padding:24px;width:100%;max-width:440px;box-shadow:0 8px 32px rgba(0,0,0,.18)">
+      <div style="font-size:15px;font-weight:700;margin-bottom:6px">↔️ Mover para outro RAMP</div>
+      <div style="font-size:12px;color:var(--mu);margin-bottom:12px">
+        ${projs.length===1
+          ? `${esc(projs[0].nome.length>60?projs[0].nome.slice(0,58)+'…':projs[0].nome)}<br>RAMP atual: <strong>${_fmtMedicao(atual)}</strong>`
+          : `${projs.length} projetos selecionados${atual?` · RAMP atual: <strong>${_fmtMedicao(atual)}</strong>`:' de RAMPs diferentes'}`}
+      </div>
+      <label for="quinzenaSelect" style="font-size:11px;font-weight:700;color:var(--mu);text-transform:uppercase;letter-spacing:.4px">RAMP de destino</label>
+      <select id="quinzenaSelect" class="fi" style="width:100%;margin:4px 0 18px;padding:9px 12px">
+        ${opts.map(o=>`<option value="${o}" ${o===atual?'selected':''}>${_fmtMedicao(o)} (${_rangeMedicao(o)})</option>`).join('')}
       </select>
       <div style="display:flex;gap:10px;justify-content:flex-end">
-        <button onclick="document.getElementById('quinzenaModal').remove()"
-          style="padding:8px 18px;border:1.5px solid #CBD5E1;border-radius:8px;background:#fff;cursor:pointer;font-size:13px;font-family:'Plus Jakarta Sans',sans-serif">Cancelar</button>
-        <button onclick="salvarQuinzenaMedicao(${pid})"
-          style="padding:8px 18px;border:none;border-radius:8px;background:#003DA5;color:#fff;cursor:pointer;font-size:13px;font-weight:700;font-family:'Plus Jakarta Sans',sans-serif">✅ Salvar</button>
+        <button class="btn bg2 bsm" onclick="document.getElementById('quinzenaModal').remove()">Cancelar</button>
+        <button class="btn bb bsm" onclick="_confirmarMoverRamp([${projs.map(p=>p.id).join(',')}])">↔️ Mover</button>
       </div>
     </div>`;
   div.addEventListener('click', e => { if(e.target===div) div.remove(); });
   document.body.appendChild(div);
+  document.getElementById('quinzenaSelect').focus();
 }
 
-function salvarQuinzenaMedicao(pid){
-  const p = DB.find(x=>x.id===pid); if(!p) return;
-  const sel = document.getElementById('quinzenaSelect');
-  if(!sel) return;
-  p.medicaoMes = sel.value;
-  fbSalvarProjeto(p);
+function _confirmarMoverRamp(pids){
+  if(!ehLideranca()){ showToast('🚫 Apenas a Liderança pode mover projetos entre RAMPs'); return; }
+  const destino = document.getElementById('quinzenaSelect')?.value;
+  if(!_ehChaveMedicao(destino)) return;
+  const projs = pids.map(id => DB.find(x=>x.id===id)).filter(p => p && _medicaoDoProjeto(p) !== destino);
+  if(!projs.length){ showToast('ℹ️ Os projetos já estão nesse RAMP'); document.getElementById('quinzenaModal')?.remove(); return; }
+  if(!confirm(`Mover ${projs.length} projeto(s) para ${_fmtMedicao(destino)}?`)) return;
+  projs.forEach(p => {
+    const origem = _medicaoDoProjeto(p);
+    p.medicaoMes = destino;
+    registrarHistorico(p, 'moveu RAMP', `Medição movida de "${_fmtMedicao(origem)}" para "${_fmtMedicao(destino)}"`);
+    fbSalvarProjeto(p);
+    _medSelecionados.delete(p.id);
+  });
   document.getElementById('quinzenaModal')?.remove();
-  showToast('📅 Mês de medição atualizado!');
+  showToast(`↔️ ${projs.length} projeto(s) movido(s) para ${_fmtMedicao(destino)}`);
   rMedicao();
 }
+
+// Seleção para mover em lote
+function _toggleSelMed(pid, marcado){
+  if(marcado) _medSelecionados.add(pid); else _medSelecionados.delete(pid);
+  _atualizarBarraMoverRamp();
+}
+function _toggleSelGrupoMed(ids, marcado){
+  ids.forEach(id => { if(marcado) _medSelecionados.add(id); else _medSelecionados.delete(id); });
+  rMedicao();
+}
+function _limparSelMed(){ _medSelecionados.clear(); rMedicao(); }
+function _atualizarBarraMoverRamp(){
+  const bar = document.getElementById('medMoverBar'); if(!bar) return;
+  const n = [..._medSelecionados].filter(id => DB.find(x=>x.id===id)?.medicaoFeita).length;
+  bar.style.display = n ? 'flex' : 'none';
+  const t = document.getElementById('medMoverQtd'); if(t) t.textContent = `${n} projeto(s) selecionado(s)`;
+}
+
+function salvarQuinzenaMedicao(pid){ _confirmarMoverRamp([pid]); }
 
 function toggleMedGroup(id){
   const g = document.getElementById(id);
@@ -8588,12 +8675,6 @@ function rMedicao(){
   // Popular filtros (sempre baseado no total)
   _populateMedFiltros(listaTotal);
 
-  if(listaTotal.length === 0){
-    el.innerHTML = '<div style="text-align:center;padding:48px;color:var(--mu)">Nenhum projeto enviado para medição ainda.</div>';
-    const ct=document.getElementById('medFiltroContador'); if(ct) ct.textContent='';
-    return;
-  }
-
   // Aplicar filtros multi-select
   const fConf = _msGetVals('medConf');
   const fResp = _msGetVals('medResp');
@@ -8618,7 +8699,8 @@ function rMedicao(){
     ct.textContent = ativo ? `${lista.length} de ${listaTotal.length} projeto(s)` : '';
   }
 
-  if(lista.length === 0){
+  const _filtroAtivo = fConf.length || fResp.length || fRec.length || fStat.length;
+  if(lista.length === 0 && _filtroAtivo){
     el.innerHTML = '<div style="text-align:center;padding:48px;color:var(--mu)">Nenhum resultado para os filtros selecionados.</div>';
     return;
   }
@@ -8654,6 +8736,8 @@ function rMedicao(){
     if(!quinzenas[label]) quinzenas[label] = [];
     quinzenas[label].push(p);
   });
+  // Sem filtro: todos os RAMPs ficam visíveis, do RAMP 1 até o mês atual (mesmo os sem projetos)
+  if(!_filtroAtivo) _todosRamps(_medicaoAtual()).forEach(k => { if(!quinzenas[k]) quinzenas[k] = []; });
 
   // Ordenar meses: mais recente primeiro, "Sem data" por último
   const quinzenasOrdenadas = Object.keys(quinzenas).sort((a,b) => {
@@ -8667,6 +8751,15 @@ function rMedicao(){
   const st = JSON.parse(localStorage.getItem('transpetro_med_groups_v2')||'{}');
 
   let html = '';
+
+  // ── Barra de movimentação em lote (só liderança; aparece ao selecionar projetos) ──
+  if(ehLideranca()){
+    html += `<div id="medMoverBar" style="display:none;align-items:center;gap:10px;flex-wrap:wrap;background:var(--surface);border:1.5px solid var(--blue);border-radius:10px;padding:10px 14px;margin-bottom:10px;position:sticky;top:0;z-index:5">
+      <strong id="medMoverQtd" style="font-size:12.5px"></strong>
+      <button class="btn bb bsm" onclick="abrirMoverRamp([..._medSelecionados])">↔️ Mover selecionados para outro RAMP</button>
+      <button class="btn bg2 bsm" onclick="_limparSelMed()">Limpar seleção</button>
+    </div>`;
+  }
 
   // ── Grupo Pendentes ──
   if(grpPend.length){
@@ -8696,15 +8789,21 @@ function rMedicao(){
         <span class="med-group-title">✅ ${fmtLabel}
           ${range?`<span style="font-weight:400;font-size:11px;color:var(--mu)">${range}</span>`:''}
           ${label===_medAtual?'<span style="font-size:10px;font-weight:700;background:var(--green);color:#fff;border-radius:6px;padding:1px 7px">MÊS ATUAL</span>':''}
-          <span class="med-group-count" style="background:#DCFCE7;color:#15803D">${projs.length}</span>
+          <span class="med-group-count" style="${projs.length?'background:#DCFCE7;color:#15803D':'background:var(--s2);color:var(--mu)'}">${projs.length}</span>
         </span>
+        ${projs.length && ehLideranca() ? (() => {
+          const ids = projs.map(p=>p.id), todos = ids.every(id=>_medSelecionados.has(id));
+          return `<label onclick="event.stopPropagation()" style="font-size:11px;color:var(--mu);display:inline-flex;align-items:center;gap:4px;margin-left:auto;margin-right:10px;cursor:pointer;white-space:nowrap">
+            <input type="checkbox" ${todos?'checked':''} onchange="_toggleSelGrupoMed([${ids.join(',')}],this.checked)"> Selecionar todos</label>`;
+        })() : ''}
         <span class="med-group-chev">▼</span>
       </div>
-      <div class="med-group-body">${_buildMedTabela(projs)}</div>
+      <div class="med-group-body">${projs.length ? _buildMedTabela(projs) : '<div style="padding:14px 16px;font-size:12px;color:var(--mu)">Nenhum projeto medido neste RAMP.</div>'}</div>
     </div>`;
   });
 
   el.innerHTML = html;
+  _atualizarBarraMoverRamp();
 
   // Atualizar ícones de ordenação
   el.querySelectorAll('.medSI').forEach(sp => {
@@ -8893,18 +8992,18 @@ function exportPDFRelMedicao(){
   rcard(ML + 3*(cardW+cardGap), cardY, cardW, cardH, 'Media por Mes',
         mediaPorQuinzena, 'cursos medidos em media', 'amber');
 
-  // Grafico de barras: ultimos 12 meses (RAMP)
+  // Grafico de barras: todos os RAMPs, do RAMP 1 ate o mes atual
   const graficoY = cardY + cardH + 8;
   const graficoH = 75;
   roundRect(ML, graficoY, TW, graficoH, 3, C.white, C.grayLight, 0.3);
   drawText('Medicoes por Mes (RAMP)', ML+4, graficoY+6, {size:11, bold:true});
-  drawText('ultimos 12 meses (mais antigo a esquerda) - mes atual destacado em verde', ML+TW-4, graficoY+6, {size:8, color:C.textMuted, align:'right'});
+  drawText('do RAMP 1 ao mes atual (mais antigo a esquerda) - mes atual destacado em verde', ML+TW-4, graficoY+6, {size:8, color:C.textMuted, align:'right'});
 
-  const graficoLabels = _gerarHistoricoQuinzenasPDF(12);
+  const graficoLabels = _todosRamps(labelAtual);
   const maxVal = Math.max(...graficoLabels.map(lbl => (quinzenas[lbl]?.length || 0)), 1);
   const barsY = graficoY + 14;
   const barsAreaH = 48;
-  const colW = (TW - 12) / 12;
+  const colW = (TW - 12) / Math.max(graficoLabels.length, 1);
   const barColW = colW * 0.55;
 
   graficoLabels.forEach((lbl, i) => {
@@ -8913,7 +9012,9 @@ function exportPDFRelMedicao(){
     const barH = barsAreaH * ratio;
     const x = ML + 6 + i*colW + (colW - barColW)/2;
     const [ano, mesN] = lbl.split('-').map(Number);
-    barraV(x, barsY + barsAreaH - barH, barColW, barH, C.purple, n, 'RAMP '+_rampNum(lbl), _MESES_ABREV[mesN-1]+'/'+String(ano).slice(-2), lbl === labelAtual);
+    // Muitos meses no gráfico: rótulo curto ("R17") para caber na coluna
+    const rotRamp = (graficoLabels.length > 18 ? 'R' : 'RAMP ') + _rampNum(lbl);
+    barraV(x, barsY + barsAreaH - barH, barColW, barH, C.purple, n, rotRamp, _MESES_ABREV[mesN-1]+'/'+String(ano).slice(-2), lbl === labelAtual);
   });
 
   // ═══════════ PAGINAS SEGUINTES — DETALHAMENTO ═══════════
@@ -9326,12 +9427,13 @@ function buildHomologCard(p){
 
 // ── MEDIÇÃO MENSAL (RAMP) ──
 // Cada mês de medição é identificado internamente por "AAAA-MM" e exibido como
-// "RAMP 17 - Nov de 2026". A numeração avança 1 por mês a partir da referência abaixo
-// (Dez/2026 = RAMP 18, Out/2026 = RAMP 16, e assim por diante).
+// "RAMP 17 - Nov de 2026". A numeração avança 1 por mês a partir do RAMP 1 (Jul/2025):
+// Jul/2025 = 1, Ago/2025 = 2 … Out/2026 = 16, Nov/2026 = 17, Dez/2026 = 18, Jan/2027 = 19, e assim por diante.
 // Regra do período: dia 26 do mês anterior até dia 25 do mês (mesmo corte das antigas quinzenas).
 const _MESES_MEDICAO = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
 const _MESES_ABREV   = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
-const _RAMP_REF      = {ano:2026, mes:11, num:17};  // Nov/2026 = RAMP 17
+const _RAMP_REF      = {ano:2025, mes:7, num:1};    // Jul/2025 = RAMP 1 (Nov/2026 = RAMP 17)
+const _RAMP_PRIMEIRO = '2025-07';                    // primeiro mês de medição do contrato (RAMP 1)
 const _MED_DIA_CORTE = 25;                          // a partir do dia 26 conta para o mês seguinte
 
 function _labelMedicao(isoDate){
