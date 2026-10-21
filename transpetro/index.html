@@ -1182,7 +1182,7 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
         <div class="si" role="menuitem" tabindex="0" aria-label="Kanban — Quadro de projetos" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();nav('kanban')}" onclick="nav('kanban')"><span class="si-ic">🗂️</span><span>Kanban</span></div>
         <div class="si" role="menuitem" tabindex="0" aria-label="Projetos cadastrados" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();nav('cadprojetos')}" onclick="nav('cadprojetos')"><span class="si-ic">📁</span><span>Projetos</span></div>
         <div class="si" role="menuitem" tabindex="0" aria-label="Homologações" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();nav('homologacoes')}" onclick="nav('homologacoes')"><span class="si-ic">🔖</span><span>Homologações</span><span class="si-badge" id="badgeHomolog" style="display:none"></span></div>
-        <div class="si" role="menuitem" tabindex="0" aria-label="Lista de Projetos" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();nav('projetos')}" onclick="nav('projetos')"><span class="si-ic">📋</span><span>Lista de Projetos</span></div>
+        <div class="si" role="menuitem" tabindex="0" aria-label="Lista de Projetos" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();nav('projetos')}" onclick="nav('projetos')"><span class="si-ic">📋</span><span>Lista de Produtos</span></div>
         <div class="si" role="menuitem" tabindex="0" aria-label="Cronograma" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();nav('timeline')}" onclick="nav('timeline')"><span class="si-ic">📅</span><span>Cronograma</span></div>
       </div>
     </div>
@@ -1427,7 +1427,6 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
 
     <!-- LISTA -->
     <div class="view" id="view-projetos">
-      <div class="sh" style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap"><div class="st">Lista de Projetos</div><div id="listCount" style="font-size:12px;color:var(--mu);font-weight:600"></div></div>
       <div class="fbox">
         <div class="fbox-row" style="flex-wrap:wrap;gap:10px;align-items:flex-end">
           <div class="fg-sm"><label class="fl-sm">Projeto</label>
@@ -1524,7 +1523,7 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
       </div>
       <div class="tw"><table>
         <thead><tr>
-  <th style="cursor:pointer;white-space:nowrap" onclick="toggleListSort('nome')">Projeto <span id="lSI_nome" style="font-size:10px;color:var(--mu)"></span></th>
+  <th style="cursor:pointer;white-space:nowrap" onclick="toggleListSort('nome')">Produto <span id="lSI_nome" style="font-size:10px;color:var(--mu)"></span></th>
   <th style="cursor:pointer;white-space:nowrap;text-align:center" onclick="toggleListSort('rel')" title="Relevância ECorp (0 = mais importante)">Relevância <span id="lSI_rel" style="font-size:10px;color:var(--mu)"></span></th>
   <th style="cursor:pointer;white-space:nowrap" onclick="toggleListSort('rec')">Recursos <span id="lSI_rec" style="font-size:10px;color:var(--mu)"></span></th>
   <th style="cursor:pointer;white-space:nowrap" onclick="toggleListSort('resp')">Responsável(is) <span id="lSI_resp" style="font-size:10px;color:var(--mu)"></span></th>
@@ -2845,7 +2844,7 @@ function projDoCard(p){ return (p && p.projCadId) ? (CADPROJ.find(c => c.id === 
 function nomeCompleto(p){ const pr = projDoCard(p); return pr ? pr.nome + ' — ' + p.nome : p.nome; }
 
 // ── NAV ──
-const PT={kanban:'Quadro Kanban',cadprojetos:'Projetos',homologacoes:'Homologações',projetos:'Lista de Projetos',timeline:'Cronograma',kpis:'KPIs & Indicadores',atrasos:'Relatório de Atrasos',cancelados:'Projetos Cancelados',medicao:'Medição',carga:'Carga da Equipe',historico:'Histórico de Edições',lixeira:'Cards Deletados'};
+const PT={kanban:'Quadro Kanban',cadprojetos:'Projetos',homologacoes:'Homologações',projetos:'Lista de Produtos',timeline:'Cronograma',kpis:'KPIs & Indicadores',atrasos:'Relatório de Atrasos',cancelados:'Projetos Cancelados',medicao:'Medição',carga:'Carga da Equipe',historico:'Histórico de Edições',lixeira:'Cards Deletados'};
 function nav(id){
   document.querySelectorAll('.view').forEach(v=>v.classList.remove('on'));
   document.getElementById('view-'+id).classList.add('on');
