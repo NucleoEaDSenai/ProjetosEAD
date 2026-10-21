@@ -2827,9 +2827,7 @@ function rKanban(){
               );
             } else {
               // Demais: botão aparece ao concluir "Instalação no SIRH"
-              gatilhoMedicaoDone = etapas.some(e =>
-                e.lb && e.lb.toLowerCase().includes('instalação no sirh') && e.done
-              );
+              gatilhoMedicaoDone = _prontoParaMedicao(p);
             }
 
             if(gatilhoMedicaoDone && !p.enviadoMedicao)
@@ -4950,14 +4948,39 @@ function getTemplate(p){
 // Verifica se um fragmento de nome corresponde a alguma etapa concluída
 // exato=true → lb deve ser exatamente igual ao frag (case-insensitive)
 // exato=false (padrão) → lb contém o frag
+// Normaliza nome de etapa: sem acento, minúsculo e com espaços únicos
+function _normEtapa(s){ return _normBusca(s).replace(/\s+/g,' ').trim(); }
+
 function etapaDone(etapas, frag, exato=false){
-  const fragLow = frag.toLowerCase();
+  const fragLow = _normEtapa(frag);
   const et = etapas.find(e => {
     if(!e.lb) return false;
-    const lbLow = e.lb.toLowerCase();
+    const lbLow = _normEtapa(e.lb);
     return exato ? lbLow === fragLow : lbLow.includes(fragLow);
   });
   return et && et.done;
+}
+
+// Etapa final de upload (a última cujo nome contém "upload")
+function _etapaUpload(etapas){
+  for(let i = etapas.length-1; i >= 0; i--){
+    if(etapas[i].lb && _normEtapa(etapas[i].lb).includes('upload')) return etapas[i];
+  }
+  return null;
+}
+
+// Todas as etapas concluídas, exceto o upload (que vem depois da medição)
+function _tudoFeitoMenosUpload(p){
+  const etapas = p.etapas || [];
+  const up = _etapaUpload(etapas);
+  if(!up) return false;
+  const outras = etapas.filter(e => e !== up);
+  return outras.length > 0 && outras.every(e => e.done);
+}
+
+// Projeto pronto para "Enviar para Medição" (fluxos que não são Apostila/E-book)
+function _prontoParaMedicao(p){
+  return etapaDone(p.etapas || [], 'instalação no sirh') || _tudoFeitoMenosUpload(p);
 }
 
 function calcColIdeal(p){
@@ -4978,8 +5001,17 @@ function calcColIdeal(p){
         if(etapaDone(etapas, g.nome, g.exato || false)) melhorCol = Math.max(melhorCol, g.col);
       }
     }
+    const ehApostila = (p.recursos||[]).includes('Produção Apostila/E-book');
+    const up = _etapaUpload(etapas);
+    if(!ehApostila && up){
+      // Regra por posição (não depende do nome exato das etapas):
+      // tudo concluído menos o upload → Pré-Medição; upload concluído → Concluídos
+      if(_tudoFeitoMenosUpload(p)) melhorCol = Math.max(melhorCol, up.done ? 14 : 12);
+    }
     // Bloqueia acima de col 12 até medição confirmada
     if(!p.medicaoFeita) melhorCol = Math.min(melhorCol, 12);
+    // Medição confirmada e upload ainda pendente → Upload BDOC - Files e Scorm
+    else if(!ehApostila && melhorCol === 12) melhorCol = 13;
     return melhorCol;
 
   } else {
