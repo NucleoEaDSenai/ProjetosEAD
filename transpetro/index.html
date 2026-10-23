@@ -1525,9 +1525,9 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
         <thead><tr>
   <th style="cursor:pointer;white-space:nowrap" onclick="toggleListSort('nome')">Produto <span id="lSI_nome" style="font-size:10px;color:var(--mu)"></span></th>
   <th style="cursor:pointer;white-space:nowrap;text-align:center" onclick="toggleListSort('rel')" title="Relevância ECorp (0 = mais importante)">Relevância <span id="lSI_rel" style="font-size:10px;color:var(--mu)"></span></th>
-  <th style="cursor:pointer;white-space:nowrap" onclick="toggleListSort('rec')">Recursos <span id="lSI_rec" style="font-size:10px;color:var(--mu)"></span></th>
+  <th style="cursor:pointer;white-space:nowrap" onclick="toggleListSort('rec')">Linha(s) de Serviço(s) <span id="lSI_rec" style="font-size:10px;color:var(--mu)"></span></th>
   <th style="cursor:pointer;white-space:nowrap" onclick="toggleListSort('resp')">Responsável(is) <span id="lSI_resp" style="font-size:10px;color:var(--mu)"></span></th>
-  <th style="cursor:pointer;white-space:nowrap" onclick="toggleListSort('col')">Coluna <span id="lSI_col" style="font-size:10px;color:var(--mu)"></span></th>
+  <th style="cursor:pointer;white-space:nowrap" onclick="toggleListSort('col')">Etapa <span id="lSI_col" style="font-size:10px;color:var(--mu)"></span></th>
   <th style="cursor:pointer;white-space:nowrap" onclick="toggleListSort('sit')">Situação <span id="lSI_sit" style="font-size:10px;color:var(--mu)"></span></th>
   <th style="cursor:pointer;white-space:nowrap" onclick="toggleListSort('criado')">Criado <span id="lSI_criado" style="font-size:10px;color:var(--mu)"></span></th>
   <th style="cursor:pointer;white-space:nowrap" onclick="toggleListSort('inicio')">Início <span id="lSI_inicio" style="font-size:10px;color:var(--mu)"></span></th>
@@ -4566,11 +4566,6 @@ function openDet(id){
         <input type="date" class="ii" value="${e.dataInicial||''}" onchange="setEIni(${id},${i},this.value)"
           aria-label="Data inicial de ${esc(e.lb)}" style="padding:3px 5px;font-size:11px;width:122px">
       </td>
-      <td style="text-align:center">
-        <input type="number" class="ii" min="1" step="1" value="${_duracaoEtapaDU(e)||''}" placeholder="—"
-          onchange="setEDur(${id},${i},this.value)" ${e.dataInicial?'':'disabled title="Informe a data inicial primeiro"'}
-          aria-label="Duração em dias úteis de ${esc(e.lb)}" style="padding:3px 5px;font-size:11px;width:58px;text-align:center">
-      </td>
       <td>
         <div style="display:flex;gap:3px;align-items:center">
           ${ETAPAS_SEM_PRAZO_AUTO.has(e.lb)
@@ -4595,6 +4590,11 @@ function openDet(id){
               style="padding:3px 7px;font-size:11px;background:var(--blue);color:#fff;border:none;border-radius:5px;cursor:pointer">✓</button>
           </div>
         </div>
+      </td>
+      <td style="text-align:center">
+        <input type="number" class="ii" min="1" step="1" value="${_duracaoEtapaDU(e)||''}" placeholder="—"
+          onchange="setEDur(${id},${i},this.value)" ${e.dataInicial?'':'disabled title="Informe a data inicial primeiro"'}
+          aria-label="Duração em dias úteis de ${esc(e.lb)}" style="padding:3px 5px;font-size:11px;width:58px;text-align:center">
       </td>
       <td style="white-space:nowrap;color:var(--green)">${fd(e.fim)||'—'}</td>
       <td>${sitEtapa(e,p)}</td>
@@ -4658,7 +4658,7 @@ function openDet(id){
       <span style="font-weight:400;font-size:11px;color:var(--mu);margin-left:8px">Marque ✓ para concluir · Ajuste responsável e prazo por etapa</span>
     </div>
     <div style="overflow-x:auto">
-    <table class="et"><thead><tr><th>Etapa</th><th>Responsável</th><th>Data Inicial</th><th title="Dias úteis da data inicial até o prazo (contando os dois dias)">Duração - Dias Úteis</th><th>Prazo da Etapa</th><th>Término Real</th><th>Situação</th><th>Obs.</th></tr></thead>
+    <table class="et"><thead><tr><th>Etapa</th><th>Responsável</th><th>Data Inicial</th><th>Data Final</th><th title="Dias úteis da data inicial até a data final (contando os dois dias)">Duração - Dias Úteis</th><th>Término Real</th><th>Situação</th><th>Observação</th></tr></thead>
     <tbody>${eRows}</tbody></table></div>
     <div class="coments-area">
       ${(p.medicaoItens||[]).length ? `
