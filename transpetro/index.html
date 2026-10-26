@@ -1771,23 +1771,8 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
       <div class="fbox" style="margin-bottom:18px">
         <div class="fbox-row">
           <span style="font-size:11px;font-weight:700;color:var(--mu);text-transform:uppercase;letter-spacing:.6px;align-self:center;padding-bottom:2px">Filtrar por</span>
-          <div class="fg-sm"><label class="fl-sm">🔎 ID do Projeto</label>
-            <input type="text" id="homBuscaId" class="ms-btn" style="width:120px;cursor:text" placeholder="Buscar ID…" oninput="rHomologacoes()" autocomplete="off">
-          </div>
           <div class="fg-sm"><label class="fl-sm">🔎 Nome do Projeto</label>
             <input type="text" id="homBuscaNome" class="ms-btn" style="width:180px;cursor:text" placeholder="Buscar nome…" oninput="rHomologacoes()" autocomplete="off">
-          </div>
-          <div class="fg-sm"><label class="fl-sm">👤 Solicitante</label>
-            <div class="ms-wrap" id="msWrap_homSol">
-              <button class="ms-btn" id="msBtn_homSol" onclick="_msToggle('homSol')">Todos</button>
-              <div class="ms-dropdown" id="msDd_homSol"></div>
-            </div>
-          </div>
-          <div class="fg-sm"><label class="fl-sm">📤 Homologado Por</label>
-            <div class="ms-wrap" id="msWrap_homEnv">
-              <button class="ms-btn" id="msBtn_homEnv" onclick="_msToggle('homEnv')">Todos</button>
-              <div class="ms-dropdown" id="msDd_homEnv"></div>
-            </div>
           </div>
           <div class="fg-sm"><label class="fl-sm">📅 Medição</label>
             <div class="ms-wrap" id="msWrap_homMed">
@@ -9808,47 +9793,21 @@ function _dataEmMedicao(isoDate, label){
 }
 
 function limparFiltrosHomolog(){
-  ['homSol','homEnv','homMed'].forEach(id=>{
+  ['homMed'].forEach(id=>{
     const dd=document.getElementById('msDd_'+id);
     if(dd) dd.querySelectorAll('input[type=checkbox]').forEach(cb=>cb.checked=false);
     _msUpdateBtn(id);
   });
-  const bId=document.getElementById('homBuscaId');     if(bId)   bId.value='';
   const bNm=document.getElementById('homBuscaNome');   if(bNm)   bNm.value='';
   rHomologacoes();
 }
 
 function _popularFiltrosHomolog(lista){
-  const solicitantes = [...new Set(lista.map(p=>p.homolog?.solicitante).filter(Boolean))].sort();
-  const enviadosPor  = [...new Set(lista.map(p=>p.homolog?.enviadaPor).filter(Boolean))].sort();
-
   // Meses de medição (RAMP): gerar a partir das datas de instalação presentes, mais recente primeiro
   const labelsSet = new Set(lista.map(p=>_labelMedicao(p.homolog?.dtInstalacao)).filter(Boolean));
   const labelsOrdenados = [...labelsSet].sort((a,b)=>b.localeCompare(a));
 
   const fmtLabel = l => _fmtMedicao(l);
-
-  // Multi-select Solicitante
-  const ddSol = document.getElementById('msDd_homSol');
-  if(ddSol){
-    const sel = _msGetVals('homSol');
-    ddSol.innerHTML = (solicitantes.length
-      ? solicitantes.map(s=>`<label class="ms-opt"><input type="checkbox" value="${s}" onchange="_msChange('homSol')"${sel.includes(s)?' checked':''}> ${s}</label>`).join('')
-      : '<div style="padding:10px 12px;font-size:11.5px;color:var(--mu);font-style:italic">Nenhum solicitante</div>')
-      + '<div class="ms-sep"></div><div class="ms-clear" data-ms-clear="homSol">✕ Limpar</div>';
-    _msUpdateBtn('homSol');
-  }
-
-  // Multi-select Enviada Por
-  const ddEnv = document.getElementById('msDd_homEnv');
-  if(ddEnv){
-    const sel = _msGetVals('homEnv');
-    ddEnv.innerHTML = (enviadosPor.length
-      ? enviadosPor.map(s=>`<label class="ms-opt"><input type="checkbox" value="${s}" onchange="_msChange('homEnv')"${sel.includes(s)?' checked':''}> ${s}</label>`).join('')
-      : '<div style="padding:10px 12px;font-size:11.5px;color:var(--mu);font-style:italic">Ninguém ainda</div>')
-      + '<div class="ms-sep"></div><div class="ms-clear" data-ms-clear="homEnv">✕ Limpar</div>';
-    _msUpdateBtn('homEnv');
-  }
 
   // Multi-select Medição (RAMP mensal)
   const ddMed = document.getElementById('msDd_homMed');
@@ -9955,22 +9914,13 @@ function rHomologacoes(){
   }
 
   // Aplicar filtros (multi-select)
-  const filtroSolic   = _msGetVals('homSol');
-  const filtroEnvPor  = _msGetVals('homEnv');
   const filtroMedicao = _msGetVals('homMed');
 
-  // Buscas por texto (ID e nome do projeto)
-  const buscaId   = (document.getElementById('homBuscaId')?.value   || '').trim().toLowerCase();
+  // Busca por texto (nome do projeto)
   const buscaNome = (document.getElementById('homBuscaNome')?.value || '').trim().toLowerCase();
 
   const lista = listaTotal.filter(p => {
-    if(filtroSolic.length   && !filtroSolic.includes(p.homolog?.solicitante || ''))  return false;
-    if(filtroEnvPor.length  && !filtroEnvPor.includes(p.homolog?.enviadaPor  || '')) return false;
     if(filtroMedicao.length && !filtroMedicao.some(l=>_dataEmMedicao(p.homolog?.dtInstalacao, l))) return false;
-    if(buscaId){
-      const idProj = String(p.homolog?.idCurso || p.idCurso || '');
-      if(!buscarFlex(idProj,buscaId)) return false;
-    }
     if(buscaNome && !buscarFlex(nomeCompleto(p) || '', buscaNome)) return false;
     return true;
   });
@@ -9978,7 +9928,7 @@ function rHomologacoes(){
   // Contador de resultados quando filtro ativo
   const contador = document.getElementById('homFiltroContador');
   if(contador){
-    const ativo = filtroSolic.length || filtroEnvPor.length || filtroMedicao.length || buscaId || buscaNome;
+    const ativo = filtroMedicao.length || buscaNome;
     contador.textContent = ativo ? `${lista.length} de ${listaTotal.length} projeto(s)` : '';
   }
 
@@ -10051,7 +10001,7 @@ function rHomologacoes(){
       }
       const gid = 'mes_'+chave.replace('-','');
       // Se há busca por texto ativa, abre todas as gavetas para não esconder resultados
-      const aberto = (buscaId || buscaNome) ? true : _homMesAbertos.has(gid);
+      const aberto = buscaNome ? true : _homMesAbertos.has(gid);
       html += `<div class="hom-mes-title" onclick="toggleHomMes('${gid}')">
         <span>📅</span><span>${rotulo}</span>
         <span class="hom-mes-count">${itens.length}</span>
