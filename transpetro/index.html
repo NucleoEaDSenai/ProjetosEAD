@@ -142,15 +142,17 @@ tr:hover td{background:#FAFAF9}
 .tco{background:#dcfce7;color:#15803d}
 .tca{background:#fff7ed;color:#c2410c}
 /* KANBAN */
-.kb{display:flex;gap:11px;overflow-x:auto;padding-bottom:12px;align-items:stretch;cursor:grab;user-select:none;scroll-behavior:smooth;max-height:calc(100vh - 210px)}
+.kb{display:flex;gap:11px;overflow-x:auto;padding-bottom:0;align-items:stretch;cursor:grab;user-select:none;scroll-behavior:smooth;max-height:calc(100vh - 210px);scrollbar-width:none;-ms-overflow-style:none}
+.kb::-webkit-scrollbar{display:none}
 .kb.is-dragging{cursor:grabbing}
 .kb.is-dragging .kcard{pointer-events:none}
 /* Indicadores de scroll lateral */
 .kb-wrap{position:relative}
-.kb-fade-left,.kb-fade-right{position:absolute;top:0;bottom:12px;width:40px;pointer-events:none;z-index:5;transition:opacity .2s}
+.kb-fade-left,.kb-fade-right{position:absolute;top:0;bottom:0;width:40px;pointer-events:none;z-index:5;transition:opacity .2s}
 .kb-fade-left{left:0;background:linear-gradient(to right,var(--bg) 30%,transparent)}
 .kb-fade-right{right:0;background:linear-gradient(to left,var(--bg) 30%,transparent)}
-.kc{background:var(--s2);border-radius:var(--r);padding:11px;border:1px solid var(--bdr);min-height:300px;min-width:185px;flex:0 0 185px;overflow-y:auto;display:flex;flex-direction:column}
+.kc{background:var(--s2);border-radius:var(--r);padding:11px;border:1px solid var(--bdr);min-height:300px;min-width:185px;flex:1 0 185px;overflow-y:auto;display:flex;flex-direction:column;scrollbar-width:none}
+.kc::-webkit-scrollbar{display:none}
 .kc-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;position:sticky;top:-11px;z-index:2;background:var(--s2);padding:11px 0 8px;margin:-11px -11px 0;padding-left:11px;padding-right:11px;box-shadow:0 4px 6px -2px var(--s2),0 2px 0 0 var(--bdr)}
 .kc-t{font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:8px;text-transform:uppercase;letter-spacing:.5px;display:flex;align-items:center;gap:5px;line-height:1.3}
 .kc-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
@@ -1431,12 +1433,6 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
               </div>
             </div>
           </div>
-          <div class="fg-sm"><label class="fl-sm">Criado após</label>
-            <input class="fi-sm" type="date" id="kFiltDe" onchange="applyKFilts()">
-          </div>
-          <div class="fg-sm"><label class="fl-sm">Criado até</label>
-            <input class="fi-sm" type="date" id="kFiltAte" onchange="applyKFilts()">
-          </div>
           <button class="btn-lim" onclick="limparKFilts()">✕ Limpar</button>
         </div>
         <div style="margin-top:6px;font-size:10.5px;color:var(--mu)">✦ Arraste os cards entre as colunas para mover o status</div>
@@ -1505,12 +1501,6 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
               <div class="ms-dropdown" id="msDd_lAcad"></div>
             </div>
           </div>
-          <div class="fg-sm"><label class="fl-sm">Relevância (ECorp)</label>
-            <div class="ms-wrap" id="msWrap_lRel">
-              <button class="ms-btn" id="msBtn_lRel" onclick="_msToggle('lRel')">Todas</button>
-              <div class="ms-dropdown" id="msDd_lRel"></div>
-            </div>
-          </div>
           <div class="fg-sm"><label class="fl-sm">Etapa</label>
             <div class="ms-wrap" id="msWrap_lCol">
               <button class="ms-btn" id="msBtn_lCol" onclick="_msToggle('lCol')">Todas</button>
@@ -1525,21 +1515,6 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
                 <div id="msOpts_lPrazo"></div>
               </div>
             </div>
-          </div>
-          <div class="fg-sm"><label class="fl-sm" title="Selecione um prazo de etapa para ver todas as tarefas com alguma etapa vencendo na mesma data">Prazo da Etapa</label>
-            <div class="ms-wrap" id="msWrap_lPrazoEt">
-              <button class="ms-btn" id="msBtn_lPrazoEt" onclick="_msToggle('lPrazoEt')">Todas</button>
-              <div class="ms-dropdown" id="msDd_lPrazoEt">
-                <div class="ms-search-wrap"><input type="text" class="ms-search-input" placeholder="🔍 Buscar data..." oninput="_msFilterOpts('lPrazoEt',this.value)" onclick="event.stopPropagation()"></div>
-                <div id="msOpts_lPrazoEt"></div>
-              </div>
-            </div>
-          </div>
-          <div class="fg-sm"><label class="fl-sm">Criado após</label>
-            <input class="fi-sm" type="date" id="lFiltDe" onchange="applyLFilts()">
-          </div>
-          <div class="fg-sm"><label class="fl-sm">Criado até</label>
-            <input class="fi-sm" type="date" id="lFiltAte" onchange="applyLFilts()">
           </div>
           <button class="btn-lim" onclick="limparLFilts()">✕ Limpar</button>
         </div>
@@ -1710,7 +1685,7 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
         <div class="kpi-row" style="grid-template-columns:1fr 1fr">
           <div class="kpi-card">
             <div class="kpi-card-head">
-              <span class="kpi-card-title">📦 Conclusões por Tipo de Recurso</span>
+              <span class="kpi-card-title">📦 Conclusões por Linha(s) de Serviço(s)</span>
             </div>
             <div id="kpiThroughputRec"></div>
           </div>
@@ -1796,23 +1771,8 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
       <div class="fbox" style="margin-bottom:18px">
         <div class="fbox-row">
           <span style="font-size:11px;font-weight:700;color:var(--mu);text-transform:uppercase;letter-spacing:.6px;align-self:center;padding-bottom:2px">Filtrar por</span>
-          <div class="fg-sm"><label class="fl-sm">🔎 ID do Projeto</label>
-            <input type="text" id="homBuscaId" class="ms-btn" style="width:120px;cursor:text" placeholder="Buscar ID…" oninput="rHomologacoes()" autocomplete="off">
-          </div>
           <div class="fg-sm"><label class="fl-sm">🔎 Nome do Projeto</label>
             <input type="text" id="homBuscaNome" class="ms-btn" style="width:180px;cursor:text" placeholder="Buscar nome…" oninput="rHomologacoes()" autocomplete="off">
-          </div>
-          <div class="fg-sm"><label class="fl-sm">👤 Solicitante</label>
-            <div class="ms-wrap" id="msWrap_homSol">
-              <button class="ms-btn" id="msBtn_homSol" onclick="_msToggle('homSol')">Todos</button>
-              <div class="ms-dropdown" id="msDd_homSol"></div>
-            </div>
-          </div>
-          <div class="fg-sm"><label class="fl-sm">📤 Homologado Por</label>
-            <div class="ms-wrap" id="msWrap_homEnv">
-              <button class="ms-btn" id="msBtn_homEnv" onclick="_msToggle('homEnv')">Todos</button>
-              <div class="ms-dropdown" id="msDd_homEnv"></div>
-            </div>
           </div>
           <div class="fg-sm"><label class="fl-sm">📅 Medição</label>
             <div class="ms-wrap" id="msWrap_homMed">
@@ -3040,7 +3000,7 @@ function populateFiltSelects(){
   });
 
   // ── Multi-select Relevância ECorp (Kanban e Lista) ──
-  ['kRel','lRel'].forEach(id=>{
+  ['kRel'].forEach(id=>{
     const dd=document.getElementById('msDd_'+id);
     if(!dd) return;
     const sel=_msGetVals(id);
@@ -3167,13 +3127,6 @@ function populateFiltSelects(){
     _msReapplySearch('kPrazoEt');
   }
 
-  // Multi-select Prazo da Etapa (Lista)
-  const _ddLPrazoEt = document.getElementById('msOpts_lPrazoEt');
-  if(_ddLPrazoEt){
-    _ddLPrazoEt.innerHTML = _prazoEtOptsHtml('lPrazoEt');
-    _msUpdateBtn('lPrazoEt');
-    _msReapplySearch('lPrazoEt');
-  }
 }
 // Filtro de busca rápida dentro dos dropdowns de prazo (Data de Conclusão / Prazo da Etapa)
 function _msFilterOpts(id,query){
@@ -3281,12 +3234,8 @@ function getLFilts(){
     recs:       _msGetVals('lRec'),
     prios:      _msGetVals('lPrio'),
     acads:      _msGetVals('lAcad'),
-    rels:       _msGetVals('lRel'),
     cols:       _msGetVals('lCol'),
     prazos:     _msGetVals('lPrazo'),
-    prazosEt:   _msGetVals('lPrazoEt'),
-    de:    document.getElementById('lFiltDe')?.value||'',
-    ate:   document.getElementById('lFiltAte')?.value||'',
   };
 }
 function applyFilt(data,f){
@@ -3325,8 +3274,7 @@ function limparKFilts(){
   rKanban();
 }
 function limparLFilts(){
-  ['lProj','lResp','lSit','lRec','lPrio','lAcad','lRel','lCol','lPrazo','lPrazoEt'].forEach(id=>_msClear(id));
-  ['lFiltDe','lFiltAte'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
+  ['lProj','lResp','lSit','lRec','lPrio','lAcad','lCol','lPrazo'].forEach(id=>_msClear(id));
   _listSortCol=''; _listSortDir=1;
   rList();
 }
@@ -4093,12 +4041,12 @@ function rKPIs(){
   if(thrRecEl){
     const recCount = {};
     todos.filter(p => p.termino).forEach(p => {
-      (p.recursos||['(sem recurso)']).forEach(r => { recCount[r] = (recCount[r]||0)+1; });
+      (p.recursos||['(sem linha de serviço)']).forEach(r => { recCount[r] = (recCount[r]||0)+1; });
     });
     const arr = Object.entries(recCount).sort((a,b) => b[1]-a[1]);
     const mx = arr.length ? arr[0][1] : 1;
     thrRecEl.innerHTML = arr.length === 0
-      ? '<div class="kpi-empty"><div class="kpi-empty-icon">📦</div>Nenhum projeto concluído ainda</div>'
+      ? '<div class="kpi-empty"><div class="kpi-empty-icon">📦</div>Nenhum produto concluído ainda</div>'
       : `<div class="kpi-bar2">${arr.map(([rec,n],i) => `
           <div class="kpi-bar2-row">
             <div class="kpi-bar2-head">
@@ -9845,47 +9793,21 @@ function _dataEmMedicao(isoDate, label){
 }
 
 function limparFiltrosHomolog(){
-  ['homSol','homEnv','homMed'].forEach(id=>{
+  ['homMed'].forEach(id=>{
     const dd=document.getElementById('msDd_'+id);
     if(dd) dd.querySelectorAll('input[type=checkbox]').forEach(cb=>cb.checked=false);
     _msUpdateBtn(id);
   });
-  const bId=document.getElementById('homBuscaId');     if(bId)   bId.value='';
   const bNm=document.getElementById('homBuscaNome');   if(bNm)   bNm.value='';
   rHomologacoes();
 }
 
 function _popularFiltrosHomolog(lista){
-  const solicitantes = [...new Set(lista.map(p=>p.homolog?.solicitante).filter(Boolean))].sort();
-  const enviadosPor  = [...new Set(lista.map(p=>p.homolog?.enviadaPor).filter(Boolean))].sort();
-
   // Meses de medição (RAMP): gerar a partir das datas de instalação presentes, mais recente primeiro
   const labelsSet = new Set(lista.map(p=>_labelMedicao(p.homolog?.dtInstalacao)).filter(Boolean));
   const labelsOrdenados = [...labelsSet].sort((a,b)=>b.localeCompare(a));
 
   const fmtLabel = l => _fmtMedicao(l);
-
-  // Multi-select Solicitante
-  const ddSol = document.getElementById('msDd_homSol');
-  if(ddSol){
-    const sel = _msGetVals('homSol');
-    ddSol.innerHTML = (solicitantes.length
-      ? solicitantes.map(s=>`<label class="ms-opt"><input type="checkbox" value="${s}" onchange="_msChange('homSol')"${sel.includes(s)?' checked':''}> ${s}</label>`).join('')
-      : '<div style="padding:10px 12px;font-size:11.5px;color:var(--mu);font-style:italic">Nenhum solicitante</div>')
-      + '<div class="ms-sep"></div><div class="ms-clear" data-ms-clear="homSol">✕ Limpar</div>';
-    _msUpdateBtn('homSol');
-  }
-
-  // Multi-select Enviada Por
-  const ddEnv = document.getElementById('msDd_homEnv');
-  if(ddEnv){
-    const sel = _msGetVals('homEnv');
-    ddEnv.innerHTML = (enviadosPor.length
-      ? enviadosPor.map(s=>`<label class="ms-opt"><input type="checkbox" value="${s}" onchange="_msChange('homEnv')"${sel.includes(s)?' checked':''}> ${s}</label>`).join('')
-      : '<div style="padding:10px 12px;font-size:11.5px;color:var(--mu);font-style:italic">Ninguém ainda</div>')
-      + '<div class="ms-sep"></div><div class="ms-clear" data-ms-clear="homEnv">✕ Limpar</div>';
-    _msUpdateBtn('homEnv');
-  }
 
   // Multi-select Medição (RAMP mensal)
   const ddMed = document.getElementById('msDd_homMed');
@@ -9992,22 +9914,13 @@ function rHomologacoes(){
   }
 
   // Aplicar filtros (multi-select)
-  const filtroSolic   = _msGetVals('homSol');
-  const filtroEnvPor  = _msGetVals('homEnv');
   const filtroMedicao = _msGetVals('homMed');
 
-  // Buscas por texto (ID e nome do projeto)
-  const buscaId   = (document.getElementById('homBuscaId')?.value   || '').trim().toLowerCase();
+  // Busca por texto (nome do projeto)
   const buscaNome = (document.getElementById('homBuscaNome')?.value || '').trim().toLowerCase();
 
   const lista = listaTotal.filter(p => {
-    if(filtroSolic.length   && !filtroSolic.includes(p.homolog?.solicitante || ''))  return false;
-    if(filtroEnvPor.length  && !filtroEnvPor.includes(p.homolog?.enviadaPor  || '')) return false;
     if(filtroMedicao.length && !filtroMedicao.some(l=>_dataEmMedicao(p.homolog?.dtInstalacao, l))) return false;
-    if(buscaId){
-      const idProj = String(p.homolog?.idCurso || p.idCurso || '');
-      if(!buscarFlex(idProj,buscaId)) return false;
-    }
     if(buscaNome && !buscarFlex(nomeCompleto(p) || '', buscaNome)) return false;
     return true;
   });
@@ -10015,7 +9928,7 @@ function rHomologacoes(){
   // Contador de resultados quando filtro ativo
   const contador = document.getElementById('homFiltroContador');
   if(contador){
-    const ativo = filtroSolic.length || filtroEnvPor.length || filtroMedicao.length || buscaId || buscaNome;
+    const ativo = filtroMedicao.length || buscaNome;
     contador.textContent = ativo ? `${lista.length} de ${listaTotal.length} projeto(s)` : '';
   }
 
@@ -10088,7 +10001,7 @@ function rHomologacoes(){
       }
       const gid = 'mes_'+chave.replace('-','');
       // Se há busca por texto ativa, abre todas as gavetas para não esconder resultados
-      const aberto = (buscaId || buscaNome) ? true : _homMesAbertos.has(gid);
+      const aberto = buscaNome ? true : _homMesAbertos.has(gid);
       html += `<div class="hom-mes-title" onclick="toggleHomMes('${gid}')">
         <span>📅</span><span>${rotulo}</span>
         <span class="hom-mes-count">${itens.length}</span>
