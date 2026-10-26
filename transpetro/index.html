@@ -1501,12 +1501,6 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
               <div class="ms-dropdown" id="msDd_lAcad"></div>
             </div>
           </div>
-          <div class="fg-sm"><label class="fl-sm">Relevância (ECorp)</label>
-            <div class="ms-wrap" id="msWrap_lRel">
-              <button class="ms-btn" id="msBtn_lRel" onclick="_msToggle('lRel')">Todas</button>
-              <div class="ms-dropdown" id="msDd_lRel"></div>
-            </div>
-          </div>
           <div class="fg-sm"><label class="fl-sm">Etapa</label>
             <div class="ms-wrap" id="msWrap_lCol">
               <button class="ms-btn" id="msBtn_lCol" onclick="_msToggle('lCol')">Todas</button>
@@ -1521,21 +1515,6 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
                 <div id="msOpts_lPrazo"></div>
               </div>
             </div>
-          </div>
-          <div class="fg-sm"><label class="fl-sm" title="Selecione um prazo de etapa para ver todas as tarefas com alguma etapa vencendo na mesma data">Prazo da Etapa</label>
-            <div class="ms-wrap" id="msWrap_lPrazoEt">
-              <button class="ms-btn" id="msBtn_lPrazoEt" onclick="_msToggle('lPrazoEt')">Todas</button>
-              <div class="ms-dropdown" id="msDd_lPrazoEt">
-                <div class="ms-search-wrap"><input type="text" class="ms-search-input" placeholder="🔍 Buscar data..." oninput="_msFilterOpts('lPrazoEt',this.value)" onclick="event.stopPropagation()"></div>
-                <div id="msOpts_lPrazoEt"></div>
-              </div>
-            </div>
-          </div>
-          <div class="fg-sm"><label class="fl-sm">Criado após</label>
-            <input class="fi-sm" type="date" id="lFiltDe" onchange="applyLFilts()">
-          </div>
-          <div class="fg-sm"><label class="fl-sm">Criado até</label>
-            <input class="fi-sm" type="date" id="lFiltAte" onchange="applyLFilts()">
           </div>
           <button class="btn-lim" onclick="limparLFilts()">✕ Limpar</button>
         </div>
@@ -3036,7 +3015,7 @@ function populateFiltSelects(){
   });
 
   // ── Multi-select Relevância ECorp (Kanban e Lista) ──
-  ['kRel','lRel'].forEach(id=>{
+  ['kRel'].forEach(id=>{
     const dd=document.getElementById('msDd_'+id);
     if(!dd) return;
     const sel=_msGetVals(id);
@@ -3163,13 +3142,6 @@ function populateFiltSelects(){
     _msReapplySearch('kPrazoEt');
   }
 
-  // Multi-select Prazo da Etapa (Lista)
-  const _ddLPrazoEt = document.getElementById('msOpts_lPrazoEt');
-  if(_ddLPrazoEt){
-    _ddLPrazoEt.innerHTML = _prazoEtOptsHtml('lPrazoEt');
-    _msUpdateBtn('lPrazoEt');
-    _msReapplySearch('lPrazoEt');
-  }
 }
 // Filtro de busca rápida dentro dos dropdowns de prazo (Data de Conclusão / Prazo da Etapa)
 function _msFilterOpts(id,query){
@@ -3277,12 +3249,8 @@ function getLFilts(){
     recs:       _msGetVals('lRec'),
     prios:      _msGetVals('lPrio'),
     acads:      _msGetVals('lAcad'),
-    rels:       _msGetVals('lRel'),
     cols:       _msGetVals('lCol'),
     prazos:     _msGetVals('lPrazo'),
-    prazosEt:   _msGetVals('lPrazoEt'),
-    de:    document.getElementById('lFiltDe')?.value||'',
-    ate:   document.getElementById('lFiltAte')?.value||'',
   };
 }
 function applyFilt(data,f){
@@ -3321,8 +3289,7 @@ function limparKFilts(){
   rKanban();
 }
 function limparLFilts(){
-  ['lProj','lResp','lSit','lRec','lPrio','lAcad','lRel','lCol','lPrazo','lPrazoEt'].forEach(id=>_msClear(id));
-  ['lFiltDe','lFiltAte'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
+  ['lProj','lResp','lSit','lRec','lPrio','lAcad','lCol','lPrazo'].forEach(id=>_msClear(id));
   _listSortCol=''; _listSortDir=1;
   rList();
 }
