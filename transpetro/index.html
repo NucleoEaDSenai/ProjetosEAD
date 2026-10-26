@@ -1685,7 +1685,7 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
         <div class="kpi-row" style="grid-template-columns:1fr 1fr">
           <div class="kpi-card">
             <div class="kpi-card-head">
-              <span class="kpi-card-title">📦 Conclusões por Tipo de Recurso</span>
+              <span class="kpi-card-title">📦 Conclusões por Linha(s) de Serviço(s)</span>
             </div>
             <div id="kpiThroughputRec"></div>
           </div>
@@ -4041,12 +4041,12 @@ function rKPIs(){
   if(thrRecEl){
     const recCount = {};
     todos.filter(p => p.termino).forEach(p => {
-      (p.recursos||['(sem recurso)']).forEach(r => { recCount[r] = (recCount[r]||0)+1; });
+      (p.recursos||['(sem linha de serviço)']).forEach(r => { recCount[r] = (recCount[r]||0)+1; });
     });
     const arr = Object.entries(recCount).sort((a,b) => b[1]-a[1]);
     const mx = arr.length ? arr[0][1] : 1;
     thrRecEl.innerHTML = arr.length === 0
-      ? '<div class="kpi-empty"><div class="kpi-empty-icon">📦</div>Nenhum projeto concluído ainda</div>'
+      ? '<div class="kpi-empty"><div class="kpi-empty-icon">📦</div>Nenhum produto concluído ainda</div>'
       : `<div class="kpi-bar2">${arr.map(([rec,n],i) => `
           <div class="kpi-bar2-row">
             <div class="kpi-bar2-head">
