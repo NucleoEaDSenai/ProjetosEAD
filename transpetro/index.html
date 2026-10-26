@@ -99,10 +99,14 @@ body.dark .skel{background:linear-gradient(90deg,var(--s2) 0%,#3a3936 50%,var(--
 .sc.cr::before{background:var(--red)}.sc.cb::before{background:var(--blue)}
 .sc.cg::before{background:var(--green)}.sc.cy::before{background:var(--yel)}
 .sc.cp::before{background:var(--pur)}.sc.cgr::before{background:var(--gray)}
-.sc-l{font-size:10px;color:var(--mu);text-transform:uppercase;letter-spacing:.7px;margin-bottom:5px}
+.sc-l{font-size:10px;color:var(--mu);text-transform:uppercase;letter-spacing:.7px;margin-bottom:5px;max-width:75%}
 .sc-v{font-family:'Plus Jakarta Sans',sans-serif;font-size:26px;font-weight:800;line-height:1}
 .sc-s{font-size:10px;color:var(--mu);margin-top:2px}
-.sc-i{position:absolute;right:11px;top:50%;transform:translateY(-50%);font-size:32px;opacity:.18}
+.sc-i{position:absolute;top:14px;right:14px;width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;opacity:.9;background:var(--s2)}
+.sc-i{color:var(--mu)}
+.sc-i .ic{width:18px;height:18px}
+.sc.cb .sc-i{background:#EFF6FF;color:#1D4ED8}.sc.cg .sc-i{background:#DCFCE7;color:#15803D}.sc.cr .sc-i{background:#FEE2E2;color:#991B1B}
+.sc.cy .sc-i{background:#FEF3C7;color:#92400E}.sc.cp .sc-i{background:#F3E8FF;color:#6D28D9}.sc.cgr .sc-i{background:var(--s2);color:var(--mu)}
 /* TABLE */
 .tw{background:#fff;border-radius:var(--r);border:1px solid var(--bdr);overflow:hidden;overflow-x:auto}
 table{width:100%;border-collapse:collapse}
@@ -321,6 +325,7 @@ body.dark .kpi-periodo-banner-content strong{color:#DBEAFE}
 .kpi-hcard:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.08);border-color:transparent}
 .kpi-hcard::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--blue);opacity:.9}
 .kpi-hcard-icon{position:absolute;top:14px;right:14px;width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;opacity:.9}
+.kpi-hcard-icon .ic{width:18px;height:18px}
 .kpi-hcard-lbl{font-size:10.5px;color:var(--mu);text-transform:uppercase;letter-spacing:.6px;font-weight:700;margin-bottom:8px;max-width:75%}
 .kpi-hcard-val{font-family:'Plus Jakarta Sans',sans-serif;font-size:30px;font-weight:800;line-height:1;margin-bottom:6px;letter-spacing:-.5px}
 .kpi-hcard-val-row{display:flex;align-items:baseline;gap:8px;margin-bottom:6px;flex-wrap:wrap}
@@ -1163,7 +1168,7 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
   </div>
 </div>
 
-<!-- Sprite de ícones da sidebar (Lucide, ISC) — usar com <svg class="ic"><use href="#i-nome"/></svg> -->
+<!-- Sprite de ícones da sidebar e KPIs (Lucide, ISC) — usar com <svg class="ic"><use href="#i-nome"/></svg> -->
 <svg id="ic-sprite" xmlns="http://www.w3.org/2000/svg" style="display:none" aria-hidden="true">
   <symbol id="i-square-plus" viewBox="0 0 24 24"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M8 12h8"/><path d="M12 8v8"/></symbol>
   <symbol id="i-folder-plus" viewBox="0 0 24 24"><path d="M12 10v6"/><path d="M9 13h6"/><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/></symbol>
@@ -1181,6 +1186,15 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
   <symbol id="i-history" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l4 2"/></symbol>
   <symbol id="i-help" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></symbol>
   <symbol id="i-moon" viewBox="0 0 24 24"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></symbol>
+  <symbol id="i-circle-check" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></symbol>
+  <symbol id="i-triangle-alert" viewBox="0 0 24 24"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4"/><path d="M12 17h.01"/></symbol>
+  <symbol id="i-timer" viewBox="0 0 24 24"><line x1="10" x2="14" y1="2" y2="2"/><line x1="12" x2="15" y1="14" y2="11"/><circle cx="12" cy="14" r="8"/></symbol>
+  <symbol id="i-refresh" viewBox="0 0 24 24"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></symbol>
+  <symbol id="i-hourglass" viewBox="0 0 24 24"><path d="M5 22h14"/><path d="M5 2h14"/><path d="M17 22v-4.172a2 2 0 0 0-.586-1.414L12 12l-4.414 4.414A2 2 0 0 0 7 17.828V22"/><path d="M7 2v4.172a2 2 0 0 0 .586 1.414L12 12l4.414-4.414A2 2 0 0 0 17 6.172V2"/></symbol>
+  <symbol id="i-building" viewBox="0 0 24 24"><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"/><path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2"/><path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2"/><path d="M10 6h4"/><path d="M10 10h4"/><path d="M10 14h4"/><path d="M10 18h4"/></symbol>
+  <symbol id="i-calendar-x" viewBox="0 0 24 24"><path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/><path d="m14 14-4 4"/><path d="m10 14 4 4"/></symbol>
+  <symbol id="i-calendar-check" viewBox="0 0 24 24"><path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/><path d="m9 16 2 2 4-4"/></symbol>
+  <symbol id="i-bookmark" viewBox="0 0 24 24"><path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"/></symbol>
   <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></symbol>
 </svg>
 
@@ -2857,12 +2871,12 @@ function rDash(){
   const el=document.getElementById('statsGrid');
   if(!el) return;
   el.innerHTML=`
-    <div class="sc cb"><div class="sc-l">Total de Cards Criados</div><div class="sc-v">${total}</div><div class="sc-s">total de produtos</div><div class="sc-i">🗂️</div></div>
-    <div class="sc cr"><div class="sc-l">Produtos Em Andamento</div><div class="sc-v">${and}</div><div class="sc-s">em execução ou aguardando</div><div class="sc-i">🔄</div></div>
-    <div class="sc cg"><div class="sc-l">Produtos Concluídos</div><div class="sc-v">${conc}</div><div class="sc-s">produtos entregues</div><div class="sc-i">✅</div></div>
-    <div class="sc cy"><div class="sc-l">Produtos Atrasados - Equipe</div><div class="sc-v">${atq}</div><div class="sc-s">em atraso</div><div class="sc-i">⚠️</div></div>
-    <div class="sc cp"><div class="sc-l">Produtos Atrasados - Cliente</div><div class="sc-v">${waitCl}</div><div class="sc-s">em atraso</div><div class="sc-i">⏳</div></div>
-    <div class="sc cgr"><div class="sc-l">Produtos Cancelados</div><div class="sc-v">${canc}</div><div class="sc-s"><a href="#" onclick="nav('cancelados');return false" style="color:var(--mu)">ver relatório</a></div><div class="sc-i">🚫</div></div>
+    <div class="sc cb"><div class="sc-l">Total de Cards Criados</div><div class="sc-v">${total}</div><div class="sc-s">total de produtos</div><div class="sc-i"><svg class="ic"><use href="#i-kanban"/></svg></div></div>
+    <div class="sc cr"><div class="sc-l">Produtos Em Andamento</div><div class="sc-v">${and}</div><div class="sc-s">em execução ou aguardando</div><div class="sc-i"><svg class="ic"><use href="#i-refresh"/></svg></div></div>
+    <div class="sc cg"><div class="sc-l">Produtos Concluídos</div><div class="sc-v">${conc}</div><div class="sc-s">produtos entregues</div><div class="sc-i"><svg class="ic"><use href="#i-circle-check"/></svg></div></div>
+    <div class="sc cy"><div class="sc-l">Produtos Atrasados - Equipe</div><div class="sc-v">${atq}</div><div class="sc-s">em atraso</div><div class="sc-i"><svg class="ic"><use href="#i-triangle-alert"/></svg></div></div>
+    <div class="sc cp"><div class="sc-l">Produtos Atrasados - Cliente</div><div class="sc-v">${waitCl}</div><div class="sc-s">em atraso</div><div class="sc-i"><svg class="ic"><use href="#i-hourglass"/></svg></div></div>
+    <div class="sc cgr"><div class="sc-l">Produtos Cancelados</div><div class="sc-v">${canc}</div><div class="sc-s"><a href="#" onclick="nav('cancelados');return false" style="color:var(--mu)">ver relatório</a></div><div class="sc-i"><svg class="ic"><use href="#i-ban"/></svg></div></div>
   `;
 }
 
@@ -3780,7 +3794,7 @@ function rKPIs(){
   if(resumoEl){
     resumoEl.innerHTML = `
       <div class="kpi-hcard tone-blue">
-        <div class="kpi-hcard-icon">📁</div>
+        <div class="kpi-hcard-icon"><svg class="ic"><use href="#i-folder"/></svg></div>
         <div class="kpi-hcard-lbl">Total de Projetos Ativos</div>
         <div class="kpi-hcard-val-row">
           <div class="kpi-hcard-val" data-target="${total}">0</div>
@@ -3789,7 +3803,7 @@ function rKPIs(){
         <div class="kpi-hcard-sub">${andando} em andamento</div>
       </div>
       <div class="kpi-hcard tone-green">
-        <div class="kpi-hcard-icon">✅</div>
+        <div class="kpi-hcard-icon"><svg class="ic"><use href="#i-circle-check"/></svg></div>
         <div class="kpi-hcard-lbl">Taxa de Conclusão</div>
         <div class="kpi-hcard-val-row">
           <div class="kpi-hcard-val" data-target="${txConc}" data-suffix="%">0%</div>
@@ -3798,7 +3812,7 @@ function rKPIs(){
         <div class="kpi-hcard-sub">${conc} concluído${conc!==1?'s':''}</div>
       </div>
       <div class="kpi-hcard tone-amber">
-        <div class="kpi-hcard-icon">⚠️</div>
+        <div class="kpi-hcard-icon"><svg class="ic"><use href="#i-triangle-alert"/></svg></div>
         <div class="kpi-hcard-lbl">Taxa de Atraso</div>
         <div class="kpi-hcard-val-row">
           <div class="kpi-hcard-val" data-target="${txAtras}" data-suffix="%">0%</div>
@@ -3807,7 +3821,7 @@ function rKPIs(){
         <div class="kpi-hcard-sub">${atras} atrasado${atras!==1?'s':''}</div>
       </div>
       <div class="kpi-hcard tone-pur">
-        <div class="kpi-hcard-icon">📊</div>
+        <div class="kpi-hcard-icon"><svg class="ic"><use href="#i-chart"/></svg></div>
         <div class="kpi-hcard-lbl">Progresso Médio</div>
         <div class="kpi-hcard-val-row">
           <div class="kpi-hcard-val" data-target="${avg}" data-suffix="%">0%</div>
@@ -3816,7 +3830,7 @@ function rKPIs(){
         <div class="kpi-hcard-sub">média geral</div>
       </div>
       <div class="kpi-hcard tone-${homolPend>0?'amber':'green'}">
-        <div class="kpi-hcard-icon">🔧</div>
+        <div class="kpi-hcard-icon"><svg class="ic"><use href="#i-badge-check"/></svg></div>
         <div class="kpi-hcard-lbl">Homologações Pendentes</div>
         <div class="kpi-hcard-val-row">
           <div class="kpi-hcard-val" data-target="${homolPend}">0</div>
@@ -3824,7 +3838,7 @@ function rKPIs(){
         <div class="kpi-hcard-sub">${medicPend} aguard. medição</div>
       </div>
       <div class="kpi-hcard tone-gray">
-        <div class="kpi-hcard-icon">⏱️</div>
+        <div class="kpi-hcard-icon"><svg class="ic"><use href="#i-timer"/></svg></div>
         <div class="kpi-hcard-lbl">Tempo Médio Ciclo</div>
         <div class="kpi-hcard-val-row">
           <div class="kpi-hcard-val">${tmCiclo!==null?tmCiclo+'d':'—'}</div>
@@ -4371,11 +4385,11 @@ function rAtrasos(){
 
   // ── Cards resumo — valores sempre fixos, sem influência dos filtros ──
   document.getElementById('atrasosResumo').innerHTML = `
-    <div class="sc cy"><div class="sc-l">Projetos em Atraso</div><div class="sc-v">${totalAberto}</div><div class="sc-s">total de projetos</div><div class="sc-i">⚠️</div></div>
-    <div class="sc cr"><div class="sc-l">Atrasos da Equipe</div><div class="sc-v">${totalEq}</div><div class="sc-s">projetos atrasados pela equipe</div><div class="sc-i">👥</div></div>
-    <div class="sc cp"><div class="sc-l">Atrasos do Cliente</div><div class="sc-v">${totalCl}</div><div class="sc-s">aguardando cliente</div><div class="sc-i">🏢</div></div>
-    <div class="sc" style="border-left:4px solid #DC2626"><div class="sc-l">Prazo Final Comprometido</div><div class="sc-v">${_totalPrazoComp}</div><div class="sc-s">prazo real vencido</div><div class="sc-i">🔴</div></div>
-    <div class="sc" style="border-left:4px solid #F59E0B"><div class="sc-l">Prazo Final Não Comprometido</div><div class="sc-v">${_totalPrazoOk}</div><div class="sc-s">etapa atrasada, prazo ok</div><div class="sc-i">🟡</div></div>
+    <div class="sc cy"><div class="sc-l">Projetos em Atraso</div><div class="sc-v">${totalAberto}</div><div class="sc-s">total de projetos</div><div class="sc-i"><svg class="ic"><use href="#i-triangle-alert"/></svg></div></div>
+    <div class="sc cr"><div class="sc-l">Atrasos da Equipe</div><div class="sc-v">${totalEq}</div><div class="sc-s">projetos atrasados pela equipe</div><div class="sc-i"><svg class="ic"><use href="#i-users"/></svg></div></div>
+    <div class="sc cp"><div class="sc-l">Atrasos do Cliente</div><div class="sc-v">${totalCl}</div><div class="sc-s">aguardando cliente</div><div class="sc-i"><svg class="ic"><use href="#i-building"/></svg></div></div>
+    <div class="sc" style="border-left:4px solid #DC2626"><div class="sc-l">Prazo Final Comprometido</div><div class="sc-v">${_totalPrazoComp}</div><div class="sc-s">prazo real vencido</div><div class="sc-i" style="background:#FEE2E2;color:#991B1B"><svg class="ic"><use href="#i-calendar-x"/></svg></div></div>
+    <div class="sc" style="border-left:4px solid #F59E0B"><div class="sc-l">Prazo Final Não Comprometido</div><div class="sc-v">${_totalPrazoOk}</div><div class="sc-s">etapa atrasada, prazo ok</div><div class="sc-i" style="background:#FEF3C7;color:#92400E"><svg class="ic"><use href="#i-calendar-check"/></svg></div></div>
   `;
 
   // ── Tabela ──────────────────────────────────────────────────────────────────
@@ -4468,10 +4482,10 @@ function limparAFilts(){
 function rCancelados(){
   const canc=cancelDB();
   document.getElementById('cancelStats').innerHTML=`
-    <div class="sc cgr"><div class="sc-l">Total Cancelados</div><div class="sc-v">${canc.length}</div><div class="sc-i">🚫</div></div>
-    <div class="sc cy"><div class="sc-l">Prog. Médio ao Cancelar</div><div class="sc-v">${canc.length?Math.round(canc.reduce((a,p)=>a+p.pct,0)/canc.length):0}%</div><div class="sc-i">📊</div></div>
-    <div class="sc cb"><div class="sc-l">Total Ativos</div><div class="sc-v">${activeDB().length}</div><div class="sc-i">🗂️</div></div>
-    <div class="sc cg"><div class="sc-l">Concluídos</div><div class="sc-v">${activeDB().filter(p=>calcSit(p)==='concluido').length}</div><div class="sc-i">✅</div></div>
+    <div class="sc cgr"><div class="sc-l">Total Cancelados</div><div class="sc-v">${canc.length}</div><div class="sc-i"><svg class="ic"><use href="#i-ban"/></svg></div></div>
+    <div class="sc cy"><div class="sc-l">Prog. Médio ao Cancelar</div><div class="sc-v">${canc.length?Math.round(canc.reduce((a,p)=>a+p.pct,0)/canc.length):0}%</div><div class="sc-i"><svg class="ic"><use href="#i-chart"/></svg></div></div>
+    <div class="sc cb"><div class="sc-l">Total Ativos</div><div class="sc-v">${activeDB().length}</div><div class="sc-i"><svg class="ic"><use href="#i-kanban"/></svg></div></div>
+    <div class="sc cg"><div class="sc-l">Concluídos</div><div class="sc-v">${activeDB().filter(p=>calcSit(p)==='concluido').length}</div><div class="sc-i"><svg class="ic"><use href="#i-circle-check"/></svg></div></div>
   `;
   document.getElementById('cancelTbl').innerHTML=canc.length===0?
     '<tr><td colspan="9" style="text-align:center;padding:20px;color:var(--mu)">Nenhum projeto cancelado</td></tr>':
@@ -7128,9 +7142,9 @@ function rLixeira(){
   const stEl = document.getElementById('lixeiraStats');
   if(stEl){
     stEl.innerHTML = `
-      <div class="sc cgr"><div class="sc-l">Total Deletados</div><div class="sc-v">${LIXEIRA.length}</div><div class="sc-i">🗑️</div></div>
-      <div class="sc cb"><div class="sc-l">Total Ativos</div><div class="sc-v">${activeDB().length}</div><div class="sc-i">🗂️</div></div>
-      <div class="sc cy"><div class="sc-l">Concluídos</div><div class="sc-v">${activeDB().filter(p=>calcSit(p)==='concluido').length}</div><div class="sc-i">✅</div></div>
+      <div class="sc cgr"><div class="sc-l">Total Deletados</div><div class="sc-v">${LIXEIRA.length}</div><div class="sc-i"><svg class="ic"><use href="#i-trash"/></svg></div></div>
+      <div class="sc cb"><div class="sc-l">Total Ativos</div><div class="sc-v">${activeDB().length}</div><div class="sc-i"><svg class="ic"><use href="#i-kanban"/></svg></div></div>
+      <div class="sc cy"><div class="sc-l">Concluídos</div><div class="sc-v">${activeDB().filter(p=>calcSit(p)==='concluido').length}</div><div class="sc-i"><svg class="ic"><use href="#i-circle-check"/></svg></div></div>
     `;
   }
   const tbl = document.getElementById('lixeiraTbl');
@@ -8969,9 +8983,9 @@ function rMedicao(){
 
   const statsEl = document.getElementById('medicaoStats');
   if(statsEl) statsEl.innerHTML = `
-    <div class="sc cp"><div class="sc-l">Total na Medição</div><div class="sc-v">${listaTotal.length}</div><div class="sc-s">projetos enviados</div><div class="sc-i">📐</div></div>
-    <div class="sc cy"><div class="sc-l">Aguardando Medição</div><div class="sc-v">${pendentes}</div><div class="sc-s">a medir</div><div class="sc-i">⏳</div></div>
-    <div class="sc cg"><div class="sc-l">Medição Concluída</div><div class="sc-v">${concluidas}</div><div class="sc-s">já medidos</div><div class="sc-i">✅</div></div>
+    <div class="sc cp"><div class="sc-l">Total na Medição</div><div class="sc-v">${listaTotal.length}</div><div class="sc-s">projetos enviados</div><div class="sc-i"><svg class="ic"><use href="#i-receipt"/></svg></div></div>
+    <div class="sc cy"><div class="sc-l">Aguardando Medição</div><div class="sc-v">${pendentes}</div><div class="sc-s">a medir</div><div class="sc-i"><svg class="ic"><use href="#i-hourglass"/></svg></div></div>
+    <div class="sc cg"><div class="sc-l">Medição Concluída</div><div class="sc-v">${concluidas}</div><div class="sc-s">já medidos</div><div class="sc-i"><svg class="ic"><use href="#i-circle-check"/></svg></div></div>
   `;
 
   const el = document.getElementById('medicaoGrupos');
@@ -9889,12 +9903,12 @@ function rHomologacoes(){
     statsEl.style.gridTemplateColumns = 'repeat(2,1fr)';
     statsEl.innerHTML = `
       <div class="sc" style="border-left:4px solid var(--red)">
-        <div class="sc-l">⏳ Pendentes</div><div class="sc-v">${cntPendente}</div>
-        <div class="sc-s">sem data de homologação</div><div class="sc-i">⏳</div>
+        <div class="sc-l">Pendentes</div><div class="sc-v">${cntPendente}</div>
+        <div class="sc-s">sem data de homologação</div><div class="sc-i" style="background:#FEE2E2;color:#991B1B"><svg class="ic"><use href="#i-hourglass"/></svg></div>
       </div>
       <div class="sc" style="border-left:4px solid var(--yel)">
-        <div class="sc-l">🔖 Homologados</div><div class="sc-v">${cntHomologado}</div>
-        <div class="sc-s">aguardando autorização</div><div class="sc-i">🔖</div>
+        <div class="sc-l">Homologados</div><div class="sc-v">${cntHomologado}</div>
+        <div class="sc-s">aguardando autorização</div><div class="sc-i" style="background:#FEF3C7;color:#92400E"><svg class="ic"><use href="#i-bookmark"/></svg></div>
       </div>`;
   }
 
@@ -11012,10 +11026,10 @@ function rCarga(){
   const statsEl = document.getElementById('cargaStats');
   if(statsEl){
     statsEl.innerHTML = `
-      <div class="sc cp"><div class="sc-l">Projetos Ativos - Equipe</div><div class="sc-v">${totalAtivosEquipe}</div><div class="sc-s">etapa atual com a equipe</div><div class="sc-i">👥</div></div>
-      <div class="sc cb"><div class="sc-l">Projetos Ativos - Cliente</div><div class="sc-v">${totalAtivosCliente}</div><div class="sc-s">na vez do cliente</div><div class="sc-i">🏢</div></div>
-      <div class="sc cr"><div class="sc-l">Atrasos Equipe</div><div class="sc-v">${totalAtrasoEq}</div><div class="sc-s">projetos atrasados</div><div class="sc-i">⚠️</div></div>
-      <div class="sc cy"><div class="sc-l">Atrasos Cliente</div><div class="sc-v">${totalAtrasoCl}</div><div class="sc-s">aguardando cliente</div><div class="sc-i">⏳</div></div>
+      <div class="sc cp"><div class="sc-l">Projetos Ativos - Equipe</div><div class="sc-v">${totalAtivosEquipe}</div><div class="sc-s">etapa atual com a equipe</div><div class="sc-i"><svg class="ic"><use href="#i-users"/></svg></div></div>
+      <div class="sc cb"><div class="sc-l">Projetos Ativos - Cliente</div><div class="sc-v">${totalAtivosCliente}</div><div class="sc-s">na vez do cliente</div><div class="sc-i"><svg class="ic"><use href="#i-building"/></svg></div></div>
+      <div class="sc cr"><div class="sc-l">Atrasos Equipe</div><div class="sc-v">${totalAtrasoEq}</div><div class="sc-s">projetos atrasados</div><div class="sc-i"><svg class="ic"><use href="#i-triangle-alert"/></svg></div></div>
+      <div class="sc cy"><div class="sc-l">Atrasos Cliente</div><div class="sc-v">${totalAtrasoCl}</div><div class="sc-s">aguardando cliente</div><div class="sc-i"><svg class="ic"><use href="#i-hourglass"/></svg></div></div>
     `;
   }
 
