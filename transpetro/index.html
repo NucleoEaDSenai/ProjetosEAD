@@ -1594,6 +1594,8 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
             <span class="kpi-period-label">Período</span>
             <div class="kpi-seg" id="kpiSegPeriodo">
               <button class="kpi-seg-btn active" data-val="0" onclick="setKpiPeriodo('0',this)">Todos</button>
+              <button class="kpi-seg-btn" data-val="7" onclick="setKpiPeriodo('7',this)">7d</button>
+              <button class="kpi-seg-btn" data-val="15" onclick="setKpiPeriodo('15',this)">15d</button>
               <button class="kpi-seg-btn" data-val="30" onclick="setKpiPeriodo('30',this)">30d</button>
               <button class="kpi-seg-btn" data-val="60" onclick="setKpiPeriodo('60',this)">60d</button>
               <button class="kpi-seg-btn" data-val="90" onclick="setKpiPeriodo('90',this)">90d</button>
@@ -1602,6 +1604,8 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
             </div>
             <select id="kpiFiltPeriodo" onchange="rKPIs()" style="display:none">
               <option value="0">Todo o histórico</option>
+              <option value="7">Últimos 7 dias</option>
+              <option value="15">Últimos 15 dias</option>
               <option value="30">Últimos 30 dias</option>
               <option value="60">Últimos 60 dias</option>
               <option value="90">Últimos 90 dias</option>
