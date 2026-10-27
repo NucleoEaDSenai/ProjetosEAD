@@ -627,6 +627,29 @@ tr.canc-row td{opacity:.55}
 .sb-sec-label{font-size:10px;letter-spacing:1.5px;color:rgba(255,255,255,.5);font-weight:700;text-transform:uppercase}
 .sb-sec-chevron{font-size:9px;color:rgba(255,255,255,.45);transition:transform .2s}
 .sb-group.closed .sb-sec-chevron{transform:rotate(-90deg)}
+/* Menu lateral retrátil: aberto (padrão) ou só ícones (body.sb-mini) */
+.sb{transition:width .2s ease}
+.main{transition:margin-left .2s ease}
+.sb-toggle{position:absolute;top:50%;right:-12px;transform:translateY(-50%);width:24px;height:24px;border-radius:50%;background:var(--dark);border:1px solid rgba(255,255,255,.25);color:rgba(255,255,255,.85);display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0;z-index:2;box-shadow:0 2px 8px rgba(0,0,0,.25);transition:background .15s,color .15s}
+.sb-toggle:hover{background:var(--red);color:#fff;border-color:var(--red)}
+.sb-toggle .ic{width:14px;height:14px;transition:transform .2s}
+body.sb-mini .sb-toggle .ic{transform:rotate(180deg)}
+body.sb-mini .sb{width:64px}
+body.sb-mini .main{margin-left:64px}
+body.sb-mini .sb-logo,body.sb-mini .sb-sec,body.sb-mini .sb-sec-btn,body.sb-mini .sb-foot>span{display:none}
+body.sb-mini .sb-group{border-top:1px solid rgba(255,255,255,.08);margin-top:6px;padding-top:6px}
+body.sb-mini .sb-group.closed .sb-group-items{display:block}
+body.sb-mini .si{justify-content:center;padding:11px 0;position:relative}
+body.sb-mini .si>span:not(.si-ic):not(.si-badge){display:none}
+body.sb-mini .si-badge{position:absolute;top:5px;right:12px;margin:0;font-size:8px;padding:0 4px;min-width:13px;line-height:13px}
+body.sb-mini .sb-foot{justify-content:center!important;padding:12px 0}
+body.sb-mini .dark-btn{padding:4px 8px}
+@media(max-width:960px){.sb-toggle{display:none}}
+/* Nome da área ao passar o mouse com o menu fechado (fixo para não ser cortado pela rolagem do menu) */
+.sb-tip{position:fixed;z-index:1000;background:#111827;color:#fff;font-size:12px;font-weight:600;padding:6px 10px;border-radius:7px;white-space:nowrap;pointer-events:none;box-shadow:0 6px 18px rgba(0,0,0,.25);display:none;transform:translateY(-50%)}
+.sb-tip::before{content:'';position:absolute;left:-4px;top:50%;width:8px;height:8px;background:#111827;transform:translateY(-50%) rotate(45deg)}
+.sb-tip.on{display:block;animation:sbTipPulo .32s cubic-bezier(.34,1.56,.64,1)}
+@keyframes sbTipPulo{0%{opacity:0;transform:translate(-8px,-50%) scale(.92)}100%{opacity:1;transform:translate(0,-50%) scale(1)}}
 /* MODAL MOTIVO ATRASO */
 .ov-motivo{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:1800;display:none;align-items:center;justify-content:center;backdrop-filter:blur(3px)}
 .ov-motivo.on{display:flex}
@@ -1201,6 +1224,7 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
   <symbol id="i-calendar-x" viewBox="0 0 24 24"><path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/><path d="m14 14-4 4"/><path d="m10 14 4 4"/></symbol>
   <symbol id="i-calendar-check" viewBox="0 0 24 24"><path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/><path d="m9 16 2 2 4-4"/></symbol>
   <symbol id="i-bookmark" viewBox="0 0 24 24"><path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"/></symbol>
+  <symbol id="i-chevron-left" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></symbol>
   <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></symbol>
 </svg>
 
@@ -1272,7 +1296,9 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
   </nav>
   <div class="sb-foot" style="display:flex;align-items:center;justify-content:space-between"><span>v2.0 · Firjan SENAI</span><button class="dark-btn" id="darkBtn" onclick="toggleDark()" title="Alternar modo escuro" aria-label="Alternar modo escuro"><svg class="ic" style="width:14px;height:14px;color:#FCD34D"><use href="#i-moon"/></svg></button></div>
 
+  <button class="sb-toggle" id="sbToggle" onclick="toggleSidebar()" title="Recolher menu" aria-label="Recolher menu" aria-expanded="true"><svg class="ic"><use href="#i-chevron-left"/></svg></button>
 </aside>
+<div class="sb-tip" id="sbTip" role="tooltip"></div>
 
 <div class="main" role="main" id="main-content" tabindex="-1">
   <div class="tp" role="banner">
@@ -7299,6 +7325,54 @@ function toggleSbGroup(id){
       if(g) g.classList.add('closed');
     }
   }
+})();
+
+// ── MENU LATERAL RETRÁTIL ──
+function _sbMiniAtivo(){
+  return document.body.classList.contains('sb-mini') || window.innerWidth <= 960;
+}
+function _aplicarSidebar(mini){
+  document.body.classList.toggle('sb-mini', mini);
+  const btn = document.getElementById('sbToggle');
+  if(btn){
+    const txt = mini ? 'Expandir menu' : 'Recolher menu';
+    btn.title = txt; btn.setAttribute('aria-label', txt);
+    btn.setAttribute('aria-expanded', String(!mini));
+  }
+  _esconderSbTip();
+}
+function toggleSidebar(){
+  const mini = !document.body.classList.contains('sb-mini');
+  _aplicarSidebar(mini);
+  try{ localStorage.setItem('transpetro_sb_mini', mini ? '1' : '0'); }catch(e){}
+}
+function _mostrarSbTip(si){
+  const tip = document.getElementById('sbTip');
+  if(!tip || !_sbMiniAtivo()) return;
+  const lbl = si.querySelector('span:not(.si-ic):not(.si-badge)');
+  if(!lbl) return;
+  const r = si.getBoundingClientRect();
+  tip.textContent = lbl.textContent;
+  tip.style.left = (r.right + 10) + 'px';
+  tip.style.top  = (r.top + r.height/2) + 'px';
+  tip.classList.remove('on'); void tip.offsetWidth;  // reinicia a animação do "pulo"
+  tip.classList.add('on');
+}
+function _esconderSbTip(){
+  document.getElementById('sbTip')?.classList.remove('on');
+}
+(function(){
+  let mini = false;
+  try{ mini = localStorage.getItem('transpetro_sb_mini') === '1'; }catch(e){}
+  _aplicarSidebar(mini);
+  const sb = document.querySelector('.sb');
+  if(!sb) return;
+  sb.addEventListener('mouseover', e => { const si = e.target.closest('.si'); if(si) _mostrarSbTip(si); });
+  sb.addEventListener('mouseout',  e => { const si = e.target.closest('.si'); if(si && !si.contains(e.relatedTarget)) _esconderSbTip(); });
+  sb.addEventListener('focusin',   e => { const si = e.target.closest('.si'); if(si) _mostrarSbTip(si); });
+  sb.addEventListener('focusout',  _esconderSbTip);
+  sb.addEventListener('click',     _esconderSbTip);
+  sb.querySelector('.sb-nav')?.addEventListener('scroll', _esconderSbTip);
 })();
 
 function toggleExportMenu(){
