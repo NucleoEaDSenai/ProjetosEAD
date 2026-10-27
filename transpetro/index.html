@@ -1737,11 +1737,10 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
 
     <!-- ATRASOS -->
     <div class="view" id="view-atrasos">
-      <div class="st" style="margin-bottom:16px">Relatórios de Atrasos — Projetos em Atraso</div>
       <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:22px" id="atrasosResumo"></div>
       <div class="fbox" style="margin-bottom:18px">
         <div class="fbox-row">
-          <div class="fg-sm"><label class="fl-sm">Projetos em Atraso</label>
+          <div class="fg-sm"><label class="fl-sm">Produtos em Atraso</label>
             <div class="ms-wrap" id="msWrap_aTipo">
               <button class="ms-btn" id="msBtn_aTipo" onclick="_msToggle('aTipo')">Todos</button>
               <div class="ms-dropdown" id="msDd_aTipo">
@@ -1779,13 +1778,13 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
     <!-- HOMOLOGAÇÕES -->
     <div class="view" id="view-homologacoes">
       <div class="st" style="margin-bottom:6px">🔖 Homologações</div>
-      <div style="font-size:12.5px;color:var(--mu);margin-bottom:16px">Projetos na etapa Homologação. Preencha os dados e acompanhe o status.</div>
+      <div style="font-size:12.5px;color:var(--mu);margin-bottom:16px">Produtos na etapa Homologação. Preencha os dados e acompanhe o status.</div>
       <div id="homologStats" style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:18px"></div>
       <!-- Filtros -->
       <div class="fbox" style="margin-bottom:18px">
         <div class="fbox-row">
           <span style="font-size:11px;font-weight:700;color:var(--mu);text-transform:uppercase;letter-spacing:.6px;align-self:center;padding-bottom:2px">Filtrar por</span>
-          <div class="fg-sm"><label class="fl-sm">🔎 Nome do Projeto</label>
+          <div class="fg-sm"><label class="fl-sm">🔎 Nome do Produto</label>
             <input type="text" id="homBuscaNome" class="ms-btn" style="width:180px;cursor:text" placeholder="Buscar nome…" oninput="rHomologacoes()" autocomplete="off">
           </div>
           <div class="fg-sm"><label class="fl-sm">📅 Medição</label>
@@ -1805,7 +1804,7 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
       <div class="st" style="margin-bottom:16px">🚫 Projetos Cancelados</div>
       <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:22px" id="cancelStats"></div>
       <div class="tw"><table>
-        <thead><tr><th>Projeto</th><th>Recursos</th><th>Responsável(is)</th><th>Criado</th><th>Cancelado em</th><th>Coluna na Cancelamento</th><th>Progresso</th><th>Motivo</th><th></th></tr></thead>
+        <thead><tr><th>Produto</th><th>Recursos</th><th>Responsável(is)</th><th>Criado</th><th>Cancelado em</th><th>Coluna na Cancelamento</th><th>Progresso</th><th>Motivo</th><th></th></tr></thead>
         <tbody id="cancelTbl"></tbody>
       </table></div>
     </div>
@@ -1827,7 +1826,7 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
         <div class="fbox-row" style="flex-wrap:wrap;gap:10px;align-items:flex-end">
           <div class="fg" style="flex:1;min-width:200px">
             <label class="fl">Buscar</label>
-            <input class="fi" id="lixBusca" type="text" placeholder="Nome do projeto ou motivo..." oninput="rLixeiraDeb()">
+            <input class="fi" id="lixBusca" type="text" placeholder="Nome do produto ou motivo..." oninput="rLixeiraDeb()">
           </div>
           <div class="fg" style="min-width:170px">
             <label class="fl">Deletado por</label>
@@ -1848,7 +1847,7 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
       </div>
       <div class="tw"><table>
         <thead><tr>
-          <th style="cursor:pointer;white-space:nowrap" onclick="toggleLixSort('nome')">Projeto <span id="lixSI_nome" style="font-size:10px;color:var(--mu)"></span></th>
+          <th style="cursor:pointer;white-space:nowrap" onclick="toggleLixSort('nome')">Produto <span id="lixSI_nome" style="font-size:10px;color:var(--mu)"></span></th>
           <th style="cursor:pointer;white-space:nowrap" onclick="toggleLixSort('data')">Deletado em <span id="lixSI_data" style="font-size:10px;color:var(--mu)"></span></th>
           <th style="cursor:pointer;white-space:nowrap" onclick="toggleLixSort('por')">Deletado por <span id="lixSI_por" style="font-size:10px;color:var(--mu)"></span></th>
           <th style="cursor:pointer;white-space:nowrap" onclick="toggleLixSort('motivo')">Motivo da exclusão <span id="lixSI_motivo" style="font-size:10px;color:var(--mu)"></span></th>
@@ -1867,7 +1866,7 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
     <!-- MEDIÇÃO -->
     <div class="view" id="view-medicao">
       <div class="st" style="margin-bottom:6px">📐 Medição</div>
-      <div style="font-size:12.5px;color:var(--mu);margin-bottom:20px">Projetos com todas as etapas concluídas e enviados para medição.</div>
+      <div style="font-size:12.5px;color:var(--mu);margin-bottom:20px">Produtos com todas as etapas concluídas e enviados para medição.</div>
       <div id="medicaoStats" style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:22px"></div>
       <!-- Filtros -->
       <div class="fbox" style="margin-bottom:18px">
@@ -1923,7 +1922,7 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
               <div class="ms-dropdown" id="msDd_cargaResp"></div>
             </div>
           </div>
-          <div class="fg-sm"><label class="fl-sm">Situação do Projeto</label>
+          <div class="fg-sm"><label class="fl-sm">Situação do Produto</label>
             <div class="ms-wrap" id="msWrap_cargaStat">
               <button class="ms-btn" id="msBtn_cargaStat" onclick="_msToggle('cargaStat')">Todos</button>
               <div class="ms-dropdown" id="msDd_cargaStat">
@@ -3512,7 +3511,7 @@ function rTimeline(){
     ?'<th style="color:#fff;background:var(--red)">'+m+'</th>'
     :'<th>'+m+'</th>').join('');
   document.getElementById('ganttHead').innerHTML=
-    '<tr><th class="pj">Projeto</th>'+headCols+
+    '<tr><th class="pj">Produto</th>'+headCols+
     '<th style="min-width:65px;text-align:center">Prog.</th>'+
     '<th style="min-width:48px;text-align:center">Sit.</th></tr>';
 
@@ -3795,7 +3794,7 @@ function rKPIs(){
     resumoEl.innerHTML = `
       <div class="kpi-hcard tone-blue">
         <div class="kpi-hcard-icon"><svg class="ic"><use href="#i-folder"/></svg></div>
-        <div class="kpi-hcard-lbl">Total de Projetos Ativos</div>
+        <div class="kpi-hcard-lbl">Total de Produtos Ativos</div>
         <div class="kpi-hcard-val-row">
           <div class="kpi-hcard-val" data-target="${total}">0</div>
           ${_trendBadge(total, cmp?.total, 'up', '', true)}
@@ -3844,7 +3843,7 @@ function rKPIs(){
           <div class="kpi-hcard-val">${tmCiclo!==null?tmCiclo+'d':'—'}</div>
           ${tmCiclo!==null?_trendBadge(tmCiclo, cmp?.tmCiclo, 'down', 'd', true):''}
         </div>
-        <div class="kpi-hcard-sub">${ciclos.length} proj. concluído${ciclos.length!==1?'s':''}</div>
+        <div class="kpi-hcard-sub">${ciclos.length} produto${ciclos.length!==1?'s':''} concluído${ciclos.length!==1?'s':''}</div>
         <div class="kpi-hcard-spark">${_kpiSparkline(sparkVals, '#6B7280')}</div>
       </div>`;
     // Animar contadores
@@ -3888,7 +3887,7 @@ function rKPIs(){
              </svg>
              <div class="kpi-donut-center">
                <div class="kpi-donut-center-val">${total}</div>
-               <div class="kpi-donut-center-lbl">projetos</div>
+               <div class="kpi-donut-center-lbl">produtos</div>
              </div>
            </div>
            <div class="kpi-donut-legend">${legenda}</div>
@@ -3929,7 +3928,7 @@ function rKPIs(){
       insights.push({tipo:'', ico:'📈', txt:`Taxa de conclusão: <strong>${txConc}%</strong> — bom desempenho`});
     }
     if(atrasEq===0 && atrasCl===0 && total>0){
-      insights.push({tipo:'ok', ico:'✨', txt:'Nenhum projeto em atraso — equipe em dia!'});
+      insights.push({tipo:'ok', ico:'✨', txt:'Nenhum produto em atraso — equipe em dia!'});
     }
     insEl.innerHTML = insights.length === 0
       ? '<div class="kpi-empty"><div class="kpi-empty-icon">💡</div>Sem alertas no momento</div>'
@@ -4385,8 +4384,8 @@ function rAtrasos(){
 
   // ── Cards resumo — valores sempre fixos, sem influência dos filtros ──
   document.getElementById('atrasosResumo').innerHTML = `
-    <div class="sc cy"><div class="sc-l">Projetos em Atraso</div><div class="sc-v">${totalAberto}</div><div class="sc-s">total de projetos</div><div class="sc-i"><svg class="ic"><use href="#i-triangle-alert"/></svg></div></div>
-    <div class="sc cr"><div class="sc-l">Atrasos da Equipe</div><div class="sc-v">${totalEq}</div><div class="sc-s">projetos atrasados pela equipe</div><div class="sc-i"><svg class="ic"><use href="#i-users"/></svg></div></div>
+    <div class="sc cy"><div class="sc-l">Produtos em Atraso</div><div class="sc-v">${totalAberto}</div><div class="sc-s">total de produtos</div><div class="sc-i"><svg class="ic"><use href="#i-triangle-alert"/></svg></div></div>
+    <div class="sc cr"><div class="sc-l">Atrasos da Equipe</div><div class="sc-v">${totalEq}</div><div class="sc-s">produtos atrasados pela equipe</div><div class="sc-i"><svg class="ic"><use href="#i-users"/></svg></div></div>
     <div class="sc cp"><div class="sc-l">Atrasos do Cliente</div><div class="sc-v">${totalCl}</div><div class="sc-s">aguardando cliente</div><div class="sc-i"><svg class="ic"><use href="#i-building"/></svg></div></div>
     <div class="sc" style="border-left:4px solid #DC2626"><div class="sc-l">Prazo Final Comprometido</div><div class="sc-v">${_totalPrazoComp}</div><div class="sc-s">prazo real vencido</div><div class="sc-i" style="background:#FEE2E2;color:#991B1B"><svg class="ic"><use href="#i-calendar-x"/></svg></div></div>
     <div class="sc" style="border-left:4px solid #F59E0B"><div class="sc-l">Prazo Final Não Comprometido</div><div class="sc-v">${_totalPrazoOk}</div><div class="sc-s">etapa atrasada, prazo ok</div><div class="sc-i" style="background:#FEF3C7;color:#92400E"><svg class="ic"><use href="#i-calendar-check"/></svg></div></div>
@@ -4488,7 +4487,7 @@ function rCancelados(){
     <div class="sc cg"><div class="sc-l">Concluídos</div><div class="sc-v">${activeDB().filter(p=>calcSit(p)==='concluido').length}</div><div class="sc-i"><svg class="ic"><use href="#i-circle-check"/></svg></div></div>
   `;
   document.getElementById('cancelTbl').innerHTML=canc.length===0?
-    '<tr><td colspan="9" style="text-align:center;padding:20px;color:var(--mu)">Nenhum projeto cancelado</td></tr>':
+    '<tr><td colspan="9" style="text-align:center;padding:20px;color:var(--mu)">Nenhum produto cancelado</td></tr>':
     canc.map(p=>`<tr class="canc-row">
       <td><strong>${esc(p.nome)}</strong></td>
       <td>${recTags(p.recursos)}</td>
@@ -4500,7 +4499,7 @@ function rCancelados(){
       <td style="font-size:12px;color:var(--mu);max-width:220px">${p.cancelMotivo||'—'}</td>
       <td>
         <button class="btn bg2 bsm" onclick="reativarP(${p.id})">↩️ Reativar</button>
-        ${podeApagarProjeto()?`<button class="btn bd bsm" style="margin-top:4px" onclick="delP(${p.id})">🗑️ Remover Projeto</button>`:''}
+        ${podeApagarProjeto()?`<button class="btn bd bsm" style="margin-top:4px" onclick="delP(${p.id})">🗑️ Remover Produto</button>`:''}
       </td>
     </tr>`).join('');
 }
@@ -5712,8 +5711,8 @@ function confirmarCanc(){
 function reativarP(id){
   const p=DB.find(x=>x.id===id);if(!p)return;
   p.cancelado=false; p.cancelEm=''; p.cancelMotivo='';
-  registrarHistorico(p, 'reativou', 'Projeto reativado');
-  fbSalvarProjeto(p); renderAll(); showToast('↩️ Projeto reativado!');
+  registrarHistorico(p, 'reativou', 'Produto reativado');
+  fbSalvarProjeto(p); renderAll(); showToast('↩️ Produto reativado!');
 }
 
 // ── MODAL NEW/EDIT ──
@@ -7084,7 +7083,7 @@ function salvar(){
 
 function delP(id){
   if(!podeApagarProjeto()){
-    showToast('🔒 Apenas lideranças podem deletar projetos');
+    showToast('🔒 Apenas lideranças podem deletar produtos');
     return;
   }
   delMotivoId = id;
@@ -7100,7 +7099,7 @@ let delMotivoId = null;
 // Confirma a exclusão: remove o projeto e registra no histórico (log_delecoes) com o motivo
 function confirmarDelMotivo(){
   if(!podeApagarProjeto()){
-    showToast('🔒 Sem permissão para deletar projetos');
+    showToast('🔒 Sem permissão para deletar produtos');
     cm('ovDelMotivo'); return;
   }
   const id = delMotivoId;
@@ -7119,7 +7118,7 @@ function confirmarDelMotivo(){
   delMotivoId = null;
   cm('ovDelMotivo');
   renderAll();
-  showToast('🗑️ Projeto deletado e registrado no histórico');
+  showToast('🗑️ Produto deletado e registrado no histórico');
 }
 
 // ── Estado de ordenação da aba Deletados ──
@@ -7202,7 +7201,7 @@ function rLixeira(){
     : '';
 
   tbl.innerHTML = totalFiltrado===0 ?
-    '<tr><td colspan="4" style="text-align:center;padding:20px;color:var(--mu)">Nenhum projeto deletado encontrado</td></tr>' :
+    '<tr><td colspan="4" style="text-align:center;padding:20px;color:var(--mu)">Nenhum produto deletado encontrado</td></tr>' :
     aviso + lista.map(r=>{
       const data = r.ts ? new Date(r.ts).toLocaleDateString('pt-BR') : '—';
       return `<tr>
@@ -8647,7 +8646,7 @@ function abrirModalMedicao(id, edicao){
         <thead><tr><th>Linha</th><th style="text-align:left">Descrição dos serviços</th><th>UN</th><th>QTD</th><th style="text-align:right">Preço unitário</th><th style="text-align:right">Preço parcial</th></tr></thead>
         <tbody id="medItensBody">${linhasHtml}</tbody>
         <tfoot><tr><td colspan="5" style="text-align:right;font-weight:700;padding-top:8px">Total da medição</td><td id="medItensTotal" style="text-align:right;font-weight:800;color:var(--blue);padding-top:8px;white-space:nowrap">—</td></tr></tfoot>
-      </table></div>` : `<div style="padding:12px;color:var(--red);font-size:12.5px">Nenhum recurso deste projeto está na tabela de preços do contrato. Ajuste os recursos em ✏️ Editar antes de enviar.</div>`}
+      </table></div>` : `<div style="padding:12px;color:var(--red);font-size:12.5px">Nenhum recurso deste produto está na tabela de preços do contrato. Ajuste os recursos em ✏️ Editar antes de enviar.</div>`}
       ${semPreco.length ? `<div style="font-size:11.5px;color:var(--yel);margin-top:8px">⚠️ Sem preço no contrato: ${semPreco.map(esc).join(', ')}</div>` : ''}
       <div id="medItensAviso" style="font-size:11.5px;color:var(--red);margin-top:8px;min-height:14px"></div>
       <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:10px">
@@ -8709,7 +8708,7 @@ function _salvarMedItens(id, edicao){
   fbSalvarProjeto(p);
   document.getElementById('medItensModal')?.remove();
   renderAll();
-  showToast(edicao ? '💾 Itens da medição atualizados!' : `📐 Medição enviada (${fmtBRL(p.medicaoTotal)})! O projeto fica em Pré-medição até a confirmação.`);
+  showToast(edicao ? '💾 Itens da medição atualizados!' : `📐 Medição enviada (${fmtBRL(p.medicaoTotal)})! O produto fica em Pré-medição até a confirmação.`);
 }
 
 function confirmarMedicao(id){
@@ -8729,7 +8728,7 @@ function confirmarMedicao(id){
     registrarHistorico(p, 'desmarcou medição', 'Medição desmarcada — retornou para ' + _colVolta);
     fbSalvarProjeto(p);
     renderAll();
-    showToast('↩️ Medição desmarcada — projeto retornou para ' + _colVolta + '.');
+    showToast('↩️ Medição desmarcada — produto retornou para ' + _colVolta + '.');
     return;
   }
   if(!confirm(`Confirmar que a medição de "${p.nome}" foi realizada?`)) return;
@@ -8741,7 +8740,7 @@ function confirmarMedicao(id){
   registrarHistorico(p, 'moveu coluna', `Movido para "${colLabel(14)}"`);
   fbSalvarProjeto(p);
   renderAll();
-  showToast('🎉 Medição confirmada! Projeto movido para Projetos Concluídos.');
+  showToast('🎉 Medição confirmada! Produto movido para Produtos Concluídos.');
 }
 
 // Itens medidos (linha · QTD · UN · preço parcial) + total; botão para ajustar enquanto não confirmada
@@ -8791,7 +8790,7 @@ function _buildMedRow(p){
       </button>
       ${p.medicaoFeita && ehLideranca()
         ? `<button onclick="abrirMoverRamp([${p.id}])"
-             title="Mover este projeto para outro RAMP"
+             title="Mover este produto para outro RAMP"
              style="padding:5px 9px;border:1.5px solid var(--bdr);border-radius:6px;background:var(--s2);color:var(--txt);cursor:pointer;font-size:11.5px;font-weight:600;margin-left:4px;white-space:nowrap">↔️ Mover RAMP</button>`
         : ''}
     </td>
@@ -8803,7 +8802,7 @@ function _buildMedTabela(projetos){
   return `<div class="tw" style="margin:0;border-radius:0;border:none">
     <table>
       <thead><tr>
-        <th style="cursor:pointer;white-space:nowrap" onclick="toggleMedSort('nome')">Projeto <span class="medSI" data-c="nome" style="font-size:10px;color:var(--mu)"></span></th>
+        <th style="cursor:pointer;white-space:nowrap" onclick="toggleMedSort('nome')">Produto <span class="medSI" data-c="nome" style="font-size:10px;color:var(--mu)"></span></th>
         <th style="cursor:pointer;white-space:nowrap" onclick="toggleMedSort('resp')">Responsáveis <span class="medSI" data-c="resp" style="font-size:10px;color:var(--mu)"></span></th>
         <th style="cursor:pointer;white-space:nowrap" onclick="toggleMedSort('rec')">Recursos <span class="medSI" data-c="rec" style="font-size:10px;color:var(--mu)"></span></th>
         <th style="cursor:pointer;white-space:nowrap" onclick="toggleMedSort('valor')">Itens · Valor <span class="medSI" data-c="valor" style="font-size:10px;color:var(--mu)"></span></th>
@@ -8845,9 +8844,9 @@ const _medSelecionados = new Set();
 function abrirSeletorQuinzena(pid){ abrirMoverRamp([pid]); }
 
 function abrirMoverRamp(pids){
-  if(!ehLideranca()){ showToast('🚫 Apenas a Liderança pode mover projetos entre RAMPs'); return; }
+  if(!ehLideranca()){ showToast('🚫 Apenas a Liderança pode mover produtos entre RAMPs'); return; }
   const projs = pids.map(id => DB.find(x=>x.id===id)).filter(p => p && p.medicaoFeita);
-  if(!projs.length){ showToast('⚠️ Selecione projetos com medição confirmada'); return; }
+  if(!projs.length){ showToast('⚠️ Selecione produtos com medição confirmada'); return; }
   const atuais = [...new Set(projs.map(_medicaoDoProjeto))];
   const atual  = atuais.length === 1 ? atuais[0] : '';
   const opts   = _opcoesQuinzena(atual);
@@ -8862,7 +8861,7 @@ function abrirMoverRamp(pids){
       <div style="font-size:12px;color:var(--mu);margin-bottom:12px">
         ${projs.length===1
           ? `${esc(projs[0].nome.length>60?projs[0].nome.slice(0,58)+'…':projs[0].nome)}<br>RAMP atual: <strong>${_fmtMedicao(atual)}</strong>`
-          : `${projs.length} projetos selecionados${atual?` · RAMP atual: <strong>${_fmtMedicao(atual)}</strong>`:' de RAMPs diferentes'}`}
+          : `${projs.length} produtos selecionados${atual?` · RAMP atual: <strong>${_fmtMedicao(atual)}</strong>`:' de RAMPs diferentes'}`}
       </div>
       <label for="quinzenaSelect" style="font-size:11px;font-weight:700;color:var(--mu);text-transform:uppercase;letter-spacing:.4px">RAMP de destino</label>
       <select id="quinzenaSelect" class="fi" style="width:100%;margin:4px 0 18px;padding:9px 12px">
@@ -8879,12 +8878,12 @@ function abrirMoverRamp(pids){
 }
 
 function _confirmarMoverRamp(pids){
-  if(!ehLideranca()){ showToast('🚫 Apenas a Liderança pode mover projetos entre RAMPs'); return; }
+  if(!ehLideranca()){ showToast('🚫 Apenas a Liderança pode mover produtos entre RAMPs'); return; }
   const destino = document.getElementById('quinzenaSelect')?.value;
   if(!_ehChaveMedicao(destino)) return;
   const projs = pids.map(id => DB.find(x=>x.id===id)).filter(p => p && _medicaoDoProjeto(p) !== destino);
-  if(!projs.length){ showToast('ℹ️ Os projetos já estão nesse RAMP'); document.getElementById('quinzenaModal')?.remove(); return; }
-  if(!confirm(`Mover ${projs.length} projeto(s) para ${_fmtMedicao(destino)}?`)) return;
+  if(!projs.length){ showToast('ℹ️ Os produtos já estão nesse RAMP'); document.getElementById('quinzenaModal')?.remove(); return; }
+  if(!confirm(`Mover ${projs.length} produto(s) para ${_fmtMedicao(destino)}?`)) return;
   projs.forEach(p => {
     const origem = _medicaoDoProjeto(p);
     p.medicaoMes = destino;
@@ -8893,7 +8892,7 @@ function _confirmarMoverRamp(pids){
     _medSelecionados.delete(p.id);
   });
   document.getElementById('quinzenaModal')?.remove();
-  showToast(`↔️ ${projs.length} projeto(s) movido(s) para ${_fmtMedicao(destino)}`);
+  showToast(`↔️ ${projs.length} produto(s) movido(s) para ${_fmtMedicao(destino)}`);
   rMedicao();
 }
 
@@ -8911,7 +8910,7 @@ function _atualizarBarraMoverRamp(){
   const bar = document.getElementById('medMoverBar'); if(!bar) return;
   const n = [..._medSelecionados].filter(id => DB.find(x=>x.id===id)?.medicaoFeita).length;
   bar.style.display = n ? 'flex' : 'none';
-  const t = document.getElementById('medMoverQtd'); if(t) t.textContent = `${n} projeto(s) selecionado(s)`;
+  const t = document.getElementById('medMoverQtd'); if(t) t.textContent = `${n} produto(s) selecionado(s)`;
 }
 
 function salvarQuinzenaMedicao(pid){ _confirmarMoverRamp([pid]); }
@@ -8983,7 +8982,7 @@ function rMedicao(){
 
   const statsEl = document.getElementById('medicaoStats');
   if(statsEl) statsEl.innerHTML = `
-    <div class="sc cp"><div class="sc-l">Total na Medição</div><div class="sc-v">${listaTotal.length}</div><div class="sc-s">projetos enviados</div><div class="sc-i"><svg class="ic"><use href="#i-receipt"/></svg></div></div>
+    <div class="sc cp"><div class="sc-l">Total na Medição</div><div class="sc-v">${listaTotal.length}</div><div class="sc-s">produtos enviados</div><div class="sc-i"><svg class="ic"><use href="#i-receipt"/></svg></div></div>
     <div class="sc cy"><div class="sc-l">Aguardando Medição</div><div class="sc-v">${pendentes}</div><div class="sc-s">a medir</div><div class="sc-i"><svg class="ic"><use href="#i-hourglass"/></svg></div></div>
     <div class="sc cg"><div class="sc-l">Medição Concluída</div><div class="sc-v">${concluidas}</div><div class="sc-s">já medidos</div><div class="sc-i"><svg class="ic"><use href="#i-circle-check"/></svg></div></div>
   `;
@@ -9015,7 +9014,7 @@ function rMedicao(){
   const ct=document.getElementById('medFiltroContador');
   if(ct){
     const ativo = fConf.length || fResp.length || fRec.length || fStat.length;
-    ct.textContent = ativo ? `${lista.length} de ${listaTotal.length} projeto(s)` : '';
+    ct.textContent = ativo ? `${lista.length} de ${listaTotal.length} produto(s)` : '';
   }
 
   const _filtroAtivo = fConf.length || fResp.length || fRec.length || fStat.length;
@@ -9117,7 +9116,7 @@ function rMedicao(){
         })() : ''}
         <span class="med-group-chev">▼</span>
       </div>
-      <div class="med-group-body">${projs.length ? _buildMedTabela(projs) : '<div style="padding:14px 16px;font-size:12px;color:var(--mu)">Nenhum projeto medido neste RAMP.</div>'}</div>
+      <div class="med-group-body">${projs.length ? _buildMedTabela(projs) : '<div style="padding:14px 16px;font-size:12px;color:var(--mu)">Nenhum produto medido neste RAMP.</div>'}</div>
     </div>`;
   });
 
@@ -11026,9 +11025,9 @@ function rCarga(){
   const statsEl = document.getElementById('cargaStats');
   if(statsEl){
     statsEl.innerHTML = `
-      <div class="sc cp"><div class="sc-l">Projetos Ativos - Equipe</div><div class="sc-v">${totalAtivosEquipe}</div><div class="sc-s">etapa atual com a equipe</div><div class="sc-i"><svg class="ic"><use href="#i-users"/></svg></div></div>
-      <div class="sc cb"><div class="sc-l">Projetos Ativos - Cliente</div><div class="sc-v">${totalAtivosCliente}</div><div class="sc-s">na vez do cliente</div><div class="sc-i"><svg class="ic"><use href="#i-building"/></svg></div></div>
-      <div class="sc cr"><div class="sc-l">Atrasos Equipe</div><div class="sc-v">${totalAtrasoEq}</div><div class="sc-s">projetos atrasados</div><div class="sc-i"><svg class="ic"><use href="#i-triangle-alert"/></svg></div></div>
+      <div class="sc cp"><div class="sc-l">Produtos Ativos - Equipe</div><div class="sc-v">${totalAtivosEquipe}</div><div class="sc-s">etapa atual com a equipe</div><div class="sc-i"><svg class="ic"><use href="#i-users"/></svg></div></div>
+      <div class="sc cb"><div class="sc-l">Produtos Ativos - Cliente</div><div class="sc-v">${totalAtivosCliente}</div><div class="sc-s">na vez do cliente</div><div class="sc-i"><svg class="ic"><use href="#i-building"/></svg></div></div>
+      <div class="sc cr"><div class="sc-l">Atrasos Equipe</div><div class="sc-v">${totalAtrasoEq}</div><div class="sc-s">produtos atrasados</div><div class="sc-i"><svg class="ic"><use href="#i-triangle-alert"/></svg></div></div>
       <div class="sc cy"><div class="sc-l">Atrasos Cliente</div><div class="sc-v">${totalAtrasoCl}</div><div class="sc-s">aguardando cliente</div><div class="sc-i"><svg class="ic"><use href="#i-hourglass"/></svg></div></div>
     `;
   }
@@ -11057,7 +11056,7 @@ function rCarga(){
   if(ct){
     const ativo = fResp.length || fStat.length || fRec.length || fPrio.length;
     const totalFiltrados = Object.values(membros).reduce((s,a)=>s+a.length,0);
-    ct.textContent = ativo ? `${Object.keys(membros).length} ${Object.keys(membros).length===1?'item':'itens'} · ${totalFiltrados} projeto(s)` : '';
+    ct.textContent = ativo ? `${Object.keys(membros).length} ${Object.keys(membros).length===1?'item':'itens'} · ${totalFiltrados} produto(s)` : '';
   }
 
   // ── Vazio ──
@@ -11139,7 +11138,7 @@ function _buildCargaCardPessoa(nome, projs, max, stOpen){
       </div>
       <div class="carga-count-wrap">
         <div class="carga-count" style="color:${corStatus}">${projs.length}</div>
-        <div class="carga-count-lbl">projetos</div>
+        <div class="carga-count-lbl">produtos</div>
       </div>
       <span class="carga-arrow${isOpen?' open':''}" id="${uid}_arrow">▼</span>
     </div>
@@ -11190,7 +11189,7 @@ function _buildCargaCardCliente(projs, max, stOpen){
       </div>
       <div class="carga-count-wrap">
         <div class="carga-count" style="color:${corStatus}">${projs.length}</div>
-        <div class="carga-count-lbl">projetos</div>
+        <div class="carga-count-lbl">produtos</div>
       </div>
       <span class="carga-arrow${isOpen?' open':''}" id="${uid}_arrow">▼</span>
     </div>
