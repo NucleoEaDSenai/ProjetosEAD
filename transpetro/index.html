@@ -1557,11 +1557,10 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
     <!-- TIMELINE -->
     <div class="view" id="view-timeline">
       <div class="sh" style="flex-wrap:wrap;gap:10px;margin-bottom:14px">
-        <div class="st" id="tlTitle">Cronograma Geral</div>
         <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
           <select class="fi-sm" id="tlAno" onchange="rTimeline()" style="width:110px"></select>
           <select class="fi-sm" id="tlFiltSit" onchange="rTimeline()" style="width:170px">
-            <option value="">Todos os projetos</option>
+            <option value="">Todos os produtos</option>
             <option value="andamento">Em Andamento</option>
             <option value="concluido">Concluídos</option>
             <option value="atrasado">Atrasados</option>
@@ -3499,7 +3498,6 @@ function rTimeline(){
 
   const anoSel=parseInt(document.getElementById('tlAno')?.value||anoAtual);
   const filtSit=document.getElementById('tlFiltSit')?.value||'';
-  document.getElementById('tlTitle').textContent='Cronograma Geral — '+anoSel;
 
   const hojeD=new Date();
   const hojeMes=hojeD.getFullYear()===anoSel?hojeD.getMonth():-1;
