@@ -210,6 +210,8 @@ tr:hover td{background:#FAFAF9}
 .mcl:hover{background:var(--s2)}
 .mbody{padding:20px 24px}
 .mft{padding:13px 24px;border-top:1px solid var(--bdr);display:flex;gap:8px;justify-content:flex-end;background:#fff;position:sticky;bottom:0}
+#ovNew .modal{height:92vh;display:flex;flex-direction:column}
+#ovNew .mbody{flex:1;overflow-y:auto}
 /* FORM */
 .fg2{display:grid;grid-template-columns:1fr 1fr;gap:13px}
 .ff{grid-column:1/-1}
@@ -385,6 +387,10 @@ body.dark .kpi-hcard-trend.down{background:rgba(220,38,38,.2);color:#FCA5A5}
 .kpi-legend-lbl{flex:1;color:var(--txt);font-weight:500}
 .kpi-legend-val{font-weight:800;font-family:'Plus Jakarta Sans',sans-serif;color:var(--txt)}
 .kpi-legend-pct{font-size:10.5px;color:var(--mu);font-weight:600;margin-left:4px}
+/* Resumo da aba Projetos: cards à esquerda, rosca à direita */
+.cadproj-resumo{display:grid;grid-template-columns:minmax(220px,1fr) 2fr;gap:14px;margin-bottom:22px}
+.cadproj-resumo-cards{display:grid;gap:11px}
+@media(max-width:900px){.cadproj-resumo{grid-template-columns:1fr}}
 
 /* Insights */
 .kpi-insights-list{display:flex;flex-direction:column;gap:8px}
@@ -621,6 +627,29 @@ tr.canc-row td{opacity:.55}
 .sb-sec-label{font-size:10px;letter-spacing:1.5px;color:rgba(255,255,255,.5);font-weight:700;text-transform:uppercase}
 .sb-sec-chevron{font-size:9px;color:rgba(255,255,255,.45);transition:transform .2s}
 .sb-group.closed .sb-sec-chevron{transform:rotate(-90deg)}
+/* Menu lateral retrátil: aberto (padrão) ou só ícones (body.sb-mini) */
+.sb{transition:width .2s ease}
+.main{transition:margin-left .2s ease}
+.sb-toggle{position:absolute;top:50%;right:-12px;transform:translateY(-50%);width:24px;height:24px;border-radius:50%;background:var(--dark);border:1px solid rgba(255,255,255,.25);color:rgba(255,255,255,.85);display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0;z-index:2;box-shadow:0 2px 8px rgba(0,0,0,.25);transition:background .15s,color .15s}
+.sb-toggle:hover{background:var(--red);color:#fff;border-color:var(--red)}
+.sb-toggle .ic{width:14px;height:14px;transition:transform .2s}
+body.sb-mini .sb-toggle .ic{transform:rotate(180deg)}
+body.sb-mini .sb{width:64px}
+body.sb-mini .main{margin-left:64px}
+body.sb-mini .sb-logo,body.sb-mini .sb-sec,body.sb-mini .sb-sec-btn,body.sb-mini .sb-foot>span{display:none}
+body.sb-mini .sb-group{border-top:1px solid rgba(255,255,255,.08);margin-top:6px;padding-top:6px}
+body.sb-mini .sb-group.closed .sb-group-items{display:block}
+body.sb-mini .si{justify-content:center;padding:11px 0;position:relative}
+body.sb-mini .si>span:not(.si-ic):not(.si-badge){display:none}
+body.sb-mini .si-badge{position:absolute;top:5px;right:12px;margin:0;font-size:8px;padding:0 4px;min-width:13px;line-height:13px}
+body.sb-mini .sb-foot{justify-content:center!important;padding:12px 0}
+body.sb-mini .dark-btn{padding:4px 8px}
+@media(max-width:960px){.sb-toggle{display:none}}
+/* Nome da área ao passar o mouse com o menu fechado (fixo para não ser cortado pela rolagem do menu) */
+.sb-tip{position:fixed;z-index:1000;background:#111827;color:#fff;font-size:12px;font-weight:600;padding:6px 10px;border-radius:7px;white-space:nowrap;pointer-events:none;box-shadow:0 6px 18px rgba(0,0,0,.25);display:none;transform:translateY(-50%)}
+.sb-tip::before{content:'';position:absolute;left:-4px;top:50%;width:8px;height:8px;background:#111827;transform:translateY(-50%) rotate(45deg)}
+.sb-tip.on{display:block;animation:sbTipPulo .32s cubic-bezier(.34,1.56,.64,1)}
+@keyframes sbTipPulo{0%{opacity:0;transform:translate(-8px,-50%) scale(.92)}100%{opacity:1;transform:translate(0,-50%) scale(1)}}
 /* MODAL MOTIVO ATRASO */
 .ov-motivo{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:1800;display:none;align-items:center;justify-content:center;backdrop-filter:blur(3px)}
 .ov-motivo.on{display:flex}
@@ -1195,6 +1224,7 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
   <symbol id="i-calendar-x" viewBox="0 0 24 24"><path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/><path d="m14 14-4 4"/><path d="m10 14 4 4"/></symbol>
   <symbol id="i-calendar-check" viewBox="0 0 24 24"><path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/><path d="m9 16 2 2 4-4"/></symbol>
   <symbol id="i-bookmark" viewBox="0 0 24 24"><path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"/></symbol>
+  <symbol id="i-chevron-left" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></symbol>
   <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></symbol>
 </svg>
 
@@ -1266,7 +1296,9 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
   </nav>
   <div class="sb-foot" style="display:flex;align-items:center;justify-content:space-between"><span>v2.0 · Firjan SENAI</span><button class="dark-btn" id="darkBtn" onclick="toggleDark()" title="Alternar modo escuro" aria-label="Alternar modo escuro"><svg class="ic" style="width:14px;height:14px;color:#FCD34D"><use href="#i-moon"/></svg></button></div>
 
+  <button class="sb-toggle" id="sbToggle" onclick="toggleSidebar()" title="Recolher menu" aria-label="Recolher menu" aria-expanded="true"><svg class="ic"><use href="#i-chevron-left"/></svg></button>
 </aside>
+<div class="sb-tip" id="sbTip" role="tooltip"></div>
 
 <div class="main" role="main" id="main-content" tabindex="-1">
   <div class="tp" role="banner">
@@ -1592,6 +1624,8 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
             <span class="kpi-period-label">Período</span>
             <div class="kpi-seg" id="kpiSegPeriodo">
               <button class="kpi-seg-btn active" data-val="0" onclick="setKpiPeriodo('0',this)">Todos</button>
+              <button class="kpi-seg-btn" data-val="7" onclick="setKpiPeriodo('7',this)">7d</button>
+              <button class="kpi-seg-btn" data-val="15" onclick="setKpiPeriodo('15',this)">15d</button>
               <button class="kpi-seg-btn" data-val="30" onclick="setKpiPeriodo('30',this)">30d</button>
               <button class="kpi-seg-btn" data-val="60" onclick="setKpiPeriodo('60',this)">60d</button>
               <button class="kpi-seg-btn" data-val="90" onclick="setKpiPeriodo('90',this)">90d</button>
@@ -1600,6 +1634,8 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
             </div>
             <select id="kpiFiltPeriodo" onchange="rKPIs()" style="display:none">
               <option value="0">Todo o histórico</option>
+              <option value="7">Últimos 7 dias</option>
+              <option value="15">Últimos 15 dias</option>
               <option value="30">Últimos 30 dias</option>
               <option value="60">Últimos 60 dias</option>
               <option value="90">Últimos 90 dias</option>
@@ -1806,6 +1842,16 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
 
     <!-- PROJETOS CADASTRADOS (cada projeto agrupa vários produtos/cards) -->
     <div class="view" id="view-cadprojetos">
+      <div class="cadproj-resumo">
+        <div class="cadproj-resumo-cards" id="cadProjStats"></div>
+        <div class="kpi-card">
+          <div class="kpi-card-head">
+            <span class="kpi-card-title">Situação dos Produtos</span>
+            <span class="kpi-card-badge" id="cadProjSitTotal">—</span>
+          </div>
+          <div id="cadProjSituacao"></div>
+        </div>
+      </div>
       <div class="tw"><table>
         <thead><tr><th>Projeto</th><th>Descrição</th><th>Objetivo</th><th>Público-Alvo</th><th>Produtos</th><th></th></tr></thead>
         <tbody id="cadProjTbl"></tbody>
@@ -2206,12 +2252,12 @@ const NOMES = ['Tatiana','Ana Paula','Amanda','Gabriel','Pedro','Maycon','Lidera
 // Categorias de Projetos da Transpetro (campo "academia" no banco)
 const CATEGORIAS_PROJETO = ['ECorp','PQDT','PQTM'];
 
-const RECURSOS = ['Acomp pedagógico - Exerc fixação e Aval','Acompanhamento pedagógico - apostila','Acompanhamento pedagógico - PPT','Animação 2D','Animação 3D','Atualização do Game 2D','Cursos alta comp até 40 min até 20 telas','Cursos alta comp até 60 min até 40 telas','Cursos alta comp até 90 min até 60 telas','Cursos baix comp até 40 min até 20 telas','Cursos baix comp até 60 min até 40 telas','Cursos baix comp até 90 min até 60 telas','Cursos de alta complexidade até 20 min','Cursos de baixa complexidade até 20 min','Editoração das apostilas','Game 2D','Game 3D','Gestão do projeto','Manutenção mensal do projeto','Objeto interativo 2D','Objeto interativo 3D','One Page - Web Content até 30 min','Personagem','Planejamento e Estruturação do Projeto','Plano Instrucional e Plano de Identidade Visual (PICV)','Pós-produção de Vídeo até 10 min','Pós-produção de Vídeo até 2 horas','Reprodução de apostila/ Pencard','Roteiro (Storyboard)','Vídeo Aula - edição','Vídeo Aula - gravação','Vídeo Instrucional 10 min','Vídeo Instrucional 5 min','Vídeo Interativo','Workshop com especialistas da Transpetro'];
+const RECURSOS = ['Acomp pedagógico - Exerc fixação e Aval','Acompanhamento pedagógico - apostila','Acompanhamento pedagógico - PPT','Animação 2D','Animação 3D','Atualização do Game 2D','Cursos alta comp até 40 min até 20 telas','Cursos alta comp até 60 min até 40 telas','Cursos alta comp até 90 min até 60 telas','Cursos baix comp até 40 min até 20 telas','Cursos baix comp até 60 min até 40 telas','Cursos baix comp até 90 min até 60 telas','Cursos de alta complexidade até 20 min','Cursos de baixa complexidade até 20 min','Editoração das apostilas','Game 2D','Game 3D','Gestão do projeto','Manutenção mensal do projeto','Objeto interativo 2D','Objeto interativo 3D','One Page - Web Content até 30 min','Personagem','Planejamento e Estruturação do Projeto','Plano Instrucional e Plano de Identidade Visual','Pós-produção de Vídeo até 10 min','Pós-produção de Vídeo até 2 horas','Reprodução de apostila/ Pencard','Roteiro (Storyboard)','Vídeo Aula - edição','Vídeo Aula - gravação','Vídeo Instrucional 10 min','Vídeo Instrucional 5 min','Vídeo Interativo','Workshop com especialistas da Transpetro'];
 
 // Grupos exibidos no formulário do produto (todo item de RECURSOS deve estar em um grupo;
 // o que ficar de fora aparece em "Outros")
 const RECURSO_GRUPOS = [
-  {titulo:'📋 Planejamento e Gestão', recursos:['Planejamento e Estruturação do Projeto','Gestão do projeto','Manutenção mensal do projeto','Workshop com especialistas da Transpetro','Plano Instrucional e Plano de Identidade Visual (PICV)','Roteiro (Storyboard)']},
+  {titulo:'📋 Planejamento e Gestão', recursos:['Planejamento e Estruturação do Projeto','Gestão do projeto','Manutenção mensal do projeto','Workshop com especialistas da Transpetro','Plano Instrucional e Plano de Identidade Visual','Roteiro (Storyboard)']},
   {titulo:'🎓 Acompanhamento Pedagógico', recursos:['Acomp pedagógico - Exerc fixação e Aval','Acompanhamento pedagógico - apostila','Acompanhamento pedagógico - PPT']},
   {titulo:'💻 Cursos e Web', recursos:['Cursos de alta complexidade até 20 min','Cursos alta comp até 40 min até 20 telas','Cursos alta comp até 60 min até 40 telas','Cursos alta comp até 90 min até 60 telas','Cursos de baixa complexidade até 20 min','Cursos baix comp até 40 min até 20 telas','Cursos baix comp até 60 min até 40 telas','Cursos baix comp até 90 min até 60 telas','One Page - Web Content até 30 min']},
   {titulo:'🎬 Vídeo', recursos:['Pós-produção de Vídeo até 10 min','Pós-produção de Vídeo até 2 horas','Vídeo Aula - gravação','Vídeo Aula - edição','Vídeo Instrucional 5 min','Vídeo Instrucional 10 min','Vídeo Interativo']},
@@ -2261,7 +2307,7 @@ const SERVICOS_CONTRATO = [
 ];
 // Recursos que correspondem a mais de uma linha do contrato
 const RECURSO_LINHAS_ESPECIAIS = {
-  'Plano Instrucional e Plano de Identidade Visual (PICV)': [15, 16],
+  'Plano Instrucional e Plano de Identidade Visual': [15, 16],
 };
 // Linhas do contrato correspondentes a um recurso
 function linhasDoRecurso(recurso){
@@ -5097,7 +5143,7 @@ const TEMPLATES = {
   },
 
   // ── TRANSPETRO ──────────────────────────────────────────────────────────────
-  'Plano Instrucional e Plano de Identidade Visual (PICV)': {
+  'Plano Instrucional e Plano de Identidade Visual': {
     colInicial: 0,                    // nasce em Diagnóstico
     // fica em Pré-medição até a medição ser confirmada → Projetos Concluídos (regra geral em _colComMedicao)
     etapas: [
@@ -6815,7 +6861,62 @@ function _blocoProjetoDet(p){
 }
 
 // ── TELA "PROJETOS" ──
+// Resumo do topo da aba Projetos. Considera só produtos ativos (sem cancelados) ligados a um projeto cadastrado.
+function _rCadProjResumo(){
+  const stEl = document.getElementById('cadProjStats');
+  const sitEl = document.getElementById('cadProjSituacao');
+  if(!stEl || !sitEl) return;
+  const ids = new Set(CADPROJ.map(pr => pr.id));
+  const prods = activeDB().filter(p => ids.has(p.projCadId));
+  const total = prods.length;
+  const media = CADPROJ.length ? (total / CADPROJ.length).toFixed(1).replace('.', ',') : '0';
+  const atras = prods.filter(p => calcSit(p) === 'atrasado').length;
+  const atrasEq = prods.filter(p => atrasadoPorEquipe(p)).length;
+  const atrasCl = prods.filter(p => atrasadoPorCliente(p)).length;
+
+  stEl.innerHTML = `
+    <div class="sc cb"><div class="sc-l">Total de Projetos</div><div class="sc-v">${CADPROJ.length}</div><div class="sc-s">${total} produto${total!==1?'s':''} ativo${total!==1?'s':''}</div><div class="sc-i"><svg class="ic"><use href="#i-folder"/></svg></div></div>
+    <div class="sc cp"><div class="sc-l">Média de Produtos por Projeto</div><div class="sc-v">${media}</div><div class="sc-s">sem cancelados</div><div class="sc-i"><svg class="ic"><use href="#i-chart"/></svg></div></div>
+    <div class="sc cr"><div class="sc-l">Produtos Atrasados</div><div class="sc-v">${atras}</div><div class="sc-s">${atrasEq} equipe · ${atrasCl} cliente</div><div class="sc-i"><svg class="ic"><use href="#i-triangle-alert"/></svg></div></div>`;
+
+  const sits  = {concluido:0, andamento:0, atrasado:0, aguardando:0};
+  prods.forEach(p => { const s = calcSit(p); if(s in sits) sits[s]++; });
+  const cores = {concluido:'#16A34A', andamento:'#2563EB', atrasado:'#E8002D', aguardando:'#94A3B8'};
+  const labs  = {concluido:'Concluído', andamento:'Em Andamento', atrasado:'Atrasado', aguardando:'Aguardando'};
+  const r = 42, c2 = 2*Math.PI*r;
+  let off = 0, arcs = '';
+  Object.entries(sits).forEach(([k,n]) => {
+    if(n === 0) return;
+    const pv = n/total;
+    arcs += `<circle class="arc" cx="60" cy="60" r="${r}" fill="none" stroke="${cores[k]}" stroke-width="12" stroke-dasharray="${pv*c2} ${c2}" stroke-dashoffset="${-off}" stroke-linecap="butt" transform="rotate(-90 60 60)"><title>${labs[k]}: ${n}</title></circle>`;
+    off += pv*c2;
+  });
+  const legenda = Object.entries(sits).map(([k,n]) => `<div class="kpi-legend-item">
+      <span class="kpi-legend-dot" style="background:${cores[k]}"></span>
+      <span class="kpi-legend-lbl">${labs[k]}</span>
+      <span class="kpi-legend-val">${n}<span class="kpi-legend-pct">${total ? Math.round(n/total*100) : 0}%</span></span>
+    </div>`).join('');
+  sitEl.innerHTML = total === 0
+    ? '<div class="kpi-empty"><div class="kpi-empty-icon">📭</div>Nenhum produto ativo vinculado a projetos</div>'
+    : `<div class="kpi-donut-wrap">
+         <div class="kpi-donut">
+           <svg viewBox="0 0 120 120" width="140" height="140">
+             <circle cx="60" cy="60" r="${r}" fill="none" stroke="var(--bdr)" stroke-width="12" opacity=".3"/>
+             ${arcs}
+           </svg>
+           <div class="kpi-donut-center">
+             <div class="kpi-donut-center-val">${total}</div>
+             <div class="kpi-donut-center-lbl">produtos</div>
+           </div>
+         </div>
+         <div class="kpi-donut-legend">${legenda}</div>
+       </div>`;
+  const badge = document.getElementById('cadProjSitTotal');
+  if(badge) badge.textContent = `${total} ativo${total!==1?'s':''}`;
+}
+
 function rCadProjetos(){
+  _rCadProjResumo();
   const tb = document.getElementById('cadProjTbl'); if(!tb) return;
   if(!CADPROJ.length){
     tb.innerHTML = `<tr><td colspan="6" style="text-align:center;color:var(--mu);padding:28px">Nenhum projeto cadastrado. Clique em <strong>+ Novo Projeto</strong>.</td></tr>`;
@@ -7224,6 +7325,54 @@ function toggleSbGroup(id){
       if(g) g.classList.add('closed');
     }
   }
+})();
+
+// ── MENU LATERAL RETRÁTIL ──
+function _sbMiniAtivo(){
+  return document.body.classList.contains('sb-mini') || window.innerWidth <= 960;
+}
+function _aplicarSidebar(mini){
+  document.body.classList.toggle('sb-mini', mini);
+  const btn = document.getElementById('sbToggle');
+  if(btn){
+    const txt = mini ? 'Expandir menu' : 'Recolher menu';
+    btn.title = txt; btn.setAttribute('aria-label', txt);
+    btn.setAttribute('aria-expanded', String(!mini));
+  }
+  _esconderSbTip();
+}
+function toggleSidebar(){
+  const mini = !document.body.classList.contains('sb-mini');
+  _aplicarSidebar(mini);
+  try{ localStorage.setItem('transpetro_sb_mini', mini ? '1' : '0'); }catch(e){}
+}
+function _mostrarSbTip(si){
+  const tip = document.getElementById('sbTip');
+  if(!tip || !_sbMiniAtivo()) return;
+  const lbl = si.querySelector('span:not(.si-ic):not(.si-badge)');
+  if(!lbl) return;
+  const r = si.getBoundingClientRect();
+  tip.textContent = lbl.textContent;
+  tip.style.left = (r.right + 10) + 'px';
+  tip.style.top  = (r.top + r.height/2) + 'px';
+  tip.classList.remove('on'); void tip.offsetWidth;  // reinicia a animação do "pulo"
+  tip.classList.add('on');
+}
+function _esconderSbTip(){
+  document.getElementById('sbTip')?.classList.remove('on');
+}
+(function(){
+  let mini = false;
+  try{ mini = localStorage.getItem('transpetro_sb_mini') === '1'; }catch(e){}
+  _aplicarSidebar(mini);
+  const sb = document.querySelector('.sb');
+  if(!sb) return;
+  sb.addEventListener('mouseover', e => { const si = e.target.closest('.si'); if(si) _mostrarSbTip(si); });
+  sb.addEventListener('mouseout',  e => { const si = e.target.closest('.si'); if(si && !si.contains(e.relatedTarget)) _esconderSbTip(); });
+  sb.addEventListener('focusin',   e => { const si = e.target.closest('.si'); if(si) _mostrarSbTip(si); });
+  sb.addEventListener('focusout',  _esconderSbTip);
+  sb.addEventListener('click',     _esconderSbTip);
+  sb.querySelector('.sb-nav')?.addEventListener('scroll', _esconderSbTip);
 })();
 
 function toggleExportMenu(){
@@ -10183,7 +10332,7 @@ function _migrarEtapasWebRise(etapas){
 function normalizar(p){
   if(!p) return p;
   p.resps          = (p.resps || []).map(_migrarNome);
-  p.recursos       = [...new Set((p.recursos || []).map(r => (r==='Plano Instrucional'||r==='Plano de Identidade Visual') ? 'Plano Instrucional e Plano de Identidade Visual (PICV)' : r)
+  p.recursos       = [...new Set((p.recursos || []).map(r => (r==='Plano Instrucional'|| r==='Plano de Identidade Visual' || r==='Plano Instrucional e Plano de Identidade Visual (PICV)') ? 'Plano Instrucional e Plano de Identidade Visual' : r)
                        .map(r => String(r).replace(/(\d) mim\b/g, '$1 min')))];  // recursos unificados no PICV · "mim" → "min"
   if(Array.isArray(p.medicaoItens)) p.medicaoItens.forEach(it => { if(it.desc) it.desc = it.desc.replace(/(\d) mim\b/g, '$1 min'); });
   p.etapas         = (p.etapas || []).map(e => ({...e, r: _migrarNome(e.r||'')}));
