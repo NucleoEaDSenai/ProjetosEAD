@@ -1804,7 +1804,7 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
       <div class="st" style="margin-bottom:16px">🚫 Projetos Cancelados</div>
       <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:22px" id="cancelStats"></div>
       <div class="tw"><table>
-        <thead><tr><th>Projeto</th><th>Recursos</th><th>Responsável(is)</th><th>Criado</th><th>Cancelado em</th><th>Coluna na Cancelamento</th><th>Progresso</th><th>Motivo</th><th></th></tr></thead>
+        <thead><tr><th>Produto</th><th>Recursos</th><th>Responsável(is)</th><th>Criado</th><th>Cancelado em</th><th>Coluna na Cancelamento</th><th>Progresso</th><th>Motivo</th><th></th></tr></thead>
         <tbody id="cancelTbl"></tbody>
       </table></div>
     </div>
@@ -4487,7 +4487,7 @@ function rCancelados(){
     <div class="sc cg"><div class="sc-l">Concluídos</div><div class="sc-v">${activeDB().filter(p=>calcSit(p)==='concluido').length}</div><div class="sc-i"><svg class="ic"><use href="#i-circle-check"/></svg></div></div>
   `;
   document.getElementById('cancelTbl').innerHTML=canc.length===0?
-    '<tr><td colspan="9" style="text-align:center;padding:20px;color:var(--mu)">Nenhum projeto cancelado</td></tr>':
+    '<tr><td colspan="9" style="text-align:center;padding:20px;color:var(--mu)">Nenhum produto cancelado</td></tr>':
     canc.map(p=>`<tr class="canc-row">
       <td><strong>${esc(p.nome)}</strong></td>
       <td>${recTags(p.recursos)}</td>
@@ -4499,7 +4499,7 @@ function rCancelados(){
       <td style="font-size:12px;color:var(--mu);max-width:220px">${p.cancelMotivo||'—'}</td>
       <td>
         <button class="btn bg2 bsm" onclick="reativarP(${p.id})">↩️ Reativar</button>
-        ${podeApagarProjeto()?`<button class="btn bd bsm" style="margin-top:4px" onclick="delP(${p.id})">🗑️ Remover Projeto</button>`:''}
+        ${podeApagarProjeto()?`<button class="btn bd bsm" style="margin-top:4px" onclick="delP(${p.id})">🗑️ Remover Produto</button>`:''}
       </td>
     </tr>`).join('');
 }
@@ -5711,8 +5711,8 @@ function confirmarCanc(){
 function reativarP(id){
   const p=DB.find(x=>x.id===id);if(!p)return;
   p.cancelado=false; p.cancelEm=''; p.cancelMotivo='';
-  registrarHistorico(p, 'reativou', 'Projeto reativado');
-  fbSalvarProjeto(p); renderAll(); showToast('↩️ Projeto reativado!');
+  registrarHistorico(p, 'reativou', 'Produto reativado');
+  fbSalvarProjeto(p); renderAll(); showToast('↩️ Produto reativado!');
 }
 
 // ── MODAL NEW/EDIT ──
@@ -7083,7 +7083,7 @@ function salvar(){
 
 function delP(id){
   if(!podeApagarProjeto()){
-    showToast('🔒 Apenas lideranças podem deletar projetos');
+    showToast('🔒 Apenas lideranças podem deletar produtos');
     return;
   }
   delMotivoId = id;
@@ -7099,7 +7099,7 @@ let delMotivoId = null;
 // Confirma a exclusão: remove o projeto e registra no histórico (log_delecoes) com o motivo
 function confirmarDelMotivo(){
   if(!podeApagarProjeto()){
-    showToast('🔒 Sem permissão para deletar projetos');
+    showToast('🔒 Sem permissão para deletar produtos');
     cm('ovDelMotivo'); return;
   }
   const id = delMotivoId;
@@ -7118,7 +7118,7 @@ function confirmarDelMotivo(){
   delMotivoId = null;
   cm('ovDelMotivo');
   renderAll();
-  showToast('🗑️ Projeto deletado e registrado no histórico');
+  showToast('🗑️ Produto deletado e registrado no histórico');
 }
 
 // ── Estado de ordenação da aba Deletados ──
