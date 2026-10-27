@@ -387,6 +387,10 @@ body.dark .kpi-hcard-trend.down{background:rgba(220,38,38,.2);color:#FCA5A5}
 .kpi-legend-lbl{flex:1;color:var(--txt);font-weight:500}
 .kpi-legend-val{font-weight:800;font-family:'Plus Jakarta Sans',sans-serif;color:var(--txt)}
 .kpi-legend-pct{font-size:10.5px;color:var(--mu);font-weight:600;margin-left:4px}
+/* Resumo da aba Projetos: cards à esquerda, rosca à direita */
+.cadproj-resumo{display:grid;grid-template-columns:minmax(220px,1fr) 2fr;gap:14px;margin-bottom:22px}
+.cadproj-resumo-cards{display:grid;gap:11px}
+@media(max-width:900px){.cadproj-resumo{grid-template-columns:1fr}}
 
 /* Insights */
 .kpi-insights-list{display:flex;flex-direction:column;gap:8px}
@@ -1812,6 +1816,16 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
 
     <!-- PROJETOS CADASTRADOS (cada projeto agrupa vários produtos/cards) -->
     <div class="view" id="view-cadprojetos">
+      <div class="cadproj-resumo">
+        <div class="cadproj-resumo-cards" id="cadProjStats"></div>
+        <div class="kpi-card">
+          <div class="kpi-card-head">
+            <span class="kpi-card-title">Situação dos Produtos</span>
+            <span class="kpi-card-badge" id="cadProjSitTotal">—</span>
+          </div>
+          <div id="cadProjSituacao"></div>
+        </div>
+      </div>
       <div class="tw"><table>
         <thead><tr><th>Projeto</th><th>Descrição</th><th>Objetivo</th><th>Público-Alvo</th><th>Produtos</th><th></th></tr></thead>
         <tbody id="cadProjTbl"></tbody>
@@ -6821,7 +6835,62 @@ function _blocoProjetoDet(p){
 }
 
 // ── TELA "PROJETOS" ──
+// Resumo do topo da aba Projetos. Considera só produtos ativos (sem cancelados) ligados a um projeto cadastrado.
+function _rCadProjResumo(){
+  const stEl = document.getElementById('cadProjStats');
+  const sitEl = document.getElementById('cadProjSituacao');
+  if(!stEl || !sitEl) return;
+  const ids = new Set(CADPROJ.map(pr => pr.id));
+  const prods = activeDB().filter(p => ids.has(p.projCadId));
+  const total = prods.length;
+  const media = CADPROJ.length ? (total / CADPROJ.length).toFixed(1).replace('.', ',') : '0';
+  const atras = prods.filter(p => calcSit(p) === 'atrasado').length;
+  const atrasEq = prods.filter(p => atrasadoPorEquipe(p)).length;
+  const atrasCl = prods.filter(p => atrasadoPorCliente(p)).length;
+
+  stEl.innerHTML = `
+    <div class="sc cb"><div class="sc-l">Total de Projetos</div><div class="sc-v">${CADPROJ.length}</div><div class="sc-s">${total} produto${total!==1?'s':''} ativo${total!==1?'s':''}</div><div class="sc-i"><svg class="ic"><use href="#i-folder"/></svg></div></div>
+    <div class="sc cp"><div class="sc-l">Média de Produtos por Projeto</div><div class="sc-v">${media}</div><div class="sc-s">sem cancelados</div><div class="sc-i"><svg class="ic"><use href="#i-chart"/></svg></div></div>
+    <div class="sc cr"><div class="sc-l">Produtos Atrasados</div><div class="sc-v">${atras}</div><div class="sc-s">${atrasEq} equipe · ${atrasCl} cliente</div><div class="sc-i"><svg class="ic"><use href="#i-triangle-alert"/></svg></div></div>`;
+
+  const sits  = {concluido:0, andamento:0, atrasado:0, aguardando:0};
+  prods.forEach(p => { const s = calcSit(p); if(s in sits) sits[s]++; });
+  const cores = {concluido:'#16A34A', andamento:'#2563EB', atrasado:'#E8002D', aguardando:'#94A3B8'};
+  const labs  = {concluido:'Concluído', andamento:'Em Andamento', atrasado:'Atrasado', aguardando:'Aguardando'};
+  const r = 42, c2 = 2*Math.PI*r;
+  let off = 0, arcs = '';
+  Object.entries(sits).forEach(([k,n]) => {
+    if(n === 0) return;
+    const pv = n/total;
+    arcs += `<circle class="arc" cx="60" cy="60" r="${r}" fill="none" stroke="${cores[k]}" stroke-width="12" stroke-dasharray="${pv*c2} ${c2}" stroke-dashoffset="${-off}" stroke-linecap="butt" transform="rotate(-90 60 60)"><title>${labs[k]}: ${n}</title></circle>`;
+    off += pv*c2;
+  });
+  const legenda = Object.entries(sits).map(([k,n]) => `<div class="kpi-legend-item">
+      <span class="kpi-legend-dot" style="background:${cores[k]}"></span>
+      <span class="kpi-legend-lbl">${labs[k]}</span>
+      <span class="kpi-legend-val">${n}<span class="kpi-legend-pct">${total ? Math.round(n/total*100) : 0}%</span></span>
+    </div>`).join('');
+  sitEl.innerHTML = total === 0
+    ? '<div class="kpi-empty"><div class="kpi-empty-icon">📭</div>Nenhum produto ativo vinculado a projetos</div>'
+    : `<div class="kpi-donut-wrap">
+         <div class="kpi-donut">
+           <svg viewBox="0 0 120 120" width="140" height="140">
+             <circle cx="60" cy="60" r="${r}" fill="none" stroke="var(--bdr)" stroke-width="12" opacity=".3"/>
+             ${arcs}
+           </svg>
+           <div class="kpi-donut-center">
+             <div class="kpi-donut-center-val">${total}</div>
+             <div class="kpi-donut-center-lbl">produtos</div>
+           </div>
+         </div>
+         <div class="kpi-donut-legend">${legenda}</div>
+       </div>`;
+  const badge = document.getElementById('cadProjSitTotal');
+  if(badge) badge.textContent = `${total} ativo${total!==1?'s':''}`;
+}
+
 function rCadProjetos(){
+  _rCadProjResumo();
   const tb = document.getElementById('cadProjTbl'); if(!tb) return;
   if(!CADPROJ.length){
     tb.innerHTML = `<tr><td colspan="6" style="text-align:center;color:var(--mu);padding:28px">Nenhum projeto cadastrado. Clique em <strong>+ Novo Projeto</strong>.</td></tr>`;
