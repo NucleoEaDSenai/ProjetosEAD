@@ -1922,7 +1922,7 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
               <div class="ms-dropdown" id="msDd_cargaResp"></div>
             </div>
           </div>
-          <div class="fg-sm"><label class="fl-sm">Situação do Projeto</label>
+          <div class="fg-sm"><label class="fl-sm">Situação do Produto</label>
             <div class="ms-wrap" id="msWrap_cargaStat">
               <button class="ms-btn" id="msBtn_cargaStat" onclick="_msToggle('cargaStat')">Todos</button>
               <div class="ms-dropdown" id="msDd_cargaStat">
@@ -11025,9 +11025,9 @@ function rCarga(){
   const statsEl = document.getElementById('cargaStats');
   if(statsEl){
     statsEl.innerHTML = `
-      <div class="sc cp"><div class="sc-l">Projetos Ativos - Equipe</div><div class="sc-v">${totalAtivosEquipe}</div><div class="sc-s">etapa atual com a equipe</div><div class="sc-i"><svg class="ic"><use href="#i-users"/></svg></div></div>
-      <div class="sc cb"><div class="sc-l">Projetos Ativos - Cliente</div><div class="sc-v">${totalAtivosCliente}</div><div class="sc-s">na vez do cliente</div><div class="sc-i"><svg class="ic"><use href="#i-building"/></svg></div></div>
-      <div class="sc cr"><div class="sc-l">Atrasos Equipe</div><div class="sc-v">${totalAtrasoEq}</div><div class="sc-s">projetos atrasados</div><div class="sc-i"><svg class="ic"><use href="#i-triangle-alert"/></svg></div></div>
+      <div class="sc cp"><div class="sc-l">Produtos Ativos - Equipe</div><div class="sc-v">${totalAtivosEquipe}</div><div class="sc-s">etapa atual com a equipe</div><div class="sc-i"><svg class="ic"><use href="#i-users"/></svg></div></div>
+      <div class="sc cb"><div class="sc-l">Produtos Ativos - Cliente</div><div class="sc-v">${totalAtivosCliente}</div><div class="sc-s">na vez do cliente</div><div class="sc-i"><svg class="ic"><use href="#i-building"/></svg></div></div>
+      <div class="sc cr"><div class="sc-l">Atrasos Equipe</div><div class="sc-v">${totalAtrasoEq}</div><div class="sc-s">produtos atrasados</div><div class="sc-i"><svg class="ic"><use href="#i-triangle-alert"/></svg></div></div>
       <div class="sc cy"><div class="sc-l">Atrasos Cliente</div><div class="sc-v">${totalAtrasoCl}</div><div class="sc-s">aguardando cliente</div><div class="sc-i"><svg class="ic"><use href="#i-hourglass"/></svg></div></div>
     `;
   }
@@ -11056,7 +11056,7 @@ function rCarga(){
   if(ct){
     const ativo = fResp.length || fStat.length || fRec.length || fPrio.length;
     const totalFiltrados = Object.values(membros).reduce((s,a)=>s+a.length,0);
-    ct.textContent = ativo ? `${Object.keys(membros).length} ${Object.keys(membros).length===1?'item':'itens'} · ${totalFiltrados} projeto(s)` : '';
+    ct.textContent = ativo ? `${Object.keys(membros).length} ${Object.keys(membros).length===1?'item':'itens'} · ${totalFiltrados} produto(s)` : '';
   }
 
   // ── Vazio ──
@@ -11138,7 +11138,7 @@ function _buildCargaCardPessoa(nome, projs, max, stOpen){
       </div>
       <div class="carga-count-wrap">
         <div class="carga-count" style="color:${corStatus}">${projs.length}</div>
-        <div class="carga-count-lbl">projetos</div>
+        <div class="carga-count-lbl">produtos</div>
       </div>
       <span class="carga-arrow${isOpen?' open':''}" id="${uid}_arrow">▼</span>
     </div>
@@ -11189,7 +11189,7 @@ function _buildCargaCardCliente(projs, max, stOpen){
       </div>
       <div class="carga-count-wrap">
         <div class="carga-count" style="color:${corStatus}">${projs.length}</div>
-        <div class="carga-count-lbl">projetos</div>
+        <div class="carga-count-lbl">produtos</div>
       </div>
       <span class="carga-arrow${isOpen?' open':''}" id="${uid}_arrow">▼</span>
     </div>
