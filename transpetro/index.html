@@ -1826,7 +1826,7 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
         <div class="fbox-row" style="flex-wrap:wrap;gap:10px;align-items:flex-end">
           <div class="fg" style="flex:1;min-width:200px">
             <label class="fl">Buscar</label>
-            <input class="fi" id="lixBusca" type="text" placeholder="Nome do projeto ou motivo..." oninput="rLixeiraDeb()">
+            <input class="fi" id="lixBusca" type="text" placeholder="Nome do produto ou motivo..." oninput="rLixeiraDeb()">
           </div>
           <div class="fg" style="min-width:170px">
             <label class="fl">Deletado por</label>
@@ -1847,7 +1847,7 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
       </div>
       <div class="tw"><table>
         <thead><tr>
-          <th style="cursor:pointer;white-space:nowrap" onclick="toggleLixSort('nome')">Projeto <span id="lixSI_nome" style="font-size:10px;color:var(--mu)"></span></th>
+          <th style="cursor:pointer;white-space:nowrap" onclick="toggleLixSort('nome')">Produto <span id="lixSI_nome" style="font-size:10px;color:var(--mu)"></span></th>
           <th style="cursor:pointer;white-space:nowrap" onclick="toggleLixSort('data')">Deletado em <span id="lixSI_data" style="font-size:10px;color:var(--mu)"></span></th>
           <th style="cursor:pointer;white-space:nowrap" onclick="toggleLixSort('por')">Deletado por <span id="lixSI_por" style="font-size:10px;color:var(--mu)"></span></th>
           <th style="cursor:pointer;white-space:nowrap" onclick="toggleLixSort('motivo')">Motivo da exclusão <span id="lixSI_motivo" style="font-size:10px;color:var(--mu)"></span></th>
@@ -7201,7 +7201,7 @@ function rLixeira(){
     : '';
 
   tbl.innerHTML = totalFiltrado===0 ?
-    '<tr><td colspan="4" style="text-align:center;padding:20px;color:var(--mu)">Nenhum projeto deletado encontrado</td></tr>' :
+    '<tr><td colspan="4" style="text-align:center;padding:20px;color:var(--mu)">Nenhum produto deletado encontrado</td></tr>' :
     aviso + lista.map(r=>{
       const data = r.ts ? new Date(r.ts).toLocaleDateString('pt-BR') : '—';
       return `<tr>
