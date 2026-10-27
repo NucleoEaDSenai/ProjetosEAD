@@ -2910,8 +2910,6 @@ function rKanban(){
           </div>`:''}
           ${p.idCurso?`<div style="font-size:10px;color:var(--mu);margin-bottom:2px"><span style="background:var(--s2);border:1px solid var(--bdr);border-radius:4px;padding:1px 5px;font-weight:600">${esc(p.idCurso)}</span></div>`:''}
           <div class="kdates">
-            <span>Criado: ${fd(p.criado)}</span>
-            ${p.inicio?`<span>Início ${fd(p.inicio)}</span>`:''}
             <span class="${sit==='atrasado'?'ov':''}">Prazo: ${fd(p.prazo)}</span>
             ${_aguardandoMaterialBase(p) && diasAguardandoMaterial(p)>0
               ? `<span class="wc" style="background:#FEF9C3;border-color:#FCD34D;color:#92400E">⏳ Aguard. material: ${diasAguardandoMaterial(p)}d</span>`
