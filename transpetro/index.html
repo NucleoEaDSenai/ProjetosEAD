@@ -1023,6 +1023,15 @@ body.dark .carga-card-cliente{background:linear-gradient(180deg,rgba(14,165,233,
 .carga-stat-pill.gray{background:var(--s2);color:var(--mu)}
 .carga-stat-pill.purple{background:#F3E8FF;color:#6B21A8;border-color:#D8B4FE}
 .carga-stat-pill-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;display:inline-block}
+/* Filtro dentro do card da Carga (projeto + etapa) */
+.carga-filtro-card{padding:10px 12px 0;display:flex;flex-direction:column;gap:8px}
+.carga-filtro-proj{width:100%;padding:6px 8px;border:1px solid var(--bdr);border-radius:8px;background:var(--surface);color:var(--txt);font-size:12px;font-family:inherit;cursor:pointer}
+.carga-stat-pill.clicavel{cursor:pointer;font-family:inherit;transition:filter .15s,background .15s}
+.carga-stat-pill.clicavel:hover{filter:brightness(.95)}
+.carga-stat-pill.purple.sel{background:#6B21A8;color:#fff;border-color:#6B21A8}
+body.dark .carga-stat-pill.purple.sel{background:#9333EA;color:#fff;border-color:#9333EA}
+.carga-filtro-info{font-size:11px;color:var(--mu)}
+.carga-filtro-info button{background:none;border:none;padding:0;color:var(--blue);font-size:11px;font-weight:600;cursor:pointer;font-family:inherit}
 body.dark .carga-stat-pill.red{background:rgba(220,38,38,.18);color:#FCA5A5}
 body.dark .carga-stat-pill.org{background:rgba(234,88,12,.18);color:#FDBA74}
 body.dark .carga-stat-pill.blue{background:rgba(30,64,175,.22);color:#93C5FD}
@@ -11036,6 +11045,7 @@ function limparCargaFilts(){
     if(dd) dd.querySelectorAll('input[type=checkbox]').forEach(cb=>cb.checked=false);
     _msUpdateBtn(id);
   });
+  Object.keys(_cargaFiltroCard).forEach(k => delete _cargaFiltroCard[k]);  // limpa também os filtros dos cards
   rCarga();
 }
 
@@ -11229,13 +11239,62 @@ function _cargaEtapaCounts(projs){
     .filter(x => x.col)
     .sort((a,b) => b.n-a.n || a.col.l.localeCompare(b.col.l,'pt-BR'));
 }
-function _cargaEtapaPillsHtml(projs){
-  const itens = _cargaEtapaCounts(projs);
-  if(!itens.length) return '';
-  const pills = itens.map(({n,col}) =>
-    `<span class="carga-stat-pill purple" title="Coluna: ${esc(col.l)}"><span class="carga-stat-pill-dot" style="background:${col.dot}"></span>${n} ${esc(col.l)}</span>`
-  ).join('');
-  return `<div class="carga-stats-row" style="padding:10px 12px 0">${pills}</div>`;
+// Filtro dentro de cada card (projeto + uma etapa por vez). Fica só em memória, por card,
+// para sobreviver ao redesenho da aba quando chegam dados novos do Firebase.
+const _cargaFiltroCard = {};  // uid → {proj:'' | projCadId | '__sem__', col:null | k da coluna}
+
+function _cargaProjKey(p){
+  return p.projCadId && CADPROJ.some(c => c.id === p.projCadId) ? p.projCadId : '__sem__';
+}
+function _cargaAplicarFiltroCard(uid, projs){
+  const st = _cargaFiltroCard[uid] || {proj:'', col:null};
+  // Descarta seleção que deixou de existir (ex.: produto mudou de coluna em tempo real)
+  if(st.proj && !projs.some(p => _cargaProjKey(p) === st.proj)) st.proj = '';
+  const porProj = st.proj ? projs.filter(p => _cargaProjKey(p) === st.proj) : projs;
+  if(st.col != null && !porProj.some(p => p.col === st.col)) st.col = null;
+  const visiveis = st.col != null ? porProj.filter(p => p.col === st.col) : porProj;
+  return {st, porProj, visiveis};
+}
+function _cargaFiltroCardHtml(uid, projs, f){
+  const {st, porProj, visiveis} = f;
+  // Projetos da pessoa, com contagem que respeita a etapa selecionada
+  const baseSel = st.col != null ? projs.filter(p => p.col === st.col) : projs;
+  const cont = {};
+  projs.forEach(p => { cont[_cargaProjKey(p)] = 0; });
+  baseSel.forEach(p => { cont[_cargaProjKey(p)]++; });
+  const nomeProj = k => k === '__sem__' ? '(sem projeto)' : (CADPROJ.find(c => c.id === k)?.nome || '—');
+  const keys = Object.keys(cont).sort((a,b) =>
+    a === '__sem__' ? 1 : b === '__sem__' ? -1 : nomeProj(a).localeCompare(nomeProj(b), 'pt-BR'));
+  const selHtml = (keys.length > 1 || st.proj)
+    ? `<select class="carga-filtro-proj" onchange="_cargaSetProj('${uid}',this.value)" aria-label="Filtrar por projeto">
+         <option value="">Todos os projetos (${baseSel.length})</option>
+         ${keys.map(k => `<option value="${esc(k)}"${st.proj===k?' selected':''}>${esc(nomeProj(k))} (${cont[k]})</option>`).join('')}
+       </select>`
+    : '';
+  // Etapas (colunas do Kanban) recontadas dentro do projeto escolhido
+  const pills = _cargaEtapaCounts(porProj).map(({n,col}) => {
+    const on = st.col === col.k;
+    return `<button type="button" class="carga-stat-pill purple clicavel${on?' sel':''}" aria-pressed="${on}" title="${on?'Mostrar todas as etapas':'Mostrar só '+esc(col.l)}" onclick="_cargaSetCol('${uid}',${col.k})"><span class="carga-stat-pill-dot" style="background:${col.dot}"></span>${n} ${esc(col.l)}</button>`;
+  }).join('');
+  if(!selHtml && !pills) return '';
+  const info = (st.proj || st.col != null)
+    ? `<div class="carga-filtro-info">Mostrando ${visiveis.length} de ${projs.length} · <button type="button" onclick="_cargaLimparCard('${uid}')">✕ Limpar</button></div>`
+    : '';
+  return `<div class="carga-filtro-card">${selHtml}${pills?`<div class="carga-stats-row" style="padding:0">${pills}</div>`:''}${info}</div>`;
+}
+function _cargaSetCol(uid, col){
+  const st = _cargaFiltroCard[uid] || (_cargaFiltroCard[uid] = {proj:'', col:null});
+  st.col = st.col === col ? null : col;   // uma etapa por vez; clicar de novo desmarca
+  rCarga();
+}
+function _cargaSetProj(uid, val){
+  const st = _cargaFiltroCard[uid] || (_cargaFiltroCard[uid] = {proj:'', col:null});
+  st.proj = val || '';
+  rCarga();
+}
+function _cargaLimparCard(uid){
+  delete _cargaFiltroCard[uid];
+  rCarga();
 }
 
 function _buildCargaCardPessoa(nome, projs, max, stOpen){
@@ -11251,10 +11310,11 @@ function _buildCargaCardPessoa(nome, projs, max, stOpen){
   const corPessoal = NOME_CORES[nome] || corStatus;
   const uid = 'carga_' + nome.replace(/\W/g,'_');
   const isOpen = stOpen[uid] === true;
+  const filtro = _cargaAplicarFiltroCard(uid, projs);
 
   // Ordenar projetos: atrasados primeiro, depois prioridade, depois prazo
   const _ordPrio={urgente:0,alta:1,media:2,baixa:3};
-  const projsOrdenados = [...projs].sort((a,b) => {
+  const projsOrdenados = [...filtro.visiveis].sort((a,b) => {
     const sA = _cargaStatusProj(a), sB = _cargaStatusProj(b);
     const ordSt = {atraso_equipe:0, andamento:1, aguardando:2};
     if(ordSt[sA] !== ordSt[sB]) return (ordSt[sA]??9) - (ordSt[sB]??9);
@@ -11286,7 +11346,7 @@ function _buildCargaCardPessoa(nome, projs, max, stOpen){
       ${aguard > 0 ? `<span class="carga-stat-pill gray">⏸️ ${aguard} aguardando</span>` : ''}
     </div>
     <div class="carga-body${isOpen?' open':''}" id="${uid}_body">
-      ${_cargaEtapaPillsHtml(projs)}
+      ${_cargaFiltroCardHtml(uid, projs, filtro)}
       <div class="carga-proj-list">
         ${projsOrdenados.map(p => _buildCargaProjCard(p, nome)).join('')}
       </div>
@@ -11303,10 +11363,11 @@ function _buildCargaCardCliente(projs, max, stOpen){
   const labelCarga = atrasados > 0 ? `${atrasados} atrasado${atrasados>1?'s':''}` : 'Aguardando retorno';
   const uid = 'carga___cliente__';
   const isOpen = stOpen[uid] === true;
+  const filtro = _cargaAplicarFiltroCard(uid, projs);
 
   // Ordenar: atrasados primeiro, depois prioridade, depois prazo
   const _ordPrio={urgente:0,alta:1,media:2,baixa:3};
-  const projsOrdenados = [...projs].sort((a,b) => {
+  const projsOrdenados = [...filtro.visiveis].sort((a,b) => {
     const atA = atrasadoPorCliente(a)?0:1, atB = atrasadoPorCliente(b)?0:1;
     if(atA !== atB) return atA - atB;
     const pA = _ordPrio[a.prioridade]??4, pB = _ordPrio[b.prioridade]??4;
@@ -11336,7 +11397,7 @@ function _buildCargaCardCliente(projs, max, stOpen){
       ${aguardando > 0 ? `<span class="carga-stat-pill blue">📨 ${aguardando} aguardando retorno</span>` : ''}
     </div>
     <div class="carga-body${isOpen?' open':''}" id="${uid}_body">
-      ${_cargaEtapaPillsHtml(projs)}
+      ${_cargaFiltroCardHtml(uid, projs, filtro)}
       <div class="carga-proj-list">
         ${projsOrdenados.map(p => _buildCargaProjCard(p, '__cliente__')).join('')}
       </div>
