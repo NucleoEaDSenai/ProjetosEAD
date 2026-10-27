@@ -36,9 +36,9 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
 .sb-logo{padding:22px 18px 16px;border-bottom:1px solid rgba(255,255,255,.08)}
 .sb-badge{display:inline-block;background:var(--cyan);color:#fff;font-family:'Plus Jakarta Sans',sans-serif;font-weight:800;font-size:10px;letter-spacing:2px;padding:3px 9px;border-radius:3px;margin-bottom:6px}
 .sb-title{font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:14px;line-height:1.35}
-.sb-sub{font-size:11px;color:rgba(255,255,255,.3);margin-top:2px}
+.sb-sub{font-size:11px;color:rgba(255,255,255,.75);margin-top:2px}
 .sb-nav{flex:1;padding:10px 0;overflow-y:auto}
-.sb-sec{font-size:10px;letter-spacing:1.5px;color:rgba(255,255,255,.25);padding:10px 18px 3px;font-weight:700;text-transform:uppercase}
+.sb-sec{font-size:10px;letter-spacing:1.5px;color:rgba(255,255,255,.5);padding:10px 18px 3px;font-weight:700;text-transform:uppercase}
 .si{display:flex;align-items:center;gap:8px;padding:9px 18px;color:rgba(255,255,255,.78);cursor:pointer;font-size:13px;border-left:3px solid transparent;transition:all .15s}
 .si:hover{background:rgba(255,255,255,.05);color:#fff}
 .si.on{color:#fff;background:rgba(232,0,45,.12);border-left-color:var(--red)}
@@ -1372,7 +1372,6 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
         <div class="user-av" id="userAv">?</div>
         <span id="userNome">...</span>
       </div>
-      <button class="btn br" onclick="openNew()" aria-label="Criar novo produto">+ Novo Produto</button>
     </div>
   </div>
 
@@ -1557,11 +1556,10 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
     <!-- TIMELINE -->
     <div class="view" id="view-timeline">
       <div class="sh" style="flex-wrap:wrap;gap:10px;margin-bottom:14px">
-        <div class="st" id="tlTitle">Cronograma Geral</div>
         <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
           <select class="fi-sm" id="tlAno" onchange="rTimeline()" style="width:110px"></select>
           <select class="fi-sm" id="tlFiltSit" onchange="rTimeline()" style="width:170px">
-            <option value="">Todos os projetos</option>
+            <option value="">Todos os produtos</option>
             <option value="andamento">Em Andamento</option>
             <option value="concluido">Concluídos</option>
             <option value="atrasado">Atrasados</option>
@@ -1777,8 +1775,6 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
     <!-- CANCELADOS -->
     <!-- HOMOLOGAÇÕES -->
     <div class="view" id="view-homologacoes">
-      <div class="st" style="margin-bottom:6px">🔖 Homologações</div>
-      <div style="font-size:12.5px;color:var(--mu);margin-bottom:16px">Produtos na etapa Homologação. Preencha os dados e acompanhe o status.</div>
       <div id="homologStats" style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:18px"></div>
       <!-- Filtros -->
       <div class="fbox" style="margin-bottom:18px">
@@ -1801,7 +1797,6 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
     </div>
 
     <div class="view" id="view-cancelados">
-      <div class="st" style="margin-bottom:16px">🚫 Projetos Cancelados</div>
       <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:22px" id="cancelStats"></div>
       <div class="tw"><table>
         <thead><tr><th>Produto</th><th>Recursos</th><th>Responsável(is)</th><th>Criado</th><th>Cancelado em</th><th>Coluna na Cancelamento</th><th>Progresso</th><th>Motivo</th><th></th></tr></thead>
@@ -1819,8 +1814,6 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
 
     <!-- HISTÓRICO DE PROJETOS DELETADOS -->
     <div class="view" id="view-lixeira">
-      <div class="st" style="margin-bottom:6px">🗑️ Cards Deletados</div>
-      <div style="font-size:12.5px;color:var(--mu);margin-bottom:20px">Histórico de cards deletados. Apenas <strong>lideranças</strong> podem deletar projetos.</div>
       <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:22px" id="lixeiraStats"></div>
       <div class="fbox" style="margin-bottom:14px">
         <div class="fbox-row" style="flex-wrap:wrap;gap:10px;align-items:flex-end">
@@ -1865,8 +1858,6 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
 
     <!-- MEDIÇÃO -->
     <div class="view" id="view-medicao">
-      <div class="st" style="margin-bottom:6px">📐 Medição</div>
-      <div style="font-size:12.5px;color:var(--mu);margin-bottom:20px">Produtos com todas as etapas concluídas e enviados para medição.</div>
       <div id="medicaoStats" style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:22px"></div>
       <!-- Filtros -->
       <div class="fbox" style="margin-bottom:18px">
@@ -2919,8 +2910,6 @@ function rKanban(){
           </div>`:''}
           ${p.idCurso?`<div style="font-size:10px;color:var(--mu);margin-bottom:2px"><span style="background:var(--s2);border:1px solid var(--bdr);border-radius:4px;padding:1px 5px;font-weight:600">${esc(p.idCurso)}</span></div>`:''}
           <div class="kdates">
-            <span>Criado: ${fd(p.criado)}</span>
-            ${p.inicio?`<span>Início ${fd(p.inicio)}</span>`:''}
             <span class="${sit==='atrasado'?'ov':''}">Prazo: ${fd(p.prazo)}</span>
             ${_aguardandoMaterialBase(p) && diasAguardandoMaterial(p)>0
               ? `<span class="wc" style="background:#FEF9C3;border-color:#FCD34D;color:#92400E">⏳ Aguard. material: ${diasAguardandoMaterial(p)}d</span>`
@@ -3501,7 +3490,6 @@ function rTimeline(){
 
   const anoSel=parseInt(document.getElementById('tlAno')?.value||anoAtual);
   const filtSit=document.getElementById('tlFiltSit')?.value||'';
-  document.getElementById('tlTitle').textContent='Cronograma Geral — '+anoSel;
 
   const hojeD=new Date();
   const hojeMes=hojeD.getFullYear()===anoSel?hojeD.getMonth():-1;
@@ -3591,7 +3579,7 @@ function rTimeline(){
 
   document.getElementById('ganttBody').innerHTML=rowsHtml||'<tr><td colspan="15" style="text-align:center;padding:32px;color:var(--mu)">Nenhum projeto para '+anoSel+'</td></tr>';
   const el=document.getElementById('tlCount');
-  if(el)el.textContent=projs.length+' projeto(s) exibido(s)';
+  if(el)el.textContent=projs.length+' produto(s) exibido(s)';
 }
 
 // ── KPIs ──
