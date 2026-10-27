@@ -2206,12 +2206,12 @@ const NOMES = ['Tatiana','Ana Paula','Amanda','Gabriel','Pedro','Maycon','Lidera
 // Categorias de Projetos da Transpetro (campo "academia" no banco)
 const CATEGORIAS_PROJETO = ['ECorp','PQDT','PQTM'];
 
-const RECURSOS = ['Acomp pedagógico - Exerc fixação e Aval','Acompanhamento pedagógico - apostila','Acompanhamento pedagógico - PPT','Animação 2D','Animação 3D','Atualização do Game 2D','Cursos alta comp até 40 min até 20 telas','Cursos alta comp até 60 min até 40 telas','Cursos alta comp até 90 min até 60 telas','Cursos baix comp até 40 min até 20 telas','Cursos baix comp até 60 min até 40 telas','Cursos baix comp até 90 min até 60 telas','Cursos de alta complexidade até 20 min','Cursos de baixa complexidade até 20 min','Editoração das apostilas','Game 2D','Game 3D','Gestão do projeto','Manutenção mensal do projeto','Objeto interativo 2D','Objeto interativo 3D','One Page - Web Content até 30 min','Personagem','Planejamento e Estruturação do Projeto','Plano Instrucional e Plano de Identidade Visual (PICV)','Pós-produção de Vídeo até 10 min','Pós-produção de Vídeo até 2 horas','Reprodução de apostila/ Pencard','Roteiro (Storyboard)','Vídeo Aula - edição','Vídeo Aula - gravação','Vídeo Instrucional 10 min','Vídeo Instrucional 5 min','Vídeo Interativo','Workshop com especialistas da Transpetro'];
+const RECURSOS = ['Acomp pedagógico - Exerc fixação e Aval','Acompanhamento pedagógico - apostila','Acompanhamento pedagógico - PPT','Animação 2D','Animação 3D','Atualização do Game 2D','Cursos alta comp até 40 min até 20 telas','Cursos alta comp até 60 min até 40 telas','Cursos alta comp até 90 min até 60 telas','Cursos baix comp até 40 min até 20 telas','Cursos baix comp até 60 min até 40 telas','Cursos baix comp até 90 min até 60 telas','Cursos de alta complexidade até 20 min','Cursos de baixa complexidade até 20 min','Editoração das apostilas','Game 2D','Game 3D','Gestão do projeto','Manutenção mensal do projeto','Objeto interativo 2D','Objeto interativo 3D','One Page - Web Content até 30 min','Personagem','Planejamento e Estruturação do Projeto','Plano Instrucional e Plano de Identidade Visual','Pós-produção de Vídeo até 10 min','Pós-produção de Vídeo até 2 horas','Reprodução de apostila/ Pencard','Roteiro (Storyboard)','Vídeo Aula - edição','Vídeo Aula - gravação','Vídeo Instrucional 10 min','Vídeo Instrucional 5 min','Vídeo Interativo','Workshop com especialistas da Transpetro'];
 
 // Grupos exibidos no formulário do produto (todo item de RECURSOS deve estar em um grupo;
 // o que ficar de fora aparece em "Outros")
 const RECURSO_GRUPOS = [
-  {titulo:'📋 Planejamento e Gestão', recursos:['Planejamento e Estruturação do Projeto','Gestão do projeto','Manutenção mensal do projeto','Workshop com especialistas da Transpetro','Plano Instrucional e Plano de Identidade Visual (PICV)','Roteiro (Storyboard)']},
+  {titulo:'📋 Planejamento e Gestão', recursos:['Planejamento e Estruturação do Projeto','Gestão do projeto','Manutenção mensal do projeto','Workshop com especialistas da Transpetro','Plano Instrucional e Plano de Identidade Visual','Roteiro (Storyboard)']},
   {titulo:'🎓 Acompanhamento Pedagógico', recursos:['Acomp pedagógico - Exerc fixação e Aval','Acompanhamento pedagógico - apostila','Acompanhamento pedagógico - PPT']},
   {titulo:'💻 Cursos e Web', recursos:['Cursos de alta complexidade até 20 min','Cursos alta comp até 40 min até 20 telas','Cursos alta comp até 60 min até 40 telas','Cursos alta comp até 90 min até 60 telas','Cursos de baixa complexidade até 20 min','Cursos baix comp até 40 min até 20 telas','Cursos baix comp até 60 min até 40 telas','Cursos baix comp até 90 min até 60 telas','One Page - Web Content até 30 min']},
   {titulo:'🎬 Vídeo', recursos:['Pós-produção de Vídeo até 10 min','Pós-produção de Vídeo até 2 horas','Vídeo Aula - gravação','Vídeo Aula - edição','Vídeo Instrucional 5 min','Vídeo Instrucional 10 min','Vídeo Interativo']},
@@ -2261,7 +2261,7 @@ const SERVICOS_CONTRATO = [
 ];
 // Recursos que correspondem a mais de uma linha do contrato
 const RECURSO_LINHAS_ESPECIAIS = {
-  'Plano Instrucional e Plano de Identidade Visual (PICV)': [15, 16],
+  'Plano Instrucional e Plano de Identidade Visual': [15, 16],
 };
 // Linhas do contrato correspondentes a um recurso
 function linhasDoRecurso(recurso){
@@ -5097,7 +5097,7 @@ const TEMPLATES = {
   },
 
   // ── TRANSPETRO ──────────────────────────────────────────────────────────────
-  'Plano Instrucional e Plano de Identidade Visual (PICV)': {
+  'Plano Instrucional e Plano de Identidade Visual': {
     colInicial: 0,                    // nasce em Diagnóstico
     // fica em Pré-medição até a medição ser confirmada → Projetos Concluídos (regra geral em _colComMedicao)
     etapas: [
@@ -10183,7 +10183,7 @@ function _migrarEtapasWebRise(etapas){
 function normalizar(p){
   if(!p) return p;
   p.resps          = (p.resps || []).map(_migrarNome);
-  p.recursos       = [...new Set((p.recursos || []).map(r => (r==='Plano Instrucional'||r==='Plano de Identidade Visual') ? 'Plano Instrucional e Plano de Identidade Visual (PICV)' : r)
+  p.recursos       = [...new Set((p.recursos || []).map(r => (r==='Plano Instrucional'|| r==='Plano de Identidade Visual' || r==='Plano Instrucional e Plano de Identidade Visual (PICV)') ? 'Plano Instrucional e Plano de Identidade Visual' : r)
                        .map(r => String(r).replace(/(\d) mim\b/g, '$1 min')))];  // recursos unificados no PICV · "mim" → "min"
   if(Array.isArray(p.medicaoItens)) p.medicaoItens.forEach(it => { if(it.desc) it.desc = it.desc.replace(/(\d) mim\b/g, '$1 min'); });
   p.etapas         = (p.etapas || []).map(e => ({...e, r: _migrarNome(e.r||'')}));
