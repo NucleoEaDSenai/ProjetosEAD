@@ -645,6 +645,14 @@ body.sb-mini .si-badge{position:absolute;top:5px;right:12px;margin:0;font-size:8
 body.sb-mini .sb-foot{justify-content:center!important;padding:12px 0}
 body.sb-mini .dark-btn{padding:4px 8px}
 @media(max-width:960px){.sb-toggle{display:none}}
+/* Hover dos ícones com o menu fechado: fundo na cor do ícone + barrinha lateral */
+body.sb-mini .si::before{content:'';position:absolute;inset:3px 9px;border-radius:10px;background:var(--ic,#fff);opacity:0;transform:scale(.7);transition:opacity .2s,transform .25s cubic-bezier(.34,1.56,.64,1)}
+body.sb-mini .si::after{content:'';position:absolute;left:-3px;top:20%;bottom:20%;width:3px;border-radius:0 3px 3px 0;background:var(--ic,#fff);transform:scaleY(0);transition:transform .2s ease}
+body.sb-mini .si-ic{position:relative;z-index:1;transition:transform .2s ease}
+body.sb-mini .si:hover::before,body.sb-mini .si:focus-visible::before{opacity:0.15;transform:scale(1)}
+body.sb-mini .si:hover::after,body.sb-mini .si:focus-visible::after{transform:scaleY(1)}
+body.sb-mini .si:hover .si-ic,body.sb-mini .si:focus-visible .si-ic{transform:scale(1.1)}
+@media (prefers-reduced-motion:reduce){body.sb-mini .si::before,body.sb-mini .si::after,body.sb-mini .si-ic{transition:none}}
 /* Nome da área ao passar o mouse com o menu fechado (fixo para não ser cortado pela rolagem do menu) */
 .sb-tip{position:fixed;z-index:1000;background:#111827;color:#fff;font-size:12px;font-weight:600;padding:6px 10px;border-radius:7px;white-space:nowrap;pointer-events:none;box-shadow:0 6px 18px rgba(0,0,0,.25);display:none;transform:translateY(-50%)}
 .sb-tip::before{content:'';position:absolute;left:-4px;top:50%;width:8px;height:8px;background:#111827;transform:translateY(-50%) rotate(45deg)}
@@ -7355,9 +7363,11 @@ function toggleSidebar(){
   _aplicarSidebar(mini);
   try{ localStorage.setItem('transpetro_sb_mini', mini ? '1' : '0'); }catch(e){}
 }
+let _sbTipAtual = null;  // item cujo balão está aberto; evita reiniciar a animação ao mover o mouse dentro dele
 function _mostrarSbTip(si){
   const tip = document.getElementById('sbTip');
-  if(!tip || !_sbMiniAtivo()) return;
+  if(!tip || !_sbMiniAtivo() || si === _sbTipAtual) return;
+  _sbTipAtual = si;
   const lbl = si.querySelector('span:not(.si-ic):not(.si-badge)');
   if(!lbl) return;
   const r = si.getBoundingClientRect();
@@ -7368,6 +7378,7 @@ function _mostrarSbTip(si){
   tip.classList.add('on');
 }
 function _esconderSbTip(){
+  _sbTipAtual = null;
   document.getElementById('sbTip')?.classList.remove('on');
 }
 (function(){
@@ -7376,6 +7387,11 @@ function _esconderSbTip(){
   _aplicarSidebar(mini);
   const sb = document.querySelector('.sb');
   if(!sb) return;
+  // Copia a cor do ícone para o item, usada no fundo e na barrinha do hover com o menu fechado
+  sb.querySelectorAll('.si').forEach(si => {
+    const cor = si.querySelector('.si-ic')?.style.getPropertyValue('--ic');
+    if(cor) si.style.setProperty('--ic', cor.trim());
+  });
   sb.addEventListener('mouseover', e => { const si = e.target.closest('.si'); if(si) _mostrarSbTip(si); });
   sb.addEventListener('mouseout',  e => { const si = e.target.closest('.si'); if(si && !si.contains(e.relatedTarget)) _esconderSbTip(); });
   sb.addEventListener('focusin',   e => { const si = e.target.closest('.si'); if(si) _mostrarSbTip(si); });
