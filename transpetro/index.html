@@ -7355,9 +7355,11 @@ function toggleSidebar(){
   _aplicarSidebar(mini);
   try{ localStorage.setItem('transpetro_sb_mini', mini ? '1' : '0'); }catch(e){}
 }
+let _sbTipAtual = null;  // item cujo balão está aberto; evita reiniciar a animação ao mover o mouse dentro dele
 function _mostrarSbTip(si){
   const tip = document.getElementById('sbTip');
-  if(!tip || !_sbMiniAtivo()) return;
+  if(!tip || !_sbMiniAtivo() || si === _sbTipAtual) return;
+  _sbTipAtual = si;
   const lbl = si.querySelector('span:not(.si-ic):not(.si-badge)');
   if(!lbl) return;
   const r = si.getBoundingClientRect();
@@ -7368,6 +7370,7 @@ function _mostrarSbTip(si){
   tip.classList.add('on');
 }
 function _esconderSbTip(){
+  _sbTipAtual = null;
   document.getElementById('sbTip')?.classList.remove('on');
 }
 (function(){
