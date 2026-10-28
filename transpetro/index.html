@@ -4710,7 +4710,7 @@ function openDet(id){
       <div class="coments-title">🔗 Links de Apoio <span style="font-weight:400;font-size:11px;color:var(--mu)">${(p.linksApoio||[]).length} link(s)</span></div>
       <div class="links-apoio-list">
         ${(p.linksApoio||[]).length===0
-          ? '<div style="color:var(--mu);font-size:12px;padding:4px 0 8px">Nenhum link de apoio ainda.</div>'
+          ? ''
           : (p.linksApoio||[]).map((lk,i)=>`
             <div class="link-apoio-item">
               <span class="link-apoio-ic">🔗</span>
@@ -4731,7 +4731,7 @@ function openDet(id){
       <div class="coments-title">💬 Comentários <span style="font-weight:400;font-size:11px;color:var(--mu)">${(p.comentarios||[]).length} comentário(s)</span></div>
       <div id="comentsList">
         ${(p.comentarios||[]).length===0
-          ? '<div style="color:var(--mu);font-size:12px;padding:8px 0">Nenhum comentário ainda.</div>'
+          ? ''
           : (p.comentarios||[]).map((cm,idx)=>({cm,idx})).reverse().map(({cm,idx})=>{
             const _ed=_comentEditado(cm), _vers=_versoesComent(cm);
             return `
