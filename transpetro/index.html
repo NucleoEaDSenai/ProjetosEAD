@@ -58,6 +58,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
 .bb{background:var(--blue);color:#fff}.bb:hover{background:#002f80}
 .bg2{background:transparent;border:1px solid var(--bdr);color:var(--txt)}.bg2:hover{background:var(--s2)}
 .bgray{background:#6B7280;color:#fff}.bgray:hover{background:#4B5563}
+.bgreen{background:var(--green);color:#fff}.bgreen:hover{background:#146C3A;transform:translateY(-1px)}
 .bsm{padding:4px 10px;font-size:11.5px}
 .bd{background:#FEE2E2;color:#991B1B;border:none}.bd:hover{background:#FECACA}
 /* CONTENT */
@@ -4725,7 +4726,7 @@ function openDet(id){
       <div class="link-apoio-form">
         <input class="fi" type="text" id="linkApoioTit" placeholder="Título (opcional) — ex: Pasta no Drive" maxlength="120">
         <input class="fi" type="text" id="linkApoioUrl" placeholder="https://..." onkeydown="if(event.key==='Enter')adicionarLinkApoio(${p.id})">
-        <button class="btn br bsm" onclick="adicionarLinkApoio(${p.id})">➕ Adicionar</button>
+        <button class="btn bgreen bsm" onclick="adicionarLinkApoio(${p.id})"> Adicionar</button>
       </div>
       <hr class="dv" style="margin:18px 0 14px">
       <div class="coments-title">💬 Comentários <span style="font-weight:400;font-size:11px;color:var(--mu)">${(p.comentarios||[]).length} comentário(s)</span></div>
@@ -4762,7 +4763,7 @@ function openDet(id){
       </div>
       <div class="coment-input-area">
         <textarea class="coment-ta" id="comentTa" placeholder="Escreva um comentário..."></textarea>
-        <button class="btn br bsm" onclick="adicionarComent(${p.id})" style="padding:8px 14px;height:64px">💬<br>Enviar</button>
+        <button class="btn bgreen bsm" onclick="adicionarComent(${p.id})" style="padding:8px 14px;height:64px"><br>Enviar</button>
       </div>
     </div>
   `;
