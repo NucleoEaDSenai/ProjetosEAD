@@ -2987,7 +2987,7 @@ function rKanban(){
           <div style="display:flex;align-items:center;justify-content:space-between;margin-top:6px">
             <span style="font-size:10.5px;font-weight:600;color:var(--mu)">${p.pct}%</span>
           </div>
-          ${p.criadoPor?`<div class="kcard-autoria"><span>✏️ ${esc(p.criadoPor)}</span>${p.editadoPor&&p.editadoPor!==p.criadoPor?`<span>· editado: ${esc(p.editadoPor)}</span>`:''}</div>`:''}
+          ${p.criadoPor?`<div class="kcard-autoria"><span>✏️ ${esc(nomeExibicao(p.criadoPor))}</span>${p.editadoPor&&nomeExibicao(p.editadoPor)!==nomeExibicao(p.criadoPor)?`<span>· editado: ${esc(nomeExibicao(p.editadoPor))}</span>`:''}</div>`:''}
           ${(() => {
             const etapas = p.etapas || [];
 
@@ -6952,7 +6952,7 @@ function rCadProjetos(){
     const podeExcluir = lider && !prods.length;
     const motivoBloq = !lider ? 'Apenas lideranças podem excluir projetos' : 'Projeto com produtos não pode ser excluído';
     return `<tr>
-      <td><strong>${esc(pr.nome)}</strong><div style="font-size:11px;color:var(--mu);margin-top:2px">Criado em ${fd(pr.criado)}${pr.criadoPor?' · '+esc(pr.criadoPor):''}</div></td>
+      <td><strong>${esc(pr.nome)}</strong><div style="font-size:11px;color:var(--mu);margin-top:2px">Criado em ${fd(pr.criado)}${pr.criadoPor?' · '+esc(nomeExibicao(pr.criadoPor)):''}</div></td>
       <td>${txt(pr.descricao)}</td>
       <td>${txt(pr.objetivo)}</td>
       <td>${txt(pr.publico)}</td>
@@ -11591,7 +11591,8 @@ const EMAIL_NOMES = {
   'ssnmart70@firjan.com.br':   'RPCI Dedicado - Haline (DI)',
   'ssnmart72@firjan.com.br':   'RPCI Dedicado - Leonidas (DI)',
   'ssnmart71@firjan.com.br':   'RPCI Dedicado - Wagner (DM)',
-  
+  'fnmartins@firjan.com.br':   'Liderança Flavia',
+  'pmelo@firjan.com.br':       'Pedro Melo',
 };
 
 // Cores fixas por nome — garante que cada pessoa tenha sempre a mesma cor única
@@ -11625,6 +11626,8 @@ const NOME_CORES = {
   'RPCI - Patricia (RT)': '#0369a1',  // azul aço RPCI
   'RPCI - Rubio (RT)': '#0369a1',  // azul aço RPCI
   'Patricia':    '#0d9488',  // teal-verde
+  'Liderança Flavia': '#4d7c0f',  // verde-oliva
+  'Pedro Melo':  '#a16207',  // mostarda
 };
 
 // ── MIGRAÇÃO: corrige nomes antigos no histórico (username → nome amigável) ──
@@ -11679,6 +11682,13 @@ function nomeUsuarioAtual(){
   return localStorage.getItem('firjan_user') || 'Desconhecido';
 }
 
+// Traduz login/e-mail gravado (ex: "fnmartins") para o nome da equipe, só na exibição
+function nomeExibicao(u){
+  if(!u) return u;
+  const el = String(u).toLowerCase().trim();
+  return EMAIL_NOMES[el] || EMAIL_NOMES[el + '@firjan.com.br'] || u;
+}
+
 // ── PERMISSÃO: só lideranças (nó transpetro/lideranca/{uid} no Realtime Database) podem apagar projetos ──
 // A verificação real está nas regras do Firebase; aqui só controla o que a UI exibe.
 function podeApagarProjeto(){
@@ -11717,8 +11727,8 @@ function _euEnvolvidoEm(p){
   if(!eu || eu === 'Desconhecido') return true; // sem usuário identificado, mostra tudo
   return (p.resps||[]).some(r => _nomeMatch(r, eu))
     || _nomeMatch(p.rp||'', eu)
-    || _nomeMatch(p.criadoPor||'', eu)
-    || _nomeMatch(p.editadoPor||'', eu);
+    || _nomeMatch(nomeExibicao(p.criadoPor)||'', eu)
+    || _nomeMatch(nomeExibicao(p.editadoPor)||'', eu);
 }
 
 // Carrega notificações do localStorage
