@@ -3521,8 +3521,10 @@ function rList(){
       <td>${cl>0?`<span class="db dcl">⏳${cl} dias</span>`:`<span class="db dok">—</span>`}</td>
       <td>${progH(p,'70px')}</td>
       <td style="white-space:nowrap">
-        <button class="btn bg2 bsm" onclick="openDet(${p.id})">Ver</button>
-        <button class="btn bd bsm" onclick="delP(${p.id})">🗑</button>
+        <div style="display:flex;align-items:stretch;gap:4px">
+          <button class="btn bg2 bsm" onclick="openDet(${p.id})">Ver</button>
+          <button class="btn bd bsm" style="padding:0 7px" onclick="delP(${p.id})" title="Excluir produto" aria-label="Excluir produto"><svg class="ic" style="width:14px;height:14px"><use href="#i-trash"/></svg></button>
+        </div>
       </td>
     </tr>`;
   }).join('');
