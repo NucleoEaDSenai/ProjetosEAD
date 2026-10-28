@@ -61,6 +61,8 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
 .bgreen{background:var(--green);color:#fff}.bgreen:hover{background:#146C3A;transform:translateY(-1px)}
 .bsm{padding:4px 10px;font-size:11.5px}
 .bd{background:#FEE2E2;color:#991B1B;border:none}.bd:hover{background:#FECACA}
+.bpastel{background:#FDF1F1;color:#B42318;border:1px solid #F9D5D5}.bpastel:hover{background:#FCE4E4;border-color:#F5BDBD}
+.bdforte{background:#DC2626;color:#fff;border:none}.bdforte:hover{background:#B91C1C;transform:translateY(-1px)}
 /* CONTENT */
 .cnt{padding:22px 26px;flex:1}
 .view{display:none;opacity:0}
@@ -966,6 +968,8 @@ body.dark .tw td,.dark .et td{border-color:var(--bdr);color:var(--txt)}
 body.dark .dcard,.dark .coment-item,.dark .hist-item{background:var(--s2);border-color:var(--bdr)}
 body.dark .bg2{background:var(--s2);color:var(--txt);border-color:var(--bdr)}
 body.dark .bg2:hover{background:var(--bdr)}
+body.dark .bpastel{background:rgba(248,113,113,.1);color:#FCA5A5;border-color:rgba(248,113,113,.25)}
+body.dark .bpastel:hover{background:rgba(248,113,113,.18)}
 body.dark .search-box input{background:var(--s2);border-color:var(--bdr);color:var(--txt)}
 body.dark .search-drop{background:var(--surface);border-color:var(--bdr)}
 body.dark .sri:hover{background:var(--s2)}
@@ -4773,8 +4777,8 @@ function openDet(id){
     ${(p.col===11 || p.homologPassou || p.homolog?.preenchido)?`<button class="btn" style="background:linear-gradient(135deg,#003DA5,#0060CC);color:#fff" onclick="cm('ovDet');irParaCardHomologacao(${p.id})" title="Abrir este projeto na aba Homologações">🔖 Abrir na aba Homologações</button>`:''}
     <button class="btn bg2" onclick="cm('ovDet');duplicarProjeto(${p.id})" title="Criar cópia deste projeto">📋 Duplicar</button>
     <button class="btn bb" onclick="cm('ovDet');openEdit(${p.id})">✏️ Editar</button>
-    <button class="btn" style="background:var(--red);color:#fff" onclick="exportPDFFicha(${p.id})">📄 Exportar PDF</button>
-    ${podeApagarProjeto()?`<button class="btn bd" onclick="cm('ovDet');delP(${p.id})">🗑️ Deletar Projeto</button>`:''}
+    <button class="btn bpastel" onclick="exportPDFFicha(${p.id})">📄 Exportar PDF</button>
+    ${podeApagarProjeto()?`<button class="btn bdforte" onclick="cm('ovDet');delP(${p.id})">🗑️ Deletar Projeto</button>`:''}
      ${!p.cancelado?`<button class="btn bgray" onclick="abrirCanc(${p.id})">🚫 Projeto Cancelado</button>`:''}
   `;
   document.getElementById('ovDet').classList.add('on');
