@@ -5418,6 +5418,8 @@ const TEMPLATES = {
       'Roteirização dos áudios',
       'Validação técnica da roteirização dos áudios',
       'Aplicação de ajustes na roteirização dos áudios pós-validação técnica',
+      'Revisão textual do roteiro dos áudios',
+      'Aplicação de ajustes no roteiro dos áudios pós-revisão textual',
     ];
     // Fase 2 — Produção
     const fase2 = [
@@ -5427,8 +5429,6 @@ const TEMPLATES = {
       'Aplicação de ajustes no one page após a validação técnica pós-produção multimídia',
       'Validação 1 da produção do one page pelo cliente',
       'Aplicação de ajustes no one page pós-validação 1 do cliente',
-      'Revisão textual do roteiro dos áudios',
-      'Aplicação de ajustes no roteiro dos áudios pós-revisão textual',
       'Produção dos áudios',
       'Validação técnica dos áudios',
       'Aplicação de ajustes nos áudios pós-validação técnica',
@@ -5440,10 +5440,13 @@ const TEMPLATES = {
     // Fase 3 — Entrega / Homologação
     const upload = 'Upload do(s) arquivo(s) para o SharePoint do cliente';
     const testes = 'Realização de testes e aprovação técnica pelo cliente';
+    // Fase 4 — Pré-medição / Concluídos: não movem o card (a saída de Pré-medição depende da medição confirmada)
+    const cobranca    = 'Emissão da cobrança no RAMP';
+    const finalizacao = 'Finalização do desenvolvimento';
     const resp = lb => /pelo cliente/i.test(lb) ? 'cl' : 'eq';
     return {
       colInicial: 3,                    // nasce em Desenho
-      etapas: [...fase1, ...fase2, upload, testes].map(lb => ({lb, r:resp(lb)})),
+      etapas: [...fase1, ...fase2, upload, testes, cobranca, finalizacao].map(lb => ({lb, r:resp(lb)})),
       gatilhos: [
         {grupo:fase1,                       col:6},   // fase 1 concluída → Produção
         {grupo:[...fase1, ...fase2],        col:7},   // fases 1 e 2 concluídas → Entrega
