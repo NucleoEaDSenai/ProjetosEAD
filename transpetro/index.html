@@ -1773,8 +1773,11 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
           <div class="kpi-card">
             <div class="kpi-card-head">
               <span class="kpi-card-title">⏱️ Tempo Médio por Etapa</span>
-              <span class="kpi-card-sub">dias médios para conclusão · cor relativa à média do dataset</span>
+              <select id="kpiTempoLinha" class="fi" onchange="rKPIs()" aria-label="Linha de serviço" style="width:auto;max-width:100%;padding:5px 9px;font-size:12px">
+                <option value="">Todas as linhas de serviço</option>
+              </select>
             </div>
+            <div class="kpi-card-sub" style="margin:-8px 0 14px">dias corridos da data inicial da etapa (ou da conclusão da etapa anterior) até a conclusão · cor relativa às demais etapas</div>
             <div id="etapaBars"></div>
           </div>
         </div>
@@ -3710,6 +3713,58 @@ function _kpiSparkline(values, cor){
   </svg>`;
 }
 
+// ── KPI Tempo Médio por Etapa ──
+// Linha de serviço do produto: o recurso que tem template; senão, o primeiro recurso.
+function _kpiLinhaDe(p){
+  const recs = p.recursos || [];
+  return recs.find(r => TEMPLATES[r]) || recs[0] || 'Sem linha de serviço';
+}
+
+// Preenche o select de linhas de serviço (só as que têm etapa concluída) e devolve a escolhida
+function _kpiTempoLinhaSelect(todos){
+  const sel = document.getElementById('kpiTempoLinha');
+  if(!sel) return '';
+  const linhas = [...new Set(todos
+    .filter(p => (p.etapas||[]).some(e => e.done && e.fim))
+    .map(_kpiLinhaDe))].sort((a,b) => a.localeCompare(b,'pt-BR'));
+  const atual = linhas.includes(sel.value) ? sel.value : '';
+  sel.innerHTML = '<option value="">Todas as linhas de serviço</option>'
+    + linhas.map(l => `<option value="${esc(l)}">${esc(l)}</option>`).join('');
+  sel.value = atual;
+  return atual;
+}
+
+// Média de dias corridos por etapa concluída.
+// Início = data inicial da etapa; sem ela, a conclusão da etapa anterior. Sem nenhuma das duas, não entra na conta.
+// Etapas com o mesmo nome repetidas no fluxo (ex: "Implementação de ajustes") são contadas separadamente.
+function _kpiTempoPorEtapa(todos, linha){
+  const grupos = {};
+  todos.forEach(p => {
+    if(linha && _kpiLinhaDe(p) !== linha) return;
+    const ets = p.etapas || [];
+    const vezes = {};
+    ets.forEach((e, i) => {
+      const base = String(e.lb||'').trim().toLowerCase();
+      vezes[base] = (vezes[base]||0) + 1;
+      const chave = base + '#' + vezes[base];
+      if(!grupos[chave]) grupos[chave] = {n: e.lb + (vezes[base] > 1 ? ` (${vezes[base]}ª vez)` : ''), r: e.r, soma:0, amostras:0, posSoma:0, posN:0};
+      const g = grupos[chave];
+      g.posSoma += i; g.posN++;
+      if(!e.done || !e.fim) return;
+      const ini = e.dataInicial || (i > 0 && ets[i-1].done ? ets[i-1].fim : null);
+      if(!ini) return;
+      const dias = Math.round((new Date(e.fim) - new Date(ini)) / 864e5);
+      if(isNaN(dias) || dias < 0) return;
+      g.soma += Math.max(1, dias);
+      g.amostras++;
+    });
+  });
+  return Object.values(grupos)
+    .filter(g => g.amostras > 0)
+    .sort((a,b) => a.posSoma/a.posN - b.posSoma/b.posN)
+    .map(g => ({n:g.n, d:Math.round(g.soma/g.amostras), r:g.r, amostras:g.amostras}));
+}
+
 function rKPIs(){
   const diasFiltro = parseInt(document.getElementById('kpiFiltPeriodo')?.value||'0');
   const corte = diasFiltro > 0 ? new Date(Date.now() - diasFiltro*864e5) : null;
@@ -4128,44 +4183,10 @@ function rKPIs(){
   }
 
   // ── 7. Tempo médio por etapa ──
-  const ETAPAS_MEDIR = [
-    {n:'Reunião Inicial',           busca:['Reunião Inicial'],                                   r:'eq'},
-    {n:'Mat. Base Recebido',        busca:['Material Base Recebido'],                             r:'cl'},
-    {n:'Análise Mat. Base',         busca:['Análise do material base'],                           r:'eq'},
-    {n:'Elaboração PICV/PI',        busca:['Elaboração do PICV','Elaboração do PI'],               r:'eq'},
-    {n:'Valid. PICV DI/DM',         busca:['Validação PICV DI/DM Referência','Validação do PI'],  r:'cl'},
-    {n:'Validação LD',              busca:['Validação LD'],                                       r:'cl'},
-    {n:'Rev. Textual PICV/PI',      busca:['Revisão textual do PICV','Revisão Textual do PI'],    r:'eq'},
-    {n:'Entrega PICV/PI cliente',   busca:['Entrega do PICV ao cliente','Entrega do PI ao cliente'],r:'eq'},
-    {n:'Solic. Ajustes PICV',       busca:['Solicitação de ajustes no PICV'],                     r:'cl'},
-    {n:'Impl. Ajustes (PI)',        busca:['Implementação de ajustes','Implementação de Ajustes'], r:'eq'},
-    {n:'Valid. Final PICV',         busca:['Validação final do PICV'],                            r:'cl'},
-    {n:'Desenho/Rot. Onepage',      busca:['Desenho/roteirização do onepage','Desenho/Roteirização'],r:'eq'},
-    {n:'Valid. DI Referência',      busca:['Validação DI Referência'],                            r:'cl'},
-    {n:'Prod. Recursos Gráficos',   busca:['Produção de recursos gráficos','Produção de Recursos Gráficos'],r:'eq'},
-    {n:'Valid. DM Referência',      busca:['Validação DM Referência'],                            r:'cl'},
-    {n:'Entrega Review cliente',    busca:['Entrega do review ao cliente','Entrega do Review ao cliente'],r:'eq'},
-    {n:'Solic. Ajustes Review',     busca:['Solicitação de ajustes','Solicitação de Ajustes'],     r:'cl'},
-    {n:'Impl. Ajustes (Review)',    busca:['Implementação de ajustes','Implementação de Ajustes'], r:'eq'},
-    {n:'Valid. Final Review',       busca:['Validação final do review','Validação Final'],         r:'cl'},
-    {n:'Rev. Textual Review',       busca:['Revisão textual do review','Revisão Textual'],         r:'eq'},
-    {n:'Homologação',               busca:['Homologação'],                                        r:'eq'},
-    {n:'Instalação SIRH',           busca:['Instalação no SIRH'],                                 r:'eq'},
-    {n:'Upload Arquivos Bdoc',      busca:['Upload Arquivos Bdoc','Upload Arquivos'],              r:'eq'},
-  ];
-  const etapaMedArr = ETAPAS_MEDIR.map(def => {
-    const amostras = [];
-    todos.forEach(p => {
-      const et = (p.etapas||[]).find(e => def.busca.includes(e.lb));
-      if(!et || !et.done || !et.fim) return;
-      const ref = et.prazo || et.inicio;
-      const dias = ref ? Math.max(1, Math.round((new Date(et.fim)-new Date(ref))/864e5)) : 1;
-      amostras.push(dias);
-    });
-    const media = amostras.length ? Math.round(amostras.reduce((a,b)=>a+b,0)/amostras.length) : null;
-    return {n:def.n, d:media, r:def.r, amostras:amostras.length};
-  });
-  const comDados = etapaMedArr.filter(e => e.d !== null);
+  // Montado a partir das etapas que existem nos produtos (não de uma lista fixa).
+  const linhaSel = _kpiTempoLinhaSelect(todos);
+  const etapaMedArr = _kpiTempoPorEtapa(todos, linhaSel);
+  const comDados = etapaMedArr;
   const mx3 = comDados.length ? Math.max(...comDados.map(e => e.d), 1) : 1;
   const mn3 = comDados.length ? Math.min(...comDados.map(e => e.d), mx3) : 0;
   const _etCor = (e) => {
@@ -6403,7 +6424,7 @@ function _renderEF(){
         <th style="width:28px">#</th>
         <th>Etapa</th>
         <th style="width:110px">Responsável</th>
-        <th style="width:185px">Prazo da Etapa</th>
+        <th style="width:185px">Data Final</th>
         <th style="width:72px;text-align:center">Ações</th>
       </tr></thead>
       <tbody>
@@ -8358,45 +8379,10 @@ function exportPDFLista(){
   const etW = TW * 0.55;
   roundRect(ML, p4Y, etW, 156, 3, C.white, C.grayLight, 0.3);
   drawText('Tempo Medio por Etapa', ML+4, p4Y+6, {size:11, bold:true, color:C.text});
-  drawText('dias medios para conclusao', ML+etW-4, p4Y+6, {size:7.5, color:C.textMuted, align:'right'});
-
-  const ETAPAS_MEDIR = [
-    {n:'Reuniao Inicial', busca:['Reunião Inicial'], r:'eq'},
-    {n:'Mat. Base Recebido', busca:['Material Base Recebido'], r:'cl'},
-    {n:'Analise Mat. Base', busca:['Análise do material base'], r:'eq'},
-    {n:'Elaboracao PICV/PI', busca:['Elaboração do PICV','Elaboração do PI'], r:'eq'},
-    {n:'Valid. PICV DI/DM', busca:['Validação PICV DI/DM Referência','Validação do PI'], r:'cl'},
-    {n:'Validacao LD', busca:['Validação LD'], r:'cl'},
-    {n:'Rev. Textual PICV/PI', busca:['Revisão textual do PICV','Revisão Textual do PI'], r:'eq'},
-    {n:'Entrega PICV/PI cliente', busca:['Entrega do PICV ao cliente','Entrega do PI ao cliente'], r:'eq'},
-    {n:'Solic. Ajustes PICV', busca:['Solicitação de ajustes no PICV'], r:'cl'},
-    {n:'Impl. Ajustes (PI)', busca:['Implementação de ajustes','Implementação de Ajustes'], r:'eq'},
-    {n:'Valid. Final PICV', busca:['Validação final do PICV'], r:'cl'},
-    {n:'Desenho/Rot. Onepage', busca:['Desenho/roteirização do onepage','Desenho/Roteirização'], r:'eq'},
-    {n:'Valid. DI Referencia', busca:['Validação DI Referência'], r:'cl'},
-    {n:'Prod. Recursos Graficos', busca:['Produção de recursos gráficos','Produção de Recursos Gráficos'], r:'eq'},
-    {n:'Valid. DM Referencia', busca:['Validação DM Referência'], r:'cl'},
-    {n:'Entrega Review cliente', busca:['Entrega do review ao cliente','Entrega do Review ao cliente'], r:'eq'},
-    {n:'Solic. Ajustes Review', busca:['Solicitação de ajustes','Solicitação de Ajustes'], r:'cl'},
-    {n:'Impl. Ajustes (Review)', busca:['Implementação de ajustes','Implementação de Ajustes'], r:'eq'},
-    {n:'Valid. Final Review', busca:['Validação final do review','Validação Final'], r:'cl'},
-    {n:'Rev. Textual Review', busca:['Revisão textual do review','Revisão Textual'], r:'eq'},
-    {n:'Homologacao', busca:['Homologação'], r:'eq'},
-    {n:'Instalacao SIRH', busca:['Instalação no SIRH'], r:'eq'},
-    {n:'Upload Arquivos Bdoc', busca:['Upload Arquivos Bdoc','Upload Arquivos'], r:'eq'},
-  ];
-  const etArrPdf = ETAPAS_MEDIR.map(def => {
-    const amostras = [];
-    todos.forEach(p => {
-      const et = (p.etapas||[]).find(e => def.busca.includes(e.lb));
-      if(!et || !et.done || !et.fim) return;
-      const ref = et.prazo || et.inicio;
-      const dias = ref ? Math.max(1, Math.round((new Date(et.fim)-new Date(ref))/864e5)) : 1;
-      amostras.push(dias);
-    });
-    const media = amostras.length ? Math.round(amostras.reduce((a,b)=>a+b,0)/amostras.length) : null;
-    return {n:def.n, d:media, r:def.r, amostras:amostras.length};
-  }).filter(e => e.d !== null);
+  // Mesmo cálculo e mesma linha de serviço escolhida na tela
+  const linhaPdf = document.getElementById('kpiTempoLinha')?.value || '';
+  drawText(trunc(linhaPdf || 'Todas as linhas de servico', 48), ML+etW-4, p4Y+6, {size:7.5, color:C.textMuted, align:'right'});
+  const etArrPdf = _kpiTempoPorEtapa(todos, linhaPdf);
   const mxET = etArrPdf.length ? Math.max(...etArrPdf.map(e => e.d), 1) : 1;
   const mnET = etArrPdf.length ? Math.min(...etArrPdf.map(e => e.d)) : 0;
 
