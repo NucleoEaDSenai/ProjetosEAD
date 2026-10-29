@@ -195,6 +195,22 @@
       line-height:1.35;margin-bottom:20px;padding-bottom:18px;
       border-bottom:1px solid rgba(255,255,255,.07);
     }
+    .lauda-type{display:flex;align-items:center;justify-content:flex-end;gap:10px;margin-bottom:14px}
+    .lauda-type-lbl{
+      font-size:10px;color:#9CA3AF;font-weight:700;
+      text-transform:uppercase;letter-spacing:.7px;
+    }
+    .seg{
+      display:inline-flex;background:rgba(255,255,255,.04);
+      border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:3px;
+    }
+    .seg button{
+      background:none;border:0;color:#9CA3AF;font-family:inherit;
+      font-size:12px;font-weight:700;padding:6px 12px;border-radius:6px;
+      cursor:pointer;transition:all .2s;
+    }
+    .seg button:hover{color:#E5E7EB}
+    .seg button.active{background:linear-gradient(135deg,#4F46E5,#6366F1);color:#fff}
     .metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
     @media (max-width:820px){ .metrics{grid-template-columns:repeat(2,1fr)} }
     .metric{
@@ -270,6 +286,13 @@
 
       <div class="result" id="result">
         <div class="result-course" id="courseTitle"></div>
+        <div class="lauda-type">
+          <span class="lauda-type-lbl">Tipo de lauda</span>
+          <div class="seg" role="group" aria-label="Tipo de lauda">
+            <button type="button" class="active" data-lauda="RT" aria-pressed="true">RT · 2.100</button>
+            <button type="button" data-lauda="DI" aria-pressed="false">DI · 1.500</button>
+          </div>
+        </div>
         <div class="metrics">
           <div class="metric">
             <div class="metric-val" id="mWords">0</div>
@@ -285,7 +308,7 @@
           </div>
           <div class="metric">
             <div class="metric-val" id="mLaudas">0</div>
-            <div class="metric-lbl">Laudas<br>(2.100 palavras)</div>
+            <div class="metric-lbl" id="mLaudasLbl">Laudas RT<br>(2.100 caract.)</div>
           </div>
         </div>
       </div>
@@ -413,7 +436,10 @@
       "text","html","label","caption","quote","description","question","answer",
       "prompt","snippet","buttonText"]);
     var BLOCK = 'p,li,div,h1,h2,h3,h4,h5,h6,td,th,blockquote,figcaption,dt,dd,pre';
-    var WORDS_PER_LAUDA = 2100;
+    // Caracteres com espaço por lauda
+    var LAUDA_TYPES = { RT: 2100, DI: 1500 };
+    var laudaType = 'RT';
+    var lastCharsWs = null;
     var PAT = /__jsonp\(\s*(['"])[^'"]*\1\s*,\s*(['"])([A-Za-z0-9+/=_-]+)\2/;
     var scratch = document.createElement('div');
 
@@ -506,6 +532,27 @@
     }
     function fmt(n){ return n.toLocaleString('pt-BR'); }
 
+    function renderLaudas(){
+      var per = LAUDA_TYPES[laudaType];
+      document.getElementById('mLaudasLbl').innerHTML =
+        'Laudas ' + laudaType + '<br>(' + fmt(per) + ' caract.)';
+      if (lastCharsWs === null) return;
+      document.getElementById('mLaudas').textContent = (lastCharsWs / per)
+        .toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+
+    document.querySelectorAll('.seg button').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        laudaType = btn.dataset.lauda;
+        document.querySelectorAll('.seg button').forEach(function(b){
+          var on = b === btn;
+          b.classList.toggle('active', on);
+          b.setAttribute('aria-pressed', on ? 'true' : 'false');
+        });
+        renderLaudas();
+      });
+    });
+
     function handleFile(file){
       resultEl.classList.remove('show');
 
@@ -534,8 +581,8 @@
           document.getElementById('mWords').textContent   = fmt(r.words);
           document.getElementById('mCharsWs').textContent = fmt(r.charsWs);
           document.getElementById('mCharsNs').textContent = fmt(r.charsNs);
-          document.getElementById('mLaudas').textContent  = (r.words / WORDS_PER_LAUDA)
-            .toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+          lastCharsWs = r.charsWs;
+          renderLaudas();
 
           setStatus('', '');
           resultEl.classList.add('show');
