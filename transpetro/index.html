@@ -615,6 +615,13 @@ tr.canc-row td{opacity:.55}
 .fi-sm:focus{border-color:var(--blue);background:#fff}
 .btn-lim{padding:6px 12px;border-radius:6px;border:1px solid var(--bdr);background:transparent;cursor:pointer;font-size:12px;color:var(--mu);font-family:'Plus Jakarta Sans',sans-serif;white-space:nowrap;align-self:flex-end;height:30px}
 .btn-lim:hover{background:var(--s2)}
+/* Limpar filtros de Cards: rosa pastel com contador de filtros aplicados */
+.btn-lim-k{display:inline-flex;align-items:center;gap:6px;background:#F6CDD0;border-color:#F6CDD0;color:#7F1D24;font-weight:700;transition:background .15s,transform .15s}
+.btn-lim-k:hover{background:#F1B8BD;border-color:#F1B8BD;transform:translateY(-1px)}
+.btn-lim-n{align-items:center;justify-content:center;min-width:16px;height:16px;padding:0 5px;border-radius:9px;background:#7F1D24;color:#fff;font-size:10px;font-weight:800}
+body.dark .btn-lim-k{background:rgba(244,167,174,.18);border-color:rgba(244,167,174,.35);color:#F9C4C9}
+body.dark .btn-lim-k:hover{background:rgba(244,167,174,.28)}
+body.dark .btn-lim-n{background:#F9C4C9;color:#3B0D12}
 /* MULTI SELECT RECURSOS */
 .rec-wrap{display:flex;flex-wrap:wrap;gap:5px;margin-top:5px}
 .rec-chip{display:inline-flex;align-items:center;gap:3px;padding:4px 10px;border-radius:20px;font-size:12px;font-weight:500;border:1px solid var(--bdr);background:var(--s2);cursor:pointer;transition:all .15s;user-select:none;line-height:1.2}
@@ -913,6 +920,7 @@ body.dark .tenant-item.current{background:rgba(34,197,94,.12)}
 .kc[data-col="14"] .kcard{border-left:3px solid #7C3AED}
 .btn-medicao{width:100%;margin-top:8px;padding:7px 10px;background:linear-gradient(135deg,#1A8A4A,#15803d);color:#fff;border:none;border-radius:7px;font-size:11.5px;font-weight:700;font-family:'Plus Jakarta Sans',sans-serif;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;transition:opacity .15s,transform .15s}
 .btn-medicao:hover{opacity:.88;transform:translateY(-1px)}
+.ic.ic-inl{display:inline-block;width:1.15em;height:1.15em;vertical-align:-.2em}
 .badge-medicao-ok{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:12px;background:#DCFCE7;color:#15803D;font-size:11px;font-weight:700}
 .badge-medicao-pend{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:12px;background:#FEF9C3;color:#854D0E;font-size:11px;font-weight:700}
 /* HOMOLOGAÇÕES */
@@ -1405,6 +1413,7 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
   <symbol id="i-calendar-range" viewBox="0 0 24 24"><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M16 2v4"/><path d="M8 2v4"/><path d="M3 10h18"/><path d="M17 14h-6"/><path d="M13 18H7"/><path d="M7 14h.01"/><path d="M17 18h.01"/></symbol>
   <symbol id="i-chart" viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></symbol>
   <symbol id="i-alarm" viewBox="0 0 24 24"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2 2"/><path d="M5 3 2 6"/><path d="m22 6-3-3"/><path d="M6.38 18.7 4 21"/><path d="M17.64 18.67 20 21"/></symbol>
+  <symbol id="i-circle-dollar" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"/><path d="M12 18V6"/></symbol>
   <symbol id="i-receipt" viewBox="0 0 24 24"><path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1Z"/><path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"/><path d="M12 17.5v-11"/></symbol>
   <symbol id="i-ban" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="m4.9 4.9 14.2 14.2"/></symbol>
   <symbol id="i-trash" viewBox="0 0 24 24"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><path d="M10 11v6"/><path d="M14 11v6"/></symbol>
@@ -1574,7 +1583,7 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
           <div style="border-top:1px solid var(--bdr);margin:0"></div>
           <div onclick="exportPDFHomologacoes();toggleExportMenu()" style="padding:11px 16px;cursor:pointer;font-size:13px;display:flex;align-items:center;gap:9px;transition:background .15s" onmouseover="this.style.background='var(--s2)'" onmouseout="this.style.background=''">🔖 <span><strong>PDF — Relatório de Homologações</strong><br><small style="color:var(--mu)">Todos os dados das Homologações</small></span></div>
           <div style="border-top:1px solid var(--bdr);margin:0"></div>
-          <div onclick="exportPDFRelMedicao();toggleExportMenu()" style="padding:11px 16px;cursor:pointer;font-size:13px;display:flex;align-items:center;gap:9px;transition:background .15s" onmouseover="this.style.background='var(--s2)'" onmouseout="this.style.background=''">📐 <span><strong>PDF — Relatório de Medições</strong><br><small style="color:var(--mu)">Cursos medidos por quinzena, com gráfico</small></span></div>
+          <div onclick="exportPDFRelMedicao();toggleExportMenu()" style="padding:11px 16px;cursor:pointer;font-size:13px;display:flex;align-items:center;gap:9px;transition:background .15s" onmouseover="this.style.background='var(--s2)'" onmouseout="this.style.background=''"><svg class="ic ic-inl" aria-hidden="true"><use href="#i-circle-dollar"/></svg> <span><strong>PDF — Relatório de Medições</strong><br><small style="color:var(--mu)">Cursos medidos por quinzena, com gráfico</small></span></div>
           <div style="border-top:1px solid var(--bdr);margin:0"></div>
           <div onclick="exportBackupJSON();toggleExportMenu()" style="padding:11px 16px;cursor:pointer;font-size:13px;display:flex;align-items:center;gap:9px;transition:background .15s;background:#FFFBEB" onmouseover="this.style.background='#FEF3C7'" onmouseout="this.style.background='#FFFBEB'">💾 <span><strong>Backup Completo (JSON)</strong><br><small style="color:var(--mu)">Todos os projetos, etapas e configurações</small></span></div>
           <div style="border-top:1px solid var(--bdr);margin:0"></div>
@@ -1652,7 +1661,7 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
               <div class="ms-dropdown" id="msDd_kRel"></div>
             </div>
           </div>
-          <div class="fg-sm"><label class="fl-sm">Coluna</label>
+          <div class="fg-sm"><label class="fl-sm">Etapas</label>
             <div class="ms-wrap" id="msWrap_kCol">
               <button class="ms-btn" id="msBtn_kCol" onclick="_msToggle('kCol')">Todas</button>
               <div class="ms-dropdown" id="msDd_kCol"></div>
@@ -1676,7 +1685,7 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
               </div>
             </div>
           </div>
-          <button class="btn-lim" onclick="limparKFilts()">✕ Limpar</button>
+          <button class="btn-lim btn-lim-k" onclick="limparKFilts()">✕ Limpar filtros<span class="btn-lim-n" id="kLimparN" style="display:none"></span></button>
         </div>
       </div>
       <div class="kb-wrap">
@@ -2233,7 +2242,7 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
               <option value="moveu coluna">📌 Moveu coluna</option>
               <option value="cancelou">🚫 Cancelamento</option>
               <option value="reativou">🔄 Reativação</option>
-              <option value="enviou medição">📐 Enviou Medição</option>
+              <option value="enviou medição">Enviou Medição</option>
               <option value="confirmou medição">🎉 Medição confirmada</option>
               <option value="desmarcou medição">↩️ Medição desmarcada</option>
               <option value="homologação salva">🔖 Homologação</option>
@@ -2315,7 +2324,7 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
           </select>
         </div>
         <div class="fg ff">
-          <label class="fl">Tipos de Recurso — selecione um ou mais</label>
+          <label class="fl">Linhas de serviço — selecione uma ou mais</label>
           <div class="rec-wrap" id="recChips"></div>
         </div>
         <!-- Descrição, Objetivo e Público-Alvo vêm do projeto selecionado (só leitura) -->
@@ -3091,6 +3100,8 @@ let NXT=1, editId=null, cancId=null, dragId=null;
 // deles via p.projCadId — a chave do push() do Firebase, sempre string
 let CADPROJ=[];
 function projDoCard(p){ return (p && p.projCadId) ? (CADPROJ.find(c => c.id === p.projCadId) || null) : null; }
+// Ícone de Medição (Lucide circle-dollar-sign) para usar dentro de textos
+function icMedicao(){ return '<svg class="ic ic-inl" aria-hidden="true"><use href="#i-circle-dollar"/></svg>'; }
 function nomeCompleto(p){ const pr = projDoCard(p); return pr ? pr.nome + ' — ' + p.nome : p.nome; }
 
 // ── NAV ──
@@ -3135,8 +3146,18 @@ function rDash(){
 }
 
 // ── KANBAN ──
+// Mostra no botão "Limpar filtros" quantos filtros de Cards estão aplicados
+function _atualizarContadorKFilts(){
+  const el=document.getElementById('kLimparN');
+  if(!el) return;
+  const n=['kProj','kResp','kSit','kAcad','kRel','kCol','kPrazo','kPrazoEt'].filter(id=>_msGetVals(id).length).length;
+  el.textContent=n;
+  el.style.display=n?'inline-flex':'none';
+}
+
 function rKanban(){
   populateFiltSelects();
+  _atualizarContadorKFilts();
   const flt=applyFilt(activeDB(),getKFilts());
   const _ordPrio={urgente:0,alta:1,media:2,baixa:3};
   const _sortCards = arr => [...arr].sort((a,b)=>{
@@ -3199,7 +3220,7 @@ function rKanban(){
             // Todo projeto na coluna Pré-Medição pode ser enviado para a fila da aba Medição,
             // sem depender da conclusão de etapas.
             if(p.col === 12 && !p.enviadoMedicao){
-              return `<button class="btn-medicao" onclick="event.stopPropagation();enviarMedicao(${p.id})">📐 Enviar Medição</button>`;
+              return `<button class="btn-medicao" onclick="event.stopPropagation();enviarMedicao(${p.id})">${icMedicao()} Enviar Medição</button>`;
             }
 
             // ── BOTÃO MEDIÇÃO ────────────────────────────────────────────────
@@ -3221,7 +3242,7 @@ function rKanban(){
             }
 
             if(gatilhoMedicaoDone && !p.enviadoMedicao)
-              return `<button class="btn-medicao" onclick="event.stopPropagation();enviarMedicao(${p.id})">📐 Enviar para Medição</button>`;
+              return `<button class="btn-medicao" onclick="event.stopPropagation();enviarMedicao(${p.id})">${icMedicao()} Enviar para Medição</button>`;
             if(p.enviadoMedicao && !p.medicaoFeita)
               return `<span class="badge-medicao-pend">⏳ Aguardando Medição</span>`;
             if(p.medicaoFeita)
@@ -4223,7 +4244,7 @@ function rKPIs(){
       insights.push({tipo:'', ico:'🔧', txt:`<strong>${homolPend}</strong> homologa${homolPend>1?'ções':'ção'} pendente${homolPend>1?'s':''}`});
     }
     if(medicPend > 0){
-      insights.push({tipo:'', ico:'📐', txt:`<strong>${medicPend}</strong> aguardando medição`});
+      insights.push({tipo:'', ico:icMedicao(), txt:`<strong>${medicPend}</strong> aguardando medição`});
     }
     if(tmCiclo !== null){
       insights.push({tipo:'', ico:'⏱️', txt:`Tempo médio de ciclo: <strong>${tmCiclo} dias</strong> (${ciclos.length} projeto${ciclos.length!==1?'s':''} concluído${ciclos.length!==1?'s':''})`});
@@ -4885,7 +4906,7 @@ function openDet(id){
   document.getElementById('detBody').innerHTML=`
     <div class="dl2r">
       <div>
-        ${p.idCurso?dl2('ID do Projeto',`<span style="font-weight:600;font-family:monospace">${esc(p.idCurso)}</span>`):''}${p.prioridade?dl2('Prioridade',prioBadge(p.prioridade)):''}${p.rp?dl2('RP',`<span style="font-weight:600">${esc(p.rp)}</span>`):''}${p.academia?dl2('Categoria de Projeto',`<span style="font-weight:600">${esc(p.academia)}</span>`):''}${relevanciaBadge(p)?dl2('Relevância',relevanciaBadge(p)):''}${dl2('Recursos',recTags(p.recursos))}
+        ${p.idCurso?dl2('ID do Projeto',`<span style="font-weight:600;font-family:monospace">${esc(p.idCurso)}</span>`):''}${p.prioridade?dl2('Prioridade',prioBadge(p.prioridade)):''}${p.rp?dl2('RP',`<span style="font-weight:600">${esc(p.rp)}</span>`):''}${p.academia?dl2('Categoria de Projeto',`<span style="font-weight:600">${esc(p.academia)}</span>`):''}${relevanciaBadge(p)?dl2('Relevância',relevanciaBadge(p)):''}${dl2('Serviços',recTags(p.recursos))}
         ${dl2('Coluna',`<span style="display:inline-flex;align-items:center;gap:5px"><span style="width:8px;height:8px;border-radius:50%;background:${colDot(p.col)};display:inline-block"></span>${colLabel(p.col)}</span>`)}
         ${dl2('Situação',sitBdg(p))}
         ${dl2('Mudou de escopo?', _buildEscopoHtml(p))}
@@ -4914,16 +4935,16 @@ function openDet(id){
     ${_blocoProjetoDet(p)}
     <hr class="dv">
     <div style="font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:13px;margin-bottom:9px">
-      Etapas de Desenvolvimento
+      Atividades de Desenvolvimento
       <span style="font-weight:400;font-size:11px;color:var(--mu);margin-left:8px">Marque ✓ para concluir · Ajuste responsável e prazo por etapa</span>
     </div>
     <div style="overflow-x:auto">
-    <table class="et"><thead><tr><th>Etapa</th><th>Responsável</th><th>Data Inicial</th><th>Data Final</th><th title="Dias úteis da data inicial até a data final (contando os dois dias)">Duração - Dias Úteis</th><th>Término Real</th><th>Situação</th><th>Observação</th></tr></thead>
+    <table class="et"><thead><tr><th>Atividade</th><th>Responsável</th><th>Data Inicial</th><th>Data Final</th><th title="Dias úteis da data inicial até a data final (contando os dois dias)">Duração - Dias Úteis</th><th>Término Real</th><th>Situação</th><th>Observação</th></tr></thead>
     <tbody>${eRows}</tbody></table></div>
     <div class="coments-area">
       ${(p.medicaoItens||[]).length ? `
       <hr class="dv" style="margin:18px 0 14px">
-      <div class="coments-title">📐 Itens da Medição <span style="font-weight:400;font-size:11px;color:var(--mu)">${p.medicaoFeita?'medição confirmada':'aguardando confirmação'}</span>
+      <div class="coments-title">${icMedicao()} Itens da Medição <span style="font-weight:400;font-size:11px;color:var(--mu)">${p.medicaoFeita?'medição confirmada':'aguardando confirmação'}</span>
         ${!p.medicaoFeita?`<button class="coment-act" style="font-size:11px" onclick="editarItensMedicao(${p.id})">✏️ Editar QTD</button>`:''}</div>
       <div style="overflow-x:auto"><table class="et" style="width:100%;font-size:12px">
         <thead><tr><th>Linha</th><th style="text-align:left">Descrição dos serviços</th><th>UN</th><th>QTD</th><th style="text-align:right">Preço unitário</th><th style="text-align:right">Preço parcial</th></tr></thead>
@@ -6014,13 +6035,13 @@ function _buildEscopoHtml(p){
     const optsN = RECURSOS.map(r => '<option value="' + r + '"' + (p.escopoNovoRecurso===r?' selected':'') + '>' + r + '</option>').join('');
     html += '<div style="display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap">';
     html += '<div style="display:flex;flex-direction:column;gap:3px">';
-    html += '<span style="font-size:10px;font-weight:700;color:var(--mu);text-transform:uppercase;letter-spacing:.5px">Antigo Recurso</span>';
+    html += '<span style="font-size:10px;font-weight:700;color:var(--mu);text-transform:uppercase;letter-spacing:.5px">Antigo Serviço</span>';
     html += '<select onchange="setEscopoRecurso(' + p.id + ',\'escopoAntigoRecurso\',this.value)" style="' + selStyle + '">';
     html += '<option value="">— Selecione —</option>' + optsA;
     html += '</select></div>';
     html += '<span style="font-size:16px;color:var(--mu);padding-bottom:6px">→</span>';
     html += '<div style="display:flex;flex-direction:column;gap:3px">';
-    html += '<span style="font-size:10px;font-weight:700;color:var(--mu);text-transform:uppercase;letter-spacing:.5px">Novo Recurso</span>';
+    html += '<span style="font-size:10px;font-weight:700;color:var(--mu);text-transform:uppercase;letter-spacing:.5px">Novo Serviço</span>';
     html += '<select onchange="setEscopoRecurso(' + p.id + ',\'escopoNovoRecurso\',this.value)" style="' + selStyle + '">';
     html += '<option value="">— Selecione —</option>' + optsN;
     html += '</select></div>';
@@ -9127,7 +9148,7 @@ function abrirModalMedicao(id, edicao){
   }).join('');
   div.innerHTML = `
     <div role="dialog" aria-modal="true" aria-label="Enviar Medição" style="background:var(--surface);color:var(--txt);border-radius:14px;padding:22px;width:100%;max-width:860px;max-height:88vh;overflow:auto;box-shadow:0 8px 32px rgba(0,0,0,.18)">
-      <div style="font-size:15px;font-weight:700;margin-bottom:4px">📐 ${edicao?'Itens da Medição':'Enviar Medição'}</div>
+      <div style="font-size:15px;font-weight:700;margin-bottom:4px">${icMedicao()} ${edicao?'Itens da Medição':'Enviar Medição'}</div>
       <div style="font-size:12px;color:var(--mu);margin-bottom:14px">${esc(p.nome)} — informe a quantidade (QTD) de cada item${edicao?'':' antes de enviar'}.</div>
       ${linhas.length ? `
       <div style="overflow-x:auto"><table class="et" style="width:100%;font-size:12.5px">
@@ -9139,7 +9160,7 @@ function abrirModalMedicao(id, edicao){
       <div id="medItensAviso" style="font-size:11.5px;color:var(--red);margin-top:8px;min-height:14px"></div>
       <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:10px">
         <button class="btn bg2 bsm" onclick="document.getElementById('medItensModal').remove()">Cancelar</button>
-        ${linhas.length ? `<button class="btn bb bsm" onclick="_salvarMedItens(${p.id},${edicao?'true':'false'})">${edicao?'💾 Salvar itens':'📐 Enviar Medição'}</button>` : ''}
+        ${linhas.length ? `<button class="btn bb bsm" onclick="_salvarMedItens(${p.id},${edicao?'true':'false'})">${edicao?'💾 Salvar itens':icMedicao()+' Enviar Medição'}</button>` : ''}
       </div>
     </div>`;
   div.addEventListener('click', e => { if(e.target===div) div.remove(); });
@@ -9196,7 +9217,7 @@ function _salvarMedItens(id, edicao){
   fbSalvarProjeto(p);
   document.getElementById('medItensModal')?.remove();
   renderAll();
-  showToast(edicao ? '💾 Itens da medição atualizados!' : `📐 Medição enviada (${fmtBRL(p.medicaoTotal)})! O produto fica em Pré-medição até a confirmação.`);
+  showToast(edicao ? '💾 Itens da medição atualizados!' : `Medição enviada (${fmtBRL(p.medicaoTotal)})! O produto fica em Pré-medição até a confirmação.`);
 }
 
 function confirmarMedicao(id){
@@ -11268,7 +11289,7 @@ function rHistorico(){
     'concluiu etapa':      '✅',
     'reabriu etapa':       '↩️',
     'moveu coluna':        '📌',
-    'enviou medição':      '📐',
+    'enviou medição':      icMedicao(),
     'confirmou medição':   '🎉',
     'desmarcou medição':   '↩️',
     'homologação salva':   '🔖',
@@ -11320,7 +11341,7 @@ function _renderHistRows(el, rows){
     'concluiu etapa':      '✅',
     'reabriu etapa':       '↩️',
     'moveu coluna':        '📌',
-    'enviou medição':      '📐',
+    'enviou medição':      icMedicao(),
     'confirmou medição':   '🎉',
     'desmarcou medição':   '↩️',
     'homologação salva':   '🔖',
@@ -12228,7 +12249,7 @@ function renderNotifPanel(){
   const tipoLabel={atraso:'Atraso',prazo:'Prazo',homolog:'Homologação',medicao:'Medição',etapacl:'Cliente'};
   listEl.innerHTML = notifs.map((n,i)=>`
     <div class="notif-item ${n.lida?'read':'unread'}" id="notifItem_${i}">
-      <div class="notif-icon">${n.icone}</div>
+      <div class="notif-icon">${n.icone==='📐'?icMedicao():n.icone}</div>
       <div class="notif-content">
         <div class="notif-text">${n.texto}</div>
         <div class="notif-meta">
