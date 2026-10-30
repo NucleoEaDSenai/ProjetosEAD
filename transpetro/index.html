@@ -4885,7 +4885,7 @@ function openDet(id){
   document.getElementById('detBody').innerHTML=`
     <div class="dl2r">
       <div>
-        ${p.idCurso?dl2('ID do Projeto',`<span style="font-weight:600;font-family:monospace">${esc(p.idCurso)}</span>`):''}${p.prioridade?dl2('Prioridade',prioBadge(p.prioridade)):''}${p.rp?dl2('RP',`<span style="font-weight:600">${esc(p.rp)}</span>`):''}${p.academia?dl2('Categoria de Projeto',`<span style="font-weight:600">${esc(p.academia)}</span>`):''}${relevanciaBadge(p)?dl2('Relevância',relevanciaBadge(p)):''}${dl2('Recursos',recTags(p.recursos))}
+        ${p.idCurso?dl2('ID do Projeto',`<span style="font-weight:600;font-family:monospace">${esc(p.idCurso)}</span>`):''}${p.prioridade?dl2('Prioridade',prioBadge(p.prioridade)):''}${p.rp?dl2('RP',`<span style="font-weight:600">${esc(p.rp)}</span>`):''}${p.academia?dl2('Categoria de Projeto',`<span style="font-weight:600">${esc(p.academia)}</span>`):''}${relevanciaBadge(p)?dl2('Relevância',relevanciaBadge(p)):''}${dl2('Serviços',recTags(p.recursos))}
         ${dl2('Coluna',`<span style="display:inline-flex;align-items:center;gap:5px"><span style="width:8px;height:8px;border-radius:50%;background:${colDot(p.col)};display:inline-block"></span>${colLabel(p.col)}</span>`)}
         ${dl2('Situação',sitBdg(p))}
         ${dl2('Mudou de escopo?', _buildEscopoHtml(p))}
@@ -6014,13 +6014,13 @@ function _buildEscopoHtml(p){
     const optsN = RECURSOS.map(r => '<option value="' + r + '"' + (p.escopoNovoRecurso===r?' selected':'') + '>' + r + '</option>').join('');
     html += '<div style="display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap">';
     html += '<div style="display:flex;flex-direction:column;gap:3px">';
-    html += '<span style="font-size:10px;font-weight:700;color:var(--mu);text-transform:uppercase;letter-spacing:.5px">Antigo Recurso</span>';
+    html += '<span style="font-size:10px;font-weight:700;color:var(--mu);text-transform:uppercase;letter-spacing:.5px">Antigo Serviço</span>';
     html += '<select onchange="setEscopoRecurso(' + p.id + ',\'escopoAntigoRecurso\',this.value)" style="' + selStyle + '">';
     html += '<option value="">— Selecione —</option>' + optsA;
     html += '</select></div>';
     html += '<span style="font-size:16px;color:var(--mu);padding-bottom:6px">→</span>';
     html += '<div style="display:flex;flex-direction:column;gap:3px">';
-    html += '<span style="font-size:10px;font-weight:700;color:var(--mu);text-transform:uppercase;letter-spacing:.5px">Novo Recurso</span>';
+    html += '<span style="font-size:10px;font-weight:700;color:var(--mu);text-transform:uppercase;letter-spacing:.5px">Novo Serviço</span>';
     html += '<select onchange="setEscopoRecurso(' + p.id + ',\'escopoNovoRecurso\',this.value)" style="' + selStyle + '">';
     html += '<option value="">— Selecione —</option>' + optsN;
     html += '</select></div>';
