@@ -615,6 +615,13 @@ tr.canc-row td{opacity:.55}
 .fi-sm:focus{border-color:var(--blue);background:#fff}
 .btn-lim{padding:6px 12px;border-radius:6px;border:1px solid var(--bdr);background:transparent;cursor:pointer;font-size:12px;color:var(--mu);font-family:'Plus Jakarta Sans',sans-serif;white-space:nowrap;align-self:flex-end;height:30px}
 .btn-lim:hover{background:var(--s2)}
+/* Limpar filtros de Cards: rosa pastel com contador de filtros aplicados */
+.btn-lim-k{display:inline-flex;align-items:center;gap:6px;background:#F6CDD0;border-color:#F6CDD0;color:#7F1D24;font-weight:700;transition:background .15s,transform .15s}
+.btn-lim-k:hover{background:#F1B8BD;border-color:#F1B8BD;transform:translateY(-1px)}
+.btn-lim-n{align-items:center;justify-content:center;min-width:16px;height:16px;padding:0 5px;border-radius:9px;background:#7F1D24;color:#fff;font-size:10px;font-weight:800}
+body.dark .btn-lim-k{background:rgba(244,167,174,.18);border-color:rgba(244,167,174,.35);color:#F9C4C9}
+body.dark .btn-lim-k:hover{background:rgba(244,167,174,.28)}
+body.dark .btn-lim-n{background:#F9C4C9;color:#3B0D12}
 /* MULTI SELECT RECURSOS */
 .rec-wrap{display:flex;flex-wrap:wrap;gap:5px;margin-top:5px}
 .rec-chip{display:inline-flex;align-items:center;gap:3px;padding:4px 10px;border-radius:20px;font-size:12px;font-weight:500;border:1px solid var(--bdr);background:var(--s2);cursor:pointer;transition:all .15s;user-select:none;line-height:1.2}
@@ -1676,7 +1683,7 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
               </div>
             </div>
           </div>
-          <button class="btn-lim" onclick="limparKFilts()">✕ Limpar</button>
+          <button class="btn-lim btn-lim-k" onclick="limparKFilts()">✕ Limpar filtros<span class="btn-lim-n" id="kLimparN" style="display:none"></span></button>
         </div>
       </div>
       <div class="kb-wrap">
@@ -3135,8 +3142,18 @@ function rDash(){
 }
 
 // ── KANBAN ──
+// Mostra no botão "Limpar filtros" quantos filtros de Cards estão aplicados
+function _atualizarContadorKFilts(){
+  const el=document.getElementById('kLimparN');
+  if(!el) return;
+  const n=['kProj','kResp','kSit','kAcad','kRel','kCol','kPrazo','kPrazoEt'].filter(id=>_msGetVals(id).length).length;
+  el.textContent=n;
+  el.style.display=n?'inline-flex':'none';
+}
+
 function rKanban(){
   populateFiltSelects();
+  _atualizarContadorKFilts();
   const flt=applyFilt(activeDB(),getKFilts());
   const _ordPrio={urgente:0,alta:1,media:2,baixa:3};
   const _sortCards = arr => [...arr].sort((a,b)=>{
