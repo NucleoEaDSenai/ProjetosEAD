@@ -723,6 +723,10 @@ body.dark .ppu-bar.esg i{background:rgba(249,115,22,.42)}body.dark .ppu-bar.esg 
 body.dark .ppu-bar.est i{background:rgba(239,68,68,.48)}body.dark .ppu-bar.est span{color:#FEE2E2}
 .ppu-qtd{font-size:12.5px;font-weight:500;color:var(--txt);margin-top:5px;font-variant-numeric:tabular-nums}
 .ppu-qtd b{font-weight:800}
+/* Medição: uma linha por item medido + linha de total do produto */
+td.med-it{border-bottom-style:dashed;font-size:12px}
+.med-ln{font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:11px;color:var(--mu)}
+tr.med-tot td{background:var(--s2);font-weight:800;font-size:12px}
 #ppuTbl tfoot td{font-weight:800;background:var(--s2);border-top:2px solid var(--bdr)}
 /* Aba Validações */
 .val-aviso{display:inline-block;margin-left:6px;font-size:10px;font-weight:700;padding:1px 6px;border-radius:6px;background:var(--warn-bg,#FEF3C7);color:var(--warn-fg,#92400E)}
@@ -2177,7 +2181,7 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
               <div class="ms-dropdown" id="msDd_medResp"></div>
             </div>
           </div>
-          <div class="fg-sm"><label class="fl-sm">Recurso</label>
+          <div class="fg-sm"><label class="fl-sm">Linha(s) de Serviço(s)</label>
             <div class="ms-wrap" id="msWrap_medRec">
               <button class="ms-btn" id="msBtn_medRec" onclick="_msToggle('medRec')">Todos</button>
               <div class="ms-dropdown" id="msDd_medRec"></div>
@@ -4916,8 +4920,8 @@ function openDet(id){
   document.getElementById('detBody').innerHTML=`
     <div class="dl2r">
       <div>
-        ${p.idCurso?dl2('ID do Projeto',`<span style="font-weight:600;font-family:monospace">${esc(p.idCurso)}</span>`):''}${p.prioridade?dl2('Prioridade',prioBadge(p.prioridade)):''}${p.rp?dl2('RP',`<span style="font-weight:600">${esc(p.rp)}</span>`):''}${p.academia?dl2('Categoria de Projeto',`<span style="font-weight:600">${esc(p.academia)}</span>`):''}${relevanciaBadge(p)?dl2('Relevância',relevanciaBadge(p)):''}${dl2('Serviços',recTags(p.recursos))}
-        ${dl2('Coluna',`<span style="display:inline-flex;align-items:center;gap:5px"><span style="width:8px;height:8px;border-radius:50%;background:${colDot(p.col)};display:inline-block"></span>${colLabel(p.col)}</span>`)}
+        ${p.idCurso?dl2('ID do Projeto',`<span style="font-weight:600;font-family:monospace">${esc(p.idCurso)}</span>`):''}${p.prioridade?dl2('Prioridade',prioBadge(p.prioridade)):''}${p.rp?dl2('RP',`<span style="font-weight:600">${esc(p.rp)}</span>`):''}${p.academia?dl2('Categoria de Projeto',`<span style="font-weight:600">${esc(p.academia)}</span>`):''}${relevanciaBadge(p)?dl2('Relevância',relevanciaBadge(p)):''}${dl2('Linha(s) de Serviço(s)',recTags(p.recursos))}
+        ${dl2('Etapa',`<span style="display:inline-flex;align-items:center;gap:5px"><span style="width:8px;height:8px;border-radius:50%;background:${colDot(p.col)};display:inline-block"></span>${colLabel(p.col)}</span>`)}
         ${dl2('Situação',sitBdg(p))}
         ${dl2('Mudou de escopo?', _buildEscopoHtml(p))}
 
@@ -9321,37 +9325,44 @@ function confirmarMedicao(id){
   showToast('🎉 Medição confirmada! Produto movido para Produtos Concluídos.');
 }
 
-// Itens medidos (linha · QTD · UN · preço parcial) + total; botão para ajustar enquanto não confirmada
-function _medItensResumo(p){
+// Uma linha por item medido (Linha · Serviço · QTD · Preço Unitário · Valor) + linha de total.
+// Produto, responsáveis, datas, status e ações ficam mesclados (rowspan) nas linhas do mesmo produto.
+function _buildMedRow(p){
+  const _podeMover = p.medicaoFeita && ehLideranca();
   const itens = p.medicaoItens || [];
+  const rs = itens.length ? itens.length + 1 : 1;
+  const span = rs > 1 ? ` rowspan="${rs}"` : '';
+  const trStyle = p.medicaoFeita ? ' style="opacity:.75"' : '';
   const editar = !p.medicaoFeita
     ? `<button class="coment-act" style="font-size:11px;opacity:.8" onclick="editarItensMedicao(${p.id})" title="${itens.length?'Editar quantidades':'Informar quantidades'}">✏️ ${itens.length?'Editar':'Informar QTD'}</button>`
     : '';
-  if(!itens.length) return `<span style="color:var(--mu);font-style:italic">Sem itens</span> ${editar}`;
-  return itens.map(it =>
-    `<div title="${esc(it.desc)} — ${it.qtd} ${it.un} × ${fmtBRL(it.precoUnit)}"><span style="color:var(--mu)">L${it.linha}</span> ${esc(it.desc.length>26?it.desc.slice(0,25)+'…':it.desc)} · <strong>${it.qtd.toLocaleString('pt-BR')} ${it.un}</strong> · ${fmtBRL(it.precoParcial)}</div>`
-  ).join('') + `<div style="margin-top:3px;font-weight:800;color:var(--blue)">Total: ${fmtBRL(p.medicaoTotal)} ${editar}</div>`;
-}
-
-function _buildMedRow(p){
-  const _podeMover = p.medicaoFeita && ehLideranca();
-  return `<tr style="${p.medicaoFeita?'opacity:.75':''}">
-    <td>
+  const celItem = it => `
+    <td class="ppu-n med-it"><span class="med-ln">${it.linha}</span></td>
+    <td class="med-it">${esc(it.desc)}</td>
+    <td class="ppu-n med-it"><strong>${it.qtd.toLocaleString('pt-BR')}</strong> <span style="color:var(--mu)">${it.un}</span></td>
+    <td class="ppu-n med-it">${fmtBRL(it.precoUnit)}</td>
+    <td class="ppu-n med-it">${fmtBRL(it.precoParcial)}</td>`;
+  const primeiraLinha = itens.length
+    ? celItem(itens[0])
+    : `<td colspan="5"><span style="color:var(--mu);font-style:italic">Sem itens</span> ${editar}</td>`;
+  const outrasLinhas = itens.slice(1).map(it => `<tr${trStyle}>${celItem(it)}</tr>`).join('')
+    + (itens.length ? `<tr class="med-tot"${trStyle}><td colspan="4" style="text-align:right">${editar} <span style="margin-left:6px">Total</span></td><td class="ppu-n" style="color:var(--blue)">${fmtBRL(p.medicaoTotal)}</td></tr>` : '');
+  return `<tr${trStyle}>
+    <td${span}>
       ${_podeMover?`<input type="checkbox" ${_medSelecionados.has(p.id)?'checked':''} onchange="_toggleSelMed(${p.id},this.checked)" title="Selecionar para mover de RAMP" aria-label="Selecionar ${esc(p.nome)}" style="margin-right:6px;vertical-align:middle;cursor:pointer">`:''}
       <span style="font-weight:600;cursor:pointer;color:var(--blue)" onclick="openDet(${p.id})">${esc(p.nome)}</span>
       ${p.cancelado?'<span style="font-size:10px;color:var(--mu);margin-left:6px">(cancelado)</span>':''}
     </td>
-    <td>${avList(p.resps)}</td>
-    <td>${recTags(p.recursos)}</td>
-    <td style="font-size:11.5px;min-width:190px">${_medItensResumo(p)}</td>
-    <td style="white-space:nowrap">${fd(p.termino||p.enviadoMedicao)}</td>
-    <td style="white-space:nowrap">${fd(p.enviadoMedicao)}</td>
-    <td style="text-align:center">
+    <td${span}>${avList(p.resps)}</td>
+    ${primeiraLinha}
+    <td${span} style="white-space:nowrap">${fd(p.termino||p.enviadoMedicao)}</td>
+    <td${span} style="white-space:nowrap">${fd(p.enviadoMedicao)}</td>
+    <td${span} style="text-align:center">
       ${p.medicaoFeita
         ? `<span class="badge-medicao-ok">✅ Feita em ${fd(p.medicaoFeitaEm)}</span>`
         : `<span class="badge-medicao-pend">⏳ Pendente</span>`}
     </td>
-    <td style="text-align:center">
+    <td${span} style="text-align:center">
       ${p.medicaoFeita && p.medicaoConfirmadaPor
         ? `<span style="font-size:11.5px;font-weight:600;color:var(--green);display:flex;align-items:center;justify-content:center;gap:4px">
              <span style="width:22px;height:22px;border-radius:50%;background:var(--green);color:#fff;font-size:9px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0">${p.medicaoConfirmadaPor.charAt(0).toUpperCase()}</span>
@@ -9359,7 +9370,7 @@ function _buildMedRow(p){
            </span>`
         : `<span style="font-size:11px;color:var(--mu);font-style:italic">—</span>`}
     </td>
-    <td style="text-align:center">
+    <td${span} style="text-align:center">
       <button onclick="confirmarMedicao(${p.id})"
         style="padding:5px 12px;border:none;border-radius:6px;cursor:pointer;font-size:11.5px;font-weight:600;font-family:'Plus Jakarta Sans',sans-serif;
         background:${p.medicaoFeita?'var(--s2)':'var(--green)'};color:${p.medicaoFeita?'var(--mu)':'#fff'};transition:opacity .15s"
@@ -9372,7 +9383,7 @@ function _buildMedRow(p){
              style="padding:5px 9px;border:1.5px solid var(--bdr);border-radius:6px;background:var(--s2);color:var(--txt);cursor:pointer;font-size:11.5px;font-weight:600;margin-left:4px;white-space:nowrap">↔️ Mover RAMP</button>`
         : ''}
     </td>
-  </tr>`;
+  </tr>${outrasLinhas}`;
 }
 
 function _buildMedTabela(projetos){
@@ -9382,11 +9393,14 @@ function _buildMedTabela(projetos){
       <thead><tr>
         <th style="cursor:pointer;white-space:nowrap" onclick="toggleMedSort('nome')">Produto <span class="medSI" data-c="nome" style="font-size:10px;color:var(--mu)"></span></th>
         <th style="cursor:pointer;white-space:nowrap" onclick="toggleMedSort('resp')">Responsáveis <span class="medSI" data-c="resp" style="font-size:10px;color:var(--mu)"></span></th>
-        <th style="cursor:pointer;white-space:nowrap" onclick="toggleMedSort('rec')">Recursos <span class="medSI" data-c="rec" style="font-size:10px;color:var(--mu)"></span></th>
-        <th style="cursor:pointer;white-space:nowrap" onclick="toggleMedSort('valor')">Itens · Valor <span class="medSI" data-c="valor" style="font-size:10px;color:var(--mu)"></span></th>
+        <th class="ppu-n">Linha</th>
+        <th>Serviço</th>
+        <th class="ppu-n">QTD</th>
+        <th class="ppu-n">Preço Unitário</th>
+        <th class="ppu-n" style="cursor:pointer" onclick="toggleMedSort('valor')">Valor <span class="medSI" data-c="valor" style="font-size:10px;color:var(--mu)"></span></th>
         <th style="cursor:pointer;white-space:nowrap" onclick="toggleMedSort('concl')">Concluído em <span class="medSI" data-c="concl" style="font-size:10px;color:var(--mu)"></span></th>
         <th style="cursor:pointer;white-space:nowrap" onclick="toggleMedSort('env')">Enviado para Medição em <span class="medSI" data-c="env" style="font-size:10px;color:var(--mu)"></span></th>
-        <th style="cursor:pointer;white-space:nowrap;text-align:center" onclick="toggleMedSort('stat')">Medição Feita <span class="medSI" data-c="stat" style="font-size:10px;color:var(--mu)"></span></th>
+        <th style="cursor:pointer;white-space:nowrap;text-align:center" onclick="toggleMedSort('stat')">Status da Medição <span class="medSI" data-c="stat" style="font-size:10px;color:var(--mu)"></span></th>
         <th style="cursor:pointer;white-space:nowrap;text-align:center" onclick="toggleMedSort('conf')">Confirmada por <span class="medSI" data-c="conf" style="font-size:10px;color:var(--mu)"></span></th>
         <th></th>
       </tr></thead>
@@ -9607,7 +9621,6 @@ function rMedicao(){
     switch(_medSortCol){
       case 'nome':  return S(a.nome).localeCompare(S(b.nome))*d;
       case 'resp':  return S((a.resps||[]).join(', ')).localeCompare(S((b.resps||[]).join(', ')))*d;
-      case 'rec':   return S((a.recursos||[]).join(', ')).localeCompare(S((b.recursos||[]).join(', ')))*d;
       case 'concl': return D(a.termino||a.enviadoMedicao).localeCompare(D(b.termino||b.enviadoMedicao))*d;
       case 'env':   return D(a.enviadoMedicao).localeCompare(D(b.enviadoMedicao))*d;
       case 'stat':  return ((a.medicaoFeita?1:0)-(b.medicaoFeita?1:0))*d;
