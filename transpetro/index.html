@@ -702,6 +702,28 @@ body.dark .bmotivo:hover{background:rgba(244,167,174,.28)}
 .motivo-op small{font-size:11.5px;color:var(--mu)}
 .motivo-campo{padding:0 2px 4px 34px;display:grid;gap:4px}
 .motivo-campo[hidden]{display:none}
+/* Aba PPU */
+.ppu-th{all:unset;cursor:pointer;display:inline-flex;align-items:center;gap:5px;white-space:nowrap}
+.ppu-th span{opacity:.5;font-size:9px}
+.ppu-th.on span{opacity:1}
+.ppu-th:focus-visible{outline:2px solid var(--blue);outline-offset:2px;border-radius:3px}
+.ppu-n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.ppu-saldo{font-weight:800;font-size:15px}
+.ppu-saldo.neg{color:var(--danger-fg)}.ppu-saldo.zero{color:var(--warn-fg)}
+.ppu-bar{position:relative;height:22px;min-width:170px;border-radius:6px;background:var(--s2);overflow:hidden}
+.ppu-bar i{position:absolute;inset:0 auto 0 0}
+.ppu-bar span{position:relative;display:flex;justify-content:space-between;align-items:center;gap:8px;height:100%;padding:0 8px;font-size:11px;font-weight:700;font-variant-numeric:tabular-nums}
+.ppu-bar.ok i{background:#BBF7D0}.ppu-bar.ok span{color:#14532D}
+.ppu-bar.at i{background:#FDE68A}.ppu-bar.at span{color:#78350F}
+.ppu-bar.esg i{background:#FDBA74}.ppu-bar.esg span{color:#7C2D12}
+.ppu-bar.est i{background:#FCA5A5}.ppu-bar.est span{color:#7F1D1D}
+body.dark .ppu-bar.ok i{background:rgba(34,197,94,.35)}body.dark .ppu-bar.ok span{color:#D1FAE5}
+body.dark .ppu-bar.at i{background:rgba(245,158,11,.38)}body.dark .ppu-bar.at span{color:#FEF3C7}
+body.dark .ppu-bar.esg i{background:rgba(249,115,22,.42)}body.dark .ppu-bar.esg span{color:#FFEDD5}
+body.dark .ppu-bar.est i{background:rgba(239,68,68,.48)}body.dark .ppu-bar.est span{color:#FEE2E2}
+.ppu-qtd{font-size:12.5px;font-weight:500;color:var(--txt);margin-top:5px;font-variant-numeric:tabular-nums}
+.ppu-qtd b{font-weight:800}
+#ppuTbl tfoot td{font-weight:800;background:var(--s2);border-top:2px solid var(--bdr)}
 /* Aba Validações */
 .val-aviso{display:inline-block;margin-left:6px;font-size:10px;font-weight:700;padding:1px 6px;border-radius:6px;background:var(--warn-bg,#FEF3C7);color:var(--warn-fg,#92400E)}
 .val-acoes{display:flex;gap:6px;white-space:nowrap}
@@ -1414,6 +1436,8 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
   <symbol id="i-chart" viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></symbol>
   <symbol id="i-alarm" viewBox="0 0 24 24"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2 2"/><path d="M5 3 2 6"/><path d="m22 6-3-3"/><path d="M6.38 18.7 4 21"/><path d="M17.64 18.67 20 21"/></symbol>
   <symbol id="i-circle-dollar" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"/><path d="M12 18V6"/></symbol>
+  <symbol id="i-hash" viewBox="0 0 24 24"><line x1="4" x2="20" y1="9" y2="9"/><line x1="4" x2="20" y1="15" y2="15"/><line x1="10" x2="8" y1="3" y2="21"/><line x1="16" x2="14" y1="3" y2="21"/></symbol>
+  <symbol id="i-clipboard-list" viewBox="0 0 24 24"><rect width="8" height="4" x="8" y="2" rx="1" ry="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M12 11h4"/><path d="M12 16h4"/><path d="M8 11h.01"/><path d="M8 16h.01"/></symbol>
   <symbol id="i-receipt" viewBox="0 0 24 24"><path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1Z"/><path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"/><path d="M12 17.5v-11"/></symbol>
   <symbol id="i-ban" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="m4.9 4.9 14.2 14.2"/></symbol>
   <symbol id="i-trash" viewBox="0 0 24 24"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><path d="M10 11v6"/><path d="M14 11v6"/></symbol>
@@ -1473,6 +1497,7 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
         <div class="si" role="menuitem" tabindex="0" aria-label="KPIs e Indicadores" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();nav('kpis')}" onclick="nav('kpis')"><span class="si-ic" style="--ic:#F472B6"><svg class="ic"><use href="#i-chart"/></svg></span><span>KPIs &amp; Indicadores</span></div>
         <div class="si" role="menuitem" tabindex="0" aria-label="Relatório de Atrasos" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();nav('atrasos')}" onclick="nav('atrasos')"><span class="si-ic" style="--ic:#F87171"><svg class="ic"><use href="#i-alarm"/></svg></span><span>Atrasos</span><span class="si-badge" id="badgeAtrasos" style="display:none"></span></div>
         <div class="si" role="menuitem" tabindex="0" aria-label="Medição" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();nav('medicao')}" onclick="nav('medicao')"><span class="si-ic" style="--ic:#4ADE80"><svg class="ic"><use href="#i-receipt"/></svg></span><span>Medição</span><span class="si-badge" id="badgeMedicao" style="display:none"></span></div>
+        <div class="si" id="siPPU" style="display:none" role="menuitem" tabindex="0" aria-label="PPU" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();nav('ppu')}" onclick="nav('ppu')"><span class="si-ic" style="--ic:#FB923C"><svg class="ic"><use href="#i-clipboard-list"/></svg></span><span>PPU</span></div>
         <div class="si" role="menuitem" tabindex="0" aria-label="Produtos Cancelados" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();nav('cancelados')}" onclick="nav('cancelados')"><span class="si-ic" style="--ic:#FB923C"><svg class="ic"><use href="#i-ban"/></svg></span><span>Cancelados</span></div>
         <div class="si" role="menuitem" tabindex="0" aria-label="Histórico de Produtos Deletados" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();nav('lixeira')}" onclick="nav('lixeira')"><span class="si-ic" style="--ic:#94A3B8"><svg class="ic"><use href="#i-trash"/></svg></span><span>Deletados</span></div>
       </div>
@@ -2129,6 +2154,12 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
     </div>
 
     <!-- MEDIÇÃO -->
+    <!-- PPU (só liderança): saldo de cada linha do contrato -->
+    <div class="view" id="view-ppu">
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:10px;margin-bottom:18px" id="ppuResumo"></div>
+      <div class="tw"><table id="ppuTbl"></table></div>
+    </div>
+
     <div class="view" id="view-medicao">
       <div id="medicaoStats" style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:22px"></div>
       <!-- Filtros -->
@@ -3105,9 +3136,9 @@ function icMedicao(){ return '<svg class="ic ic-inl" aria-hidden="true"><use hre
 function nomeCompleto(p){ const pr = projDoCard(p); return pr ? pr.nome + ' — ' + p.nome : p.nome; }
 
 // ── NAV ──
-const PT={kanban:'Cards',cadprojetos:'Projetos',homologacoes:'Homologações',projetos:'Lista de Produtos',validacoes:'Validações',timeline:'Cronograma',kpis:'KPIs & Indicadores',atrasos:'Relatório de Atrasos',cancelados:'Produtos Cancelados',medicao:'Medição',carga:'Carga da Equipe',historico:'Histórico de Edições',lixeira:'Produtos Deletados'};
+const PT={kanban:'Cards',cadprojetos:'Projetos',homologacoes:'Homologações',projetos:'Lista de Produtos',validacoes:'Validações',ppu:'PPU',timeline:'Cronograma',kpis:'KPIs & Indicadores',atrasos:'Relatório de Atrasos',cancelados:'Produtos Cancelados',medicao:'Medição',carga:'Carga da Equipe',historico:'Histórico de Edições',lixeira:'Produtos Deletados'};
 function nav(id){
-  if(id==='validacoes' && !ehLideranca()) id='kanban';  // aba exclusiva da liderança
+  if((id==='validacoes'||id==='ppu') && !ehLideranca()) id='kanban';  // abas exclusivas da liderança
   document.querySelectorAll('.view').forEach(v=>v.classList.remove('on'));
   document.getElementById('view-'+id).classList.add('on');
   document.querySelectorAll('.si').forEach(n=>n.classList.remove('on'));
@@ -5816,13 +5847,15 @@ function _atualizarMenuLideranca(){
   const lider = ehLideranca();
   const si = document.getElementById('siValidacoes');
   if(si) si.style.display = lider ? '' : 'none';
+  const siP = document.getElementById('siPPU');
+  if(siP) siP.style.display = lider ? '' : 'none';
   const b = document.getElementById('badgeValidacoes');
   if(b){
     const n = lider ? _solicitacoesPrazo('pendente').length : 0;
     b.style.display = n > 0 ? 'inline-flex' : 'none';
     b.textContent = n || '';
   }
-  if(!lider && currentViewId() === 'validacoes') nav('kanban');
+  if(!lider && ['validacoes','ppu'].includes(currentViewId())) nav('kanban');
 }
 
 function rValidacoes(){
@@ -9114,6 +9147,76 @@ function enviarMedicao(id){ abrirModalMedicao(id, false); }
 function editarItensMedicao(id){ abrirModalMedicao(id, true); }
 
 // Quantidade já usada de uma linha do contrato em outros projetos enviados para medição
+// ══════════════════════════════════════════════
+//  PPU — saldo de cada linha do contrato (só liderança)
+// ══════════════════════════════════════════════
+const _PPU_COLS = [
+  {k:'linha', t:'Linha',               v:x=>x.linha},
+  {k:'desc',  t:'Serviço',             v:x=>x.desc, txt:true},
+  {k:'saldo', t:'<svg class="ic ic-inl" aria-hidden="true"><use href="#i-hash"/></svg> Saldo', v:x=>x.saldo, n:true},
+  {k:'pct',   t:'Situação do consumo', v:x=>x.pct},
+  {k:'preco', t:'Preço Unitário',      v:x=>x.preco, n:true},
+  {k:'parc',  t:'Preço Parcial',       v:x=>x.parc, n:true},
+  {k:'fat',   t:'Valor Medido',        v:x=>x.fat, n:true},
+  {k:'sfat',  t:'<svg class="ic ic-inl" aria-hidden="true"><use href="#i-circle-dollar"/></svg> Saldo', v:x=>x.sfat, n:true},
+];
+let _ppuOrd = {k:'saldo', dir:1};  // ao abrir: do menor saldo para o maior
+
+function ordenarPPU(k){
+  const c = _PPU_COLS.find(c=>c.k===k);
+  _ppuOrd = _ppuOrd.k===k ? {k, dir:-_ppuOrd.dir} : {k, dir:c.txt?1:-1};
+  rPPU();
+}
+
+// Nome e cor da barra conforme o consumo aumenta
+function _ppuEstado(x){
+  if(x.usado > x.qtdContrato) return ['Estourado','est'];
+  if(x.usado === x.qtdContrato) return ['Esgotado','esg'];
+  return x.pct >= 75 ? ['Atenção','at'] : ['Disponível','ok'];
+}
+
+function rPPU(){
+  if(!ehLideranca()) return;
+  // "Usado" segue a Medição: produtos enviados + confirmados, sem os cancelados
+  const linhas = SERVICOS_CONTRATO.map(s => {
+    const usado = _qtdUsadaContrato(s.linha);
+    const saldo = s.qtdContrato - usado;
+    return {...s, usado, saldo, pct:usado/s.qtdContrato*100, parc:s.qtdContrato*s.preco, fat:usado*s.preco, sfat:saldo*s.preco};
+  });
+  const c = _PPU_COLS.find(c=>c.k===_ppuOrd.k);
+  const ord = [...linhas].sort((a,b) =>
+    (c.txt ? c.v(a).localeCompare(c.v(b),'pt-BR') : c.v(a)-c.v(b))*_ppuOrd.dir || a.linha-b.linha);
+  const totFat = linhas.reduce((a,x)=>a+x.fat,0), totSaldo = linhas.reduce((a,x)=>a+x.sfat,0);
+  const nEst = linhas.filter(x=>_ppuEstado(x)[1]==='est').length;
+  const nEsg = linhas.filter(x=>_ppuEstado(x)[1]==='esg').length;
+  const nAt  = linhas.filter(x=>_ppuEstado(x)[1]==='at').length;
+
+  document.getElementById('ppuResumo').innerHTML = `
+    <div class="sc cb"><div class="sc-l">Saldo</div><div class="sc-v" style="font-size:20px">${fmtBRL(totSaldo)}</div><div class="sc-s">preço unitário × quanto falta vender</div><div class="sc-i"><svg class="ic"><use href="#i-circle-dollar"/></svg></div></div>
+    <div class="sc cr"><div class="sc-l">Estouradas</div><div class="sc-v">${nEst}</div><div class="sc-s">usado passou do contratado</div><div class="sc-i"><svg class="ic"><use href="#i-triangle-alert"/></svg></div></div>
+    <div class="sc cy"><div class="sc-l">Esgotadas</div><div class="sc-v">${nEsg}</div><div class="sc-s">saldo zero</div><div class="sc-i"><svg class="ic"><use href="#i-ban"/></svg></div></div>
+    <div class="sc cp"><div class="sc-l">Em atenção</div><div class="sc-v">${nAt}</div><div class="sc-s">75% ou mais consumido</div><div class="sc-i"><svg class="ic"><use href="#i-hourglass"/></svg></div></div>`;
+
+  const nf = n => Number(n).toLocaleString('pt-BR');
+  document.getElementById('ppuTbl').innerHTML = '<thead><tr>' + _PPU_COLS.map(h => {
+    const on = h.k===_ppuOrd.k;
+    return `<th${h.n?' class="ppu-n"':''} aria-sort="${on?(_ppuOrd.dir===1?'ascending':'descending'):'none'}"><button type="button" class="ppu-th${on?' on':''}" onclick="ordenarPPU('${h.k}')">${h.t}<span aria-hidden="true">${on?(_ppuOrd.dir===1?'▲':'▼'):'↕'}</span></button></th>`;
+  }).join('') + '</tr></thead><tbody>' + ord.map(x => {
+    const [nome, cls] = _ppuEstado(x);
+    const pct = Math.floor(x.pct);
+    return `<tr>
+      <td>${x.linha}</td>
+      <td>${esc(x.desc)}</td>
+      <td class="ppu-n"><span class="ppu-saldo${x.saldo<0?' neg':x.saldo===0?' zero':''}">${nf(x.saldo)}</span> <small style="color:var(--mu)">${x.un}</small></td>
+      <td><div class="ppu-bar ${cls}" role="img" aria-label="${nome}, ${pct}% consumido"><i style="width:${Math.min(x.pct,100)}%"></i><span><b>${nome}</b><b>${pct}%</b></span></div><div class="ppu-qtd"><b>${nf(x.usado)}</b> de <b>${nf(x.qtdContrato)}</b> ${x.un}</div></td>
+      <td class="ppu-n">${fmtBRL(x.preco)}</td>
+      <td class="ppu-n">${fmtBRL(x.parc)}</td>
+      <td class="ppu-n">${fmtBRL(x.fat)}</td>
+      <td class="ppu-n">${fmtBRL(x.sfat)}</td>
+    </tr>`;
+  }).join('') + `</tbody><tfoot><tr><td colspan="6" class="ppu-n">Totais</td><td class="ppu-n">${fmtBRL(totFat)}</td><td class="ppu-n">${fmtBRL(totSaldo)}</td></tr></tfoot>`;
+}
+
 function _qtdUsadaContrato(linha, exceto){
   return DB.reduce((s,p)=>{
     if(p.id===exceto || !p.enviadoMedicao || p.cancelado) return s;
@@ -10578,6 +10681,7 @@ const VIEW_RENDERERS = {
   kanban:        () => { rDash(); rKanban(); },
   projetos:      () => rList(),
   validacoes:    () => rValidacoes(),
+  ppu:           () => rPPU(),
   timeline:      () => rTimeline(),
   kpis:          () => rKPIs(),
   atrasos:       () => rAtrasos(),
