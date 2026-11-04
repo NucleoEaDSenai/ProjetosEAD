@@ -4870,38 +4870,17 @@ function openDet(id){
         </select>
         ${_etapaRespExtrasHtml(p, e, i)}
       </td>
-      <td>
-        <input type="date" class="ii" value="${e.dataInicial||''}" onchange="setEIni(${id},${i},this.value)"
-          aria-label="Data inicial de ${esc(e.lb)}" style="padding:3px 5px;font-size:11px;width:122px">
-      </td>
-      <td>
-        <div style="display:flex;gap:3px;align-items:center">
-          ${ETAPAS_SEM_PRAZO_AUTO.has(e.lb)
-            ? '<i style="color:#CBD5E1;font-size:11px">sem data definida</i>'
-            : `<span id="ep_prazo_txt_${id}_${i}" style="font-size:11.5px;color:${e.prazo?'var(--txt)':'#94A3B8'};font-style:${e.prazo?'normal':'italic'}">${e.prazo?fd(e.prazo):'a definir'}</span>`
-          }
-          <div id="ep_prazo_inp_${id}_${i}" style="display:none;gap:3px;align-items:center">
-            <input class="ii" type="number" id="ep_d_${id}_${i}" placeholder="DD" min="1" max="31"
-              value="${e.prazo?parseInt(e.prazo.split('-')[2]):''}"
-              style="width:44px;padding:4px 5px;font-size:11px"
-              onkeydown="if(event.key==='Enter')setEPdma(${id},${i})">
-            <input class="ii" type="number" id="ep_m_${id}_${i}" placeholder="MM" min="1" max="12"
-              value="${e.prazo?parseInt(e.prazo.split('-')[1]):''}"
-              style="width:44px;padding:4px 5px;font-size:11px"
-              onkeydown="if(event.key==='Enter')setEPdma(${id},${i})">
-            <input class="ii" type="number" id="ep_a_${id}_${i}" placeholder="AAAA" min="2020" max="2099"
-              value="${e.prazo?parseInt(e.prazo.split('-')[0]):''}"
-              style="width:58px;padding:4px 5px;font-size:11px"
-              onkeydown="if(event.key==='Enter')setEPdma(${id},${i})">
-            <button type="button" class="mcal-btn sm" title="Abrir calendário" onclick="_abrirMcalTriplet('ep_${id}_${i}')">📅</button>
-            <button type="button" onclick="setEPdma(${id},${i})"
-              style="padding:3px 7px;font-size:11px;background:var(--blue);color:#fff;border:none;border-radius:5px;cursor:pointer">✓</button>
-          </div>
-        </div>
+      <!-- Datas só para visualizar: a edição fica em Editar → Equipe & Etapas -->
+      <td style="white-space:nowrap;font-size:11.5px;color:${e.dataInicial?'var(--txt)':'#94A3B8'}">${e.dataInicial?fd(e.dataInicial):'—'}</td>
+      <td style="white-space:nowrap">
+        ${ETAPAS_SEM_PRAZO_AUTO.has(e.lb)
+          ? '<i style="color:#CBD5E1;font-size:11px">sem data definida</i>'
+          : `<span style="font-size:11.5px;color:${e.prazo?'var(--txt)':'#94A3B8'};font-style:${e.prazo?'normal':'italic'}">${e.prazo?fd(e.prazo):'a definir'}</span>`
+        }
       </td>
       <td style="text-align:center">
         <input type="number" class="ii" min="1" step="1" value="${_duracaoEtapaDU(e)||''}" placeholder="—"
-          onchange="setEDur(${id},${i},this.value)" ${e.dataInicial?'':'disabled title="Informe a data inicial primeiro"'}
+          onchange="setEDur(${id},${i},this.value)" ${e.dataInicial?'':'disabled title="Defina a data inicial em Editar → Equipe & Etapas"'}
           aria-label="Duração em dias úteis de ${esc(e.lb)}" style="padding:3px 5px;font-size:11px;width:58px;text-align:center">
       </td>
       <td style="white-space:nowrap;color:var(--green)">${fd(e.fim)||'—'}</td>
@@ -5977,17 +5956,6 @@ function setEP(pid,idx,v){
   fbSalvarProjeto(p);
   renderAll(); openDet(pid);
 }
-function _editarPrazoEtapa(pid, idx, btn){
-  const wrap = document.getElementById(`ep_prazo_inp_${pid}_${idx}`);
-  const txt  = document.getElementById(`ep_prazo_txt_${pid}_${idx}`);
-  if(!wrap) return;
-  const aberto = wrap.style.display !== 'none';
-  wrap.style.display = aberto ? 'none' : 'flex';
-  if(txt) txt.style.display = aberto ? '' : 'none';
-  btn.textContent = aberto ? '✏️' : '✕';
-  if(!aberto) document.getElementById(`ep_d_${pid}_${idx}`)?.focus();
-}
-
 // ── DATA INICIAL E DURAÇÃO (DIAS ÚTEIS) DA ETAPA ──
 // Duração conta a data inicial e o prazo (ex.: começa e termina no mesmo dia útil = 1).
 function _primeiroDiaUtil(iso){
@@ -5999,17 +5967,6 @@ function _duracaoEtapaDU(e){
   if(!e?.dataInicial || !e?.prazo || e.prazo < e.dataInicial) return null;
   const ini = new Date(e.dataInicial+'T12:00:00');
   return (isDiaUtil(ini)?1:0) + diasUteisTotais(e.dataInicial, e.prazo);
-}
-function setEIni(pid,idx,v){
-  const p=DB.find(x=>x.id===pid); if(!p||!p.etapas[idx]) return;
-  const e=p.etapas[idx], ant=e.dataInicial||null;
-  const durAnt=_duracaoEtapaDU(e);
-  e.dataInicial = v||null;
-  if(ant !== e.dataInicial)
-    registrarHistorico(p, 'alterou data inicial', `"${e.lb}": "${fd(ant)||'—'}" → "${fd(e.dataInicial)||'—'}"`);
-  // Já havia duração: mantém a duração e recalcula o prazo a partir da nova data inicial
-  if(e.dataInicial && durAnt){ setEP(pid, idx, addDiasUteis(_primeiroDiaUtil(e.dataInicial), durAnt-1)); return; }
-  fbSalvarProjeto(p); renderAll(); openDet(pid);
 }
 function setEDur(pid,idx,v){
   const p=DB.find(x=>x.id===pid); if(!p||!p.etapas[idx]) return;
@@ -6811,6 +6768,7 @@ function _renderEF(){
         <th style="width:28px">#</th>
         <th>Etapa</th>
         <th style="width:110px">Responsável</th>
+        <th style="width:135px">Data Inicial</th>
         <th style="width:185px">Data Final</th>
         <th style="width:72px;text-align:center">Ações</th>
       </tr></thead>
@@ -6829,6 +6787,10 @@ function _renderEF(){
             <select class="iis" id="er${i}" style="width:100%">
               ${_efRespOpts(e.r)}
             </select>
+          </td>
+          <td>
+            <input class="fi ii" type="date" id="ef_ini_${i}" value="${e.dataInicial||''}" onchange="_efEtapas[${i}].dataInicial=this.value||null"
+              aria-label="Data inicial de ${esc(e.lb||'')}" style="width:100%;padding:5px 4px;font-size:11.5px">
           </td>
           <td>
             <div style="display:flex;gap:3px">
@@ -6865,7 +6827,7 @@ function _renderEF(){
           </td>
         </tr>`).join('')}
         <tr class="et-add-row">
-          <td colspan="6">
+          <td colspan="7">
             <button type="button" onclick="_efAdd()"
               style="background:none;border:none;color:var(--blue);font-size:12px;font-family:'Plus Jakarta Sans',sans-serif;font-weight:600;cursor:pointer;padding:2px 4px;display:flex;align-items:center;gap:5px">
               ＋ Adicionar etapa
@@ -6977,11 +6939,13 @@ function _efSync(){
     const novoPrazo = camposExistem
       ? (dma2iso(dEl.value, mEl.value, aEl.value) || null)
       : e.prazo || null;
+    const iniEl = document.getElementById('ef_ini_'+i);
     return {
       ...e,
       lb: document.getElementById('ef_lb_'+i)?.value.trim() || e.lb,
       r:  document.getElementById('er'+i)?.value || e.r,
       prazo: novoPrazo,
+      dataInicial: iniEl ? (iniEl.value || null) : (e.dataInicial || null),
       _prazoAntes: e._prazoAntes !== undefined ? e._prazoAntes : novoPrazo,
     };
   });
@@ -7585,6 +7549,8 @@ function salvar(){
       if(!ea) return;
       if((ea.prazo||'') !== (en.prazo||'') && !ETAPAS_SEM_PRAZO_AUTO.has(en.lb))
         diffs.push(`Prazo "${en.lb}": "${fd(ea.prazo)||'—'}" → "${fd(en.prazo)||'—'}"`);
+      if((ea.dataInicial||'') !== (en.dataInicial||''))
+        diffs.push(`Data inicial "${en.lb}": "${fd(ea.dataInicial)||'—'}" → "${fd(en.dataInicial)||'—'}"`);
       if((ea.r||'') !== (en.r||''))
         diffs.push(`Resp. "${en.lb}": "${ea.r==='cl'?'Cliente':ea.r==='eq'?'Equipe':ea.r}" → "${en.r==='cl'?'Cliente':en.r==='eq'?'Equipe':en.r}"`);
     });
