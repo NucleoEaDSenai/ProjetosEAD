@@ -610,6 +610,24 @@ tr.canc-row td{opacity:.55}
 .ms-search-wrap{position:sticky;top:0;background:#fff;padding:2px 10px 6px;margin-bottom:2px;border-bottom:1px solid var(--bdr)}
 .ms-search-input{width:100%;box-sizing:border-box;border:1px solid var(--bdr);border-radius:6px;padding:5px 8px;font-size:12px;font-family:'Plus Jakarta Sans',sans-serif;color:var(--txt);outline:none}
 .ms-search-input:focus{border-color:var(--blue)}
+/* KPIs → aba Relatórios (exportações) */
+.rel-aviso{display:flex;gap:9px;align-items:flex-start;background:var(--s2);border:1px solid var(--bdr);border-radius:9px;padding:10px 12px;font-size:12.5px;line-height:1.45;margin-bottom:18px}
+.rel-aviso .ic{color:var(--blue);margin-top:1px;flex-shrink:0}
+.rel-grp{margin-bottom:18px}
+.rel-grp-t{font-family:'Plus Jakarta Sans',sans-serif;font-size:10.5px;font-weight:800;text-transform:uppercase;letter-spacing:.07em;color:var(--mu);margin-bottom:9px}
+.rel-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:10px}
+.rel-card{background:var(--surface);border:1px solid var(--bdr);border-radius:10px;padding:14px;display:flex;flex-direction:column;gap:12px;min-width:0}
+.rel-card.rel-bkp{background:var(--s2);border-style:dashed}
+.rel-top{display:flex;gap:11px;align-items:flex-start}
+.rel-top h3{margin:0 0 3px;font-family:'Plus Jakarta Sans',sans-serif;font-size:13.5px;font-weight:800;color:var(--txt)}
+.rel-top p{margin:0;font-size:12px;color:var(--mu);line-height:1.45}
+.rel-ic{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.rel-ic .ic{width:18px;height:18px}
+.rel-xlsx{background:#DCFCE7;color:#15803D}.rel-dash{background:#E0E7FF;color:#3730A3}.rel-hom{background:#ECFCCB;color:#3F6212}.rel-med{background:#FFEDD5;color:#9A3412}.rel-ic-bkp{background:var(--surface);color:var(--mu)}
+body.dark .rel-xlsx{background:var(--ok-bg);color:var(--ok-fg)}body.dark .rel-dash{background:var(--info-bg);color:var(--info-fg)}body.dark .rel-hom{background:var(--ok-bg);color:var(--ok-fg)}body.dark .rel-med{background:var(--orange-bg);color:var(--orange-fg)}
+.rel-acao{margin-top:auto;display:flex;align-items:center;justify-content:space-between;gap:8px}
+.rel-fmt{font-size:10px;font-weight:800;letter-spacing:.06em;color:var(--mu);border:1px solid var(--bdr);border-radius:5px;padding:1px 6px}
+.rel-lider{display:inline-flex;align-items:center;gap:4px;font-size:10.5px;font-weight:700;color:var(--mu)}
 /* Lupa (Lucide) dentro da caixa de busca dos filtros */
 .ms-search-wrap .ms-search-input{padding-left:27px}
 .ms-search-ic{position:absolute;left:18px;top:calc(50% - 2px);transform:translateY(-50%);width:13px;height:13px;color:var(--mu);pointer-events:none}
@@ -1152,8 +1170,6 @@ body.dark .bdg.b-conc{background:var(--ok-bg);color:var(--ok-fg)}
 body.dark .bdg.b-ag{background:var(--info-bg);color:var(--info-fg)}
 body.dark .bd:hover{background:rgba(239,68,68,.25)}
 /* Estilos escritos direto no HTML/JS (style="...") com cor clara fixa: no escuro, trocados pelos tokens */
-body.dark #exportMenu,body.dark #exportMenu>div{background:var(--s3)!important}
-body.dark #exportMenu>div:hover{background:var(--s2)!important}
 body.dark [style*="background:#fff;" i],body.dark [style$="background:#fff" i]{background:var(--s3)!important}
 body.dark [style*="background:#FFFBEB" i],body.dark [style*="background:#FEF9C3" i],body.dark [style*="background:#FEF3C7" i]{background:var(--warn-bg)!important}
 body.dark [style*="background:#EFF6FF" i]{background:var(--info-bg)!important}
@@ -1465,6 +1481,11 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
   <symbol id="i-pencil" viewBox="0 0 24 24"><path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"/><path d="m15 5 4 4"/></symbol>
   <symbol id="i-calendar-plus" viewBox="0 0 24 24"><path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/><path d="M10 16h4"/><path d="M12 14v4"/></symbol>
   <symbol id="i-calendar-clock" viewBox="0 0 24 24"><path d="M21 7.5V6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h3.5"/><path d="M16 2v4"/><path d="M8 2v4"/><path d="M3 10h5"/><path d="M17.5 17.5 16 16.3V14"/><circle cx="16" cy="16" r="6"/></symbol>
+  <symbol id="i-file-text" viewBox="0 0 24 24"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/></symbol>
+  <symbol id="i-file-sheet" viewBox="0 0 24 24"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M8 13h2"/><path d="M14 13h2"/><path d="M8 17h2"/><path d="M14 17h2"/></symbol>
+  <symbol id="i-download" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></symbol>
+  <symbol id="i-database" viewBox="0 0 24 24"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5V19A9 3 0 0 0 21 19V5"/><path d="M3 12A9 3 0 0 0 21 12"/></symbol>
+  <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></symbol>
   <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></symbol>
   <symbol id="i-lock" viewBox="0 0 24 24"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></symbol>
   <symbol id="i-bookmark" viewBox="0 0 24 24"><path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"/></symbol>
@@ -1612,23 +1633,6 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
         <span class="search-icon">🔍</span>
         <input id="searchInp" placeholder="Buscar projeto..." oninput="buscarGlobalDeb(this.value)" autocomplete="off">
         <div class="search-drop" id="searchDrop"></div>
-      </div>
-      <div style="position:relative;display:inline-block" id="exportMenuWrap">
-        <button class="btn bg2 bsm" onclick="toggleExportMenu()" aria-label="Exportar dados" aria-haspopup="true" aria-expanded="false" id="btnExport">⬇️ Exportar ▾</button>
-        <div id="exportMenu" style="display:none;position:absolute;right:0;top:calc(100% + 6px);background:#fff;border:1px solid var(--bdr);border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.12);z-index:999;min-width:210px;overflow:hidden">
-          <div onclick="exportXLSX();toggleExportMenu()" style="padding:11px 16px;cursor:pointer;font-size:13px;display:flex;align-items:center;gap:9px;transition:background .15s" onmouseover="this.style.background='var(--s2)'" onmouseout="this.style.background=''">📊 <span><strong>Exportar XLSX</strong><br><small style="color:var(--mu)">Projetos, Etapas, Atrasos, Homologações e Medição</small></span></div>
-          <div style="border-top:1px solid var(--bdr);margin:0"></div>
-          <div onclick="exportPDFLista();toggleExportMenu()" style="padding:11px 16px;cursor:pointer;font-size:13px;display:flex;align-items:center;gap:9px;transition:background .15s" onmouseover="this.style.background='var(--s2)'" onmouseout="this.style.background=''">📊 <span><strong>PDF — Dashboard Executivo</strong><br><small style="color:var(--mu)">KPIs visuais</small></span></div>
-          <div style="border-top:1px solid var(--bdr);margin:0"></div>
-          <div onclick="exportPDFHomologacoes();toggleExportMenu()" style="padding:11px 16px;cursor:pointer;font-size:13px;display:flex;align-items:center;gap:9px;transition:background .15s" onmouseover="this.style.background='var(--s2)'" onmouseout="this.style.background=''">🔖 <span><strong>PDF — Relatório de Homologações</strong><br><small style="color:var(--mu)">Todos os dados das Homologações</small></span></div>
-          <div style="border-top:1px solid var(--bdr);margin:0"></div>
-          <div onclick="exportPDFRelMedicao();toggleExportMenu()" style="padding:11px 16px;cursor:pointer;font-size:13px;display:flex;align-items:center;gap:9px;transition:background .15s" onmouseover="this.style.background='var(--s2)'" onmouseout="this.style.background=''"><svg class="ic ic-inl" aria-hidden="true"><use href="#i-circle-dollar"/></svg> <span><strong>PDF — Relatório de Medições</strong><br><small style="color:var(--mu)">Cursos medidos por quinzena, com gráfico</small></span></div>
-          <div style="border-top:1px solid var(--bdr);margin:0"></div>
-          <div onclick="exportBackupJSON();toggleExportMenu()" style="padding:11px 16px;cursor:pointer;font-size:13px;display:flex;align-items:center;gap:9px;transition:background .15s;background:#FFFBEB" onmouseover="this.style.background='#FEF3C7'" onmouseout="this.style.background='#FFFBEB'">💾 <span><strong>Backup Completo (JSON)</strong><br><small style="color:var(--mu)">Todos os projetos, etapas e configurações</small></span></div>
-          <div style="border-top:1px solid var(--bdr);margin:0"></div>
-          <div onclick="importBackupJSON();toggleExportMenu()" style="padding:11px 16px;cursor:pointer;font-size:13px;display:flex;align-items:center;gap:9px;transition:background .15s;background:#EFF6FF" onmouseover="this.style.background='#DBEAFE'" onmouseout="this.style.background='#EFF6FF'">📥 <span><strong>Restaurar Backup</strong><br><small style="color:var(--mu)">Importar arquivo .json</small></span></div>
-          <div style="border-top:1px solid var(--bdr);margin:0"></div>
-        </div>
       </div>
       <div style="position:relative" id="notifWrap">
         <div class="notif-bell" id="notifBell" onclick="toggleNotifPanel()" title="Notificações">
@@ -1914,6 +1918,51 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
         <button class="kpi-tab"        data-tab="equipe"   onclick="setKpiTab('equipe',this)">👥 Responsáveis &amp; Categorias</button>
         <button class="kpi-tab"        data-tab="pipeline" onclick="setKpiTab('pipeline',this)">🔄 Fluxo &amp; Entregas</button>
         <button class="kpi-tab"        data-tab="tempos"   onclick="setKpiTab('tempos',this)">⏱️ Tempos &amp; Eficiência</button>
+        <button class="kpi-tab"        data-tab="relatorios" onclick="setKpiTab('relatorios',this)"><svg class="ic ic-inl" aria-hidden="true"><use href="#i-file-text"/></svg> Relatórios</button>
+      </div>
+
+      <!-- TAB: RELATÓRIOS (substitui o antigo botão Exportar do topo) -->
+      <div class="kpi-tab-content" id="kpiTab-relatorios">
+        <div class="rel-aviso"><svg class="ic" aria-hidden="true"><use href="#i-info"/></svg><span>Os arquivos incluem <strong>todos os produtos</strong>, independentemente do período selecionado acima.</span></div>
+
+        <div class="rel-grp">
+          <div class="rel-grp-t">Planilhas</div>
+          <div class="rel-cards">
+            <div class="rel-card">
+              <div class="rel-top"><div class="rel-ic rel-xlsx"><svg class="ic" aria-hidden="true"><use href="#i-file-sheet"/></svg></div><div><h3>Exportar XLSX</h3><p>Projetos, Etapas, Atrasos, Homologações e Medição, uma aba para cada.</p></div></div>
+              <div class="rel-acao"><span class="rel-fmt">XLSX</span><button class="btn bb bsm" type="button" onclick="exportXLSX()"><svg class="ic ic-inl" aria-hidden="true"><use href="#i-download"/></svg> Baixar</button></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="rel-grp">
+          <div class="rel-grp-t">Relatórios em PDF</div>
+          <div class="rel-cards">
+            <div class="rel-card">
+              <div class="rel-top"><div class="rel-ic rel-dash"><svg class="ic" aria-hidden="true"><use href="#i-chart"/></svg></div><div><h3>Dashboard Executivo</h3><p>Os KPIs visuais da produção em uma página para apresentar.</p></div></div>
+              <div class="rel-acao"><span class="rel-fmt">PDF</span><button class="btn bb bsm" type="button" onclick="exportPDFLista()"><svg class="ic ic-inl" aria-hidden="true"><use href="#i-download"/></svg> Baixar</button></div>
+            </div>
+            <div class="rel-card">
+              <div class="rel-top"><div class="rel-ic rel-hom"><svg class="ic" aria-hidden="true"><use href="#i-badge-check"/></svg></div><div><h3>Relatório de Homologações</h3><p>Todos os dados preenchidos nas homologações.</p></div></div>
+              <div class="rel-acao"><span class="rel-fmt">PDF</span><button class="btn bb bsm" type="button" onclick="exportPDFHomologacoes()"><svg class="ic ic-inl" aria-hidden="true"><use href="#i-download"/></svg> Baixar</button></div>
+            </div>
+            <div class="rel-card">
+              <div class="rel-top"><div class="rel-ic rel-med"><svg class="ic" aria-hidden="true"><use href="#i-circle-dollar"/></svg></div><div><h3>Relatório de Medições</h3><p>Cursos medidos por quinzena, com gráfico.</p></div></div>
+              <div class="rel-acao"><span class="rel-fmt">PDF</span><button class="btn bb bsm" type="button" onclick="exportPDFRelMedicao()"><svg class="ic ic-inl" aria-hidden="true"><use href="#i-download"/></svg> Baixar</button></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Só liderança: mostrado por _atualizarMenuLideranca() -->
+        <div class="rel-grp" id="relGrpBackup" style="display:none">
+          <div class="rel-grp-t">Cópia de segurança</div>
+          <div class="rel-cards">
+            <div class="rel-card rel-bkp">
+              <div class="rel-top"><div class="rel-ic rel-ic-bkp"><svg class="ic" aria-hidden="true"><use href="#i-database"/></svg></div><div><h3>Backup Completo</h3><p>Todos os projetos, etapas e configurações em um arquivo. Serve para guardar uma cópia, não para relatório.</p></div></div>
+              <div class="rel-acao"><span class="rel-lider"><svg class="ic ic-inl" aria-hidden="true"><use href="#i-lock"/></svg> Só liderança</span><button class="btn bg2 bsm" type="button" onclick="exportBackupJSON()"><svg class="ic ic-inl" aria-hidden="true"><use href="#i-download"/></svg> Baixar JSON</button></div>
+            </div>
+          </div>
+        </div>
       </div>
 
       <!-- TAB 1: VISÃO GERAL -->
@@ -5842,6 +5891,8 @@ function _atualizarMenuLideranca(){
   const lider = ehLideranca();
   const si = document.getElementById('siValidacoes');
   if(si) si.style.display = lider ? '' : 'none';
+  const bkp = document.getElementById('relGrpBackup');  // backup JSON na aba Relatórios dos KPIs
+  if(bkp) bkp.style.display = lider ? '' : 'none';
   const siP = document.getElementById('siPPU');
   if(siP) siP.style.display = lider ? '' : 'none';
   const b = document.getElementById('badgeValidacoes');
@@ -7798,18 +7849,6 @@ function _esconderSbTip(){
   sb.querySelector('.sb-nav')?.addEventListener('scroll', _esconderSbTip);
 })();
 
-function toggleExportMenu(){
-  const m = document.getElementById('exportMenu');
-  const btn = document.getElementById('btnExport');
-  const open = m.style.display === 'block';
-  m.style.display = open ? 'none' : 'block';
-  btn.setAttribute('aria-expanded', String(!open));
-  if(!open){
-    const close = (e)=>{ if(!document.getElementById('exportMenuWrap').contains(e.target)){ m.style.display='none'; document.removeEventListener('click',close); } };
-    setTimeout(()=>document.addEventListener('click',close),0);
-  }
-}
-
 // Tenant switcher (seletor de cliente)
 function toggleTenantMenu(){
   const menu = document.getElementById('tenantMenu');
@@ -7844,8 +7883,9 @@ function sitLabel(p){
   return {andamento:'Em Andamento',concluido:'Concluído',aguardando:'Aguardando'}[s]||s;
 }
 
-// ── BACKUP / RESTORE JSON ─────────────────────────────────────────────────────
+// ── BACKUP JSON (só liderança) ────────────────────────────────────────────────
 function exportBackupJSON(){
+  if(!ehLideranca()){ showToast('🔒 Apenas a liderança pode gerar o backup completo'); return; }
   try {
     const payload = {
       versao: '1.1',
@@ -7875,122 +7915,6 @@ function exportBackupJSON(){
     console.error('Erro ao gerar backup:', err);
     showToast('❌ Erro ao gerar backup');
   }
-}
-
-function importBackupJSON(){
-  // Criar modal de confirmação primeiro
-  const modal = document.createElement('div');
-  modal.id = 'modalRestore';
-  modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;z-index:10000;animation:viewFadeIn .25s ease';
-  modal.innerHTML = `
-    <div style="background:#fff;border-radius:14px;max-width:520px;width:90%;box-shadow:0 20px 60px rgba(0,0,0,.3);overflow:hidden">
-      <div style="background:linear-gradient(135deg,#003DA5,#0050C8);padding:20px 24px;color:#fff">
-        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;opacity:.85;margin-bottom:4px">RESTAURAR BACKUP</div>
-        <div style="font-size:18px;font-weight:700">📥 Importar arquivo JSON</div>
-      </div>
-      <div style="padding:22px 24px">
-        <div style="background:#FEF3C7;border:1px solid #FDE68A;border-radius:8px;padding:12px 14px;margin-bottom:16px;display:flex;gap:10px;align-items:flex-start">
-          <span style="font-size:20px;flex-shrink:0">⚠️</span>
-          <div style="font-size:12.5px;color:#92400E;line-height:1.5">
-            <strong>Atenção:</strong> A restauração irá <strong>substituir TODOS os dados atuais</strong> pelo conteúdo do arquivo. Esta ação não pode ser desfeita.
-            <br><br>
-            Recomendamos <strong>fazer um backup completo antes</strong> de restaurar.
-          </div>
-        </div>
-        <label style="display:block;font-size:12px;font-weight:700;color:var(--mu);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">Selecione o arquivo .json</label>
-        <input type="file" id="restoreFile" accept="application/json,.json" style="width:100%;padding:10px;border:2px dashed var(--bdr);border-radius:8px;background:var(--s2);cursor:pointer;font-size:12.5px">
-        <div id="restorePreview" style="margin-top:14px;display:none;background:#EFF6FF;border:1px solid #BFDBFE;border-radius:8px;padding:12px 14px;font-size:12px;color:#1E40AF"></div>
-      </div>
-      <div style="padding:14px 24px;background:var(--s2);display:flex;gap:10px;justify-content:flex-end">
-        <button onclick="document.getElementById('modalRestore').remove()" class="btn bg2 bsm" style="font-size:13px">Cancelar</button>
-        <button onclick="exportBackupJSON()" class="btn bg2 bsm" style="font-size:13px">💾 Backup antes</button>
-        <button id="btnConfirmRestore" disabled onclick="confirmarRestore()" class="btn bsm" style="background:#dc2626;color:#fff;font-size:13px;opacity:.5">📥 Confirmar restauração</button>
-      </div>
-    </div>`;
-  document.body.appendChild(modal);
-
-  // Listener pra pré-visualizar quando arquivo for selecionado
-  document.getElementById('restoreFile').addEventListener('change', function(ev){
-    const file = ev.target.files[0];
-    if(!file){ return; }
-    const reader = new FileReader();
-    reader.onload = function(e){
-      try {
-        const data = JSON.parse(e.target.result);
-        const preview = document.getElementById('restorePreview');
-        const btn = document.getElementById('btnConfirmRestore');
-        // Validar formato — aceita 2 formatos: { DB: [...] } ou um array direto
-        let projetosArr = null;
-        if(Array.isArray(data)) projetosArr = data;
-        else if(Array.isArray(data.DB)) projetosArr = data.DB;
-        if(!projetosArr){
-          preview.style.display = 'block';
-          preview.style.background = 'var(--danger-bg)';
-          preview.style.color = 'var(--danger-fg)';
-          preview.style.borderColor = '#FECACA';
-          preview.innerHTML = '❌ <strong>Arquivo inválido.</strong> Esperado JSON com "DB" como array.';
-          btn.disabled = true; btn.style.opacity = '.5';
-          window._restoreBuffer = null;
-          return;
-        }
-        const ativos = projetosArr.filter(p => !p.cancelado).length;
-        const canc = projetosArr.length - ativos;
-        const data_gen = data.gerado_em ? new Date(data.gerado_em).toLocaleString('pt-BR') : '—';
-        preview.style.display = 'block';
-        preview.innerHTML = `
-          ✅ <strong>Arquivo válido.</strong><br>
-          • Total: <strong>${projetosArr.length}</strong> projeto${projetosArr.length!==1?'s':''}<br>
-          • Ativos: <strong>${ativos}</strong> · Cancelados: <strong>${canc}</strong><br>
-          • Gerado em: <strong>${data_gen}</strong>
-        `;
-        // Backup 1.1+ traz também os projetos cadastrados (o formato antigo continua aceito)
-        const cadArr = Array.isArray(data.cadprojetos) ? data.cadprojetos
-          : (data.cadprojetos && typeof data.cadprojetos === 'object' ? Object.values(data.cadprojetos) : []);
-        window._restoreCadProj = cadArr.filter(c => c && c.id && c.nome);
-        if(window._restoreCadProj.length)
-          preview.innerHTML += `• Projetos cadastrados: <strong>${window._restoreCadProj.length}</strong>`;
-        btn.disabled = false; btn.style.opacity = '1';
-        window._restoreBuffer = projetosArr;
-      } catch(err){
-        const preview = document.getElementById('restorePreview');
-        preview.style.display = 'block';
-        preview.style.background = 'var(--danger-bg)';
-        preview.style.color = 'var(--danger-fg)';
-        preview.style.borderColor = '#FECACA';
-        preview.innerHTML = '❌ <strong>Erro ao ler o arquivo:</strong> JSON inválido. ' + (err.message||'');
-        document.getElementById('btnConfirmRestore').disabled = true;
-        document.getElementById('btnConfirmRestore').style.opacity = '.5';
-        window._restoreBuffer = null;
-      }
-    };
-    reader.readAsText(file);
-  });
-}
-
-function confirmarRestore(){
-  if(!window._restoreBuffer){ showToast('⚠️ Nenhum arquivo válido carregado'); return; }
-  const arr = window._restoreBuffer;
-  // Substituir DB inteiramente
-  DB.length = 0;
-  arr.forEach(p => DB.push(p));
-  // Persistir no Firebase se disponível
-  if(typeof fbSalvarTudo === 'function'){
-    try { fbSalvarTudo(); } catch(e){ console.warn('Erro ao sincronizar com Firebase:', e); }
-  } else if(typeof fbSalvarProjeto === 'function'){
-    try { DB.forEach(p => fbSalvarProjeto(p)); } catch(e){ console.warn(e); }
-  }
-  // Projetos cadastrados do backup (se houver)
-  if(window._restoreCadProj && window._restoreCadProj.length && fbCadProjRef){
-    window._restoreCadProj.forEach(c => {
-      fbCadProjRef.child(c.id).set(JSON.parse(JSON.stringify(c, (k,v) => v === undefined ? null : v)))
-        .catch(e => { console.error(e); showToast('⚠️ Erro ao restaurar o projeto "' + c.nome + '": ' + e.message); });
-    });
-  }
-  window._restoreCadProj = null;
-  document.getElementById('modalRestore').remove();
-  window._restoreBuffer = null;
-  renderAll();
-  showToast(`✅ Restaurados ${arr.length} projeto${arr.length!==1?'s':''}!`);
 }
 
 // ── XLSX ──────────────────────────────────────────────────────────────────────
