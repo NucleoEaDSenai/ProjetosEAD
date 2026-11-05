@@ -610,6 +610,9 @@ tr.canc-row td{opacity:.55}
 .ms-search-wrap{position:sticky;top:0;background:#fff;padding:2px 10px 6px;margin-bottom:2px;border-bottom:1px solid var(--bdr)}
 .ms-search-input{width:100%;box-sizing:border-box;border:1px solid var(--bdr);border-radius:6px;padding:5px 8px;font-size:12px;font-family:'Plus Jakarta Sans',sans-serif;color:var(--txt);outline:none}
 .ms-search-input:focus{border-color:var(--blue)}
+/* Lupa (Lucide) dentro da caixa de busca dos filtros */
+.ms-search-wrap .ms-search-input{padding-left:27px}
+.ms-search-ic{position:absolute;left:18px;top:calc(50% - 2px);transform:translateY(-50%);width:13px;height:13px;color:var(--mu);pointer-events:none}
 .ms-opt.ms-opt-hidden{display:none}
 .ms-empty{padding:8px 12px;font-size:11.5px;color:var(--mu)}
 .fi-sm:focus{border-color:var(--blue);background:#fff}
@@ -1457,6 +1460,13 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
   <symbol id="i-building" viewBox="0 0 24 24"><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"/><path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2"/><path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2"/><path d="M10 6h4"/><path d="M10 10h4"/><path d="M10 14h4"/><path d="M10 18h4"/></symbol>
   <symbol id="i-calendar-x" viewBox="0 0 24 24"><path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/><path d="m14 14-4 4"/><path d="m10 14 4 4"/></symbol>
   <symbol id="i-calendar-check" viewBox="0 0 24 24"><path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/><path d="m9 16 2 2 4-4"/></symbol>
+  <symbol id="i-star" viewBox="0 0 24 24"><path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"/></symbol>
+  <symbol id="i-flag" viewBox="0 0 24 24"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" x2="4" y1="22" y2="15"/></symbol>
+  <symbol id="i-pencil" viewBox="0 0 24 24"><path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"/><path d="m15 5 4 4"/></symbol>
+  <symbol id="i-calendar-plus" viewBox="0 0 24 24"><path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/><path d="M10 16h4"/><path d="M12 14v4"/></symbol>
+  <symbol id="i-calendar-clock" viewBox="0 0 24 24"><path d="M21 7.5V6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h3.5"/><path d="M16 2v4"/><path d="M8 2v4"/><path d="M3 10h5"/><path d="M17.5 17.5 16 16.3V14"/><circle cx="16" cy="16" r="6"/></symbol>
+  <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></symbol>
+  <symbol id="i-lock" viewBox="0 0 24 24"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></symbol>
   <symbol id="i-bookmark" viewBox="0 0 24 24"><path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"/></symbol>
   <symbol id="i-chevron-left" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></symbol>
   <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></symbol>
@@ -1654,7 +1664,7 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
             <div class="ms-wrap" id="msWrap_kProj">
               <button class="ms-btn" id="msBtn_kProj" onclick="_msToggle('kProj')">Todos</button>
               <div class="ms-dropdown" id="msDd_kProj">
-                <div class="ms-search-wrap"><input type="text" class="ms-search-input" placeholder="🔍 Buscar projeto..." oninput="_msFilterOpts('kProj',this.value)" onclick="event.stopPropagation()"></div>
+                <div class="ms-search-wrap"><svg class="ic ms-search-ic" aria-hidden="true"><use href="#i-search"/></svg><input type="text" class="ms-search-input" placeholder="Buscar projeto..." oninput="_msFilterOpts('kProj',this.value)" onclick="event.stopPropagation()"></div>
                 <div id="msOpts_kProj"></div>
               </div>
             </div>
@@ -1669,10 +1679,10 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
             <div class="ms-wrap" id="msWrap_kSit">
               <button class="ms-btn" id="msBtn_kSit" onclick="_msToggle('kSit')">Todas</button>
               <div class="ms-dropdown" id="msDd_kSit">
-                <label class="ms-opt"><input type="checkbox" value="aguardando" onchange="_msChange('kSit')"> ⏳ Aguardando</label>
-                <label class="ms-opt"><input type="checkbox" value="andamento" onchange="_msChange('kSit')"> 🔄 Em Andamento</label>
-                <label class="ms-opt"><input type="checkbox" value="atrasado" onchange="_msChange('kSit')"> ⚠️ Atrasado</label>
-                <label class="ms-opt"><input type="checkbox" value="concluido" onchange="_msChange('kSit')"> ✅ Concluído</label>
+                <label class="ms-opt"><input type="checkbox" value="aguardando" onchange="_msChange('kSit')"> Aguardando</label>
+                <label class="ms-opt"><input type="checkbox" value="andamento" onchange="_msChange('kSit')"> Em Andamento</label>
+                <label class="ms-opt"><input type="checkbox" value="atrasado" onchange="_msChange('kSit')"> Atrasado</label>
+                <label class="ms-opt"><input type="checkbox" value="concluido" onchange="_msChange('kSit')"> Concluído</label>
                 <div class="ms-sep"></div>
                 <div class="ms-clear" data-ms-clear="kSit">✕ Limpar</div>
               </div>
@@ -1700,7 +1710,7 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
             <div class="ms-wrap" id="msWrap_kPrazo">
               <button class="ms-btn" id="msBtn_kPrazo" onclick="_msToggle('kPrazo')">Todas</button>
               <div class="ms-dropdown" id="msDd_kPrazo">
-                <div class="ms-search-wrap"><input type="text" class="ms-search-input" placeholder="🔍 Buscar data..." oninput="_msFilterOpts('kPrazo',this.value)" onclick="event.stopPropagation()"></div>
+                <div class="ms-search-wrap"><svg class="ic ms-search-ic" aria-hidden="true"><use href="#i-search"/></svg><input type="text" class="ms-search-input" placeholder="Buscar data..." oninput="_msFilterOpts('kPrazo',this.value)" onclick="event.stopPropagation()"></div>
                 <div id="msOpts_kPrazo"></div>
               </div>
             </div>
@@ -1709,7 +1719,7 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
             <div class="ms-wrap" id="msWrap_kPrazoEt">
               <button class="ms-btn" id="msBtn_kPrazoEt" onclick="_msToggle('kPrazoEt')">Todas</button>
               <div class="ms-dropdown" id="msDd_kPrazoEt">
-                <div class="ms-search-wrap"><input type="text" class="ms-search-input" placeholder="🔍 Buscar data..." oninput="_msFilterOpts('kPrazoEt',this.value)" onclick="event.stopPropagation()"></div>
+                <div class="ms-search-wrap"><svg class="ic ms-search-ic" aria-hidden="true"><use href="#i-search"/></svg><input type="text" class="ms-search-input" placeholder="Buscar data..." oninput="_msFilterOpts('kPrazoEt',this.value)" onclick="event.stopPropagation()"></div>
                 <div id="msOpts_kPrazoEt"></div>
               </div>
             </div>
@@ -1749,7 +1759,7 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
             <div class="ms-wrap" id="msWrap_lProj">
               <button class="ms-btn" id="msBtn_lProj" onclick="_msToggle('lProj')">Todos</button>
               <div class="ms-dropdown" id="msDd_lProj">
-                <div class="ms-search-wrap"><input type="text" class="ms-search-input" placeholder="🔍 Buscar projeto..." oninput="_msFilterOpts('lProj',this.value)" onclick="event.stopPropagation()"></div>
+                <div class="ms-search-wrap"><svg class="ic ms-search-ic" aria-hidden="true"><use href="#i-search"/></svg><input type="text" class="ms-search-input" placeholder="Buscar projeto..." oninput="_msFilterOpts('lProj',this.value)" onclick="event.stopPropagation()"></div>
                 <div id="msOpts_lProj"></div>
               </div>
             </div>
@@ -1808,7 +1818,7 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
             <div class="ms-wrap" id="msWrap_lPrazo">
               <button class="ms-btn" id="msBtn_lPrazo" onclick="_msToggle('lPrazo')">Todas</button>
               <div class="ms-dropdown" id="msDd_lPrazo">
-                <div class="ms-search-wrap"><input type="text" class="ms-search-input" placeholder="🔍 Buscar data..." oninput="_msFilterOpts('lPrazo',this.value)" onclick="event.stopPropagation()"></div>
+                <div class="ms-search-wrap"><svg class="ic ms-search-ic" aria-hidden="true"><use href="#i-search"/></svg><input type="text" class="ms-search-input" placeholder="Buscar data..." oninput="_msFilterOpts('lPrazo',this.value)" onclick="event.stopPropagation()"></div>
                 <div id="msOpts_lPrazo"></div>
               </div>
             </div>
@@ -2636,15 +2646,15 @@ const COLS_AV = ['#E8002D','#003DA5','#1A8A4A','#D97706','#7C3AED','#0891B2','#b
 
 // ── PRIORIDADE ──
 const PRIO_MAP = {
-  urgente:{label:'🔴 Urgente', cls:'prio-urgente'},
-  alta:   {label:'🟠 Alta',    cls:'prio-alta'},
-  media:  {label:'🟡 Média',   cls:'prio-media'},
-  baixa:  {label:'🔵 Baixa',   cls:'prio-baixa'},
+  urgente:{label:'Urgente', cls:'prio-urgente'},
+  alta:   {label:'Alta',    cls:'prio-alta'},
+  media:  {label:'Média',   cls:'prio-media'},
+  baixa:  {label:'Baixa',   cls:'prio-baixa'},
 };
 function prioBadge(prio){
   if(!prio||!PRIO_MAP[prio]) return '';
   const m = PRIO_MAP[prio];
-  return `<span class="prio-badge ${m.cls}" aria-label="Prioridade: ${m.label.replace(/./u,'').trim()}">${m.label}</span>`;
+  return `<span class="prio-badge ${m.cls}" aria-label="Prioridade: ${m.label}">${icL('flag')} ${m.label}</span>`;
 }
 
 // ── ALERTA DE PRAZO ──
@@ -3048,11 +3058,11 @@ function calcSit(p){
 function sitBdg(p){
   const s=calcSit(p);
   const map={
-    concluido:`<span class="bdg b-conc">✅ Concluído</span>`,
-    atrasado:`<span class="bdg b-atq">⚠️ Atrasado</span>`,
-    andamento:`<span class="bdg b-and">🔄 Em Andamento</span>`,
-    cancelado:`<span class="bdg b-canc">🚫 Cancelado</span>`,
-    aguardando:`<span class="bdg b-ag">⏳ Aguardando</span>`,
+    concluido:`<span class="bdg b-conc">${icL('circle-check')} Concluído</span>`,
+    atrasado:`<span class="bdg b-atq">${icL('triangle-alert')} Atrasado</span>`,
+    andamento:`<span class="bdg b-and">${icL('refresh')} Em Andamento</span>`,
+    cancelado:`<span class="bdg b-canc">${icL('ban')} Cancelado</span>`,
+    aguardando:`<span class="bdg b-ag">${icL('hourglass')} Aguardando</span>`,
   };
   return map[s]||`<span class="bdg b-ag">${s}</span>`;
 }
@@ -3137,6 +3147,8 @@ let CADPROJ=[];
 function projDoCard(p){ return (p && p.projCadId) ? (CADPROJ.find(c => c.id === p.projCadId) || null) : null; }
 // Ícone de Medição (Lucide circle-dollar-sign) para usar dentro de textos
 function icMedicao(){ return '<svg class="ic ic-inl" aria-hidden="true"><use href="#i-circle-dollar"/></svg>'; }
+// Ícone Lucide do sprite (#i-<id>) alinhado ao texto
+function icL(id){ return '<svg class="ic ic-inl" aria-hidden="true"><use href="#i-' + id + '"/></svg>'; }
 function nomeCompleto(p){ const pr = projDoCard(p); return pr ? pr.nome + ' — ' + p.nome : p.nome; }
 
 // ── NAV ──
@@ -3217,7 +3229,7 @@ function rKanban(){
         const{eq,cl}=delInf(p);
         return`<div class="kcard" draggable="true" data-id="${p.id}"
           role="article" tabindex="0"
-          aria-label="${esc(nomeCompleto(p))}${p.prioridade?' — '+PRIO_MAP[p.prioridade]?.label.replace(/./u,'').trim():''}"
+          aria-label="${esc(nomeCompleto(p))}${p.prioridade?' — '+(PRIO_MAP[p.prioridade]?.label||''):''}"
           onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openDet(${p.id})}"
           ondragstart="onDragStart(event,${p.id})" ondragend="onDragEnd()" onclick="cardClick(event,${p.id})">
           <!-- Ordem: 1) projeto (negrito) + produto · 2) relevância e urgência (recursos não aparecem no card do Kanban) -->
@@ -3240,7 +3252,7 @@ function rKanban(){
           <div style="display:flex;align-items:center;justify-content:space-between;margin-top:6px">
             <span style="font-size:10.5px;font-weight:600;color:var(--mu)">${p.pct}%</span>
           </div>
-          ${p.criadoPor?`<div class="kcard-autoria"><span>✏️ ${esc(nomeExibicao(p.criadoPor))}</span>${p.editadoPor&&nomeExibicao(p.editadoPor)!==nomeExibicao(p.criadoPor)?`<span>· editado: ${esc(nomeExibicao(p.editadoPor))}</span>`:''}</div>`:''}
+          ${p.criadoPor?`<div class="kcard-autoria"><span>${icL('pencil')} ${esc(nomeExibicao(p.criadoPor))}</span>${p.editadoPor&&nomeExibicao(p.editadoPor)!==nomeExibicao(p.criadoPor)?`<span>· editado: ${esc(nomeExibicao(p.editadoPor))}</span>`:''}</div>`:''}
           ${(() => {
             const etapas = p.etapas || [];
 
@@ -3248,7 +3260,7 @@ function rKanban(){
             // Aparece para projetos que estão na coluna Homologação.
             // Leva direto ao card correspondente na aba Homologações.
             if(p.col === 11){
-              return `<button class="btn-medicao" style="background:linear-gradient(135deg,#003DA5,#0060CC)" onclick="event.stopPropagation();irParaCardHomologacao(${p.id})">🔖 Abrir na aba Homologações</button>`;
+              return `<button class="btn-medicao" style="background:linear-gradient(135deg,#003DA5,#0060CC)" onclick="event.stopPropagation();irParaCardHomologacao(${p.id})">${icL('badge-check')} Abrir na aba Homologações</button>`;
             }
 
             // ── BOTÃO ENVIAR MEDIÇÃO ──────────────────────────────────────────
@@ -3279,9 +3291,9 @@ function rKanban(){
             if(gatilhoMedicaoDone && !p.enviadoMedicao)
               return `<button class="btn-medicao" onclick="event.stopPropagation();enviarMedicao(${p.id})">${icMedicao()} Enviar para Medição</button>`;
             if(p.enviadoMedicao && !p.medicaoFeita)
-              return `<span class="badge-medicao-pend">⏳ Aguardando Medição</span>`;
+              return `<span class="badge-medicao-pend">${icL('hourglass')} Aguardando Medição</span>`;
             if(p.medicaoFeita)
-              return `<span class="badge-medicao-ok">✅ Medição Concluída</span>`;
+              return `<span class="badge-medicao-ok">${icL('circle-check')} Medição Concluída</span>`;
             return '';
           })()}
         </div>`;
@@ -3314,7 +3326,7 @@ function populateFiltSelects(){
     if(!box) return;
     const sel=_msGetVals(id);
     const opt=(v,txt)=>`<label class="ms-opt"><input type="checkbox" value="${esc(v)}" onchange="_msChange('${id}')"${sel.includes(v)?' checked':''}> ${txt}</label>`;
-    box.innerHTML=[...CADPROJ].sort((a,b)=>a.nome.localeCompare(b.nome,'pt-BR')).map(c=>opt(c.id,'📁 '+esc(c.nome))).join('')
+    box.innerHTML=[...CADPROJ].sort((a,b)=>a.nome.localeCompare(b.nome,'pt-BR')).map(c=>opt(c.id,esc(c.nome))).join('')
       + opt('__sem_projeto__','— Sem projeto —')
       + `<div class="ms-sep"></div><div class="ms-clear" data-ms-clear="${id}">✕ Limpar</div>`;
     _msUpdateBtn(id);
@@ -3327,7 +3339,7 @@ function populateFiltSelects(){
     if(!dd) return;
     const sel=_msGetVals(id);
     const opt=(v,txt)=>`<label class="ms-opt"><input type="checkbox" value="${v}" onchange="_msChange('${id}')"${sel.includes(v)?' checked':''}> ${txt}</label>`;
-    dd.innerHTML=['0','1','2','3','4','5'].map(v=>opt(v,'⭐ '+v+(v==='0'?' (mais importante)':''))).join('')
+    dd.innerHTML=['0','1','2','3','4','5'].map(v=>opt(v,'Relevância '+v+(v==='0'?' (mais importante)':''))).join('')
       + opt('__sem_relevancia__','— Sem relevância —')
       + `<div class="ms-sep"></div><div class="ms-clear" data-ms-clear="${id}">✕ Limpar</div>`;
     _msUpdateBtn(id);
@@ -3403,7 +3415,7 @@ function populateFiltSelects(){
   const _prazoOptsHtml = (grpId)=> _prazosDup.length
     ? _prazosDup.map(d=>{
         const _sel=_msGetVals(grpId);
-        return `<label class="ms-opt"><input type="checkbox" value="${d}" onchange="_msChange('${grpId}')"${_sel.includes(d)?' checked':''}> 📅 ${fd(d)} <span style="color:var(--mu)">(${_prazoCount[d]} tarefas)</span></label>`;
+        return `<label class="ms-opt"><input type="checkbox" value="${d}" onchange="_msChange('${grpId}')"${_sel.includes(d)?' checked':''}> ${fd(d)} <span style="color:var(--mu)">(${_prazoCount[d]} tarefas)</span></label>`;
       }).join('') + `<div class="ms-sep"></div><div class="ms-clear" data-ms-clear="${grpId}">✕ Limpar</div>`
     : `<div class="ms-empty">Nenhum prazo repetido entre as tarefas</div>`;
 
@@ -3437,7 +3449,7 @@ function populateFiltSelects(){
   const _prazoEtOptsHtml = (grpId)=> _prazosEtDup.length
     ? _prazosEtDup.map(d=>{
         const _sel=_msGetVals(grpId);
-        return `<label class="ms-opt"><input type="checkbox" value="${d}" onchange="_msChange('${grpId}')"${_sel.includes(d)?' checked':''}> 📌 ${fd(d)} <span style="color:var(--mu)">(${_etapaPrazoProjs[d].size} tarefas)</span></label>`;
+        return `<label class="ms-opt"><input type="checkbox" value="${d}" onchange="_msChange('${grpId}')"${_sel.includes(d)?' checked':''}> ${fd(d)} <span style="color:var(--mu)">(${_etapaPrazoProjs[d].size} tarefas)</span></label>`;
       }).join('') + `<div class="ms-sep"></div><div class="ms-clear" data-ms-clear="${grpId}">✕ Limpar</div>`
     : `<div class="ms-empty">Nenhum prazo de etapa pendente repetido entre as tarefas</div>`;
 
@@ -3764,8 +3776,8 @@ function rList(){
     const{eq,cl}=delInf(p);
     const _area=p.area?'<br><small style="color:var(--mu)">'+p.area+'</small>':'';
     return`<tr>
-      <td>${projDoCard(p)?`<div style="font-weight:700;font-size:11px;color:var(--mu)">📁 ${esc(projDoCard(p).nome)}</div>`:''}<span style="font-weight:600;cursor:pointer" onclick="openDet(${p.id})">${esc(p.nome)}</span>${_area}${p.prioridade?'<div style="margin-top:3px">'+prioBadge(p.prioridade)+'</div>':''}</td>
-      <td style="text-align:center">${_relevanciaTxt(p)!==''?`<span class="prio-badge" style="background:rgba(0,61,165,.1);color:var(--blue)" title="Relevância ECorp (0 = mais importante)">⭐ ${_relevanciaTxt(p)}</span>`:'<span style="color:var(--mu)">—</span>'}</td>
+      <td>${projDoCard(p)?`<div style="font-weight:700;font-size:11px;color:var(--mu)">${icL('folder')} ${esc(projDoCard(p).nome)}</div>`:''}<span style="font-weight:600;cursor:pointer" onclick="openDet(${p.id})">${esc(p.nome)}</span>${_area}${p.prioridade?'<div style="margin-top:3px">'+prioBadge(p.prioridade)+'</div>':''}</td>
+      <td style="text-align:center">${_relevanciaTxt(p)!==''?`<span class="prio-badge" style="background:rgba(0,61,165,.1);color:var(--blue)" title="Relevância ECorp (0 = mais importante)">${icL('star')} ${_relevanciaTxt(p)}</span>`:'<span style="color:var(--mu)">—</span>'}</td>
       <td>${recTags(p.recursos)}</td>
       <td>${avList(p.resps)}</td>
       <td style="font-size:11.5px"><span style="display:inline-flex;align-items:center;gap:4px"><span style="width:6px;height:6px;border-radius:50%;background:${colDot(p.col)};flex-shrink:0;display:inline-block"></span>${colLabel(p.col)}</span></td>
@@ -3774,8 +3786,8 @@ function rList(){
       <td>${fd(p.inicio)||'—'}</td>
       <td style="${calcSit(p)==='atrasado'?'color:var(--red);font-weight:700':''}">${fd(p.prazo)}</td>
       <td style="color:var(--green)">${fd(p.termino)||'—'}</td>
-      <td>${eq>0?`<span class="db deq">⚠️${eq} dias</span>`:`<span class="db dok">—</span>`}</td>
-      <td>${cl>0?`<span class="db dcl">⏳${cl} dias</span>`:`<span class="db dok">—</span>`}</td>
+      <td>${eq>0?`<span class="db deq">${icL('triangle-alert')} ${eq} dias</span>`:`<span class="db dok">—</span>`}</td>
+      <td>${cl>0?`<span class="db dcl">${icL('hourglass')} ${cl} dias</span>`:`<span class="db dok">—</span>`}</td>
       <td>${progH(p,'70px')}</td>
       <td style="white-space:nowrap">
         <div style="display:flex;align-items:stretch;gap:4px">
@@ -4834,7 +4846,7 @@ function rCancelados(){
 
 // ── DETAIL ──
 function sitEtapa(e, p){
-  if(e.done) return`<span class="sit sit-done">✓ Concluída</span>`;
+  if(e.done) return`<span class="sit sit-done">${icL('circle-check')} Concluída</span>`;
   // Etapas sem prazo automático: nunca mostrar atraso
   if(ETAPAS_SEM_PRAZO_AUTO.has(e.lb)) return`<span class="sit sit-pend">Pendente</span>`;
   // Apostila/E-book: Validação Final e Upload nunca mostram atraso
@@ -4845,11 +4857,11 @@ function sitEtapa(e, p){
   const ov=_prazo0<_hoje0;
   if(e.r==='cl'){
     const diasEspera=Math.max(0,Math.round((_hoje0-_prazo0)/(864e5)));
-    if(ov) return`<span class="sit sit-ov">⏳ Aguard. cliente <strong>${diasEspera} dias</strong></span>`;
-    return`<span class="sit sit-and">⏳ Aguardando cliente</span>`;
+    if(ov) return`<span class="sit sit-ov">${icL('hourglass')} Aguard. cliente <strong>${diasEspera} dias</strong></span>`;
+    return`<span class="sit sit-and">${icL('hourglass')} Aguardando cliente</span>`;
   }
-  if(ov) return`<span class="sit sit-ov">⚠️ Atrasada ${dd(e.prazo,td())} dias</span>`;
-  return`<span class="sit sit-and">🔄 Em andamento</span>`;
+  if(ov) return`<span class="sit sit-ov">${icL('triangle-alert')} Atrasada ${dd(e.prazo,td())} dias</span>`;
+  return`<span class="sit sit-and">${icL('refresh')} Em andamento</span>`;
 }
 
 function openDet(id){
@@ -4897,19 +4909,19 @@ function openDet(id){
                onchange="setEObs(${id},${i},this.value)"
                title="Observação livre para esta etapa">`
           : `${e.done && e.solicPrazo?.status==='pendente'
-              ? `<span class="val-st pendente" title="Solicitado por ${esc(nomeExibicao(e.solicPrazo.por)||'')} em ${esc(e.solicPrazo.em||'')}">⏳ Aguardando validação — concluída em ${fd(e.solicPrazo.dataReal)}</span>`
+              ? `<span class="val-st pendente" title="Solicitado por ${esc(nomeExibicao(e.solicPrazo.por)||'')} em ${esc(e.solicPrazo.em||'')}">${icL('hourglass')} Aguardando validação — concluída em ${fd(e.solicPrazo.dataReal)}</span>`
               : e.done && e.r!=='cl' && e.prazo && e.fim && new Date(e.prazo)<new Date(e.fim)
               ? e.solicPrazo?.status==='negada' && !e.atrasoMotivo
                 ? '<span class="val-st negada">Solicitação negada</span> <span style="color:var(--mu);font-style:italic">sem motivo registrado</span>'
                 : e.atrasoMotivo
-                ? `<span style="color:var(--red)" title="${esc(e.atrasoMotivo)}">⚠️ ${esc(e.atrasoMotivo.length>38?e.atrasoMotivo.slice(0,36)+'…':e.atrasoMotivo)}</span>`
+                ? `<span style="color:var(--red)" title="${esc(e.atrasoMotivo)}">${icL('triangle-alert')} ${esc(e.atrasoMotivo.length>38?e.atrasoMotivo.slice(0,36)+'…':e.atrasoMotivo)}</span>`
                 : '<span style="color:var(--mu);font-style:italic">sem motivo registrado</span>'
               : ''
             }
             ${e.r==='cl' && !e.done && e.prazo
-              ? `<span class="cl-dias">⏳ ${Math.max(0,Math.round((new Date()-new Date(e.prazo))/(864e5)))} dias em espera</span>`
+              ? `<span class="cl-dias">${icL('hourglass')} ${Math.max(0,Math.round((new Date()-new Date(e.prazo))/(864e5)))} dias em espera</span>`
               : e.r==='cl' && e.done && e.diasCl!=null
-                ? `<span class="cl-dias" style="background:#DCFCE7;border-color:#16A34A;color:#14532D">✓ ${e.diasCl} dias aguardado</span>`
+                ? `<span class="cl-dias" style="background:#DCFCE7;border-color:#16A34A;color:#14532D">${icL('circle-check')} ${e.diasCl} dias aguardado</span>`
                 : ''
             }`
         }
@@ -4934,17 +4946,17 @@ function openDet(id){
       </div>
     </div>
     <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px">
-      <div class="dcard"><div class="dcard-l">📌 Criado</div><div class="dcard-v">${fd(p.criado)}</div></div>
-      <div class="dcard"><div class="dcard-l">▶️ Início Real</div><div class="dcard-v">${fd(p.inicio)||'—'}</div></div>
-      <div class="dcard" style="${calcSit(p)==='atrasado'?'background:#FEE2E2':''}"><div class="dcard-l">🏁 Prazo</div><div class="dcard-v" style="${calcSit(p)==='atrasado'?'color:var(--red)':''}">${fd(p.prazo)}</div></div>
-      <div class="dcard" style="${p.termino?'background:#DCFCE7':''}"><div class="dcard-l">✅ Término</div><div class="dcard-v" style="${p.termino?'color:var(--green)':'color:var(--mu)'}">${fd(p.termino)||'—'}</div></div>
+      <div class="dcard"><div class="dcard-l">${icL('calendar-plus')} Criado</div><div class="dcard-v">${fd(p.criado)}</div></div>
+      <div class="dcard"><div class="dcard-l">${icL('calendar-clock')} Início Real</div><div class="dcard-v">${fd(p.inicio)||'—'}</div></div>
+      <div class="dcard" style="${calcSit(p)==='atrasado'?'background:#FEE2E2':''}"><div class="dcard-l">${icL('flag')} Prazo</div><div class="dcard-v" style="${calcSit(p)==='atrasado'?'color:var(--red)':''}">${fd(p.prazo)}</div></div>
+      <div class="dcard" style="${p.termino?'background:#DCFCE7':''}"><div class="dcard-l">${icL('calendar-check')} Término</div><div class="dcard-v" style="${p.termino?'color:var(--green)':'color:var(--mu)'}">${fd(p.termino)||'—'}</div></div>
     </div>
     <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px">
       ${_aguardandoMaterialBase(p) && diasAguardandoMaterial(p)>0
-        ? `<span class="db" style="font-size:12px;padding:4px 11px;background:#FEF9C3;border:1.5px solid #FCD34D;color:#92400E;border-radius:8px">⏳ Aguardando material base há ${diasAguardandoMaterial(p)} dias</span>`
-        : eq>0 ? `<span class="db deq" style="font-size:12px;padding:4px 11px">⚠️ Atraso Equipe: ${eq} dias</span>` : ''}
-      ${!_aguardandoMaterialBase(p) && cl>0?`<span class="db dcl" style="font-size:12px;padding:4px 11px">⏳ Aguard. Cliente: ${cl} dias</span>`:''}
-      ${!eq&&!cl?`<span class="db dok" style="font-size:12px;padding:4px 11px">✅ Em dia</span>`:''}
+        ? `<span class="db" style="font-size:12px;padding:4px 11px;background:#FEF9C3;border:1.5px solid #FCD34D;color:#92400E;border-radius:8px">${icL('hourglass')} Aguardando material base há ${diasAguardandoMaterial(p)} dias</span>`
+        : eq>0 ? `<span class="db deq" style="font-size:12px;padding:4px 11px">${icL('triangle-alert')} Atraso Equipe: ${eq} dias</span>` : ''}
+      ${!_aguardandoMaterialBase(p) && cl>0?`<span class="db dcl" style="font-size:12px;padding:4px 11px">${icL('hourglass')} Aguard. Cliente: ${cl} dias</span>`:''}
+      ${!eq&&!cl?`<span class="db dok" style="font-size:12px;padding:4px 11px">${icL('circle-check')} Em dia</span>`:''}
     </div>
     ${_blocoProjetoDet(p)}
     <hr class="dv">
@@ -4966,7 +4978,7 @@ function openDet(id){
         <tfoot><tr><td colspan="5" style="text-align:right;font-weight:700">Total</td><td style="text-align:right;font-weight:800;color:var(--blue);white-space:nowrap">${fmtBRL(p.medicaoTotal)}</td></tr></tfoot>
       </table></div>` : ''}
       <hr class="dv" style="margin:18px 0 14px">
-      <div class="coments-title">🔗 Links de Apoio <span style="font-weight:400;font-size:11px;color:var(--mu)">${(p.linksApoio||[]).length} link(s)</span></div>
+      <div class="coments-title">Links de Apoio <span style="font-weight:400;font-size:11px;color:var(--mu)">${(p.linksApoio||[]).length} link(s)</span></div>
       <div class="links-apoio-list">
         ${(p.linksApoio||[]).length===0
           ? ''
@@ -4987,7 +4999,7 @@ function openDet(id){
         <button class="btn bgreen bsm" onclick="adicionarLinkApoio(${p.id})"> Adicionar</button>
       </div>
       <hr class="dv" style="margin:18px 0 14px">
-      <div class="coments-title">💬 Comentários <span style="font-weight:400;font-size:11px;color:var(--mu)">${(p.comentarios||[]).length} comentário(s)</span></div>
+      <div class="coments-title">Comentários <span style="font-weight:400;font-size:11px;color:var(--mu)">${(p.comentarios||[]).length} comentário(s)</span></div>
       <div id="comentsList">
         ${(p.comentarios||[]).length===0
           ? ''
@@ -5028,12 +5040,12 @@ function openDet(id){
 
   document.getElementById('detFt').innerHTML=`
     <button class="btn bg2" onclick="cm('ovDet')">Fechar</button>
-    ${(p.col===11 || p.homologPassou || p.homolog?.preenchido)?`<button class="btn" style="background:linear-gradient(135deg,#003DA5,#0060CC);color:#fff" onclick="cm('ovDet');irParaCardHomologacao(${p.id})" title="Abrir este projeto na aba Homologações">🔖 Abrir na aba Homologações</button>`:''}
-    <button class="btn bg2" onclick="cm('ovDet');duplicarProjeto(${p.id})" title="Criar cópia deste projeto">📋 Duplicar</button>
-    <button class="btn bb" onclick="cm('ovDet');openEdit(${p.id})">✏️ Editar</button>
-    <button class="btn bpastel" onclick="exportPDFFicha(${p.id})">📄 Exportar PDF</button>
-    ${podeApagarProjeto()?`<button class="btn bdforte" onclick="cm('ovDet');delP(${p.id})">🗑️ Deletar Projeto</button>`:''}
-     ${!p.cancelado?`<button class="btn bgray" onclick="abrirCanc(${p.id})">🚫 Projeto Cancelado</button>`:''}
+    ${(p.col===11 || p.homologPassou || p.homolog?.preenchido)?`<button class="btn" style="background:linear-gradient(135deg,#003DA5,#0060CC);color:#fff" onclick="cm('ovDet');irParaCardHomologacao(${p.id})" title="Abrir este projeto na aba Homologações">${icL('badge-check')} Abrir na aba Homologações</button>`:''}
+    <button class="btn bg2" onclick="cm('ovDet');duplicarProjeto(${p.id})" title="Criar cópia deste projeto">Duplicar</button>
+    <button class="btn bb" onclick="cm('ovDet');openEdit(${p.id})">Editar</button>
+    <button class="btn bpastel" onclick="exportPDFFicha(${p.id})">Exportar PDF</button>
+    ${podeApagarProjeto()?`<button class="btn bdforte" onclick="cm('ovDet');delP(${p.id})">Deletar Projeto</button>`:''}
+     ${!p.cancelado?`<button class="btn bgray" onclick="abrirCanc(${p.id})">Projeto Cancelado</button>`:''}
   `;
   document.getElementById('ovDet').classList.add('on');
   setTimeout(()=>{const m=document.querySelector('#ovDet .modal');if(m)m.focus();},80);
@@ -7118,7 +7130,7 @@ function _ordRelev(p){
 
 function relevanciaBadge(p){
   if(p?.academia !== 'ECorp' || p.relevancia == null || p.relevancia === '') return '';
-  return `<span class="prio-badge" style="background:rgba(0,61,165,.1);color:var(--blue)" title="Relevância ECorp (0 a 5)" aria-label="Relevância ${p.relevancia}">⭐ Relevância ${p.relevancia}</span>`;
+  return `<span class="prio-badge" style="background:rgba(0,61,165,.1);color:var(--blue)" title="Relevância ECorp (0 a 5)" aria-label="Relevância ${p.relevancia}">${icL('star')} Relevância ${p.relevancia}</span>`;
 }
 
 function toggleIdCursoInput(){
@@ -7252,12 +7264,13 @@ function confirmarExcluirCadProj(){
 // Bloco de Descrição/Objetivo/Público-Alvo no modal de detalhe do produto
 function _blocoProjetoDet(p){
   const pr = projDoCard(p);
-  const caixa = 'background:var(--s2);border-radius:8px;padding:11px;font-size:12.5px;color:var(--mu);white-space:pre-wrap;word-break:break-word';
+  // Título em azul e texto na cor principal, para não ficar tudo no mesmo cinza
+  const caixa = 'background:var(--s2);border-radius:8px;padding:11px;font-size:13px;line-height:1.45;color:var(--txt);white-space:pre-wrap;word-break:break-word';
   if(!pr) return p.desc ? `<div style="${caixa};margin-bottom:14px">${linkify(p.desc)}</div>` : '';
   const itens = [['Descrição', pr.descricao], ['Objetivo', pr.objetivo], ['Público-Alvo', pr.publico]].filter(([,v]) => v);
   if(!itens.length) return '';
   return `<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;margin-bottom:14px">${itens.map(([lb, v]) =>
-    `<div style="${caixa}"><div class="fl" style="margin-bottom:4px">${lb}</div>${linkify(v)}</div>`).join('')}</div>`;
+    `<div style="${caixa}"><div class="fl" style="margin-bottom:5px;color:var(--blue);font-weight:800">${lb}</div>${linkify(v)}</div>`).join('')}</div>`;
 }
 
 // ── TELA "PROJETOS" ──
@@ -7335,8 +7348,8 @@ function rCadProjetos(){
       <td>${txt(pr.publico)}</td>
       <td>${prods.length ? prods.map(p => `<div><span style="cursor:pointer;color:var(--blue)" onclick="openDet(${p.id})">${esc(p.nome)}</span>${p.cancelado?' <span style="color:var(--mu);font-size:11px">(cancelado)</span>':''}</div>`).join('') : '<span style="color:var(--mu)">Nenhum produto</span>'}</td>
       <td style="white-space:nowrap">
-        <button class="btn bg2 bsm" onclick="openEditCadProj('${esc(pr.id)}')" title="Editar projeto">✏️</button>
-        <button class="btn bg2 bsm" onclick="excluirCadProj('${esc(pr.id)}')" ${podeExcluir?'':'disabled style="opacity:.4;cursor:not-allowed"'} title="${podeExcluir?'Excluir projeto':motivoBloq}">${lider?'🗑️':'🔒'}</button>
+        <button class="btn bg2 bsm" onclick="openEditCadProj('${esc(pr.id)}')" title="Editar projeto" aria-label="Editar projeto ${esc(pr.nome)}">${icL('pencil')}</button>
+        <button class="btn bg2 bsm" onclick="excluirCadProj('${esc(pr.id)}')" ${podeExcluir?'':'disabled style="opacity:.4;cursor:not-allowed"'} title="${podeExcluir?'Excluir projeto':motivoBloq}" aria-label="${podeExcluir?'Excluir projeto '+esc(pr.nome):motivoBloq}">${icL(lider?'trash':'lock')}</button>
       </td>
     </tr>`;
   }).join('');
