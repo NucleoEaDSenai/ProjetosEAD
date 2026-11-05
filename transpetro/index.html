@@ -1488,6 +1488,8 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
   <symbol id="i-download" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></symbol>
   <symbol id="i-database" viewBox="0 0 24 24"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5V19A9 3 0 0 0 21 19V5"/><path d="M3 12A9 3 0 0 0 21 12"/></symbol>
   <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></symbol>
+  <symbol id="i-undo" viewBox="0 0 24 24"><path d="M9 14 4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 5.5 5.5a5.5 5.5 0 0 1-5.5 5.5H11"/></symbol>
+  <symbol id="i-arrows" viewBox="0 0 24 24"><path d="M8 3 4 7l4 4"/><path d="M4 7h16"/><path d="m16 21 4-4-4-4"/><path d="M20 17H4"/></symbol>
   <symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></symbol>
   <symbol id="i-bell" viewBox="0 0 24 24"><path d="M10.268 21a2 2 0 0 0 3.464 0"/><path d="M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326"/></symbol>
   <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></symbol>
@@ -9316,12 +9318,12 @@ function _buildMedRow(p){
         style="padding:5px 12px;border:none;border-radius:6px;cursor:pointer;font-size:11.5px;font-weight:600;font-family:'Plus Jakarta Sans',sans-serif;
         background:${p.medicaoFeita?'var(--s2)':'var(--green)'};color:${p.medicaoFeita?'var(--mu)':'#fff'};transition:opacity .15s"
         title="${p.medicaoFeita?'Desmarcar medição':'Confirmar medição feita'}">
-        ${p.medicaoFeita ? '↩️ Desmarcar' : icL('circle-check')+' Confirmar'}
+        ${p.medicaoFeita ? icL('undo')+' Desmarcar' : icL('circle-check')+' Confirmar'}
       </button>
       ${p.medicaoFeita && ehLideranca()
         ? `<button onclick="abrirMoverRamp([${p.id}])"
              title="Mover este produto para outro RAMP"
-             style="padding:5px 9px;border:1.5px solid var(--bdr);border-radius:6px;background:var(--s2);color:var(--txt);cursor:pointer;font-size:11.5px;font-weight:600;margin-left:4px;white-space:nowrap">↔️ Mover RAMP</button>`
+             style="padding:5px 9px;border:1.5px solid var(--bdr);border-radius:6px;background:var(--s2);color:var(--txt);cursor:pointer;font-size:11.5px;font-weight:600;margin-left:4px;white-space:nowrap">${icL('arrows')} Mover RAMP</button>`
         : ''}
     </td>
   </tr>${outrasLinhas}`;
@@ -9390,7 +9392,7 @@ function abrirMoverRamp(pids){
   div.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:9999;display:flex;align-items:center;justify-content:center;padding:16px';
   div.innerHTML = `
     <div role="dialog" aria-modal="true" aria-label="Mover para outro RAMP" style="background:var(--surface);color:var(--txt);border-radius:14px;padding:24px;width:100%;max-width:440px;box-shadow:0 8px 32px rgba(0,0,0,.18)">
-      <div style="font-size:15px;font-weight:700;margin-bottom:6px">↔️ Mover para outro RAMP</div>
+      <div style="font-size:15px;font-weight:700;margin-bottom:6px">${icL('arrows')} Mover para outro RAMP</div>
       <div style="font-size:12px;color:var(--mu);margin-bottom:12px">
         ${projs.length===1
           ? `${esc(projs[0].nome.length>60?projs[0].nome.slice(0,58)+'…':projs[0].nome)}<br>RAMP atual: <strong>${_fmtMedicao(atual)}</strong>`
@@ -9402,7 +9404,7 @@ function abrirMoverRamp(pids){
       </select>
       <div style="display:flex;gap:10px;justify-content:flex-end">
         <button class="btn bg2 bsm" onclick="document.getElementById('quinzenaModal').remove()">Cancelar</button>
-        <button class="btn bb bsm" onclick="_confirmarMoverRamp([${projs.map(p=>p.id).join(',')}])">↔️ Mover</button>
+        <button class="btn bb bsm" onclick="_confirmarMoverRamp([${projs.map(p=>p.id).join(',')}])">${icL('arrows')} Mover</button>
       </div>
     </div>`;
   div.addEventListener('click', e => { if(e.target===div) div.remove(); });
@@ -9606,7 +9608,7 @@ function rMedicao(){
   if(ehLideranca()){
     html += `<div id="medMoverBar" style="display:none;align-items:center;gap:10px;flex-wrap:wrap;background:var(--surface);border:1.5px solid var(--blue);border-radius:10px;padding:10px 14px;margin-bottom:10px;position:sticky;top:0;z-index:5">
       <strong id="medMoverQtd" style="font-size:12.5px"></strong>
-      <button class="btn bb bsm" onclick="abrirMoverRamp([..._medSelecionados])">↔️ Mover selecionados para outro RAMP</button>
+      <button class="btn bb bsm" onclick="abrirMoverRamp([..._medSelecionados])">${icL('arrows')} Mover selecionados para outro RAMP</button>
       <button class="btn bg2 bsm" onclick="_limparSelMed()">Limpar seleção</button>
     </div>`;
   }
