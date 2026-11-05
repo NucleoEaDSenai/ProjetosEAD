@@ -9275,7 +9275,7 @@ function _buildMedRow(p){
   const span = rs > 1 ? ` rowspan="${rs}"` : '';
   const trStyle = p.medicaoFeita ? ' style="opacity:.75"' : '';
   const editar = !p.medicaoFeita
-    ? `<button class="coment-act" style="font-size:11px;opacity:.8" onclick="editarItensMedicao(${p.id})" title="${itens.length?'Editar quantidades':'Informar quantidades'}">✏️ ${itens.length?'Editar':'Informar QTD'}</button>`
+    ? `<button class="coment-act" style="font-size:11px;opacity:.8" onclick="editarItensMedicao(${p.id})" title="${itens.length?'Editar quantidades':'Informar quantidades'}">${icL('pencil')} ${itens.length?'Editar':'Informar QTD'}</button>`
     : '';
   const celItem = it => `
     <td class="ppu-n med-it"><span class="med-ln">${it.linha}</span></td>
@@ -9300,8 +9300,8 @@ function _buildMedRow(p){
     <td${span} style="white-space:nowrap">${fd(p.enviadoMedicao)}</td>
     <td${span} style="text-align:center">
       ${p.medicaoFeita
-        ? `<span class="badge-medicao-ok">✅ Feita em ${fd(p.medicaoFeitaEm)}</span>`
-        : `<span class="badge-medicao-pend">⏳ Pendente</span>`}
+        ? `<span class="badge-medicao-ok">${icL('circle-check')} Feita em ${fd(p.medicaoFeitaEm)}</span>`
+        : `<span class="badge-medicao-pend">${icL('hourglass')} Pendente</span>`}
     </td>
     <td${span} style="text-align:center">
       ${p.medicaoFeita && p.medicaoConfirmadaPor
@@ -9316,7 +9316,7 @@ function _buildMedRow(p){
         style="padding:5px 12px;border:none;border-radius:6px;cursor:pointer;font-size:11.5px;font-weight:600;font-family:'Plus Jakarta Sans',sans-serif;
         background:${p.medicaoFeita?'var(--s2)':'var(--green)'};color:${p.medicaoFeita?'var(--mu)':'#fff'};transition:opacity .15s"
         title="${p.medicaoFeita?'Desmarcar medição':'Confirmar medição feita'}">
-        ${p.medicaoFeita ? '↩️ Desmarcar' : '✅ Confirmar'}
+        ${p.medicaoFeita ? '↩️ Desmarcar' : icL('circle-check')+' Confirmar'}
       </button>
       ${p.medicaoFeita && ehLideranca()
         ? `<button onclick="abrirMoverRamp([${p.id}])"
@@ -9617,7 +9617,7 @@ function rMedicao(){
     const fechado = st[gid] === true ? '' : 'closed';
     html += `<div class="med-group med-group-pendente ${fechado}" id="${gid}">
       <div class="med-group-hd" onclick="toggleMedGroup('${gid}')">
-        <span class="med-group-title">⏳ Aguardando Medição
+        <span class="med-group-title">${icL('hourglass')} Aguardando Medição
           <span class="med-group-count">${grpPend.length}</span>
         </span>
         <span class="med-group-chev">▼</span>
@@ -9636,7 +9636,7 @@ function rMedicao(){
     const range = _rangeMedicao(label);
     html += `<div class="med-group ${fechado}" id="${gid}">
       <div class="med-group-hd" onclick="toggleMedGroup('${gid}')">
-        <span class="med-group-title">✅ ${fmtLabel}
+        <span class="med-group-title">${icL('circle-check')} ${fmtLabel}
           ${range?`<span style="font-weight:400;font-size:11px;color:var(--mu)">${range}</span>`:''}
           ${label===_medAtual?'<span style="font-size:10px;font-weight:700;background:var(--green);color:#fff;border-radius:6px;padding:1px 7px">MÊS ATUAL</span>':''}
           <span class="med-group-count" style="${projs.length?'background:#DCFCE7;color:#15803D':'background:var(--s2);color:var(--mu)'}">${projs.length}</span>
