@@ -4894,8 +4894,8 @@ function rCancelados(){
       <td>${progH(p,'70px')}</td>
       <td style="font-size:12px;color:var(--mu);max-width:220px">${p.cancelMotivo||'—'}</td>
       <td>
-        <button class="btn bg2 bsm" onclick="reativarP(${p.id})">↩️ Reativar</button>
-        ${podeApagarProjeto()?`<button class="btn bd bsm" style="margin-top:4px" onclick="delP(${p.id})">🗑️ Remover Produto</button>`:''}
+        <button class="btn bg2 bsm" onclick="reativarP(${p.id})">${icL('undo')} Reativar</button>
+        ${podeApagarProjeto()?`<button class="btn bd bsm" style="margin-top:4px" onclick="delP(${p.id})">${icL('trash')} Remover Produto</button>`:''}
       </td>
     </tr>`).join('');
 }
