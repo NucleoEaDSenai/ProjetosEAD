@@ -260,7 +260,8 @@ tr:hover td{background:#FAFAF9}
 .et-add-row td{padding:8px 9px}
 .chk{width:16px;height:16px;border-radius:50%;border:2px solid var(--bdr);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:9px;flex-shrink:0;transition:all .2s}
 .chk.done{background:var(--green);border-color:var(--green);color:#fff}
-.chk.cwait{background:var(--yel);border-color:var(--yel);color:#fff}
+.chk.cwait{background:var(--yel);border-color:var(--yel);color:#78350F}
+.chk .ic{width:10px;height:10px;stroke-width:2.5;vertical-align:0}
 /* GANTT */
 .gw{background:#fff;border-radius:var(--r);border:1px solid var(--bdr);overflow-x:auto}
 .gt{width:100%;border-collapse:collapse;min-width:700px}
@@ -4933,7 +4934,7 @@ function openDet(id){
     const rowCls=e.done?'done-row':(!e.done&&e.prazo&&_rp<_rh&&!_isentaAtraso?'ov-row':'');
     return`<tr class="${rowCls}">
       <td><div style="display:flex;align-items:center;gap:6px">
-        <div class="chk ${e.done?'done':isCl&&!e.done&&!ETAPAS_SEM_PRAZO_AUTO.has(e.lb)?'cwait':''}" onclick="toggleE(${id},${i})">${e.done?'✓':isCl&&!ETAPAS_SEM_PRAZO_AUTO.has(e.lb)?'⏳':''}</div>
+        <div class="chk ${e.done?'done':isCl&&!e.done&&!ETAPAS_SEM_PRAZO_AUTO.has(e.lb)?'cwait':''}" onclick="toggleE(${id},${i})">${e.done?'✓':isCl&&!ETAPAS_SEM_PRAZO_AUTO.has(e.lb)?icL('hourglass'):''}</div>
         <span>${esc(e.lb)}</span>
       </div></td>
       <td>
