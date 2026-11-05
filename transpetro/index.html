@@ -610,6 +610,9 @@ tr.canc-row td{opacity:.55}
 .ms-search-wrap{position:sticky;top:0;background:#fff;padding:2px 10px 6px;margin-bottom:2px;border-bottom:1px solid var(--bdr)}
 .ms-search-input{width:100%;box-sizing:border-box;border:1px solid var(--bdr);border-radius:6px;padding:5px 8px;font-size:12px;font-family:'Plus Jakarta Sans',sans-serif;color:var(--txt);outline:none}
 .ms-search-input:focus{border-color:var(--blue)}
+/* Lupa (Lucide) dentro da caixa de busca dos filtros */
+.ms-search-wrap .ms-search-input{padding-left:27px}
+.ms-search-ic{position:absolute;left:18px;top:calc(50% - 2px);transform:translateY(-50%);width:13px;height:13px;color:var(--mu);pointer-events:none}
 .ms-opt.ms-opt-hidden{display:none}
 .ms-empty{padding:8px 12px;font-size:11.5px;color:var(--mu)}
 .fi-sm:focus{border-color:var(--blue);background:#fff}
@@ -1462,6 +1465,7 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
   <symbol id="i-pencil" viewBox="0 0 24 24"><path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"/><path d="m15 5 4 4"/></symbol>
   <symbol id="i-calendar-plus" viewBox="0 0 24 24"><path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/><path d="M10 16h4"/><path d="M12 14v4"/></symbol>
   <symbol id="i-calendar-clock" viewBox="0 0 24 24"><path d="M21 7.5V6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h3.5"/><path d="M16 2v4"/><path d="M8 2v4"/><path d="M3 10h5"/><path d="M17.5 17.5 16 16.3V14"/><circle cx="16" cy="16" r="6"/></symbol>
+  <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></symbol>
   <symbol id="i-lock" viewBox="0 0 24 24"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></symbol>
   <symbol id="i-bookmark" viewBox="0 0 24 24"><path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"/></symbol>
   <symbol id="i-chevron-left" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></symbol>
@@ -1660,7 +1664,7 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
             <div class="ms-wrap" id="msWrap_kProj">
               <button class="ms-btn" id="msBtn_kProj" onclick="_msToggle('kProj')">Todos</button>
               <div class="ms-dropdown" id="msDd_kProj">
-                <div class="ms-search-wrap"><input type="text" class="ms-search-input" placeholder="🔍 Buscar projeto..." oninput="_msFilterOpts('kProj',this.value)" onclick="event.stopPropagation()"></div>
+                <div class="ms-search-wrap"><svg class="ic ms-search-ic" aria-hidden="true"><use href="#i-search"/></svg><input type="text" class="ms-search-input" placeholder="Buscar projeto..." oninput="_msFilterOpts('kProj',this.value)" onclick="event.stopPropagation()"></div>
                 <div id="msOpts_kProj"></div>
               </div>
             </div>
@@ -1675,10 +1679,10 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
             <div class="ms-wrap" id="msWrap_kSit">
               <button class="ms-btn" id="msBtn_kSit" onclick="_msToggle('kSit')">Todas</button>
               <div class="ms-dropdown" id="msDd_kSit">
-                <label class="ms-opt"><input type="checkbox" value="aguardando" onchange="_msChange('kSit')"> ⏳ Aguardando</label>
-                <label class="ms-opt"><input type="checkbox" value="andamento" onchange="_msChange('kSit')"> 🔄 Em Andamento</label>
-                <label class="ms-opt"><input type="checkbox" value="atrasado" onchange="_msChange('kSit')"> ⚠️ Atrasado</label>
-                <label class="ms-opt"><input type="checkbox" value="concluido" onchange="_msChange('kSit')"> ✅ Concluído</label>
+                <label class="ms-opt"><input type="checkbox" value="aguardando" onchange="_msChange('kSit')"> Aguardando</label>
+                <label class="ms-opt"><input type="checkbox" value="andamento" onchange="_msChange('kSit')"> Em Andamento</label>
+                <label class="ms-opt"><input type="checkbox" value="atrasado" onchange="_msChange('kSit')"> Atrasado</label>
+                <label class="ms-opt"><input type="checkbox" value="concluido" onchange="_msChange('kSit')"> Concluído</label>
                 <div class="ms-sep"></div>
                 <div class="ms-clear" data-ms-clear="kSit">✕ Limpar</div>
               </div>
@@ -1706,7 +1710,7 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
             <div class="ms-wrap" id="msWrap_kPrazo">
               <button class="ms-btn" id="msBtn_kPrazo" onclick="_msToggle('kPrazo')">Todas</button>
               <div class="ms-dropdown" id="msDd_kPrazo">
-                <div class="ms-search-wrap"><input type="text" class="ms-search-input" placeholder="🔍 Buscar data..." oninput="_msFilterOpts('kPrazo',this.value)" onclick="event.stopPropagation()"></div>
+                <div class="ms-search-wrap"><svg class="ic ms-search-ic" aria-hidden="true"><use href="#i-search"/></svg><input type="text" class="ms-search-input" placeholder="Buscar data..." oninput="_msFilterOpts('kPrazo',this.value)" onclick="event.stopPropagation()"></div>
                 <div id="msOpts_kPrazo"></div>
               </div>
             </div>
@@ -1715,7 +1719,7 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
             <div class="ms-wrap" id="msWrap_kPrazoEt">
               <button class="ms-btn" id="msBtn_kPrazoEt" onclick="_msToggle('kPrazoEt')">Todas</button>
               <div class="ms-dropdown" id="msDd_kPrazoEt">
-                <div class="ms-search-wrap"><input type="text" class="ms-search-input" placeholder="🔍 Buscar data..." oninput="_msFilterOpts('kPrazoEt',this.value)" onclick="event.stopPropagation()"></div>
+                <div class="ms-search-wrap"><svg class="ic ms-search-ic" aria-hidden="true"><use href="#i-search"/></svg><input type="text" class="ms-search-input" placeholder="Buscar data..." oninput="_msFilterOpts('kPrazoEt',this.value)" onclick="event.stopPropagation()"></div>
                 <div id="msOpts_kPrazoEt"></div>
               </div>
             </div>
@@ -1755,7 +1759,7 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
             <div class="ms-wrap" id="msWrap_lProj">
               <button class="ms-btn" id="msBtn_lProj" onclick="_msToggle('lProj')">Todos</button>
               <div class="ms-dropdown" id="msDd_lProj">
-                <div class="ms-search-wrap"><input type="text" class="ms-search-input" placeholder="🔍 Buscar projeto..." oninput="_msFilterOpts('lProj',this.value)" onclick="event.stopPropagation()"></div>
+                <div class="ms-search-wrap"><svg class="ic ms-search-ic" aria-hidden="true"><use href="#i-search"/></svg><input type="text" class="ms-search-input" placeholder="Buscar projeto..." oninput="_msFilterOpts('lProj',this.value)" onclick="event.stopPropagation()"></div>
                 <div id="msOpts_lProj"></div>
               </div>
             </div>
@@ -1814,7 +1818,7 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
             <div class="ms-wrap" id="msWrap_lPrazo">
               <button class="ms-btn" id="msBtn_lPrazo" onclick="_msToggle('lPrazo')">Todas</button>
               <div class="ms-dropdown" id="msDd_lPrazo">
-                <div class="ms-search-wrap"><input type="text" class="ms-search-input" placeholder="🔍 Buscar data..." oninput="_msFilterOpts('lPrazo',this.value)" onclick="event.stopPropagation()"></div>
+                <div class="ms-search-wrap"><svg class="ic ms-search-ic" aria-hidden="true"><use href="#i-search"/></svg><input type="text" class="ms-search-input" placeholder="Buscar data..." oninput="_msFilterOpts('lPrazo',this.value)" onclick="event.stopPropagation()"></div>
                 <div id="msOpts_lPrazo"></div>
               </div>
             </div>
@@ -3322,7 +3326,7 @@ function populateFiltSelects(){
     if(!box) return;
     const sel=_msGetVals(id);
     const opt=(v,txt)=>`<label class="ms-opt"><input type="checkbox" value="${esc(v)}" onchange="_msChange('${id}')"${sel.includes(v)?' checked':''}> ${txt}</label>`;
-    box.innerHTML=[...CADPROJ].sort((a,b)=>a.nome.localeCompare(b.nome,'pt-BR')).map(c=>opt(c.id,'📁 '+esc(c.nome))).join('')
+    box.innerHTML=[...CADPROJ].sort((a,b)=>a.nome.localeCompare(b.nome,'pt-BR')).map(c=>opt(c.id,esc(c.nome))).join('')
       + opt('__sem_projeto__','— Sem projeto —')
       + `<div class="ms-sep"></div><div class="ms-clear" data-ms-clear="${id}">✕ Limpar</div>`;
     _msUpdateBtn(id);
@@ -3335,7 +3339,7 @@ function populateFiltSelects(){
     if(!dd) return;
     const sel=_msGetVals(id);
     const opt=(v,txt)=>`<label class="ms-opt"><input type="checkbox" value="${v}" onchange="_msChange('${id}')"${sel.includes(v)?' checked':''}> ${txt}</label>`;
-    dd.innerHTML=['0','1','2','3','4','5'].map(v=>opt(v,'⭐ '+v+(v==='0'?' (mais importante)':''))).join('')
+    dd.innerHTML=['0','1','2','3','4','5'].map(v=>opt(v,'Relevância '+v+(v==='0'?' (mais importante)':''))).join('')
       + opt('__sem_relevancia__','— Sem relevância —')
       + `<div class="ms-sep"></div><div class="ms-clear" data-ms-clear="${id}">✕ Limpar</div>`;
     _msUpdateBtn(id);
@@ -3411,7 +3415,7 @@ function populateFiltSelects(){
   const _prazoOptsHtml = (grpId)=> _prazosDup.length
     ? _prazosDup.map(d=>{
         const _sel=_msGetVals(grpId);
-        return `<label class="ms-opt"><input type="checkbox" value="${d}" onchange="_msChange('${grpId}')"${_sel.includes(d)?' checked':''}> 📅 ${fd(d)} <span style="color:var(--mu)">(${_prazoCount[d]} tarefas)</span></label>`;
+        return `<label class="ms-opt"><input type="checkbox" value="${d}" onchange="_msChange('${grpId}')"${_sel.includes(d)?' checked':''}> ${fd(d)} <span style="color:var(--mu)">(${_prazoCount[d]} tarefas)</span></label>`;
       }).join('') + `<div class="ms-sep"></div><div class="ms-clear" data-ms-clear="${grpId}">✕ Limpar</div>`
     : `<div class="ms-empty">Nenhum prazo repetido entre as tarefas</div>`;
 
@@ -3445,7 +3449,7 @@ function populateFiltSelects(){
   const _prazoEtOptsHtml = (grpId)=> _prazosEtDup.length
     ? _prazosEtDup.map(d=>{
         const _sel=_msGetVals(grpId);
-        return `<label class="ms-opt"><input type="checkbox" value="${d}" onchange="_msChange('${grpId}')"${_sel.includes(d)?' checked':''}> 📌 ${fd(d)} <span style="color:var(--mu)">(${_etapaPrazoProjs[d].size} tarefas)</span></label>`;
+        return `<label class="ms-opt"><input type="checkbox" value="${d}" onchange="_msChange('${grpId}')"${_sel.includes(d)?' checked':''}> ${fd(d)} <span style="color:var(--mu)">(${_etapaPrazoProjs[d].size} tarefas)</span></label>`;
       }).join('') + `<div class="ms-sep"></div><div class="ms-clear" data-ms-clear="${grpId}">✕ Limpar</div>`
     : `<div class="ms-empty">Nenhum prazo de etapa pendente repetido entre as tarefas</div>`;
 
