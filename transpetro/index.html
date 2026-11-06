@@ -141,22 +141,53 @@ tr:hover td{background:#FAFAF9}
 .tvi{background:#fef3c7;color:#b45309}
 .ttr{background:#e0f2fe;color:#0369a1}
 .tav{background:#f3e8ff;color:#7e22ce}
-.atraso-proj{background:#fff;border:1px solid var(--bdr);border-radius:10px;margin-bottom:10px;overflow:hidden;box-shadow:var(--sh)}
-.atraso-proj-hd{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;cursor:pointer;gap:12px;user-select:none;transition:background .15s}
-.atraso-proj-hd:hover{background:var(--s2)}
-.atraso-proj-hd.open{background:#EFF6FF;border-bottom:1px solid #BFDBFE}
-.atraso-proj-info{display:flex;align-items:center;gap:10px;flex:1;min-width:0}
-.atraso-proj-nome{font-weight:700;font-size:13px;color:var(--blue);cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:360px}
-.atraso-proj-meta{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
-.atraso-proj-right{display:flex;align-items:center;gap:8px;flex-shrink:0}
-.atraso-proj-arrow{font-size:12px;color:var(--mu);transition:transform .2s}
-.atraso-proj-hd.open .atraso-proj-arrow{transform:rotate(180deg)}
-.atraso-etapas{display:none;padding:0}
-.atraso-etapas.open{display:block}
-.atraso-etapa-row{display:grid;grid-template-columns:1fr auto auto;gap:8px;align-items:center;padding:10px 16px;border-bottom:1px solid var(--bdr);font-size:12.5px}
-.atraso-etapa-row:last-child{border-bottom:none}
-.atraso-etapa-row:nth-child(even){background:var(--s2)}
-.atraso-etapa-hdr{display:grid;grid-template-columns:1fr auto auto;gap:8px;padding:6px 16px;background:var(--s2);font-size:11px;font-weight:700;color:var(--mu);text-transform:uppercase;letter-spacing:.4px;border-bottom:1px solid var(--bdr)}
+/* ── Relatório de Atrasos: filtros + tabela expansível (projeto → produto → atividades) ── */
+.atr-sel{min-width:170px;max-width:260px;border:1px solid var(--bdr);border-radius:6px;padding:6px 10px;font-size:12.5px;background:var(--bg);color:var(--txt);font-family:'Plus Jakarta Sans',sans-serif;min-height:30px;cursor:pointer}
+.atr-sel.atr-sel-on{border-color:var(--blue);box-shadow:0 0 0 1px var(--blue)}
+.atr-resumo{margin-left:auto;align-self:center;font-size:12.5px;color:var(--mu);font-weight:600;white-space:nowrap}
+.atr-resumo strong{color:var(--txt)}
+.atr-scroll{overflow-x:auto;border-radius:12px}
+.atr-tbl{min-width:960px;background:#fff;border:1px solid #E7E5E0;border-radius:12px;overflow:hidden}
+.atr-cols{display:grid;grid-template-columns:28px minmax(220px,2.2fr) 90px 150px minmax(200px,2fr) 110px;gap:12px;align-items:center;padding:0 16px}
+.atr-hd{padding-top:10px;padding-bottom:10px;background:var(--s2);border-bottom:1px solid #E7E5E0;font-size:11px;font-weight:700;color:var(--mu);text-transform:uppercase;letter-spacing:.4px}
+.atr-pj{border-bottom:1px solid #E7E5E0}
+.atr-pj:last-child{border-bottom:none}
+.atr-pj-btn{width:100%;background:none;border:none;text-align:left;cursor:pointer;font:inherit;color:var(--txt);padding-top:12px;padding-bottom:12px;font-size:12.5px}
+.atr-pj-btn:hover{background:var(--s2)}
+.atr-pj-btn:focus-visible,.atr-pd-btn:focus-visible,.atr-abrir:focus-visible{outline:2px solid var(--blue);outline-offset:-2px}
+.atr-pj-btn[aria-expanded="true"]{background:#EFF6FF}
+.atr-chev{width:16px;height:16px;color:var(--mu);transition:transform .15s;flex-shrink:0}
+[aria-expanded="true"]>.atr-chev,[aria-expanded="true"] .atr-chev{transform:rotate(90deg)}
+.atr-pj-nome{font-weight:700;font-size:13px;color:var(--blue);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.atr-num{font-weight:700;font-variant-numeric:tabular-nums}
+.atr-resps{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--mu)}
+.atr-pj-body{padding:4px 16px 14px 44px;background:#FAFAF8}
+.atr-pd{background:#fff;border:1px solid #E7E5E0;border-radius:12px;margin-top:10px;overflow:hidden}
+.atr-pd-hd{display:flex;align-items:stretch}
+.atr-pd-btn{flex:1;min-width:0;display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:none;border:none;text-align:left;cursor:pointer;font:inherit;color:var(--txt);padding:11px 14px;font-size:12.5px}
+.atr-pd-btn:hover{background:var(--s2)}
+.atr-pd-nome{font-weight:700;font-size:13px}
+.atr-pd-etapa{font-size:11.5px;color:var(--mu)}
+.atr-pd-etapa strong{color:var(--txt);font-weight:700}
+.atr-pd-prazo{font-size:11.5px;color:var(--mu)}
+.atr-pd-prazo .comp{color:#9B1C1C;font-weight:700}
+.atr-pd-n{font-size:11.5px;color:var(--mu);margin-left:auto}
+.atr-abrir{background:none;border:none;border-left:1px solid #E7E5E0;padding:0 14px;cursor:pointer;color:var(--blue);font:inherit;font-size:11.5px;font-weight:700;white-space:nowrap}
+.atr-abrir:hover{background:var(--s2)}
+.atr-at{width:100%;border-collapse:collapse;font-size:12.5px;border-top:1px solid #E7E5E0}
+.atr-at th{text-align:left;padding:8px 14px;background:var(--s2);font-size:11px;font-weight:700;color:var(--mu);text-transform:uppercase;letter-spacing:.4px;white-space:nowrap}
+.atr-at td{padding:9px 14px;border-top:1px solid #E7E5E0;vertical-align:middle}
+.atr-at td.atr-nw{white-space:nowrap}
+.atr-pessoa{display:inline-flex;align-items:center;gap:6px;margin:2px 10px 2px 0;white-space:nowrap}
+.atr-av{width:24px;height:24px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:#fff;flex-shrink:0;letter-spacing:.2px}
+.atr-bdg{display:inline-block;padding:2px 9px;border-radius:999px;font-size:11px;font-weight:700;white-space:nowrap;line-height:1.6}
+.atr-d1{background:#FEF3C7;color:#854D0E}
+.atr-d2{background:#FFEDD5;color:#9A3412}
+.atr-d3{background:#FDE2E2;color:#9B1C1C}
+.atr-st-and{background:#DBEAFE;color:#1E40AF}
+.atr-st-ni{background:#EEEDEA;color:#44403C}
+.atr-st-ap{background:#EDE9FE;color:#5B21B6}
+.atr-vazio{text-align:center;padding:40px 16px;color:var(--mu);font-size:13.5px;background:#fff;border:1px solid #E7E5E0;border-radius:12px}
 .tco{background:#dcfce7;color:#15803d}
 .tca{background:#fff7ed;color:#c2410c}
 /* KANBAN */
@@ -1092,8 +1123,11 @@ body.dark .tdi{background:var(--pink-bg);color:var(--pink-fg)}
 body.dark .tvi{background:var(--warn-bg);color:var(--warn-fg)}
 body.dark .ttr{background:var(--info-bg);color:var(--info-fg)}
 body.dark .tav{background:var(--purple-bg);color:var(--purple-fg)}
-body.dark .atraso-proj{background:var(--surface)}
-body.dark .atraso-proj-hd.open{background:var(--info-bg)}
+body.dark .atr-tbl,body.dark .atr-pd,body.dark .atr-vazio{background:var(--surface);border-color:var(--bdr)}
+body.dark .atr-hd,body.dark .atr-pj,body.dark .atr-at td,body.dark .atr-at,body.dark .atr-abrir{border-color:var(--bdr)}
+body.dark .atr-pj-body{background:var(--bg)}
+body.dark .atr-pj-btn[aria-expanded="true"]{background:var(--info-bg)}
+body.dark .atr-pd-prazo .comp{color:#FCA5A5}
 body.dark .tco{background:var(--ok-bg);color:var(--ok-fg)}
 body.dark .tca{background:var(--orange-bg);color:var(--orange-fg)}
 body.dark .kc.drag-over{background:var(--info-bg)}
@@ -1498,6 +1532,7 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
   <symbol id="i-lock" viewBox="0 0 24 24"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></symbol>
   <symbol id="i-bookmark" viewBox="0 0 24 24"><path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"/></symbol>
   <symbol id="i-chevron-left" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></symbol>
+  <symbol id="i-chevron-right" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></symbol>
   <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></symbol>
 </svg>
 
@@ -2096,35 +2131,21 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
       <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:22px" id="atrasosResumo"></div>
       <div class="fbox" style="margin-bottom:18px">
         <div class="fbox-row">
-          <div class="fg-sm"><label class="fl-sm">Produtos em Atraso</label>
-            <div class="ms-wrap" id="msWrap_aTipo">
-              <button class="ms-btn" id="msBtn_aTipo" onclick="_msToggle('aTipo')">Todos</button>
-              <div class="ms-dropdown" id="msDd_aTipo">
-                <label class="ms-opt"><input type="checkbox" value="eq" onchange="_msChange('aTipo')"> 👥 Equipe</label>
-                <label class="ms-opt"><input type="checkbox" value="cl" onchange="_msChange('aTipo')"> 🏢 Cliente</label>
-                <div class="ms-sep"></div>
-                <div class="ms-clear" data-ms-clear="aTipo">✕ Limpar</div>
-              </div>
-            </div>
+          <div class="fg-sm"><label class="fl-sm" for="aFProj">Projeto</label>
+            <select class="atr-sel" id="aFProj" onchange="_atrOnFiltro()"><option value="">Todos</option></select>
           </div>
-          <div class="fg-sm"><label class="fl-sm">Responsável da Etapa</label>
-            <div class="ms-wrap" id="msWrap_aRespEt">
-              <button class="ms-btn" id="msBtn_aRespEt" onclick="_msToggle('aRespEt')">Todos</button>
-              <div class="ms-dropdown" id="msDd_aRespEt"></div>
-            </div>
+          <div class="fg-sm"><label class="fl-sm" for="aFResp">Responsável</label>
+            <select class="atr-sel" id="aFResp" onchange="_atrOnFiltro()"><option value="">Todos</option></select>
           </div>
-          <div class="fg-sm"><label class="fl-sm">Prazo Final</label>
-            <div class="ms-wrap" id="msWrap_aRespGeral">
-              <button class="ms-btn" id="msBtn_aRespGeral" onclick="_msToggle('aRespGeral')">Todos</button>
-              <div class="ms-dropdown" id="msDd_aRespGeral">
-                <label class="ms-opt"><input type="checkbox" value="prazo_real" onchange="_msChange('aRespGeral')"> 🔴 Comprometido</label>
-                <label class="ms-opt"><input type="checkbox" value="etapa" onchange="_msChange('aRespGeral')"> 🟡 Não comprometido</label>
-                <div class="ms-sep"></div>
-                <div class="ms-clear" data-ms-clear="aRespGeral">✕ Limpar</div>
-              </div>
-            </div>
+          <div class="fg-sm"><label class="fl-sm" for="aFPrazo">Prazo Final</label>
+            <select class="atr-sel" id="aFPrazo" onchange="_atrOnFiltro()">
+              <option value="">Todos</option>
+              <option value="comp">Comprometido</option>
+              <option value="ok">Não comprometido</option>
+            </select>
           </div>
           <button class="btn-lim btn-lim-k" onclick="limparAFilts()">✕ Limpar Filtros</button>
+          <div class="atr-resumo" id="atrasosResumoTxt" aria-live="polite"></div>
         </div>
       </div>
       <div id="atrasosDetail"></div>
@@ -3604,7 +3625,6 @@ function _msUpdateBtn(id){
     'medConf':'Todos','medResp':'Todos','medRec':'Todos','medStat':'Todos',
     'cargaResp':'Todos','cargaStat':'Todos','cargaRec':'Todos','cargaPrio':'Todas',
     'kProj':'Todos','kResp':'Todos','kSit':'Todas','kAcad':'Todas','kRel':'Todas','kCol':'Todas','kPrazo':'Todas','kPrazoEt':'Todas',
-    'aTipo':'Todos','aRespGeral':'Todos','aRespEt':'Todos',
     'homSol':'Todos','homEnv':'Todos','homMed':'Todos'
   };
   if(vals.length===0){ btn.textContent=labels[id]||'Todos'; btn.classList.remove('ms-active'); }
@@ -4654,222 +4674,282 @@ function rKPIs(){
 
 
 // ── ATRASOS ──
-function rAtrasos(){
-  // Apenas projetos ativos e concluídos — cancelados ficam só na aba Cancelados
-  const todos = activeDB();
+// Tabela em 3 níveis: Projeto (transpetro/cadprojetos, via p.projCadId) → Produto (transpetro/projetos)
+// → Atividades em atraso (p.etapas). Só leitura: nada é gravado no banco.
+// Atividade em atraso = não concluída, com Data Final (e.prazo) anterior a hoje.
+// Ficam de fora (isenções que já existiam): etapas sem prazo automático (Reunião Inicial,
+// Material Base), validação/upload de Apostila/E-book e produtos aguardando o material base.
+// Atraso em dias = hoje − prazo.
 
-  const filtTipo      = _msGetVals('aTipo');     // ['eq','cl']
-  const filtRespEtapa = _msGetVals('aRespEt');   // multi
-  const filtPrazo     = _msGetVals('aRespGeral'); // ['prazo_real','etapa']
+// Estado aberto/fechado. Sem filtro: só o que foi clicado fica aberto.
+// Com filtro: tudo aberto, menos o que foi fechado no clique (zera ao mudar o filtro).
+const _atrAbertos = new Set();
+const _atrFechadosFiltro = new Set();
 
-  // ── Montar lista de linhas de atraso ──────────────────────────────────────
-  // Apenas etapas em aberto com prazo vencido (anterior ao dia de hoje).
-  // "Dias Atraso" = contados a partir da ETAPA ANTERIOR ter sido concluída.
-  // Se não há etapa anterior, usa o prazo da própria etapa como referência.
-  // ──────────────────────────────────────────────────────────────────────────
+function _atrHoje(){ const d = new Date(); d.setHours(0,0,0,0); return d; }
 
-  // ── Função auxiliar: processar etapas atrasadas de um projeto ──
-  function _processarEtapasAtraso(p, aplicarFiltros){
-    const sitP = p.cancelado ? 'cancelado' : calcSit(p);
+// Responsáveis da atividade: "Equipe", "Cliente" e/ou nomes (e.r + e.rExtras)
+function _atrResps(e){
+  const nomes = _respsEtapa(e);
+  if(e.r === 'cl') return ['Cliente', ...nomes];
+  return nomes.length ? nomes : ['Equipe'];
+}
+
+// Status derivado (não existe campo gravado):
+//  - atividade atual (primeira não concluída) com o Cliente → Aguardando aprovação
+//  - atividade atual com a equipe                          → Em andamento
+//  - atividades seguintes                                   → Não iniciada
+function _atrStatus(e, idx, atualIdx){
+  if(idx !== atualIdx) return 'ni';
+  return e.r === 'cl' ? 'ap' : 'and';
+}
+const _ATR_STATUS = {and:['Em andamento','atr-st-and'], ni:['Não iniciada','atr-st-ni'], ap:['Aguardando aprovação','atr-st-ap']};
+
+// Coluna do Kanban em que o produto está (mostrada como "Etapa")
+function _atrEtapaKanban(p){
+  const k = COLUNA_REMAP[p.col] ?? p.col;
+  return COLUNAS.find(c => c.k === k)?.l || '—';
+}
+
+// 1. Coleta: uma linha por atividade em atraso, sem filtros
+function _atrColetar(){
+  const hoje = _atrHoje();
+  const lista = [];
+  activeDB().forEach(p => {
+    if(_aguardandoMaterialBase(p)) return;
     const etapas = p.etapas || [];
-    const proximaIdx = etapas.findIndex(e => !e.done && !ETAPAS_SEM_PRAZO_AUTO.has(e.lb));
-    const resultado = [];
-
+    const atualIdx = etapas.findIndex(e => !e.done);
+    const pr = projDoCard(p);
+    const prazoFinalComp = !!(p.prazo && new Date(p.prazo+'T00:00:00') < hoje);
     etapas.forEach((e, i) => {
-      if(!e.prazo && !e.fim) return;
-      if(ETAPAS_SEM_PRAZO_AUTO.has(e.lb)) return;
-      if(_isApostilaIsentaAtraso(p, e)) return;
-      if(_aguardandoMaterialBase(p)) return;
-      if(e.done) return;
-      if(i !== proximaIdx) return;
-
-      const _ah=new Date();_ah.setHours(0,0,0,0);
-      const _ap=new Date(e.prazo+'T00:00:00');
-      if(!(_ap<_ah)) return;
-
-      let antFim = null;
-      for(let j = i-1; j >= 0; j--){
-        if(etapas[j] && etapas[j].done && etapas[j].fim){ antFim = etapas[j].fim; break; }
-      }
-
-      const base = antFim && new Date(antFim+'T00:00:00') > _ap ? antFim : e.prazo;
-      const diasAtraso = Math.round((_ah - new Date(base+'T00:00:00')) / 864e5);
-      const prazoProjVencido = !!(p.prazo && new Date(p.prazo+'T00:00:00') < _ah);
-      const tipoAtraso = prazoProjVencido ? 'prazo_real' : 'etapa';
-
-      if(aplicarFiltros){
-        // Filtro geral: equipe vs cliente (multi)
-        if(filtTipo.length){
-          const ehEq = e.r !== 'cl';
-          if(filtTipo.includes('eq') && filtTipo.includes('cl')){
-            // ambos selecionados — passa
-          } else if(filtTipo.includes('eq') && !ehEq) return;
-          else if(filtTipo.includes('cl') && ehEq) return;
-        }
-        // Filtro específico de responsável da etapa (multi)
-        if(filtRespEtapa.length){
-          const respNome = e.r === 'cl' ? 'cl' : e.r === 'eq' ? 'Equipe' : e.r;
-          if(!filtRespEtapa.includes(respNome) && !(e.rExtras||[]).some(n=>filtRespEtapa.includes(n))) return;
-        }
-        // Filtro de prazo (multi)
-        if(filtPrazo.length && !filtPrazo.includes(tipoAtraso)) return;
-      }
-
-      resultado.push({
-        projId: p.id, proj: p.nome, sitProjeto: sitP, cancelado: p.cancelado,
-        etapa: e.lb, r: e.r, rExtras: e.rExtras||[], prazo: e.prazo, antFim, diasAtraso, statusEtapa:'aberta_atraso',
-        fim: e.fim||null, motivo: e.atrasoMotivo||null, diasCl: e.diasCl||null,
-        resp: (p.resps||[]).join(', '), prazoProjVencido, tipoAtraso,
+      if(e.done || !e.prazo) return;
+      if(ETAPAS_SEM_PRAZO_AUTO.has(e.lb) || _isApostilaIsentaAtraso(p, e)) return;
+      const pz = new Date(e.prazo+'T00:00:00');
+      if(!(pz < hoje)) return;
+      lista.push({
+        p, e, idx:i,
+        projKey: pr ? pr.id : '__sem', projNome: pr ? pr.nome : 'Sem projeto',
+        resps: _atrResps(e), status: _atrStatus(e, i, atualIdx),
+        dias: Math.round((hoje - pz) / 864e5), prazoFinalComp,
       });
     });
-    return resultado;
-  }
-
-  // ── 1. Calcular totais SEM filtros (para os cards — sempre fixos) ──
-  let totalEq=0, totalCl=0, totalAberto=0, totalHistorico=0;
-  let _totalPrazoComp=0, _totalPrazoOk=0;
-
-  todos.forEach(p => {
-    const etapas = p.etapas || [];
-    etapas.forEach(e => {
-      if(e.done && e.fim && e.prazo && !ETAPAS_SEM_PRAZO_AUTO.has(e.lb)){
-        if(new Date(e.prazo) < new Date(e.fim)) totalHistorico++;
-      }
-    });
-    const rowsSemFiltro = _processarEtapasAtraso(p, false);
-    rowsSemFiltro.forEach(r => {
-      totalAberto++;
-      if(r.r === 'cl') totalCl++; else totalEq++; // qualquer r≠cl = equipe
-      if(r.tipoAtraso === 'prazo_real') _totalPrazoComp++;
-      else _totalPrazoOk++;
-    });
   });
+  return lista;
+}
 
-  // ── 2. Calcular rows COM filtros (para a tabela) ──
-  let rows = [];
-  todos.forEach(p => {
-    rows.push(..._processarEtapasAtraso(p, true));
+// 2. Filtros (combinados com E)
+function _atrLerFiltros(){
+  const v = id => document.getElementById(id)?.value || '';
+  return {proj: v('aFProj'), resp: v('aFResp'), prazo: v('aFPrazo')};
+}
+function _atrFiltroAtivo(f){ return !!(f.proj || f.resp || f.prazo); }
+function _atrAplicarFiltros(lista, f){
+  return lista.filter(a =>
+    (!f.proj || a.projKey === f.proj) &&
+    (!f.resp || a.resps.includes(f.resp)) &&
+    (!f.prazo || (f.prazo === 'comp') === a.prazoFinalComp));
+}
+
+// Opções dos selects: só projetos/responsáveis com atividade em atraso
+function _atrPreencherSelect(id, opcoes){
+  const sel = document.getElementById(id);
+  if(!sel) return;
+  const atual = sel.value;
+  const existe = opcoes.some(o => o.v === atual);
+  sel.innerHTML = '<option value="">Todos</option>' +
+    opcoes.map(o => `<option value="${esc(o.v)}"${o.v===atual?' selected':''}>${esc(o.l)}</option>`).join('');
+  if(!existe) sel.value = '';
+}
+function _atrAtualizarOpcoes(lista){
+  const projs = new Map();
+  lista.forEach(a => projs.set(a.projKey, a.projNome));
+  _atrPreencherSelect('aFProj', [...projs].map(([v,l]) => ({v,l}))
+    .sort((a,b) => (a.v==='__sem') - (b.v==='__sem') || a.l.localeCompare(b.l, 'pt-BR')));
+  const ordem = r => r === 'Equipe' ? 0 : r === 'Cliente' ? 2 : 1;
+  const resps = [...new Set(lista.flatMap(a => a.resps))]
+    .sort((a,b) => ordem(a) - ordem(b) || a.localeCompare(b, 'pt-BR'));
+  _atrPreencherSelect('aFResp', resps.map(r => ({v:r, l:r})));
+  ['aFProj','aFResp','aFPrazo'].forEach(id => {
+    const s = document.getElementById(id);
+    if(s) s.classList.toggle('atr-sel-on', !!s.value);
   });
+}
 
-  // Ordenar: mais atraso primeiro
-  rows.sort((a,b) => b.diasAtraso - a.diasAtraso);
-
-  // ── Popular multi-select de responsável da etapa com valores reais ──
-  const _ddRE = document.getElementById('msDd_aRespEt');
-  if(_ddRE){
-    // Coletar todos os responsáveis únicos das etapas atrasadas (sem filtro)
-    const _respSet = new Set();
-    todos.forEach(p => {
-      _processarEtapasAtraso(p, false).forEach(r => {
-        _respSet.add(r.r === 'cl' ? 'cl' : r.r === 'eq' ? 'Equipe' : r.r);
-      });
-    });
-    const _respList = [..._respSet].sort((a,b)=>{
-      if(a==='cl') return 1; if(b==='cl') return -1;
-      if(a==='Equipe') return -1; if(b==='Equipe') return 1;
-      return a.localeCompare(b,'pt-BR');
-    });
-    const _selRE = _msGetVals('aRespEt');
-    _ddRE.innerHTML = _respList.map(r => {
-      const lbl = r === 'cl' ? '🏢 Cliente' : r === 'Equipe' ? '👥 Equipe' : '👤 '+r;
-      return `<label class="ms-opt"><input type="checkbox" value="${r}" onchange="_msChange('aRespEt')"${_selRE.includes(r)?' checked':''}> ${lbl}</label>`;
-    }).join('') + '<div class="ms-sep"></div><div class="ms-clear" data-ms-clear="aRespEt">✕ Limpar</div>';
-    _msUpdateBtn('aRespEt');
-  }
-  _msUpdateBtn('aTipo');
-  _msUpdateBtn('aRespGeral');
-
-  // ── Cards resumo — valores sempre fixos, sem influência dos filtros ──
-  document.getElementById('atrasosResumo').innerHTML = `
-    <div class="sc cy"><div class="sc-l">Produtos em Atraso</div><div class="sc-v">${totalAberto}</div><div class="sc-s">total de produtos</div><div class="sc-i"><svg class="ic"><use href="#i-triangle-alert"/></svg></div></div>
-    <div class="sc cr"><div class="sc-l">Atrasos da Equipe</div><div class="sc-v">${totalEq}</div><div class="sc-s">produtos atrasados pela equipe</div><div class="sc-i"><svg class="ic"><use href="#i-users"/></svg></div></div>
-    <div class="sc cp"><div class="sc-l">Atrasos do Cliente</div><div class="sc-v">${totalCl}</div><div class="sc-s">aguardando cliente</div><div class="sc-i"><svg class="ic"><use href="#i-building"/></svg></div></div>
-    <div class="sc" style="border-left:4px solid #DC2626"><div class="sc-l">Prazo Final Comprometido</div><div class="sc-v">${_totalPrazoComp}</div><div class="sc-s">prazo real vencido</div><div class="sc-i" style="background:#FEE2E2;color:#991B1B"><svg class="ic"><use href="#i-calendar-x"/></svg></div></div>
-    <div class="sc" style="border-left:4px solid #F59E0B"><div class="sc-l">Prazo Final Não Comprometido</div><div class="sc-v">${_totalPrazoOk}</div><div class="sc-s">etapa atrasada, prazo ok</div><div class="sc-i" style="background:#FEF3C7;color:#92400E"><svg class="ic"><use href="#i-calendar-check"/></svg></div></div>
-  `;
-
-  // ── Tabela ──────────────────────────────────────────────────────────────────
-  function sitProjBdg(row){
-    if(row.cancelado) return '<span class="bdg b-canc">🚫 Cancelado</span>';
-    const m={concluido:'<span class="bdg b-conc">✅ Concluído</span>',atrasado:'<span class="bdg b-atq">⚠️ Atrasado</span>',andamento:'<span class="bdg b-and">🔄 Andamento</span>',aguardando:'<span class="bdg b-ag">⏳ Aguardando</span>'};
-    return m[row.sitProjeto]||row.sitProjeto;
-  }
-
-  if(rows.length === 0){
-    document.getElementById('atrasosDetail').innerHTML =
-      '<div style="text-align:center;padding:40px;color:var(--green);font-size:14px">✅ Nenhum atraso encontrado com os filtros selecionados</div>';
-    return;
-  }
-
-  // Agrupar rows por projeto
-  const porProjeto = {};
-  rows.forEach(r => {
-    if(!porProjeto[r.projId]) porProjeto[r.projId] = { proj:r.proj, resp:r.resp, sitProjeto:r.sitProjeto, cancelado:r.cancelado, projId:r.projId, etapas:[] };
-    porProjeto[r.projId].etapas.push(r);
+// 3. KPIs (sobre o resultado filtrado), contados por produto
+function _atrKpis(lista){
+  const prods = new Map();
+  lista.forEach(a => {
+    const k = prods.get(a.p.id) || {eq:false, cl:false, comp:a.prazoFinalComp};
+    if(a.e.r === 'cl') k.cl = true; else k.eq = true;
+    prods.set(a.p.id, k);
   });
+  const v = [...prods.values()];
+  return {
+    produtos: v.length,
+    eq: v.filter(k => k.eq).length,
+    cl: v.filter(k => k.cl).length,
+    comp: v.filter(k => k.comp).length,
+    ok: v.filter(k => !k.comp).length,
+  };
+}
 
-  // Ordenar projetos pelo maior atraso dentre suas etapas
-  const projArr = Object.values(porProjeto)
-    .sort((a,b) => Math.max(...b.etapas.map(e=>e.diasAtraso)) - Math.max(...a.etapas.map(e=>e.diasAtraso)));
+// 4. Agrupamento: projeto → produto → atividades, ordenados pelo maior atraso
+function _atrAgrupar(lista){
+  const projs = new Map();
+  lista.forEach(a => {
+    if(!projs.has(a.projKey)) projs.set(a.projKey, {key:a.projKey, nome:a.projNome, prods:new Map()});
+    const pj = projs.get(a.projKey);
+    if(!pj.prods.has(a.p.id)) pj.prods.set(a.p.id, {p:a.p, comp:a.prazoFinalComp, ativs:[]});
+    pj.prods.get(a.p.id).ativs.push(a);
+  });
+  return [...projs.values()].map(pj => {
+    const produtos = [...pj.prods.values()].map(pd => {
+      pd.ativs.sort((x,y) => y.dias - x.dias || x.idx - y.idx);
+      pd.max = pd.ativs[0].dias;
+      return pd;
+    }).sort((x,y) => y.max - x.max || (x.p.nome||'').localeCompare(y.p.nome||'', 'pt-BR'));
+    const ativs = produtos.flatMap(pd => pd.ativs);
+    return {
+      key: pj.key, nome: pj.nome, produtos,
+      nAtiv: ativs.length,
+      resps: [...new Set(ativs.flatMap(a => a.resps))],
+      max: produtos[0].max,
+    };
+  }).sort((x,y) => y.max - x.max || x.nome.localeCompare(y.nome, 'pt-BR'));
+}
 
-  document.getElementById('atrasosDetail').innerHTML = projArr.map((pg, pi) => {
-    const maxDias = Math.max(...pg.etapas.map(e=>e.diasAtraso));
-    const nAberto = pg.etapas.length;
-    const corMax  = maxDias > 10 ? 'var(--red)' : maxDias > 5 ? 'var(--yel)' : 'var(--org)';
+// 5. Renderização
+function _atrBdgDias(d, prefixo){
+  const cls = d <= 2 ? 'atr-d1' : d <= 6 ? 'atr-d2' : 'atr-d3';
+  const txt = prefixo ? `máx ${d}d` : `${d} ${d===1?'dia':'dias'}`;
+  return `<span class="atr-bdg ${cls}">${txt}</span>`;
+}
+function _atrIniciais(n){
+  if(n === 'Equipe') return 'EQ';
+  if(n === 'Cliente') return 'CL';
+  const p = String(n).trim().split(/\s+/);
+  return ((p[0]?.[0]||'') + (p.length > 1 ? p[p.length-1][0] : (p[0]?.[1]||''))).toUpperCase();
+}
+function _atrCorAvatar(n){
+  if(n === 'Cliente') return '#7C3AED';
+  if(n === 'Equipe')  return '#64748B';
+  let s = 0; for(const c of String(n)) s = (s*31 + c.charCodeAt(0)) >>> 0;
+  return COLS_AV[s % COLS_AV.length];
+}
+function _atrPessoa(n){
+  return `<span class="atr-pessoa"><span class="atr-av" style="background:${_atrCorAvatar(n)}" aria-hidden="true">${esc(_atrIniciais(n))}</span>${esc(n)}</span>`;
+}
+function _atrAberto(key, filtro){ return filtro ? !_atrFechadosFiltro.has(key) : _atrAbertos.has(key); }
+function _atrDomId(key){ return 'atr-' + String(key).replace(/[^A-Za-z0-9_-]/g, '_'); }
 
-    const etapasHtml = pg.etapas.map((r,ei) => {
-      const respBdg = r.r==='cl'
-        ? '<span class="db dcl" style="font-size:11px">🏢 Cliente</span>'
-        : `<span class="db deq" style="font-size:11px">👤 ${esc(_respEtapaTxt(r))}</span>`;
-      const diasColor = r.diasAtraso > 10 ? 'var(--red)' : r.diasAtraso > 5 ? 'var(--yel)' : 'var(--org)';
-      return `<div class="atraso-etapa-row">
-        <div style="min-width:0">
-          <div style="font-weight:600;font-size:12.5px">${esc(r.etapa)}</div>
-          <div style="font-size:11px;color:var(--mu);margin-top:2px">${respBdg} · Prazo: ${fd(r.prazo)} · ${r.antFim ? 'Ant: '+fd(r.antFim) : '<span style="color:var(--mu)">primeira etapa</span>'}</div>
-        </div>
-        <div><span class="sit sit-ov" style="font-size:11px">⚠️ Em aberto</span></div>
-        <div><strong style="color:${diasColor};font-size:13px;white-space:nowrap">${r.diasAtraso}d</strong></div>
-      </div>`;
-    }).join('');
+function _atrRenderProduto(pd, filtro){
+  const p = pd.p, key = 'pd:' + p.id, aberto = _atrAberto(key, filtro), bodyId = _atrDomId(key);
+  const n = pd.ativs.length;
+  const linhas = pd.ativs.map(a => {
+    const [stTxt, stCls] = _ATR_STATUS[a.status];
+    return `<tr>
+      <td><strong>${esc(a.e.lb)}</strong></td>
+      <td>${a.resps.map(_atrPessoa).join('')}</td>
+      <td class="atr-nw">${fd(a.e.prazo)}</td>
+      <td class="atr-nw"><span class="atr-bdg ${stCls}">${stTxt}</span></td>
+      <td class="atr-nw">${_atrBdgDias(a.dias, false)}</td>
+    </tr>`;
+  }).join('');
+  return `<div class="atr-pd">
+    <div class="atr-pd-hd">
+      <button type="button" class="atr-pd-btn" data-atr-key="${esc(key)}" aria-expanded="${aberto}" aria-controls="${bodyId}" onclick="_atrToggle(this)">
+        <svg class="ic atr-chev" aria-hidden="true"><use href="#i-chevron-right"/></svg>
+        <span class="atr-pd-nome">${esc(p.nome)}</span>
+        ${sitBdg(p)}
+        <span class="atr-pd-etapa">Etapa: <strong>${esc(_atrEtapaKanban(p))}</strong></span>
+        <span class="atr-pd-prazo">Prazo final: ${p.prazo ? fd(p.prazo) : '—'} · ${pd.comp ? '<span class="comp">Comprometido</span>' : 'Não comprometido'}</span>
+        <span class="atr-pd-n">${n} ${n===1?'atividade em atraso':'atividades em atraso'}</span>
+        ${_atrBdgDias(pd.max, true)}
+      </button>
+      <button type="button" class="atr-abrir" onclick="openDet(${p.id})" aria-label="Abrir o card de ${esc(p.nome)}">Abrir card</button>
+    </div>
+    <div id="${bodyId}"${aberto?'':' hidden'}>
+      <table class="atr-at">
+        <thead><tr><th>Atividade</th><th>Responsável</th><th>Prazo</th><th>Status</th><th>Atraso</th></tr></thead>
+        <tbody>${linhas}</tbody>
+      </table>
+    </div>
+  </div>`;
+}
 
-    return `<div class="atraso-proj">
-      <div class="atraso-proj-hd" onclick="toggleAtrasoProj(this)">
-        <div class="atraso-proj-info">
-          <div class="atraso-proj-nome" onclick="event.stopPropagation();openDet(${pg.projId})">${esc(pg.proj)}</div>
-          <div class="atraso-proj-meta">
-            ${sitProjBdg(pg)}
-            <span style="font-size:11px;color:var(--mu)">${esc(pg.resp)}</span>
-          </div>
-        </div>
-        <div class="atraso-proj-right">
-          ${nAberto>0?`<span class="sit sit-ov" style="font-size:11px">${nAberto} em aberto</span>`:''}
-          <span style="font-weight:700;color:${corMax};font-size:13px;white-space:nowrap">máx ${maxDias}d</span>
-          <span class="atraso-proj-arrow">▼</span>
-        </div>
-      </div>
-      <div class="atraso-etapas">
-        <div class="atraso-etapa-hdr">
-          <span>Etapa · Responsável · Prazo</span>
-          <span>Status</span><span>Dias</span>
-        </div>
-        ${etapasHtml}
+function _atrRenderTabela(grupos, filtro){
+  if(!grupos.length)
+    return `<div class="atr-vazio">${filtro ? 'Nenhuma atividade em atraso com esses filtros.' : 'Nenhuma atividade em atraso.'}</div>`;
+  const linhas = grupos.map(pj => {
+    const key = 'pj:' + pj.key, aberto = _atrAberto(key, filtro), bodyId = _atrDomId(key);
+    const resps = pj.resps.join(', ');
+    return `<div class="atr-pj">
+      <button type="button" class="atr-pj-btn atr-cols" data-atr-key="${esc(key)}" aria-expanded="${aberto}" aria-controls="${bodyId}" onclick="_atrToggle(this)">
+        <svg class="ic atr-chev" aria-hidden="true"><use href="#i-chevron-right"/></svg>
+        <span class="atr-pj-nome">${esc(pj.nome)}</span>
+        <span class="atr-num">${pj.produtos.length}</span>
+        <span class="atr-num">${pj.nAtiv}</span>
+        <span class="atr-resps" title="${esc(resps)}">${esc(resps)}</span>
+        <span>${_atrBdgDias(pj.max, true)}</span>
+      </button>
+      <div class="atr-pj-body" id="${bodyId}"${aberto?'':' hidden'}>
+        ${pj.produtos.map(pd => _atrRenderProduto(pd, filtro)).join('')}
       </div>
     </div>`;
   }).join('');
+  return `<div class="atr-scroll"><div class="atr-tbl" role="region" aria-label="Atividades em atraso por projeto">
+    <div class="atr-cols atr-hd" aria-hidden="true"><span></span><span>Projeto</span><span>Produtos</span><span>Atividades em atraso</span><span>Responsáveis</span><span>Maior atraso</span></div>
+    ${linhas}
+  </div></div>`;
 }
 
-function toggleAtrasoProj(hd){
-  hd.classList.toggle('open');
-  const body = hd.nextElementSibling;
-  body.classList.toggle('open');
+function _atrRenderKpis(k){
+  document.getElementById('atrasosResumo').innerHTML = `
+    <div class="sc cy"><div class="sc-l">Produtos em Atraso</div><div class="sc-v">${k.produtos}</div><div class="sc-s">total de produtos</div><div class="sc-i"><svg class="ic"><use href="#i-triangle-alert"/></svg></div></div>
+    <div class="sc cr"><div class="sc-l">Atrasos da Equipe</div><div class="sc-v">${k.eq}</div><div class="sc-s">produtos atrasados pela equipe</div><div class="sc-i"><svg class="ic"><use href="#i-users"/></svg></div></div>
+    <div class="sc cp"><div class="sc-l">Atrasos do Cliente</div><div class="sc-v">${k.cl}</div><div class="sc-s">aguardando cliente</div><div class="sc-i"><svg class="ic"><use href="#i-building"/></svg></div></div>
+    <div class="sc" style="border-left:4px solid #DC2626"><div class="sc-l">Prazo Final Comprometido</div><div class="sc-v">${k.comp}</div><div class="sc-s">prazo real vencido</div><div class="sc-i" style="background:#FEE2E2;color:#991B1B"><svg class="ic"><use href="#i-calendar-x"/></svg></div></div>
+    <div class="sc" style="border-left:4px solid #F59E0B"><div class="sc-l">Prazo Final Não Comprometido</div><div class="sc-v">${k.ok}</div><div class="sc-s">etapa atrasada, prazo ok</div><div class="sc-i" style="background:#FEF3C7;color:#92400E"><svg class="ic"><use href="#i-calendar-check"/></svg></div></div>
+  `;
+}
+
+function rAtrasos(){
+  const todas = _atrColetar();
+  _atrAtualizarOpcoes(todas);
+  const f = _atrLerFiltros();
+  const filtro = _atrFiltroAtivo(f);
+  const lista = _atrAplicarFiltros(todas, f);
+  const grupos = _atrAgrupar(lista);
+
+  _atrRenderKpis(_atrKpis(lista));
+  const nP = grupos.length, nA = lista.length;
+  document.getElementById('atrasosResumoTxt').innerHTML =
+    `<strong>${nP}</strong> ${nP===1?'projeto':'projetos'} · <strong>${nA}</strong> ${nA===1?'atividade em atraso':'atividades em atraso'}`;
+  document.getElementById('atrasosDetail').innerHTML = _atrRenderTabela(grupos, filtro);
+}
+
+// Abre/fecha um nível sem redesenhar a tela (mantém o foco do teclado)
+function _atrToggle(btn){
+  const key = btn.dataset.atrKey;
+  const abrir = btn.getAttribute('aria-expanded') !== 'true';
+  if(_atrFiltroAtivo(_atrLerFiltros())){
+    if(abrir) _atrFechadosFiltro.delete(key); else _atrFechadosFiltro.add(key);
+  } else {
+    if(abrir) _atrAbertos.add(key); else _atrAbertos.delete(key);
+  }
+  btn.setAttribute('aria-expanded', abrir);
+  const body = document.getElementById(btn.getAttribute('aria-controls'));
+  if(body) body.hidden = !abrir;
+}
+
+function _atrOnFiltro(){
+  _atrFechadosFiltro.clear();
+  rAtrasos();
 }
 
 function limparAFilts(){
-  ['aTipo','aRespEt','aRespGeral'].forEach(id=>{
-    const dd=document.getElementById('msDd_'+id);
-    if(dd) dd.querySelectorAll('input[type=checkbox]').forEach(cb=>cb.checked=false);
-    _msUpdateBtn(id);
-  });
+  ['aFProj','aFResp','aFPrazo'].forEach(id => { const s = document.getElementById(id); if(s) s.value = ''; });
+  _atrFechadosFiltro.clear();
   rAtrasos();
 }
 
