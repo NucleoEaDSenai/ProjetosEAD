@@ -167,6 +167,8 @@ tr:hover td{background:#FAFAF9}
 .atr-pd-btn{flex:1;min-width:0;display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:none;border:none;text-align:left;cursor:pointer;font:inherit;color:var(--txt);padding:11px 14px;font-size:12.5px}
 .atr-pd-btn:hover{background:var(--s2)}
 .atr-pd-nome{font-weight:700;font-size:13px}
+.atr-pd-etapa{font-size:11.5px;color:var(--mu)}
+.atr-pd-etapa strong{color:var(--txt);font-weight:700}
 .atr-pd-prazo{font-size:11.5px;color:var(--mu)}
 .atr-pd-prazo .comp{color:#9B1C1C;font-weight:700}
 .atr-pd-n{font-size:11.5px;color:var(--mu);margin-left:auto}
@@ -4847,7 +4849,6 @@ function _atrRenderProduto(pd, filtro){
     const [stTxt, stCls] = _ATR_STATUS[a.status];
     return `<tr>
       <td><strong>${esc(a.e.lb)}</strong></td>
-      <td>${esc(_atrEtapaKanban(p))}</td>
       <td>${a.resps.map(_atrPessoa).join('')}</td>
       <td class="atr-nw">${fd(a.e.prazo)}</td>
       <td class="atr-nw"><span class="atr-bdg ${stCls}">${stTxt}</span></td>
@@ -4860,6 +4861,7 @@ function _atrRenderProduto(pd, filtro){
         <svg class="ic atr-chev" aria-hidden="true"><use href="#i-chevron-right"/></svg>
         <span class="atr-pd-nome">${esc(p.nome)}</span>
         ${sitBdg(p)}
+        <span class="atr-pd-etapa">Etapa: <strong>${esc(_atrEtapaKanban(p))}</strong></span>
         <span class="atr-pd-prazo">Prazo final: ${p.prazo ? fd(p.prazo) : '—'} · ${pd.comp ? '<span class="comp">Comprometido</span>' : 'Não comprometido'}</span>
         <span class="atr-pd-n">${n} ${n===1?'atividade em atraso':'atividades em atraso'}</span>
         ${_atrBdgDias(pd.max, true)}
@@ -4868,7 +4870,7 @@ function _atrRenderProduto(pd, filtro){
     </div>
     <div id="${bodyId}"${aberto?'':' hidden'}>
       <table class="atr-at">
-        <thead><tr><th>Atividade</th><th>Etapa</th><th>Responsável</th><th>Prazo</th><th>Status</th><th>Atraso</th></tr></thead>
+        <thead><tr><th>Atividade</th><th>Responsável</th><th>Prazo</th><th>Status</th><th>Atraso</th></tr></thead>
         <tbody>${linhas}</tbody>
       </table>
     </div>
