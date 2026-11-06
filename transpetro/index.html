@@ -215,6 +215,7 @@ tr:hover td{background:#FAFAF9}
 .kcard-proj + .kcard-t{font-weight:400;margin-top:0}
 .rec-grupo{width:100%;font-size:10.5px;font-weight:700;color:var(--mu);text-transform:uppercase;letter-spacing:.4px;margin:9px 0 1px}
 .rec-grupo:first-child{margin-top:0}
+.rec-grupo .ic{color:var(--blue);width:13px;height:13px;vertical-align:-2px;margin-right:2px}
 .proj-ro{background:var(--s2);border:1px solid var(--bdr);border-radius:7px;padding:8px 10px;font-size:12.5px;color:var(--txt);min-height:36px;white-space:pre-wrap;word-break:break-word}
 .proj-ro.vazio{color:var(--mu);font-style:italic}
 .cadproj-txt{font-size:12px;color:var(--mu);max-width:240px;white-space:pre-wrap;word-break:break-word;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
@@ -535,6 +536,11 @@ body.dark .kpi-tabs{background:var(--surface);border-color:var(--bdr)}
 .mcal-btn:hover{border-color:var(--blue);background:#EFF6FF;color:var(--blue);transform:translateY(-1px)}
 body.dark .mcal-btn:hover{background:rgba(59,130,246,.15)}
 .mcal-btn.sm{width:24px;height:24px;font-size:12px;border-radius:5px}
+.mcal-btn .ic{width:16px;height:16px}
+.mcal-btn.sm .ic{width:13px;height:13px}
+.ef-drag-handle .ic{width:14px;height:14px;display:inline-block;vertical-align:middle}
+.et-btn-del .ic{width:13px;height:13px;stroke-width:2.5}
+.et-add-row .ic{width:14px;height:14px;stroke-width:2.5}
 
 /* Overlay e popup */
 .mcal-pop{position:absolute;z-index:9999;background:var(--surface);border:1px solid var(--bdr);border-radius:12px;box-shadow:0 12px 36px rgba(0,0,0,.15);padding:14px;width:268px;font-family:'Plus Jakarta Sans',sans-serif;animation:mcalFadeIn .15s ease}
@@ -1527,6 +1533,17 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
   <symbol id="i-undo" viewBox="0 0 24 24"><path d="M9 14 4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 5.5 5.5a5.5 5.5 0 0 1-5.5 5.5H11"/></symbol>
   <symbol id="i-arrows" viewBox="0 0 24 24"><path d="M8 3 4 7l4 4"/><path d="M4 7h16"/><path d="m16 21 4-4-4-4"/><path d="M20 17H4"/></symbol>
   <symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></symbol>
+  <symbol id="i-calendar" viewBox="0 0 24 24"><path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/></symbol>
+  <symbol id="i-save" viewBox="0 0 24 24"><path d="M15.2 3a2 2 0 0 1 1.4.6l3.8 3.8a2 2 0 0 1 .6 1.4V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z"/><path d="M17 21v-7a1 1 0 0 0-1-1H8a1 1 0 0 0-1 1v7"/><path d="M7 3v4a1 1 0 0 0 1 1h7"/></symbol>
+  <symbol id="i-link" viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></symbol>
+  <symbol id="i-unlink" viewBox="0 0 24 24"><path d="m18.84 12.25 1.72-1.71h-.02a5.004 5.004 0 0 0-.12-7.07 5.006 5.006 0 0 0-6.95 0l-1.72 1.71"/><path d="m5.17 11.75-1.71 1.71a5.004 5.004 0 0 0 .12 7.07 5.006 5.006 0 0 0 6.95 0l1.71-1.71"/><path d="M8 2v3"/><path d="M2 8h3"/><path d="M16 22v-3"/><path d="M22 16h-3"/></symbol>
+  <symbol id="i-graduation" viewBox="0 0 24 24"><path d="M21.42 10.922a1 1 0 0 0-.019-1.838L12.83 5.18a2 2 0 0 0-1.66 0L2.6 9.08a1 1 0 0 0 0 1.832l8.57 3.908a2 2 0 0 0 1.66 0z"/><path d="M22 10v6"/><path d="M6 12.5V16a6 3 0 0 0 12 0v-3.5"/></symbol>
+  <symbol id="i-monitor" viewBox="0 0 24 24"><rect width="20" height="14" x="2" y="3" rx="2"/><path d="M8 21h8"/><path d="M12 17v4"/></symbol>
+  <symbol id="i-clapper" viewBox="0 0 24 24"><path d="M20.2 6 3 11l-.9-2.4c-.3-1.1.3-2.2 1.3-2.5l13.5-4c1.1-.3 2.2.3 2.5 1.3Z"/><path d="m6.2 5.3 3.1 3.9"/><path d="m12.4 3.4 3.1 4"/><path d="M3 11h18v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"/></symbol>
+  <symbol id="i-gamepad" viewBox="0 0 24 24"><line x1="6" x2="10" y1="11" y2="11"/><line x1="8" x2="8" y1="9" y2="13"/><line x1="15" x2="15.01" y1="12" y2="12"/><line x1="18" x2="18.01" y1="10" y2="10"/><path d="M17.32 5H6.68a4 4 0 0 0-3.978 3.59c-.006.052-.01.101-.017.152C2.604 9.416 2 14.456 2 16a3 3 0 0 0 3 3c1 0 1.5-.5 2-1l1.414-1.414A2 2 0 0 1 9.828 16h4.344a2 2 0 0 1 1.414.586L17 18c.5.5 1 1 2 1a3 3 0 0 0 3-3c0-1.545-.604-6.584-.685-7.258-.007-.05-.011-.1-.017-.151A4 4 0 0 0 17.32 5z"/></symbol>
+  <symbol id="i-book-open" viewBox="0 0 24 24"><path d="M12 7v14"/><path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><path d="M5 12h14"/><path d="M12 5v14"/></symbol>
+  <symbol id="i-grip" viewBox="0 0 24 24"><circle cx="9" cy="12" r="1"/><circle cx="9" cy="5" r="1"/><circle cx="9" cy="19" r="1"/><circle cx="15" cy="12" r="1"/><circle cx="15" cy="5" r="1"/><circle cx="15" cy="19" r="1"/></symbol>
   <symbol id="i-bell" viewBox="0 0 24 24"><path d="M10.268 21a2 2 0 0 0 3.464 0"/><path d="M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326"/></symbol>
   <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></symbol>
   <symbol id="i-lock" viewBox="0 0 24 24"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></symbol>
@@ -2390,9 +2407,9 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
   </div>
   <div class="mbody">
     <div class="tabs">
-      <div class="tab on" onclick="stab(0,this)">📁 Dados Gerais</div>
-      <div class="tab" onclick="stab(1,this)">🗓️ Datas &amp; Prazos</div>
-      <div class="tab" onclick="stab(2,this)">👥 Equipe &amp; Etapas</div>
+      <div class="tab on" onclick="stab(0,this)"><svg class="ic ic-inl" aria-hidden="true"><use href="#i-folder"/></svg> Dados Gerais</div>
+      <div class="tab" onclick="stab(1,this)"><svg class="ic ic-inl" aria-hidden="true"><use href="#i-calendar"/></svg> Datas &amp; Prazos</div>
+      <div class="tab" onclick="stab(2,this)"><svg class="ic ic-inl" aria-hidden="true"><use href="#i-users"/></svg> Equipe &amp; Etapas</div>
     </div>
     <!-- TAB 0 -->
     <div id="tab0">
@@ -2460,7 +2477,7 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
     <!-- TAB 1 -->
     <div id="tab1" style="display:none">
       <div class="fg2">
-        <div class="fg"><label class="fl">Data de Criação do Card</label><div style="display:flex;gap:5px;align-items:center"><input class="fi" type="number" id="fcr_d" placeholder="DD" min="1" max="31" style="width:58px"><input class="fi" type="number" id="fcr_m" placeholder="MM" min="1" max="12" style="width:58px"><input class="fi" type="number" id="fcr_a" placeholder="AAAA" min="2020" max="2099" style="width:80px"><button type="button" class="mcal-btn" title="Abrir calendário" onclick="_abrirMcalTriplet('fcr')">📅</button></div></div>
+        <div class="fg"><label class="fl">Data de Criação do Card</label><div style="display:flex;gap:5px;align-items:center"><input class="fi" type="number" id="fcr_d" placeholder="DD" min="1" max="31" style="width:58px"><input class="fi" type="number" id="fcr_m" placeholder="MM" min="1" max="12" style="width:58px"><input class="fi" type="number" id="fcr_a" placeholder="AAAA" min="2020" max="2099" style="width:80px"><button type="button" class="mcal-btn" title="Abrir calendário" aria-label="Abrir calendário" onclick="_abrirMcalTriplet('fcr')"><svg class="ic" aria-hidden="true"><use href="#i-calendar"/></svg></button></div></div>
         <div class="fg"><label class="fl">Coluna Inicial</label>
           <select class="fs" id="fcol">
             <option value="0">Diagnóstico</option>
@@ -2473,8 +2490,8 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
             <option value="14">Projetos Concluídos</option>
           </select>
         </div>
-        <div class="fg"><label class="fl">Data de Início Real</label><div style="display:flex;gap:5px;align-items:center"><input class="fi" type="number" id="fi_d" placeholder="DD" min="1" max="31" style="width:58px" onchange="onDataInicioChange()"><input class="fi" type="number" id="fi_m" placeholder="MM" min="1" max="12" style="width:58px" onchange="onDataInicioChange()"><input class="fi" type="number" id="fi_a" placeholder="AAAA" min="2020" max="2099" style="width:80px" onchange="onDataInicioChange()"><button type="button" class="mcal-btn" title="Abrir calendário" onclick="_abrirMcalTriplet('fi')">📅</button></div></div>
-        <div class="fg"><label class="fl" id="lblPrazo">Prazo de Entrega</label><div style="display:flex;gap:5px;align-items:center"><input class="fi" type="number" id="fp_d" placeholder="DD" min="1" max="31" style="width:58px"><input class="fi" type="number" id="fp_m" placeholder="MM" min="1" max="12" style="width:58px"><input class="fi" type="number" id="fp_a" placeholder="AAAA" min="2020" max="2099" style="width:80px"><button type="button" class="mcal-btn" title="Abrir calendário" onclick="_abrirMcalTriplet('fp')">📅</button></div></div>
+        <div class="fg"><label class="fl">Data de Início Real</label><div style="display:flex;gap:5px;align-items:center"><input class="fi" type="number" id="fi_d" placeholder="DD" min="1" max="31" style="width:58px" onchange="onDataInicioChange()"><input class="fi" type="number" id="fi_m" placeholder="MM" min="1" max="12" style="width:58px" onchange="onDataInicioChange()"><input class="fi" type="number" id="fi_a" placeholder="AAAA" min="2020" max="2099" style="width:80px" onchange="onDataInicioChange()"><button type="button" class="mcal-btn" title="Abrir calendário" aria-label="Abrir calendário" onclick="_abrirMcalTriplet('fi')"><svg class="ic" aria-hidden="true"><use href="#i-calendar"/></svg></button></div></div>
+        <div class="fg"><label class="fl" id="lblPrazo">Prazo de Entrega</label><div style="display:flex;gap:5px;align-items:center"><input class="fi" type="number" id="fp_d" placeholder="DD" min="1" max="31" style="width:58px"><input class="fi" type="number" id="fp_m" placeholder="MM" min="1" max="12" style="width:58px"><input class="fi" type="number" id="fp_a" placeholder="AAAA" min="2020" max="2099" style="width:80px"><button type="button" class="mcal-btn" title="Abrir calendário" aria-label="Abrir calendário" onclick="_abrirMcalTriplet('fp')"><svg class="ic" aria-hidden="true"><use href="#i-calendar"/></svg></button></div></div>
         <div class="fg ff"><label class="fl">Observação sobre Prazo</label><textarea class="fta" id="fpo" placeholder="Ex: cliente solicitou extensão..."></textarea></div>
       </div>
     </div>
@@ -2495,7 +2512,7 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
   </div>
   <div class="mft">
     <button class="btn bg2" onclick="cm('ovNew')">Cancelar</button>
-    <button class="btn br" onclick="salvar()">💾 Salvar Produto</button>
+    <button class="btn br" onclick="salvar()"><svg class="ic ic-inl" aria-hidden="true"><use href="#i-save"/></svg> Salvar Produto</button>
   </div>
 </div>
 </div>
@@ -2606,12 +2623,12 @@ const RECURSOS = ['Acomp pedagógico - Exerc fixação e Aval','Acompanhamento p
 // Grupos exibidos no formulário do produto (todo item de RECURSOS deve estar em um grupo;
 // o que ficar de fora aparece em "Outros")
 const RECURSO_GRUPOS = [
-  {titulo:'📋 Planejamento e Gestão', recursos:['Planejamento e Estruturação do Projeto','Gestão do projeto','Manutenção mensal do projeto','Workshop com especialistas da Transpetro','Plano Instrucional e Plano de Identidade Visual','Roteiro (Storyboard)']},
-  {titulo:'🎓 Acompanhamento Pedagógico', recursos:['Acomp pedagógico - Exerc fixação e Aval','Acompanhamento pedagógico - apostila','Acompanhamento pedagógico - PPT']},
-  {titulo:'💻 Cursos e Web', recursos:['Cursos de alta complexidade até 20 min','Cursos alta comp até 40 min até 20 telas','Cursos alta comp até 60 min até 40 telas','Cursos alta comp até 90 min até 60 telas','Cursos de baixa complexidade até 20 min','Cursos baix comp até 40 min até 20 telas','Cursos baix comp até 60 min até 40 telas','Cursos baix comp até 90 min até 60 telas','One Page - Web Content até 30 min']},
-  {titulo:'🎬 Vídeo', recursos:['Pós-produção de Vídeo até 10 min','Pós-produção de Vídeo até 2 horas','Vídeo Aula - gravação','Vídeo Aula - edição','Vídeo Instrucional 5 min','Vídeo Instrucional 10 min','Vídeo Interativo']},
-  {titulo:'🎮 Animação, Interativos e Games', recursos:['Animação 2D','Animação 3D','Objeto interativo 2D','Objeto interativo 3D','Personagem','Game 2D','Atualização do Game 2D','Game 3D']},
-  {titulo:'📚 Material Impresso', recursos:['Editoração das apostilas','Reprodução de apostila/ Pencard']},
+  {titulo:'Planejamento e Gestão', ic:'clipboard-list', recursos:['Planejamento e Estruturação do Projeto','Gestão do projeto','Manutenção mensal do projeto','Workshop com especialistas da Transpetro','Plano Instrucional e Plano de Identidade Visual','Roteiro (Storyboard)']},
+  {titulo:'Acompanhamento Pedagógico', ic:'graduation', recursos:['Acomp pedagógico - Exerc fixação e Aval','Acompanhamento pedagógico - apostila','Acompanhamento pedagógico - PPT']},
+  {titulo:'Cursos e Web', ic:'monitor', recursos:['Cursos de alta complexidade até 20 min','Cursos alta comp até 40 min até 20 telas','Cursos alta comp até 60 min até 40 telas','Cursos alta comp até 90 min até 60 telas','Cursos de baixa complexidade até 20 min','Cursos baix comp até 40 min até 20 telas','Cursos baix comp até 60 min até 40 telas','Cursos baix comp até 90 min até 60 telas','One Page - Web Content até 30 min']},
+  {titulo:'Vídeo', ic:'clapper', recursos:['Pós-produção de Vídeo até 10 min','Pós-produção de Vídeo até 2 horas','Vídeo Aula - gravação','Vídeo Aula - edição','Vídeo Instrucional 5 min','Vídeo Instrucional 10 min','Vídeo Interativo']},
+  {titulo:'Animação, Interativos e Games', ic:'gamepad', recursos:['Animação 2D','Animação 3D','Objeto interativo 2D','Objeto interativo 3D','Personagem','Game 2D','Atualização do Game 2D','Game 3D']},
+  {titulo:'Material Impresso', ic:'book-open', recursos:['Editoração das apostilas','Reprodução de apostila/ Pencard']},
 ];
 
 // ── TABELA DE PREÇOS DO CONTRATO TRANSPETRO (planilha de serviços) ──────────
@@ -6301,9 +6318,9 @@ function stab(n,el){
 function buildRecChips(selected){
   const agrupados = new Set(RECURSO_GRUPOS.flatMap(g => g.recursos));
   const outros = RECURSOS.filter(r => !agrupados.has(r));
-  const grupos = outros.length ? [...RECURSO_GRUPOS, {titulo:'Outros', recursos:outros}] : RECURSO_GRUPOS;
+  const grupos = outros.length ? [...RECURSO_GRUPOS, {titulo:'Outros', ic:'folder', recursos:outros}] : RECURSO_GRUPOS;
   document.getElementById('recChips').innerHTML=grupos.map(g=>`
-    <div class="rec-grupo">${g.titulo}</div>
+    <div class="rec-grupo">${g.ic ? icL(g.ic) : ''} ${g.titulo}</div>
     ${g.recursos.filter(r=>RECURSOS.includes(r)).map(r=>`
     <div class="rec-chip ${(selected||[]).includes(r)?'sel':''}" onclick="toggleRec(this,'${r}')">${r}</div>`).join('')}
   `).join('');
@@ -6874,24 +6891,24 @@ function _renderEF(){
   if(!wrap) return;
   // Label e estilo do botão conforme estado atual
   const _btnCascLabel = _efCascataAtiva
-    ? '🔗 Cronograma Automático: Ligado'
-    : '✂️ Cronograma Automático: Desligado';
+    ? '<svg class="ic ic-inl" aria-hidden="true"><use href="#i-link"/></svg> Cronograma Automático: Ligado'
+    : '<svg class="ic ic-inl" aria-hidden="true"><use href="#i-unlink"/></svg> Cronograma Automático: Desligado';
   const _btnCascStyle = _efCascataAtiva
     ? 'background:#DCFCE7;color:#15803D;border:1.5px solid #86EFAC;'
     : 'background:#FEE2E2;color:#991B1B;border:1.5px solid #FCA5A5;';
   const _lockBadge = _efEtapasLockadas
-    ? '<span style="font-size:10px;background:#FEF9C3;color:#92400E;border:1px solid #FCD34D;border-radius:4px;padding:1px 6px;margin-left:6px">🔒 etapas travadas</span>'
+    ? '<span style="font-size:10px;background:#FEF9C3;color:#92400E;border:1px solid #FCD34D;border-radius:4px;padding:1px 6px;margin-left:6px"><svg class="ic ic-inl" aria-hidden="true"><use href="#i-lock"/></svg> etapas travadas</span>'
     : '';
   const _customBadge = _efEtapasCustomizadas
-    ? '<span style="font-size:10px;background:#E0E7FF;color:#3730A3;border:1px solid #A5B4FC;border-radius:4px;padding:1px 6px;margin-left:6px" title="Estas etapas foram personalizadas e não serão sobrescritas ao trocar o recurso">✏️ etapas personalizadas</span>'
+    ? '<span style="font-size:10px;background:#E0E7FF;color:#3730A3;border:1px solid #A5B4FC;border-radius:4px;padding:1px 6px;margin-left:6px" title="Estas etapas foram personalizadas e não serão sobrescritas ao trocar o recurso"><svg class="ic ic-inl" aria-hidden="true"><use href="#i-pencil"/></svg> etapas personalizadas</span>'
     : '';
 
   wrap.innerHTML = `
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;flex-wrap:wrap;gap:6px">
       <span style="font-size:11px;color:var(--mu)">
         ${_efCascataAtiva
-          ? '🔗 Cronograma Automático <strong>ativado</strong> — ao editar uma data, as demais se ajustam automaticamente'
-          : '✂️ Cronograma Automático <strong>desativado</strong> — edite cada data manualmente sem afetar as demais'}
+          ? '<span style="color:#15803D"><svg class="ic ic-inl" aria-hidden="true"><use href="#i-link"/></svg></span> Cronograma Automático <strong>ativado</strong> — ao editar uma data, as demais se ajustam automaticamente'
+          : '<span style="color:#991B1B"><svg class="ic ic-inl" aria-hidden="true"><use href="#i-unlink"/></svg></span> Cronograma Automático <strong>desativado</strong> — edite cada data manualmente sem afetar as demais'}
         ${_lockBadge}
         ${_customBadge}
       </span>
@@ -6907,7 +6924,7 @@ function _renderEF(){
       <button type="button" onclick="_efDelSelecionadas()"
         style="background:#DC2626;color:#fff;border:none;padding:6px 14px;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;display:inline-flex;align-items:center;gap:6px"
         onmouseover="this.style.background='#B91C1C'" onmouseout="this.style.background='#DC2626'">
-        🗑️ Remover selecionadas
+        <svg class="ic ic-inl" aria-hidden="true"><use href="#i-trash"/></svg> Remover selecionadas
       </button>
       <button type="button" onclick="document.querySelectorAll('.ef-row-check').forEach(cb=>cb.checked=false);_efUpdateBulkBar()"
         style="background:transparent;border:1px solid #CBD5E1;color:var(--mu);padding:6px 12px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif">
@@ -6933,7 +6950,7 @@ function _renderEF(){
           <td style="text-align:center">
             <input type="checkbox" class="ef-row-check" data-idx="${i}" onchange="_efUpdateBulkBar()" style="cursor:pointer;width:14px;height:14px;accent-color:#DC2626" title="Selecionar para remover">
           </td>
-          <td style="color:var(--mu);font-size:11px;text-align:center"><span class="ef-drag-handle" draggable="true" ondragstart="_efDragStart(event,${i})" title="Arraste para reordenar">⠿</span></td>
+          <td style="color:var(--mu);font-size:11px;text-align:center"><span class="ef-drag-handle" draggable="true" ondragstart="_efDragStart(event,${i})" title="Arraste para reordenar" aria-label="Arraste para reordenar"><svg class="ic" aria-hidden="true"><use href="#i-grip"/></svg></span></td>
           <td>
             <input class="et-lb-input" id="ef_lb_${i}" value="${(e.lb||'').replace(/"/g,'&quot;')}"
               placeholder="Nome da etapa" title="Clique para editar o nome">
@@ -6958,7 +6975,7 @@ function _renderEF(){
                       value="${parseInt(e.prazo.split('-')[1])}" style="width:48px;padding:5px 4px;font-size:11.5px" onchange="_efOnChangePrazo(${i})">
                     <input class="fi ii" type="number" id="ep_a_${i}" placeholder="AAAA" min="2020" max="2099"
                       value="${parseInt(e.prazo.split('-')[0])}" style="width:60px;padding:5px 4px;font-size:11.5px" onchange="_efOnChangePrazo(${i})">
-                    <button type="button" class="mcal-btn sm" title="Abrir calendário" onclick="_abrirMcalTriplet('ep_${i}')">📅</button>`
+                    <button type="button" class="mcal-btn sm" title="Abrir calendário" aria-label="Abrir calendário" onclick="_abrirMcalTriplet('ep_${i}')"><svg class="ic" aria-hidden="true"><use href="#i-calendar"/></svg></button>`
                   : `<span class="ef-a-definir" onclick="abrirInputPrazo(${i})"
                       style="font-size:11.5px;color:#94A3B8;font-style:italic;cursor:pointer;padding:5px 8px;border:1px dashed #CBD5E1;border-radius:6px;white-space:nowrap"
                       title="Clique para definir a data">a definir</span>
@@ -6969,7 +6986,7 @@ function _renderEF(){
                         style="width:48px;padding:5px 4px;font-size:11.5px" onblur="_efOnChangePrazo(${i})">
                       <input class="fi ii" type="number" id="ep_a_${i}" placeholder="AAAA" min="2020" max="2099"
                         style="width:60px;padding:5px 4px;font-size:11.5px" onblur="_efOnChangePrazo(${i})">
-                      <button type="button" class="mcal-btn sm" title="Abrir calendário" onclick="_abrirMcalTriplet('ep_${i}')">📅</button>
+                      <button type="button" class="mcal-btn sm" title="Abrir calendário" aria-label="Abrir calendário" onclick="_abrirMcalTriplet('ep_${i}')"><svg class="ic" aria-hidden="true"><use href="#i-calendar"/></svg></button>
                     </div>`
               }
             </div>
@@ -6977,7 +6994,7 @@ function _renderEF(){
           <td>
             <div style="display:flex;align-items:center;justify-content:center;gap:2px">
               <button type="button" class="et-btn et-btn-del" onclick="_efDel(${i})"
-                title="Remover etapa">✕</button>
+                title="Remover etapa" aria-label="Remover etapa"><svg class="ic" aria-hidden="true"><use href="#i-x"/></svg></button>
             </div>
           </td>
         </tr>`).join('')}
@@ -6985,7 +7002,7 @@ function _renderEF(){
           <td colspan="7">
             <button type="button" onclick="_efAdd()"
               style="background:none;border:none;color:var(--blue);font-size:12px;font-family:'Plus Jakarta Sans',sans-serif;font-weight:600;cursor:pointer;padding:2px 4px;display:flex;align-items:center;gap:5px">
-              ＋ Adicionar etapa
+              <svg class="ic" aria-hidden="true"><use href="#i-plus"/></svg> Adicionar etapa
             </button>
           </td>
         </tr>
