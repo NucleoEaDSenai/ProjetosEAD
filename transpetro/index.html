@@ -1047,7 +1047,12 @@ body.dark .tenant-item.current{background:rgba(34,197,94,.12)}
 .coment-acao{background:transparent;border:none;cursor:pointer;font-size:13px;padding:3px 5px;border-radius:5px;opacity:.65;transition:all .15s;line-height:1}
 .coment-acao:hover{opacity:1;background:var(--bdr)}
 .link-apoio-item{display:flex;align-items:center;gap:9px;background:var(--s2);border-radius:8px;padding:8px 12px;margin-bottom:6px;font-size:12.5px}
-.link-apoio-ic{flex-shrink:0;font-size:14px}
+.link-apoio-ic{flex-shrink:0;font-size:14px;color:var(--blue);display:inline-flex}
+.link-apoio-ic .ic{width:16px;height:16px}
+.coment-act .ic,.coment-acao .ic{width:15px;height:15px;vertical-align:middle}
+.coment-act[title^="Editar"]{color:#EA580C}
+.coment-act[title^="Excluir"],.coment-acao.del{color:var(--mu)}
+.coment-act[title^="Excluir"]:hover,.coment-acao.del:hover{color:var(--red)}
 .link-apoio-info{flex:1;min-width:0}
 .link-apoio-tit{color:var(--blue);font-weight:600;text-decoration:none;word-break:break-all}
 .link-apoio-tit:hover{text-decoration:underline}
@@ -5375,12 +5380,12 @@ function openDet(id){
           ? ''
           : (p.linksApoio||[]).map((lk,i)=>`
             <div class="link-apoio-item">
-              <span class="link-apoio-ic">🔗</span>
+              <span class="link-apoio-ic">${icL('link')}</span>
               <div class="link-apoio-info">
                 <a href="${esc(lk.url)}" target="_blank" rel="noopener noreferrer" class="link-apoio-tit">${esc(lk.titulo||lk.url)}</a>
                 <div class="link-apoio-meta">${lk.titulo?`<span class="link-apoio-url">${esc(lk.url)}</span> · `:''}${esc(lk.autor||'')}${lk.dt?` · ${esc(lk.dt)}`:''}</div>
               </div>
-              ${_podeRemoverLink(lk)?`<button class="coment-acao del" onclick="removerLinkApoio(${p.id},${i})" title="Remover link" aria-label="Remover link">🗑️</button>`:''}
+              ${_podeRemoverLink(lk)?`<button class="coment-acao del" onclick="removerLinkApoio(${p.id},${i})" title="Remover link" aria-label="Remover link">${icL('trash')}</button>`:''}
             </div>`).join('')
         }
       </div>
@@ -5415,8 +5420,8 @@ function openDet(id){
               <div class="coment-body">
                 <div class="coment-txt">${linkify(cm.txt).replace(/\n/g,'<br>')}</div>
                 ${_ehMeuComent(cm)?`<div class="coment-actions">
-                  <button class="coment-act" title="Editar comentário" aria-label="Editar comentário" onclick="editarComent(${p.id},${idx})">✏️</button>
-                  <button class="coment-act" title="Excluir comentário" aria-label="Excluir comentário" onclick="excluirComent(${p.id},${idx})">🗑️</button>
+                  <button class="coment-act" title="Editar comentário" aria-label="Editar comentário" onclick="editarComent(${p.id},${idx})">${icL('pencil')}</button>
+                  <button class="coment-act" title="Excluir comentário" aria-label="Excluir comentário" onclick="excluirComent(${p.id},${idx})">${icL('trash')}</button>
                 </div>`:''}
               </div>
             </div>`;}).join('')
