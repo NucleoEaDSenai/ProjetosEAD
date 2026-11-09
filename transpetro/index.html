@@ -1129,10 +1129,65 @@ body.dark .tenant-item.current{background:rgba(34,197,94,.12)}
 .hom-body{overflow:hidden;transition:max-height .3s ease,opacity .25s ease;max-height:0;opacity:0}
 .hom-body.open{max-height:2000px;opacity:1}
 .hom-sec-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--mu);padding:10px 14px 4px;background:var(--s2);border-bottom:1px solid var(--bdr);grid-column:span 4}
-.hom-pendente .hom-card-head{background:linear-gradient(135deg,#991B1B,#DC2626)}
-.hom-instalado .hom-card-head{background:linear-gradient(135deg,#14532D,#15803d)}
-.hom-homologado .hom-card-head{background:linear-gradient(135deg,#B45309,#F59E0B)}
-.hom-autorizado .hom-card-head{background:linear-gradient(135deg,#1D4ED8,#2563EB)}
+/* Homologações: acordeão por projeto (azul pastel) e card do produto por status (vermelho, amarelo, verde pastel) */
+.hom-pj{background:var(--surface);border:1px solid #14213D;border-radius:12px;margin-bottom:12px;overflow:hidden}
+.hom-pj-hd{width:100%;display:flex;align-items:center;gap:9px;flex-wrap:wrap;background:#14213D;color:#FFFFFF;border:none;padding:12px 16px;cursor:pointer;font:inherit;font-family:'Plus Jakarta Sans',sans-serif;text-align:left}
+.hom-pj-hd:hover{background:#1C2D52}
+.hom-pj-hd:focus-visible{outline:2px solid #93C5FD;outline-offset:-3px}
+.hom-card-title:focus-visible{outline:2px solid var(--blue);outline-offset:-2px}
+.hom-pj-ic{display:inline-flex;color:#93C5FD}
+.hom-pj-nome{font-weight:800;font-size:13.5px}
+.hom-pj-n{font-size:11.5px;font-weight:600;opacity:.8}
+.hom-pj-pills{display:flex;gap:6px;flex-wrap:wrap;margin-left:auto}
+.hom-pj-body{padding:12px 14px 2px;background:#F4F5F8}
+.hom-pj-body .hom-card{margin-bottom:12px}
+.hom-chev{width:16px;height:16px;flex-shrink:0;transition:transform .2s}
+[aria-expanded="true"]>.hom-chev{transform:rotate(90deg)}
+.hom-card-head{color:var(--hc-fg,#1E3A8A);background:var(--hc-bg,#E3EDFF);padding:10px 14px}
+.hom-card-head:hover{filter:none}
+.hom-card .hom-card-head{cursor:default}
+.hom-grid .hom-field:nth-child(4n){border-right:1px solid var(--bdr)}
+.hom-grid .hom-field:nth-child(5),.hom-grid .hom-field:nth-child(10),.hom-grid .hom-field-conf{border-right:none}
+.hom-card-title{display:flex;align-items:center;gap:7px;background:none;border:none;color:inherit;font:inherit;font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:13.5px;cursor:pointer;padding:2px 0;text-align:left;flex:1;min-width:0}
+.hom-card .hom-badge{background:rgba(255,255,255,.65);color:inherit}
+.hom-card .hom-badge .ic,.hom-pj .hom-badge .ic{margin-right:3px}
+.hom-badge.hom-st-pend{background:#FEE2E2;color:#991B1B}
+.hom-badge.hom-st-solic,.hom-badge.hom-st-aguard{background:#FEF3C7;color:#92400E}
+.hom-badge.hom-st-ok{background:#DCFCE7;color:#166534}
+.hom-card .hom-badge.hom-st-pend,.hom-card .hom-badge.hom-st-solic,.hom-card .hom-badge.hom-st-aguard,.hom-card .hom-badge.hom-st-ok{background:#fff}
+.hom-c-pend{--hc-bg:#FEE2E2;--hc-fg:#991B1B;border-color:#FCA5A5}
+.hom-c-solic,.hom-c-aguard{--hc-bg:#FEF3C7;--hc-fg:#92400E;border-color:#FCD34D}
+.hom-c-ok{--hc-bg:#DCFCE7;--hc-fg:#166534;border-color:#86EFAC}
+.hom-ver{display:inline-flex;align-items:center;gap:4px;background:rgba(255,255,255,.7);border:1px solid rgba(0,0,0,.08);color:inherit;padding:3px 10px;border-radius:6px;cursor:pointer;font-size:11.5px;font-weight:600;font-family:'Plus Jakarta Sans',sans-serif}
+.hom-ver:hover{background:#fff}
+.hom-sec-title .ic{color:var(--blue);margin-right:2px}
+.hom-field-conf{grid-column:span 4}
+.hom-link-wrap{display:flex;align-items:center;gap:6px}
+.hom-grid .hom-field{display:flex;flex-direction:column}
+.hom-grid .hom-field .hom-field-val{margin-top:auto}
+.hom-field-val input[type=url]{width:100%;border:1px solid var(--bdr);border-radius:5px;padding:5px 7px;font-size:12px;font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(--txt);outline:none}
+.hom-field-val input[type=url]:focus{border-color:var(--blue)}
+.hom-link-abrir{display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;width:28px;height:28px;border:1px solid var(--bdr);border-radius:6px;color:var(--blue);background:var(--surface)}
+.hom-link-abrir:hover{border-color:var(--blue)}
+.hom-conf{font-size:12px;color:var(--mu);display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.hom-conf.ok{color:#166534}
+.hom-conf.aguard{color:#92400E}
+.hom-conf-btn{display:inline-flex;align-items:center;gap:6px;background:#15803D;color:#fff;border:none;border-radius:7px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif}
+.hom-conf-btn:hover{background:#166534}
+.hom-conf-undo{display:inline-flex;align-items:center;gap:4px;background:none;border:1px solid var(--bdr);color:var(--mu);border-radius:6px;padding:2px 8px;font-size:11px;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif}
+.hom-conf-undo:hover{color:var(--red);border-color:var(--red)}
+.hom-salvar{display:inline-flex;align-items:center;gap:6px;padding:7px 18px;background:var(--blue);color:#fff;border:none;border-radius:7px;cursor:pointer;font-size:12.5px;font-weight:600;font-family:'Plus Jakarta Sans',sans-serif}
+.hom-empty-ic{color:var(--mu);margin-bottom:10px}
+.hom-empty-ic .ic{width:30px;height:30px}
+.hom-busca-ic{position:absolute;left:9px;top:50%;transform:translateY(-50%);width:13px;height:13px;color:var(--mu);pointer-events:none;z-index:1}
+body.dark .hom-pj{border-color:#22335C}
+body.dark .hom-pj-hd{background:#1B2A4A;color:#FFFFFF}
+body.dark .hom-pj-hd:hover{background:#22335C}
+body.dark .hom-pj-body{background:var(--bg)}
+body.dark .hom-c-pend{--hc-bg:var(--danger-bg);--hc-fg:var(--danger-fg);border-color:var(--bdr)}
+body.dark .hom-c-solic,body.dark .hom-c-aguard{--hc-bg:var(--warn-bg);--hc-fg:var(--warn-fg);border-color:var(--bdr)}
+body.dark .hom-c-ok{--hc-bg:var(--ok-bg);--hc-fg:var(--ok-fg);border-color:var(--bdr)}
+body.dark .hom-card .hom-badge,body.dark .hom-ver{background:rgba(0,0,0,.2)}
 .hom-resumo{display:flex;flex-wrap:wrap;gap:10px;padding:10px 14px;background:var(--s2);border-top:1px solid var(--bdr)}
 .hom-resumo-item{font-size:11.5px;display:flex;gap:4px;align-items:center}
 .hom-resumo-label{color:var(--mu);font-weight:600}
@@ -2283,22 +2338,27 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
     <!-- CANCELADOS -->
     <!-- HOMOLOGAÇÕES -->
     <div class="view" id="view-homologacoes">
-      <div id="homologStats" style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:18px"></div>
+      <div id="homologStats" style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:18px"></div>
       <!-- Filtros -->
       <div class="fbox" style="margin-bottom:18px">
         <div class="fbox-row">
-          <span style="font-size:11px;font-weight:700;color:var(--mu);text-transform:uppercase;letter-spacing:.6px;align-self:center;padding-bottom:2px">Filtrar por</span>
-          <div class="fg-sm"><label class="fl-sm">🔎 Nome do Produto</label>
-            <input type="text" id="homBuscaNome" class="ms-btn" style="width:180px;cursor:text" placeholder="Buscar nome…" oninput="rHomologacoes()" autocomplete="off">
+          <div class="fg-sm"><label class="fl-sm" for="homBuscaNome">Nome do Produto</label>
+            <div style="position:relative">
+              <svg class="ic hom-busca-ic" aria-hidden="true"><use href="#i-search"/></svg>
+              <input type="text" id="homBuscaNome" class="ms-btn" style="width:200px;cursor:text;padding-left:28px" placeholder="Buscar produto…" oninput="rHomologacoes()" autocomplete="off">
+            </div>
           </div>
-          <div class="fg-sm"><label class="fl-sm">📅 Medição</label>
+          <div class="fg-sm"><label class="fl-sm" for="homProj">Projeto</label>
+            <select class="atr-sel" id="homProj" onchange="_homOnFiltro()"><option value="">Todos</option></select>
+          </div>
+          <div class="fg-sm"><label class="fl-sm">Medição</label>
             <div class="ms-wrap" id="msWrap_homMed">
               <button class="ms-btn" id="msBtn_homMed" onclick="_msToggle('homMed')">Todos</button>
               <div class="ms-dropdown" id="msDd_homMed"></div>
             </div>
           </div>
           <button onclick="limparFiltrosHomolog()" class="btn-lim btn-lim-k">✕ Limpar Filtros</button>
-          <span id="homFiltroContador" style="font-size:11px;color:var(--mu);margin-left:auto;align-self:center"></span>
+          <span id="homFiltroContador" style="font-size:11.5px;color:var(--mu);margin-left:auto;align-self:center;font-weight:600"></span>
         </div>
       </div>
       <div id="homologLista"></div>
@@ -4425,7 +4485,7 @@ function rKPIs(){
   const atrasCl = act.filter(p=>atrasadoPorCliente(p)).length;
   const andando = act.filter(p=>calcSit(p)==='andamento').length;
   const aguard  = act.filter(p=>calcSit(p)==='aguardando').length;
-  const homolPend = todos.filter(p=>(p.col===11||p.homologPassou||p.homolog?.preenchido)&&!p.homolog?.dtInstalacao).length;
+  const homolPend = todos.filter(p=>(p.col===11||p.homologPassou||p.homolog?.preenchido)&&!_homConcluida(p)).length;
   const medicPend = todos.filter(p=>p.enviadoMedicao&&!p.medicaoFeita).length;
   const avg     = total>0 ? Math.round(act.reduce((a,p)=>a+p.pct,0)/total) : 0;
   const txConc  = total>0 ? Math.round(conc/total*100) : 0;
@@ -4474,7 +4534,7 @@ function rKPIs(){
       total: actAnt.length,
       conc: actAnt.filter(p=>calcSit(p)==='concluido').length,
       atras: actAnt.filter(p=>calcSit(p)==='atrasado').length,
-      homolPend: todosAnt.filter(p=>(p.col===11||p.homologPassou||p.homolog?.preenchido)&&!p.homolog?.dtInstalacao).length,
+      homolPend: todosAnt.filter(p=>(p.col===11||p.homologPassou||p.homolog?.preenchido)&&!_homConcluida(p)).length,
     };
     ant.txConc  = ant.total>0 ? Math.round(ant.conc/ant.total*100)  : 0;
     ant.txAtras = ant.total>0 ? Math.round(ant.atras/ant.total*100) : 0;
@@ -8358,23 +8418,23 @@ function exportXLSX(){
   XLSX.utils.book_append_sheet(wb, wsA, 'Atrasos');
 
   // ── Aba 4: Homologações ──
-  const hdrH = ['Projeto','Situação','RP','Categoria de Projeto','ID Curso','Pacote SCORM','Solicitou a Homologação','Homologado Por','RT','Conclusão','Nota de Corte','Novo/Manutenção','Serviço','Dt. Homologação','Dt. Autorização','Dt. Instalação SIRH','Status'];
+  const hdrH = ['Projeto','Produto','Situação','RP','Categoria de Projeto','Solicitou a Homologação','Homologado Por','Dt. Disponibilização no SharePoint do cliente','Dt. Solicitação da Homologação','Dt. Homologação (cliente)','Link para a aprovação da homologação','Confirmada por','Confirmada em','Status'];
   const todosTodos = activeDB().concat(cancelDB());
   const rowsH = todosTodos
     .filter(p => p.col === 11 || p.homologPassou || p.homolog?.preenchido)
     .map(p => {
       const h = p.homolog || {};
       return [
-        p.nome, sitLabel(p), p.rp||'', p.academia||'',
-        h.idCurso||'', h.pacoteScorm||'', h.solicitante||'', h.enviadaPor||'',
-        h.rt||'', h.conclusao||'', h.notaCorte||'', h.nPaginas||'', h.novoManut||'', h.servico||'',
-        isoToBR(h.dtHomolog), isoToBR(h.dtAutorizacao), isoToBR(h.dtInstalacao),
-        h.dtInstalacao ? 'Instalado' : 'Pendente'
+        projDoCard(p)?.nome || '', p.nome, sitLabel(p), p.rp||'', p.academia||'',
+        h.solicitante||'', h.enviadaPor||'',
+        isoToBR(h.dtDispSharepoint), isoToBR(h.dtHomolog), isoToBR(_homDataCliente(p)), h.linkEmailOk||'',
+        h.homologConfirmadaPor||'', h.homologConfirmadaEm||'',
+        _HOM_ST[_homStatus(p)].lbl
       ];
     });
   if(rowsH.length === 0) rowsH.push(['Nenhuma homologação registrada']);
   const wsH = XLSX.utils.aoa_to_sheet([hdrH, ...rowsH]);
-  wsH['!cols'] = [44,16,14,14,14,22,16,16,16,14,14,16,18,18,18,18,12].map(w=>({wch:w}));
+  wsH['!cols'] = [30,40,16,14,16,22,18,20,18,18,40,20,18,22].map(w=>({wch:w}));
   XLSX.utils.book_append_sheet(wb, wsH, 'Homologações');
 
   // ── Aba 5: Medição ──
@@ -8710,7 +8770,7 @@ function exportPDFLista(){
   const atrasClV = act.filter(p=>atrasadoPorCliente(p)).length;
   const andando = act.filter(p=>calcSit(p)==='andamento').length;
   const aguard = act.filter(p=>calcSit(p)==='aguardando').length;
-  const homolPendV = todos.filter(p=>(p.col===11||p.homologPassou||p.homolog?.preenchido)&&!p.homolog?.dtInstalacao).length;
+  const homolPendV = todos.filter(p=>(p.col===11||p.homologPassou||p.homolog?.preenchido)&&!_homConcluida(p)).length;
   const medicPendV = todos.filter(p=>p.enviadoMedicao&&!p.medicaoFeita).length;
   const avg = total>0 ? Math.round(act.reduce((a,p)=>a+p.pct,0)/total) : 0;
   const txConc = total>0 ? Math.round(conc/total*100) : 0;
@@ -9172,10 +9232,10 @@ function exportPDFHomologacoes(){
     .filter(p => p.col === 11 || p.homologPassou || p.homolog?.preenchido)
     .sort((a,b) => a.nome.localeCompare(b.nome,'pt-BR'));
 
-  const grpPendente   = lista.filter(p => !(p.homolog?.dtHomolog) && !(p.homolog?.dtAutorizacao) && !(p.homolog?.dtInstalacao));
-  const grpHomologado = lista.filter(p =>  !!(p.homolog?.dtHomolog) && !(p.homolog?.dtAutorizacao) && !(p.homolog?.dtInstalacao));
-  const grpAutorizado = lista.filter(p =>  !!(p.homolog?.dtAutorizacao) && !(p.homolog?.dtInstalacao));
-  const grpInstalado  = lista.filter(p =>  !!(p.homolog?.dtInstalacao));
+  const grpPendente   = lista.filter(p => _homStatus(p) === 'pendente');
+  const grpSolicitada = lista.filter(p => _homStatus(p) === 'solicitada');
+  const grpAguardConf = lista.filter(p => _homStatus(p) === 'aguard_conf');
+  const grpHomologada = lista.filter(p => _homStatus(p) === 'homologada');
 
   // ════════════════════════════════════════
   //  CAPA
@@ -9213,9 +9273,9 @@ function exportPDFHomologacoes(){
   const cards = [
     { label:'Total', val: lista.length,           cor: AZUL,    icone:'TOTAL' },
     { label:'Pendentes', val: grpPendente.length,  cor: [185,28,28],  icone:'PEND'  }, // vermelho
-    { label:'Homologados', val: grpHomologado.length, cor: [161,98,7],  icone:'HOM' }, // ambar
-    { label:'Autorizados', val: grpAutorizado.length, cor: AZUL2,   icone:'AUT' },
-    { label:'Instalados', val: grpInstalado.length,   cor: VERDE,   icone:'INST' },
+    { label:'Solicitadas', val: grpSolicitada.length, cor: [161,98,7],  icone:'SOL' }, // âmbar
+    { label:'Aguardando confirmacao', val: grpAguardConf.length, cor: [194,65,12], icone:'AGU' },
+    { label:'Homologadas', val: grpHomologada.length, cor: VERDE,   icone:'HOM' },
   ];
   const cw = 48, ch = 28, gap = 4;
   const totalW = cards.length * cw + (cards.length-1)*gap;
@@ -9290,27 +9350,22 @@ function exportPDFHomologacoes(){
       const h = p.homolog || {};
       return [
         p.nome,
+        projDoCard(p)?.nome || '—',
         p.rp || '—',
         p.academia || '—',
         h.solicitante || '—',
         h.enviadaPor || '—',
-        h.servico || '—',
-        h.novoManut || '—',
-        h.conclusao || '—',
-        h.idCurso || '—',
-        h.notaCorte || '—',
-        h.nPaginas  || '—',
+        isoFmt(h.dtDispSharepoint),
         isoFmt(h.dtHomolog),
-        isoFmt(h.dtAutorizacao),
-        isoFmt(h.dtInstalacao),
+        isoFmt(_homDataCliente(p)),
+        h.homologConfirmadaPor || '—',
       ];
     });
 
     doc.autoTable({
       head: [[
-        'Projeto','RP','Categoria de Projeto','Solicitou a Homologação','Homologado Por',
-        'Servico','Tipo','Conclusao','ID Curso','Nota','Pag.',
-        'Homologacao','Autorizacao','Instalacao'
+        'Produto','Projeto','RP','Categoria de Projeto','Solicitou a Homologação','Homologado Por',
+        'SharePoint','Solicitação','Homologação (cliente)','Confirmada por'
       ]],
       body: rows,
       startY: 23,
@@ -9331,31 +9386,26 @@ function exportPDFHomologacoes(){
       },
       alternateRowStyles: { fillColor: corAlt },
       columnStyles: {
-        0: { cellWidth: 58, fontStyle:'bold' },
-        1: { cellWidth: 13, halign:'center' },
-        2: { cellWidth: 22 },
+        0: { cellWidth: 52, fontStyle:'bold' },
+        1: { cellWidth: 34 },
+        2: { cellWidth: 24 },
         3: { cellWidth: 22 },
-        4: { cellWidth: 22 },
-        5: { cellWidth: 22 },
-        6: { cellWidth: 14, halign:'center' },
-        7: { cellWidth: 16, halign:'center' },
-        8: { cellWidth: 14, halign:'center' },
-        9: { cellWidth: 10, halign:'center' },
-        10:{ cellWidth: 14, halign:'center' },
-        11:{ cellWidth: 10, halign:'center' },
-        12:{ cellWidth: 18, halign:'center' },
-        13:{ cellWidth: 18, halign:'center' },
-        14:{ cellWidth: 18, halign:'center' },
+        4: { cellWidth: 24 },
+        5: { cellWidth: 24 },
+        6: { cellWidth: 20, halign:'center' },
+        7: { cellWidth: 22, halign:'center' },
+        8: { cellWidth: 22, halign:'center' },
+        9: { cellWidth: 25 },
       },
       didParseCell(data){
         if(data.section === 'body'){
           // Datas preenchidas em negrito colorido
-          if([12,13,14].includes(data.column.index) && data.cell.raw !== '—'){
+          if([6,7,8].includes(data.column.index) && data.cell.raw !== '—'){
             data.cell.styles.textColor = corHead;
             data.cell.styles.fontStyle = 'bold';
           }
           // Datas ausentes em cinza
-          if([12,13,14].includes(data.column.index) && data.cell.raw === '—'){
+          if([6,7,8].includes(data.column.index) && data.cell.raw === '—'){
             data.cell.styles.textColor = [156,163,175];
           }
         }
@@ -9372,10 +9422,10 @@ function exportPDFHomologacoes(){
   // ════════════════════════════════════════
   //  Renderizar os 4 grupos
   // ════════════════════════════════════════
-  renderGrupo(grpPendente,   'PENDENTES — sem data de Homologacao',   [185,28,28],  [185,28,28],  [255,241,241], [220,38,38],  'Pendente');
-  renderGrupo(grpHomologado, 'HOMOLOGADOS — aguardando Autorizacao',  [161,98,7],   [161,98,7],   [254,252,232], [234,179,8],  'Homologado');
-  renderGrupo(grpAutorizado, 'AUTORIZADOS — aguardando Instalacao SIRH',   [0,61,165],  [0,61,165],  [239,246,255], [37,99,235],  'Autorizado');
-  renderGrupo(grpInstalado,  'INSTALADOS NO SIRH',                    [21,128,61],  [21,128,61],  [240,253,244], [34,197,94],  'Instalado');
+  renderGrupo(grpPendente,   'PENDENTES — sem solicitacao de homologacao',        [185,28,28], [185,28,28], [255,241,241], [220,38,38], 'Pendente');
+  renderGrupo(grpSolicitada, 'SOLICITADAS — aguardando a data do cliente',        [161,98,7],  [161,98,7],  [254,252,232], [234,179,8], 'Solicitada');
+  renderGrupo(grpAguardConf, 'AGUARDANDO CONFIRMACAO — data do cliente informada', [194,65,12], [194,65,12], [255,247,237], [234,88,12], 'Aguardando confirmacao');
+  renderGrupo(grpHomologada, 'HOMOLOGADAS — confirmadas pela lideranca',          [21,128,61], [21,128,61], [240,253,244], [34,197,94], 'Homologada');
 
   // ── Rodapé em todas as páginas ──
   const pages = doc.internal.getNumberOfPages();
@@ -9393,7 +9443,7 @@ function exportPDFHomologacoes(){
   }
 
   doc.save('homologacoes-firjan-'+td()+'.pdf');
-  showToast('🔖 PDF de Homologações exportado!');
+  showToast('PDF de Homologações exportado!');
 }
 
 // ── CSV (mantido como fallback interno) ──
@@ -10404,143 +10454,180 @@ function exportPDFRelMedicao(){
 
 // ── HOMOLOGAÇÕES ─────────────────────────────────────────────────────────────
 
-// Auto-save silencioso ao sair de qualquer campo de homologação
+// Fluxo: Pendente → Solicitada (Solicitação da Homologação) → Aguardando confirmação
+// (Data da Homologação informada pelo cliente) → Homologada (confirmada pela liderança).
+// Produtos com a antiga "Instalação SIRH" gravada contam como Homologados.
+// Campos antigos (RT, ID do curso, SCORM, páginas, configurações, autorização, instalação)
+// continuam no banco, só não aparecem mais.
+const _HOM_ST = {
+  pendente:    {lbl:'Pendente',               ic:'hourglass',      cls:'pend'},
+  solicitada:  {lbl:'Solicitada',             ic:'mail',           cls:'solic'},
+  aguard_conf: {lbl:'Aguardando confirmação', ic:'calendar-clock', cls:'aguard'},
+  homologada:  {lbl:'Homologada',             ic:'badge-check',    cls:'ok'},
+};
+const _HOM_ORDEM = ['pendente','solicitada','aguard_conf','homologada'];
+function _homStatus(p){
+  const h = p.homolog || {};
+  if(h.homologConfirmada || h.dtInstalacao) return 'homologada';
+  if(h.dtHomologCliente) return 'aguard_conf';
+  if(h.dtHomolog || h.dtAutorizacao) return 'solicitada';
+  return 'pendente';
+}
+function _homConcluida(p){ return _homStatus(p) === 'homologada'; }
+// Data da homologação informada pelo cliente (ou a instalação, nos registros antigos)
+function _homDataCliente(p){ return p.homolog?.dtHomologCliente || p.homolog?.dtInstalacao || null; }
+function _homProjKey(p){ return (p.projCadId && CADPROJ.some(c => c.id === p.projCadId)) ? p.projCadId : '__sem'; }
+function _homBadge(st){ const s = _HOM_ST[st]; return `<span class="hom-badge hom-st-${s.cls}">${icL(s.ic)} ${s.lbl}</span>`; }
+
+// Lê os campos visíveis do card (quem não está na tela mantém o valor salvo)
+function _homLerCampos(pid, h){
+  const v = (fld, ant) => { const el = document.getElementById('hom_'+pid+'_'+fld); return el ? (el.value||'').trim() : (ant||''); };
+  return {
+    solicitante:      v('solicitante', h.solicitante),
+    enviadaPor:       v('enviadaPor',  h.enviadaPor),
+    academia:         v('academia',    h.academia),
+    dtHomolog:        v('dtHomolog',   h.dtHomolog) || null,
+    dtHomologCliente: v('dtHomologCliente', h.dtHomologCliente) || null,
+    dtDispSharepoint: v('dtDispSharepoint', h.dtDispSharepoint) || null,
+    linkEmailOk:      v('linkEmailOk',      h.linkEmailOk),
+  };
+}
+// Aplica os campos no produto; devolve true se algo mudou
+function _homAplicar(p, campos){
+  const h = p.homolog || {};
+  const mudou = Object.keys(campos).some(k => (campos[k]||'') !== (h[k]||''));
+  if(!mudou && h.preenchido) return false;
+  const novo = {...h, ...campos, preenchido:true};
+  // Data do cliente alterada depois da confirmação: a confirmação precisa ser refeita
+  if(h.homologConfirmada && (campos.dtHomologCliente||'') !== (h.dtHomologCliente||'')){
+    novo.homologConfirmada = false; novo.homologConfirmadaPor = null; novo.homologConfirmadaEm = null;
+    registrarHistorico(p, 'homologação', 'Data da homologação (cliente) alterada — confirmação desfeita');
+  }
+  p.homolog = novo;
+  p.homologPassou = true;
+  return true;
+}
+
+// Auto-save silencioso ao sair de qualquer campo
 function _homAutoSave(pid){
   const p = DB.find(x=>x.id===pid); if(!p) return;
-  const h = p.homolog || {};
-  const g = fld => document.getElementById('hom_'+pid+'_'+fld)?.value?.trim() || '';
-  const gd = fld => { const v=document.getElementById('hom_'+pid+'_'+fld)?.value; return v||null; };
-
-  // Preservar dados existentes e sobrescrever só o que está no DOM
-  const campos = {
-    idCurso:      g('idCurso')      || h.idCurso      || '',
-    pacoteScorm:  g('pacoteScorm')  || h.pacoteScorm  || '',
-    nPaginas:     g('nPaginas')     || h.nPaginas     || '',
-    solicitante:  g('solicitante')  || h.solicitante  || '',
-    enviadaPor:   g('enviadaPor')   || h.enviadaPor   || '',
-    rt:           g('rt')           || h.rt           || '',
-    academia:     g('academia')     || h.academia     || '',
-    conclusao:    g('conclusao')    || h.conclusao    || '',
-    notaCorte:    g('notaCorte')    || h.notaCorte    || '',
-    novoManut:    g('novoManut')    || h.novoManut    || '',
-    servico:      g('servico')      || h.servico      || '',
-    dtHomolog:    gd('dtHomolog')   ?? h.dtHomolog    ?? null,
-    dtAutorizacao:gd('dtAutorizacao')?? h.dtAutorizacao?? null,
-    dtInstalacao: gd('dtInstalacao')?? h.dtInstalacao ?? null,
-  };
-
-  // Só salvar se houve alguma mudança real
-  const mudou = Object.keys(campos).some(k => campos[k] !== (h[k]||null) && campos[k] !== (h[k]||''));
-  if(!mudou && h.preenchido) return;
-
-  p.homolog = { ...h, ...campos, preenchido: true };
-  p.homologPassou = true;
+  const stAntes = _homStatus(p);
+  if(!_homAplicar(p, _homLerCampos(pid, p.homolog||{}))) return;
   fbSalvarProjeto(p);
+  if(_homStatus(p) !== stAntes) rHomologacoes(); // muda a cor/grupo do card
 }
 
 function salvarHomolog(pid){
   const p = DB.find(x=>x.id===pid); if(!p) return;
-  const h = p.homolog || {};
-  const g = id => document.getElementById('hom_'+pid+'_'+id)?.value || '';
-
-  h.idCurso       = g('idCurso');
-  h.pacoteScorm   = g('pacoteScorm');
-  h.solicitante   = g('solicitante');
-  h.enviadaPor    = g('enviadaPor');
-  h.rt            = g('rt');
-  h.academia      = g('academia');
-  h.conclusao     = g('conclusao');
-  h.notaCorte     = g('notaCorte');
-  h.nPaginas      = g('nPaginas');
-  h.novoManut     = g('novoManut');
-  h.dtHomolog     = g('dtHomolog');
-  h.dtAutorizacao = g('dtAutorizacao');
-  h.dtInstalacao  = g('dtInstalacao');
-  h.servico       = g('servico');
-  h.preenchido    = true; // marca que o usuário já iniciou o preenchimento
-  p.homologPassou  = true; // projeto já esteve na col 11
-
-  p.homolog = h;
-  const dtStr = h.dtInstalacao ? `Instalação: ${h.dtInstalacao.split('-').reverse().join('/')}` :
-                h.dtHomolog    ? `Homologação: ${h.dtHomolog.split('-').reverse().join('/')}` :
-                'Dados atualizados';
+  _homAplicar(p, _homLerCampos(pid, p.homolog||{}));
+  const h = p.homolog;
+  const dtStr = h.dtHomologCliente ? `Homologação (cliente): ${fd(h.dtHomologCliente)}`
+              : h.dtHomolog        ? `Solicitação da homologação: ${fd(h.dtHomolog)}`
+              : 'Dados atualizados';
   registrarHistorico(p, 'homologação salva', dtStr);
   fbSalvarProjeto(p);
-  showToast('💾 Dados salvos!');
-  // Não re-renderiza — gaveta permanece aberta para continuar editando
+  showToast('Dados salvos!');
+  rHomologacoes();
+}
+
+// Só a liderança confirma a data informada pelo cliente
+function confirmarHomolog(pid){
+  const p = DB.find(x=>x.id===pid); if(!p) return;
+  if(!ehLideranca()){ showToast('Apenas a liderança pode confirmar a homologação'); return; }
+  _homAplicar(p, _homLerCampos(pid, p.homolog||{}));
+  const h = p.homolog;
+  if(!h.dtHomologCliente){ showToast('Informe a Data da Homologação (cliente) antes de confirmar'); return; }
+  Object.assign(h, {homologConfirmada:true, homologConfirmadaPor:nomeUsuarioAtual(), homologConfirmadaEm:_dtAgora()});
+  registrarHistorico(p, 'confirmou homologação', `Homologação em ${fd(h.dtHomologCliente)} confirmada`);
+  fbSalvarProjeto(p);
+  showToast('Homologação confirmada');
+  rHomologacoes();
+}
+function desfazerConfirmHomolog(pid){
+  const p = DB.find(x=>x.id===pid); if(!p) return;
+  if(!ehLideranca()){ showToast('Apenas a liderança pode desfazer a confirmação'); return; }
+  const h = p.homolog || {};
+  Object.assign(h, {homologConfirmada:false, homologConfirmadaPor:null, homologConfirmadaEm:null});
+  p.homolog = h;
+  registrarHistorico(p, 'homologação', 'Confirmação da homologação desfeita');
+  fbSalvarProjeto(p);
+  showToast('Confirmação desfeita');
+  rHomologacoes();
 }
 
 function _homSel(pid, fld, opts, val){
-  const sel = opts.map(o => `<option value="${o}" ${val===o?'selected':''}>${o}</option>`).join('');
+  const sel = opts.map(o => `<option value="${esc(o)}" ${val===o?'selected':''}>${esc(o)}</option>`).join('');
   return `<select id="hom_${pid}_${fld}" onchange="_homAutoSave(${pid})">${sel}</select>`;
 }
 
 function _homInput(pid, fld, val, type='text', placeholder=''){
   const evtAttr = type==='date' ? `onchange="_homAutoSave(${pid})"` : `onblur="_homAutoSave(${pid})"`;
-  return `<input type="${type}" id="hom_${pid}_${fld}" value="${val||''}" placeholder="${placeholder}" style="width:100%" ${evtAttr}>`;
+  return `<input type="${type}" id="hom_${pid}_${fld}" value="${esc(val||'')}" placeholder="${placeholder}" style="width:100%" ${evtAttr}>`;
 }
 
 function toggleHomolog(id){
-  const body   = document.getElementById('hom_body_'+id);
-  const chev   = document.getElementById('hom_chev_'+id);
+  const body = document.getElementById('hom_body_'+id);
+  const btn  = document.getElementById('hom_tg_'+id);
   if(!body) return;
-  const aberto = body.classList.contains('open');
-  body.classList.toggle('open', !aberto);
-  if(chev) chev.classList.toggle('open', !aberto);
+  const abrir = !body.classList.contains('open');
+  body.classList.toggle('open', abrir);
+  if(btn) btn.setAttribute('aria-expanded', abrir);
+}
+
+// Abre o link do e-mail em nova aba (aceita só http/https)
+function _homLinkAbrir(url){
+  if(!/^https?:\/\//i.test(url||'')) return '';
+  return `<a class="hom-link-abrir" href="${esc(url)}" target="_blank" rel="noopener noreferrer" title="Abrir a aprovação da homologação" aria-label="Abrir a aprovação da homologação">${icL('link')}</a>`;
+}
+
+// Bloco da confirmação (dentro de Datas)
+function _homConfirmacaoHtml(p){
+  const h = p.homolog || {};
+  const lider = ehLideranca();
+  if(h.homologConfirmada){
+    return `<div class="hom-conf ok">${icL('badge-check')} Confirmada por <strong>${esc(h.homologConfirmadaPor||'—')}</strong>${h.homologConfirmadaEm?' em '+esc(h.homologConfirmadaEm):''}
+      ${lider?`<button type="button" class="hom-conf-undo" onclick="desfazerConfirmHomolog(${p.id})">${icL('undo')} Desfazer</button>`:''}</div>`;
+  }
+  if(h.dtInstalacao && !h.dtHomologCliente){
+    return `<div class="hom-conf ok">${icL('badge-check')} Concluída no registro antigo (Instalação SIRH em ${fd(h.dtInstalacao)})</div>`;
+  }
+  if(!h.dtHomologCliente){
+    return `<div class="hom-conf">Informe a data da homologação do cliente para poder confirmar.</div>`;
+  }
+  return lider
+    ? `<button type="button" class="hom-conf-btn" onclick="confirmarHomolog(${p.id})">${icL('circle-check')} Confirmar homologação</button>`
+    : `<div class="hom-conf aguard">${icL('calendar-clock')} Aguardando a confirmação da liderança</div>`;
 }
 
 function buildHomologCard(p){
-  const h = p.homolog || {};
-  const completo    = !!(h.dtInstalacao);
-  const autorizado  = !!(h.dtAutorizacao) && !completo;
-  const homologado  = !!(h.dtHomolog) && !autorizado && !completo;
-
-  const cardCls = completo   ? 'hom-instalado'
-                : autorizado ? 'hom-autorizado'
-                : homologado ? 'hom-homologado'
-                : 'hom-pendente';
-
-  const statusBdg = completo
-    ? `<span class="hom-badge hom-status-ok">✅ Instalado</span>`
-    : autorizado
-      ? `<span class="hom-badge hom-status-autorizado">🔓 Autorizado</span>`
-      : homologado
-        ? `<span class="hom-badge hom-status-homolog">🔖 Homologado</span>`
-        : `<span class="hom-badge hom-status-pend">⏳ Pendente</span>`;
-
+  const h  = p.homolog || {};
+  const st = _homStatus(p);
   const acadBdg = p.academia ? `<span class="hom-badge">${esc(p.academia)}</span>` : '';
   const rpBdg   = p.rp       ? `<span class="hom-badge">RP: ${esc(p.rp)}</span>`  : '';
+  const dCli    = _homDataCliente(p);
 
-  // Mini resumo visível quando recolhido (só mostra se já tem dados)
-  const temDados = h.preenchido;
-  const resumo = temDados ? `
-    <div class="hom-resumo">
-      ${h.idCurso      ? `<span class="hom-resumo-item"><span class="hom-resumo-label">ID:</span><span class="hom-resumo-val">${h.idCurso}</span></span>` : ''}
-      ${h.solicitante  ? `<span class="hom-resumo-item"><span class="hom-resumo-label">Solicitante:</span><span class="hom-resumo-val">${h.solicitante}</span></span>` : ''}
-      ${h.servico      ? `<span class="hom-resumo-item"><span class="hom-resumo-label">Serviço:</span><span class="hom-resumo-val">${h.servico}</span></span>` : ''}
-      ${h.novoManut    ? `<span class="hom-resumo-item"><span class="hom-resumo-label">Tipo:</span><span class="hom-resumo-val">${h.novoManut}</span></span>` : ''}
-      ${h.dtHomolog     ? `<span class="hom-resumo-item"><span class="hom-resumo-label">Homolog.:</span><span class="hom-resumo-val" style="color:var(--blue);font-weight:700">${h.dtHomolog.split('-').reverse().join('/')}</span></span>` : ''}
-      ${h.dtAutorizacao ? `<span class="hom-resumo-item"><span class="hom-resumo-label">Autorização:</span><span class="hom-resumo-val" style="color:var(--blue);font-weight:700">${h.dtAutorizacao.split('-').reverse().join('/')}</span></span>` : ''}
-      ${h.dtInstalacao  ? `<span class="hom-resumo-item"><span class="hom-resumo-label">Instalação:</span><span class="hom-resumo-val" style="color:var(--blue);font-weight:700">${h.dtInstalacao.split('-').reverse().join('/')}</span></span>` : ''}
-    </div>` : '';
+  // Resumo visível com o card recolhido
+  const itens = [
+    h.solicitante && ['Solicitante', esc(h.solicitante)],
+    h.dtDispSharepoint && ['Arquivos no SharePoint do cliente', fd(h.dtDispSharepoint)],
+    h.dtHomolog   && ['Solicitação', fd(h.dtHomolog)],
+    dCli          && ['Homologação (cliente)', fd(dCli)],
+    h.homologConfirmada && ['Confirmada por', esc(h.homologConfirmadaPor||'—')],
+  ].filter(Boolean);
+  const resumo = itens.length ? `<div class="hom-resumo">${itens.map(([l,v]) => `<span class="hom-resumo-item"><span class="hom-resumo-label">${l}:</span><span class="hom-resumo-val">${v}</span></span>`).join('')}</div>` : '';
 
-  const SOLICITANTES = ['', ...NOMES];  // equipe da Transpetro
-  const ENVIADA_POR  = ['', ...NOMES];  // equipe da Transpetro
-  const CONCLUSAO    = ['','Navegação','Avaliação'];
-  const NOVO_MANUT   = ['','Novo','Manutenção'];
-  const SERVICOS     = ['','Básico','Intermediário','Avançado','Encapsulamento','Manutenção','Autoria Digital','Versionamento'];
+  const PESSOAS = ['', ...NOMES];  // equipe da Transpetro
 
   return `
-  <div class="hom-card ${cardCls}" id="homcard_${p.id}">
-
-    <div class="hom-card-head" onclick="toggleHomolog(${p.id})" title="Clique para expandir / recolher">
-      <div class="hom-card-title">
-        📂 ${esc(p.nome)}
-        <span class="hom-chevron" id="hom_chev_${p.id}">▼</span>
-      </div>
-      <div class="hom-card-badges" onclick="event.stopPropagation()">
-        ${rpBdg}${acadBdg}${statusBdg}
-        <button onclick="openDet(${p.id})" style="background:rgba(255,255,255,.15);border:none;color:#fff;padding:3px 10px;border-radius:6px;cursor:pointer;font-size:11.5px;font-family:'Plus Jakarta Sans',sans-serif">Ver ↗</button>
+  <div class="hom-card hom-c-${_HOM_ST[st].cls}" id="homcard_${p.id}">
+    <div class="hom-card-head">
+      <button type="button" class="hom-card-title" id="hom_tg_${p.id}" aria-expanded="false" aria-controls="hom_body_${p.id}" onclick="toggleHomolog(${p.id})">
+        <svg class="ic hom-chev" aria-hidden="true"><use href="#i-chevron-right"/></svg>
+        <span>${esc(p.nome)}</span>
+      </button>
+      <div class="hom-card-badges">
+        ${rpBdg}${acadBdg}${_homBadge(st)}
+        <button type="button" class="hom-ver" onclick="openDet(${p.id})" title="Abrir o card do produto">${icL('search')} Abrir card</button>
       </div>
     </div>
 
@@ -10548,92 +10635,53 @@ function buildHomologCard(p){
 
     <div class="hom-body" id="hom_body_${p.id}">
       <div class="hom-grid">
-
-        <div class="hom-sec-title">📋 Identificação</div>
-
+        <div class="hom-sec-title">${icL('users')} Identificação e responsáveis</div>
         <div class="hom-field">
           <div class="hom-field-label">Nome do Curso</div>
           <div class="hom-field-val" style="font-weight:600">${esc(p.nome)}</div>
         </div>
         <div class="hom-field">
-          <div class="hom-field-label">ID do Curso</div>
-          <div class="hom-field-val">${_homInput(p.id,'idCurso',h.idCurso||p.idCurso||'','text','Ex: 12345')}</div>
-        </div>
-        <div class="hom-field">
-          <div class="hom-field-label">Pacote SCORM</div>
-          <div class="hom-field-val">${_homInput(p.id,'pacoteScorm',h.pacoteScorm,'text','Ex: curso_v1.zip')}</div>
-        </div>
-        <div class="hom-field">
-          <div class="hom-field-label">Nº de Páginas</div>
-          <div class="hom-field-val">${_homInput(p.id,'nPaginas',h.nPaginas||'','number','Ex: 42')}</div>
-        </div>
-
-        <div class="hom-sec-title">👥 Responsáveis</div>
-
-        <div class="hom-field">
           <div class="hom-field-label">Solicitou a Homologação</div>
-          <div class="hom-field-val">${_homSel(p.id,'solicitante',SOLICITANTES,h.solicitante||'')}</div>
+          <div class="hom-field-val">${_homSel(p.id,'solicitante',PESSOAS,h.solicitante||'')}</div>
         </div>
         <div class="hom-field">
           <div class="hom-field-label">Homologado Por</div>
-          <div class="hom-field-val">${_homSel(p.id,'enviadaPor',ENVIADA_POR,h.enviadaPor||'')}</div>
-        </div>
-        <div class="hom-field">
-          <div class="hom-field-label">RT</div>
-          <div class="hom-field-val">${_homInput(p.id,'rt',h.rt||p.rp||'','text','Responsável Técnico')}</div>
+          <div class="hom-field-val">${_homSel(p.id,'enviadaPor',PESSOAS,h.enviadaPor||'')}</div>
         </div>
         <div class="hom-field">
           <div class="hom-field-label">Categoria de Projeto</div>
           <div class="hom-field-val">${_homInput(p.id,'academia',h.academia||p.academia||'','text','Categoria de Projeto')}</div>
         </div>
 
-        <div class="hom-sec-title">⚙️ Configurações do Curso</div>
-
+        <div class="hom-sec-title">${icL('calendar')} Datas e comprovação</div>
         <div class="hom-field">
-          <div class="hom-field-label">Conclusão</div>
-          <div class="hom-field-val">${_homSel(p.id,'conclusao',CONCLUSAO,h.conclusao||'')}</div>
+          <div class="hom-field-label">Disponibilização do(s) arquivo(s) no SharePoint do cliente</div>
+          <div class="hom-field-val">${_homInput(p.id,'dtDispSharepoint',h.dtDispSharepoint,'date','')}</div>
         </div>
         <div class="hom-field">
-          <div class="hom-field-label">Nota de Corte</div>
-          <div class="hom-field-val">${_homInput(p.id,'notaCorte',h.notaCorte,'text','Ex: 70')}</div>
-        </div>
-        <div class="hom-field">
-          <div class="hom-field-label">Novo ou Manutenção</div>
-          <div class="hom-field-val">${_homSel(p.id,'novoManut',NOVO_MANUT,h.novoManut||'')}</div>
-        </div>
-        <div class="hom-field">
-          <div class="hom-field-label">Serviço</div>
-          <div class="hom-field-val">${_homSel(p.id,'servico',SERVICOS,h.servico||'')}</div>
-        </div>
-
-        <div class="hom-sec-title">📅 Datas</div>
-
-        <div class="hom-field">
-          <div class="hom-field-label">📅 Homologação</div>
+          <div class="hom-field-label">Solicitação da Homologação</div>
           <div class="hom-field-val">${_homInput(p.id,'dtHomolog',h.dtHomolog,'date','')}</div>
         </div>
         <div class="hom-field">
-          <div class="hom-field-label">✅ Autorização</div>
-          <div class="hom-field-val">${_homInput(p.id,'dtAutorizacao',h.dtAutorizacao,'date','')}</div>
+          <div class="hom-field-label">Data da Homologação (cliente)</div>
+          <div class="hom-field-val">${_homInput(p.id,'dtHomologCliente',h.dtHomologCliente,'date','')}</div>
         </div>
         <div class="hom-field">
-          <div class="hom-field-label">🖥️ Instalação SIRH</div>
-          <div class="hom-field-val">${_homInput(p.id,'dtInstalacao',h.dtInstalacao,'date','')}</div>
+          <div class="hom-field-label">Link para a aprovação da homologação</div>
+          <div class="hom-field-val hom-link-wrap">${_homInput(p.id,'linkEmailOk',h.linkEmailOk,'url','https://…')}${_homLinkAbrir(h.linkEmailOk)}</div>
         </div>
-        <div class="hom-field"></div>
-
+        <div class="hom-field hom-field-conf">
+          <div class="hom-field-label">Confirmação</div>
+          <div class="hom-field-val">${_homConfirmacaoHtml(p)}</div>
+        </div>
       </div>
       <div class="hom-foot">
         <span style="font-size:11px;color:var(--mu);align-self:center">
-          ${temDados ? 'Dados salvos — edite e salve novamente para atualizar' : 'Preencha os campos e salve'}
+          ${h.preenchido ? 'Os campos são salvos ao sair de cada um. Use Salvar para registrar no histórico.' : 'Preencha os campos e salve'}
         </span>
-        <button onclick="salvarHomolog(${p.id})"
-          style="padding:7px 18px;background:var(--blue);color:#fff;border:none;border-radius:7px;cursor:pointer;font-size:12.5px;font-weight:600;font-family:'Plus Jakarta Sans',sans-serif">
-          💾 Salvar
-        </button>
+        <button type="button" class="hom-salvar" onclick="salvarHomolog(${p.id})">${icL('save')} Salvar</button>
       </div>
     </div>
-
   </div>`;
 }
 
@@ -10690,7 +10738,7 @@ function _medicaoAtual(){ return _labelMedicao(td()); }
 // Mês de medição de um projeto: escolha manual (📅) ou calculado pelas datas
 function _medicaoDoProjeto(p){
   if(_ehChaveMedicao(p.medicaoMes)) return p.medicaoMes;
-  return _labelMedicao(p.homolog?.dtInstalacao || p.medicaoFeitaEm || p.termino || p.enviadoMedicao) || 'Sem data';
+  return _labelMedicao(_homDataCliente(p) || p.medicaoFeitaEm || p.termino || p.enviadoMedicao) || 'Sem data';
 }
 
 // Verifica se uma data ISO pertence ao mês de medição informado
@@ -10705,72 +10753,65 @@ function limparFiltrosHomolog(){
     if(dd) dd.querySelectorAll('input[type=checkbox]').forEach(cb=>cb.checked=false);
     _msUpdateBtn(id);
   });
-  const bNm=document.getElementById('homBuscaNome');   if(bNm)   bNm.value='';
+  const bNm=document.getElementById('homBuscaNome'); if(bNm) bNm.value='';
+  const sPj=document.getElementById('homProj');      if(sPj) sPj.value='';
   rHomologacoes();
 }
+function _homOnFiltro(){ rHomologacoes(); }
 
 function _popularFiltrosHomolog(lista){
-  // Meses de medição (RAMP): gerar a partir das datas de instalação presentes, mais recente primeiro
-  const labelsSet = new Set(lista.map(p=>_labelMedicao(p.homolog?.dtInstalacao)).filter(Boolean));
-  const labelsOrdenados = [...labelsSet].sort((a,b)=>b.localeCompare(a));
-
-  const fmtLabel = l => _fmtMedicao(l);
-
-  // Multi-select Medição (RAMP mensal)
+  // Projeto
+  const sel = document.getElementById('homProj');
+  if(sel){
+    const atual = sel.value;
+    const projs = new Map();
+    lista.forEach(p => { const k = _homProjKey(p); projs.set(k, k === '__sem' ? 'Sem projeto' : (projDoCard(p)?.nome || 'Sem projeto')); });
+    const ops = [...projs].sort((a,b) => (a[0]==='__sem') - (b[0]==='__sem') || a[1].localeCompare(b[1], 'pt-BR'));
+    sel.innerHTML = '<option value="">Todos</option>' + ops.map(([v,l]) => `<option value="${esc(v)}"${v===atual?' selected':''}>${esc(l)}</option>`).join('');
+    if(!projs.has(atual)) sel.value = '';
+    sel.classList.toggle('atr-sel-on', !!sel.value);
+  }
+  // Medição: mês (RAMP) da Data da Homologação informada pelo cliente, mais recente primeiro
+  const labels = [...new Set(lista.map(p => _labelMedicao(_homDataCliente(p))).filter(Boolean))].sort((a,b)=>b.localeCompare(a));
   const ddMed = document.getElementById('msDd_homMed');
   if(ddMed){
-    const sel = _msGetVals('homMed');
-    ddMed.innerHTML = (labelsOrdenados.length
-      ? labelsOrdenados.map(l=>`<label class="ms-opt"><input type="checkbox" value="${l}" onchange="_msChange('homMed')"${sel.includes(l)?' checked':''}> ${fmtLabel(l)}</label>`).join('')
-      : '<div style="padding:10px 12px;font-size:11.5px;color:var(--mu);font-style:italic">Sem datas de instalação</div>')
+    const selM = _msGetVals('homMed');
+    ddMed.innerHTML = (labels.length
+      ? labels.map(l=>`<label class="ms-opt"><input type="checkbox" value="${l}" onchange="_msChange('homMed')"${selM.includes(l)?' checked':''}> ${_fmtMedicao(l)}</label>`).join('')
+      : '<div style="padding:10px 12px;font-size:11.5px;color:var(--mu);font-style:italic">Nenhuma data de homologação do cliente</div>')
       + '<div class="ms-sep"></div><div class="ms-clear" data-ms-clear="homMed">✕ Limpar</div>';
     _msUpdateBtn('homMed');
   }
 }
 
-// Estado das gavetas de mês (Instalados). Por padrão, abre só o mês mais recente.
-const _homMesAbertos = new Set();
-let _homMesInicializado = false;
-
-function toggleHomMes(gid){
-  const body = document.getElementById(gid+'_body');
-  const chev = document.getElementById(gid+'_chev');
-  if(!body) return;
-  const abrir = !body.classList.contains('open');
-  body.classList.toggle('open', abrir);
-  if(chev) chev.classList.toggle('open', abrir);
-  if(abrir) _homMesAbertos.add(gid); else _homMesAbertos.delete(gid);
+// Acordeões de projeto abertos (sem filtro, começam fechados)
+const _homPjAbertos = new Set();
+function _homTogglePj(btn){
+  const key = btn.dataset.pj;
+  const body = document.getElementById(btn.getAttribute('aria-controls'));
+  const abrir = btn.getAttribute('aria-expanded') !== 'true';
+  if(abrir) _homPjAbertos.add(key); else _homPjAbertos.delete(key);
+  btn.setAttribute('aria-expanded', abrir);
+  if(body) body.hidden = !abrir;
 }
 
 function irParaCardHomologacao(id){
   nav('homologacoes');
-
   let card = document.getElementById('homcard_'+id);
-
-  // 1ª tentativa: a aba pode não ter sido re-renderizada ainda
   if(!card){ rHomologacoes(); card = document.getElementById('homcard_'+id); }
-
-  // 2ª tentativa: o card pode estar oculto por filtros/busca ativos
   if(!card){ limparFiltrosHomolog(); card = document.getElementById('homcard_'+id); }
+  if(!card){ showToast('⚠️ Este produto ainda não aparece na aba Homologações.'); return; }
 
-  if(!card){
-    showToast('⚠️ Este projeto ainda não aparece na aba Homologações.');
-    return;
+  // Abre o acordeão do projeto
+  const pjBody = card.closest('.hom-pj-body');
+  if(pjBody && pjBody.hidden){
+    const btn = document.querySelector(`.hom-pj-hd[aria-controls="${pjBody.id}"]`);
+    if(btn) _homTogglePj(btn);
   }
-
-  // Abre a gaveta do mês (grupo "Instalados"), se estiver recolhida
-  const mesBody = card.closest('.hom-mes-body');
-  if(mesBody && !mesBody.classList.contains('open')) toggleHomMes(mesBody.id.replace(/_body$/,''));
-
-  // Expande o corpo do card
+  // Abre o card do produto
   const body = document.getElementById('hom_body_'+id);
-  const chev = document.getElementById('hom_chev_'+id);
-  if(body && !body.classList.contains('open')){
-    body.classList.add('open');
-    if(chev) chev.classList.add('open');
-  }
+  if(body && !body.classList.contains('open')) toggleHomolog(id);
 
-  // Rola até o card e destaca
   setTimeout(()=>{
     card.scrollIntoView({behavior:'smooth', block:'center'});
     card.classList.add('hom-card-destaque');
@@ -10780,32 +10821,24 @@ function irParaCardHomologacao(id){
 
 function rHomologacoes(){
   const todos = activeDB().concat(cancelDB());
-
-  // Todos que aparecem na lista
   const listaTotal = todos.filter(p => p.col === 11 || p.homologPassou || p.homolog?.preenchido);
 
-  // Ordenação alfabética dentro de cada grupo
-  listaTotal.sort((a,b) => a.nome.localeCompare(b.nome, 'pt-BR'));
-
-  // Estatísticas sempre do total (sem filtro)
-  const cntPendente   = listaTotal.filter(p => !(p.homolog?.dtHomolog) && !(p.homolog?.dtAutorizacao) && !(p.homolog?.dtInstalacao)).length;
-  const cntHomologado = listaTotal.filter(p =>  !!(p.homolog?.dtHomolog) && !(p.homolog?.dtAutorizacao) && !(p.homolog?.dtInstalacao)).length;
-
+  // Estatísticas do total (sem filtro)
+  const cnt = {pendente:0, solicitada:0, aguard_conf:0, homologada:0};
+  listaTotal.forEach(p => cnt[_homStatus(p)]++);
   const statsEl = document.getElementById('homologStats');
   if(statsEl){
-    statsEl.style.gridTemplateColumns = 'repeat(2,1fr)';
-    statsEl.innerHTML = `
-      <div class="sc" style="border-left:4px solid var(--red)">
-        <div class="sc-l">Pendentes</div><div class="sc-v">${cntPendente}</div>
-        <div class="sc-s">sem data de homologação</div><div class="sc-i" style="background:#FEE2E2;color:#991B1B"><svg class="ic"><use href="#i-hourglass"/></svg></div>
-      </div>
-      <div class="sc" style="border-left:4px solid var(--yel)">
-        <div class="sc-l">Homologados</div><div class="sc-v">${cntHomologado}</div>
-        <div class="sc-s">aguardando autorização</div><div class="sc-i" style="background:#FEF3C7;color:#92400E"><svg class="ic"><use href="#i-bookmark"/></svg></div>
+    const card = (st, titulo, sub, cor, bg, fg) => `<div class="sc" style="border-left:4px solid ${cor}">
+        <div class="sc-l">${titulo}</div><div class="sc-v">${cnt[st]}</div>
+        <div class="sc-s">${sub}</div><div class="sc-i" style="background:${bg};color:${fg}"><svg class="ic"><use href="#i-${_HOM_ST[st].ic}"/></svg></div>
       </div>`;
+    statsEl.innerHTML =
+      card('pendente',    'Pendentes',              'sem solicitação de homologação', '#EF4444', '#FEE2E2', '#991B1B') +
+      card('solicitada',  'Solicitadas',            'aguardando a data do cliente',   '#EAB308', '#FEF3C7', '#92400E') +
+      card('aguard_conf', 'Aguardando Confirmação', 'data do cliente informada',      '#EAB308', '#FEF3C7', '#92400E') +
+      card('homologada',  'Homologadas',            'confirmadas pela liderança',     '#22C55E', '#DCFCE7', '#166534');
   }
 
-  // Popular filtros com valores únicos do total
   _popularFiltrosHomolog(listaTotal);
 
   const listaEl = document.getElementById('homologLista');
@@ -10813,123 +10846,72 @@ function rHomologacoes(){
 
   if(listaTotal.length === 0){
     listaEl.innerHTML = `<div class="hom-empty">
-      <div style="font-size:32px;margin-bottom:10px">🔖</div>
-      <div style="font-weight:600;margin-bottom:6px">Nenhum projeto em Homologação ainda</div>
-      <div>Quando um projeto chegar na coluna <strong>Homologação</strong> no Kanban, ele aparecerá aqui automaticamente.</div>
+      <div class="hom-empty-ic">${icL('badge-check')}</div>
+      <div style="font-weight:600;margin-bottom:6px">Nenhum produto em Homologação ainda</div>
+      <div>Quando um produto chegar na coluna <strong>Homologação</strong> no Kanban, ele aparecerá aqui automaticamente.</div>
     </div>`;
     return;
   }
 
-  // Aplicar filtros (multi-select)
+  // Filtros
   const filtroMedicao = _msGetVals('homMed');
-
-  // Busca por texto (nome do projeto)
-  const buscaNome = (document.getElementById('homBuscaNome')?.value || '').trim().toLowerCase();
+  const filtroProj    = document.getElementById('homProj')?.value || '';
+  const buscaNome     = (document.getElementById('homBuscaNome')?.value || '').trim().toLowerCase();
+  const filtroAtivo   = !!(filtroMedicao.length || filtroProj || buscaNome);
 
   const lista = listaTotal.filter(p => {
-    if(filtroMedicao.length && !filtroMedicao.some(l=>_dataEmMedicao(p.homolog?.dtInstalacao, l))) return false;
-    if(buscaNome && !buscarFlex(nomeCompleto(p) || '', buscaNome)) return false;
+    if(filtroProj && _homProjKey(p) !== filtroProj) return false;
+    if(filtroMedicao.length && !filtroMedicao.some(l => _dataEmMedicao(_homDataCliente(p), l))) return false;
+    if(buscaNome && !buscarFlex(p.nome || '', buscaNome)) return false;
     return true;
   });
 
-  // Contador de resultados quando filtro ativo
   const contador = document.getElementById('homFiltroContador');
-  if(contador){
-    const ativo = filtroMedicao.length || buscaNome;
-    contador.textContent = ativo ? `${lista.length} de ${listaTotal.length} projeto(s)` : '';
-  }
+  if(contador) contador.textContent = filtroAtivo ? `${lista.length} de ${listaTotal.length} produto(s)` : `${listaTotal.length} produto(s)`;
 
   if(lista.length === 0){
     listaEl.innerHTML = `<div class="hom-empty">
-      <div style="font-size:28px;margin-bottom:10px">🔍</div>
-      <div style="font-weight:600;margin-bottom:6px">Nenhum resultado para os filtros selecionados</div>
+      <div class="hom-empty-ic">${icL('search')}</div>
+      <div style="font-weight:600;margin-bottom:6px">Nenhum produto para os filtros selecionados</div>
       <div><button onclick="limparFiltrosHomolog()" class="btn bg2 bsm" style="margin-top:8px">✕ Limpar filtros</button></div>
     </div>`;
     return;
   }
 
-  // Separar em 4 grupos
-  const grpPendente   = lista.filter(p => !(p.homolog?.dtHomolog) && !(p.homolog?.dtAutorizacao) && !(p.homolog?.dtInstalacao));
-  const grpHomologado = lista.filter(p =>  !!(p.homolog?.dtHomolog) && !(p.homolog?.dtAutorizacao) && !(p.homolog?.dtInstalacao));
-  const grpAutorizado = lista.filter(p =>  !!(p.homolog?.dtAutorizacao) && !(p.homolog?.dtInstalacao));
-  const grpInstalado  = lista.filter(p =>  !!(p.homolog?.dtInstalacao));
-
-  let html = '';
-  let temAnterior = false;
-
-  if(grpPendente.length > 0){
-    html += `<div class="hom-group-title pendente" style="margin-top:${temAnterior?'28px':'4px'}">⏳ Pendentes <span style="font-size:12px;font-weight:800">${grpPendente.length}</span></div>`;
-    html += grpPendente.map(p => buildHomologCard(p)).join('');
-    temAnterior = true;
-  }
-
-  if(grpHomologado.length > 0){
-    html += `<div class="hom-group-title homologado" style="margin-top:${temAnterior?'28px':'4px'}">🔖 Homologados <span style="font-size:12px;font-weight:800">${grpHomologado.length}</span></div>`;
-    html += grpHomologado.map(p => buildHomologCard(p)).join('');
-    temAnterior = true;
-  }
-
-  if(grpAutorizado.length > 0){
-    html += `<div class="hom-group-title autorizado" style="margin-top:${temAnterior?'28px':'4px'}">🔓 Autorizados <span style="font-size:12px;font-weight:800">${grpAutorizado.length}</span></div>`;
-    html += grpAutorizado.map(p => buildHomologCard(p)).join('');
-    temAnterior = true;
-  }
-
-  if(grpInstalado.length > 0){
-    html += `<div class="hom-group-title instalado" style="margin-top:${temAnterior?'28px':'4px'}">✅ Instalados <span style="font-size:12px;font-weight:800">${grpInstalado.length}</span></div>`;
-
-    const MESES_PT = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
-    // Agrupar por mês/ano da data de instalação (ISO YYYY-MM-DD)
-    const gavetas = {};
-    grpInstalado.forEach(p => {
-      const iso = p.homolog?.dtInstalacao || '';
-      const m = iso.match(/^(\d{4})-(\d{2})/);
-      const chave = m ? `${m[1]}-${m[2]}` : '0000-00';
-      (gavetas[chave] = gavetas[chave] || []).push(p);
-    });
-    // Ordenar meses do mais recente para o mais antigo; "sem data" por último
-    const chaves = Object.keys(gavetas).sort((a,b) => b.localeCompare(a));
-
-    // Na primeira renderização, deixa apenas o mês mais recente aberto
-    if(!_homMesInicializado){
-      _homMesInicializado = true;
-      const primeira = chaves.find(c => c !== '0000-00') || chaves[0];
-      if(primeira) _homMesAbertos.add('mes_'+primeira.replace('-',''));
-    }
-
-    chaves.forEach(chave => {
-      const itens = gavetas[chave];
-      let rotulo;
-      if(chave === '0000-00'){
-        rotulo = 'Sem data de instalação';
-      } else {
-        const [ano, mes] = chave.split('-');
-        rotulo = `${MESES_PT[parseInt(mes,10)-1]} / ${ano}`;
-      }
-      const gid = 'mes_'+chave.replace('-','');
-      // Se há busca por texto ativa, abre todas as gavetas para não esconder resultados
-      const aberto = buscaNome ? true : _homMesAbertos.has(gid);
-      html += `<div class="hom-mes-title" onclick="toggleHomMes('${gid}')">
-        <span>📅</span><span>${rotulo}</span>
-        <span class="hom-mes-count">${itens.length}</span>
-        <span class="hom-mes-chev ${aberto?'open':''}" id="${gid}_chev">▼</span>
-      </div>
-      <div class="hom-mes-body ${aberto?'open':''}" id="${gid}_body">
-        ${itens.map(p => buildHomologCard(p)).join('')}
-      </div>`;
-    });
-  }
-
-  // Salvar gavetas abertas antes de re-renderizar
-  const _gavetasAbertas = [...document.querySelectorAll('.hom-body.open')].map(el=>el.id.replace('hom_body_',''));
-  listaEl.innerHTML = html;
-  // Restaurar gavetas abertas após re-render
-  _gavetasAbertas.forEach(id => {
-    const body = document.getElementById('hom_body_'+id);
-    const chev = document.getElementById('hom_chev_'+id);
-    if(body) body.classList.add('open');
-    if(chev) chev.classList.add('open');
+  // Agrupar por projeto
+  const grupos = new Map();
+  lista.forEach(p => {
+    const k = _homProjKey(p);
+    if(!grupos.has(k)) grupos.set(k, {key:k, nome: k === '__sem' ? 'Sem projeto' : (projDoCard(p)?.nome || 'Sem projeto'), prods:[]});
+    grupos.get(k).prods.push(p);
   });
+  const ordenados = [...grupos.values()].sort((a,b) => (a.key==='__sem') - (b.key==='__sem') || a.nome.localeCompare(b.nome, 'pt-BR'));
+
+  const html = ordenados.map(g => {
+    g.prods.sort((a,b) => _HOM_ORDEM.indexOf(_homStatus(a)) - _HOM_ORDEM.indexOf(_homStatus(b)) || a.nome.localeCompare(b.nome, 'pt-BR'));
+    const c = {pendente:0, solicitada:0, aguard_conf:0, homologada:0};
+    g.prods.forEach(p => c[_homStatus(p)]++);
+    const pills = _HOM_ORDEM.filter(st => c[st]).map(st => `<span class="hom-badge hom-st-${_HOM_ST[st].cls}">${icL(_HOM_ST[st].ic)} ${c[st]} ${_HOM_ST[st].lbl.toLowerCase()}</span>`).join('');
+    const aberto = filtroAtivo || _homPjAbertos.has(g.key);
+    const bodyId = 'hom_pj_' + g.key.replace(/[^A-Za-z0-9_-]/g,'_');
+    return `<section class="hom-pj">
+      <button type="button" class="hom-pj-hd" data-pj="${esc(g.key)}" aria-expanded="${aberto}" aria-controls="${bodyId}" onclick="_homTogglePj(this)">
+        <svg class="ic hom-chev" aria-hidden="true"><use href="#i-chevron-right"/></svg>
+        <span class="hom-pj-ic">${icL('folder')}</span>
+        <span class="hom-pj-nome">${esc(g.nome)}</span>
+        <span class="hom-pj-n">${g.prods.length} ${g.prods.length===1?'produto':'produtos'}</span>
+        <span class="hom-pj-pills">${pills}</span>
+      </button>
+      <div class="hom-pj-body" id="${bodyId}"${aberto?'':' hidden'}>
+        ${g.prods.map(p => buildHomologCard(p)).join('')}
+      </div>
+    </section>`;
+  }).join('');
+
+  // Mantém abertos os cards de produto que estavam abertos
+  const _abertos = [...document.querySelectorAll('.hom-body.open')].map(el=>el.id.replace('hom_body_',''));
+  listaEl.innerHTML = html;
+  _abertos.forEach(id => { if(document.getElementById('hom_body_'+id)) toggleHomolog(id); });
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -12521,13 +12503,13 @@ function detectarNotificacoes(){
       }
     }
 
-    // 3. Homologação pendente (sem data de instalação)
-    if((p.col===11 || p.homologPassou || p.homolog?.preenchido) && !p.homolog?.dtInstalacao){
+    // 3. Homologação pendente (ainda não confirmada)
+    if((p.col===11 || p.homologPassou || p.homolog?.preenchido) && !_homConcluida(p)){
       const id = _notifId('homolog', p.id, 'pend');
       if(!idsExist.has(id) && !descartados.has(id)){
         novas.push({
           id, tipo:'homolog', projId:p.id,
-          texto:`<strong>${esc(p.nome)}</strong> aguarda instalação na Homologação.`,
+          texto:`<strong>${esc(p.nome)}</strong> aguarda a homologação.`,
           icone:'🔖', dt: new Date().toISOString(), lida:false
         });
       }
@@ -12580,7 +12562,7 @@ function limparNotifObsoletas(){
     if(!p) return false; // projeto deletado
     if(n.tipo==='atraso'   && calcSit(p)!=='atrasado') return false;
     if(n.tipo==='prazo'    && (calcSit(p)==='concluido'||p.cancelado)) return false;
-    if(n.tipo==='homolog'  && p.homolog?.dtInstalacao) return false;
+    if(n.tipo==='homolog'  && _homConcluida(p)) return false;
     if(n.tipo==='medicao'  && p.medicaoFeita) return false;
     if(n.tipo==='etapacl'){
       const etapa = (p.etapas||[]).find(e=>e.lb===n.id.split('_').slice(2).join('_'));
