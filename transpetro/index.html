@@ -5304,13 +5304,13 @@ function openDet(id){
     <div class="dl2r">
       <div>
         ${p.idCurso?dl2('ID do Projeto',`<span style="font-weight:600;font-family:monospace">${esc(p.idCurso)}</span>`):''}${p.prioridade?dl2('Prioridade',prioBadge(p.prioridade)):''}${p.rp?dl2('RP',`<span style="font-weight:600">${esc(p.rp)}</span>`):''}${p.academia?dl2('Categoria de Projeto',`<span style="font-weight:600">${esc(p.academia)}</span>`):''}${relevanciaBadge(p)?dl2('Relevância',relevanciaBadge(p)):''}${dl2('Linha(s) de Serviço(s)',recTags(p.recursos))}
-        // ${dl2('Etapa',`<span style="display:inline-flex;align-items:center;gap:5px"><span style="width:8px;height:8px;border-radius:50%;background:${colDot(p.col)};display:inline-block"></span>${colLabel(p.col)}</span>`)}
+        ${dl2('Etapa',`<span style="display:inline-flex;align-items:center;gap:5px"><span style="width:8px;height:8px;border-radius:50%;background:${colDot(p.col)};display:inline-block"></span>${colLabel(p.col)}</span>`)}
         ${dl2('Situação',sitBdg(p))}
         ${dl2('Mudou de escopo?', _buildEscopoHtml(p))}
 
       </div>
       <div>
-        ${dl2('Responsável(is)',avList(p.resps)+'<div style="font-size:11.5px;margin-top:3px">'+(p.resps||[]).join(', ')+'</div>')}
+        ${dl2('Responsável(is)','<div style="font-size:11.5px">'+((p.resps||[]).join(', ')||'—')+'</div>')}
         ${dl2('Progresso',progH(p,'110px'))}
         ${p.linkBdoc?dl2('Link BDOC Firjan',`<a href="${esc(p.linkBdoc)}" target="_blank" rel="noopener noreferrer" style="color:var(--blue);text-decoration:underline;word-break:break-all;font-size:12.5px">🔗 ${esc(p.linkBdoc)}</a>`):''}
         ${p.prazObs?dl2('Obs. Prazo',`<em style="color:var(--mu)">${p.prazObs}</em>`):''}
