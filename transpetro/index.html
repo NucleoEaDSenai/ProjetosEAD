@@ -6418,12 +6418,17 @@ function _buildEscopoHtml(p){
     return '<option value="' + r + '"' + sel(r) + '>' + r + '</option>';
   }).join('');
 
+  // Ícone ao lado do campo conforme a escolha (o <option> não aceita ícone; a lógica usa só o value)
+  const icEscopo = p.mudouEscopo==='sim' ? '<span style="color:#D97706;display:inline-flex" title="Escopo alterado">' + icL('triangle-alert') + '</span>'
+                 : p.mudouEscopo==='nao' ? '<span style="color:var(--green);display:inline-flex" title="Escopo mantido">' + icL('circle-check') + '</span>'
+                 : '';
   let html = '<div style="display:flex;flex-direction:column;gap:8px">';
-  html += '<select onchange="setEscopo(' + p.id + ',this.value)" style="' + selStyle + '">';
+  html += '<div style="display:flex;align-items:center;gap:7px">';
+  html += '<select onchange="setEscopo(' + p.id + ',this.value)" aria-label="Mudou de escopo?" style="' + selStyle + '">';
   html += '<option value=""' + (!p.mudouEscopo?' selected':'') + '>— Não informado —</option>';
-  html += '<option value="nao"' + (p.mudouEscopo==='nao'?' selected':'') + '>✅ Não</option>';
-  html += '<option value="sim"' + (p.mudouEscopo==='sim'?' selected':'') + '>⚠️ Sim</option>';
-  html += '</select>';
+  html += '<option value="nao"' + (p.mudouEscopo==='nao'?' selected':'') + '>Não</option>';
+  html += '<option value="sim"' + (p.mudouEscopo==='sim'?' selected':'') + '>Sim</option>';
+  html += '</select>' + icEscopo + '</div>';
 
   if(p.mudouEscopo === 'sim'){
     const optsA = RECURSOS.map(r => '<option value="' + r + '"' + (p.escopoAntigoRecurso===r?' selected':'') + '>' + r + '</option>').join('');
