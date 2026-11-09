@@ -323,8 +323,8 @@ tr:hover td{background:#FAFAF9}
 .cr-acoes{display:flex;align-items:center;gap:8px}
 .cr-count{font-size:12px;color:var(--mu);font-weight:600;margin-right:4px}
 .cr-gw{max-height:calc(100vh - 260px);overflow:auto}
-.cr-g{min-width:980px}
-.cr-row{display:grid;grid-template-columns:320px 1fr;border-bottom:1px solid var(--bdr);min-height:40px}
+.cr-g{min-width:1060px}
+.cr-row{display:grid;grid-template-columns:400px 1fr;border-bottom:1px solid var(--bdr);min-height:40px}
 .cr-row:last-child{border-bottom:none}
 .cr-name{position:sticky;left:0;z-index:2;background:var(--surface);display:flex;align-items:center;gap:7px;padding:5px 10px;border-right:1px solid var(--bdr);min-width:0}
 .cr-head{position:sticky;top:0;z-index:4;min-height:32px;background:var(--dark)}
@@ -344,6 +344,7 @@ tr:hover td{background:#FAFAF9}
 .cr-link:hover{color:var(--blue);text-decoration:underline}
 .cr-pill{font-size:10px;font-weight:700;border-radius:8px;padding:1px 7px;white-space:nowrap;flex-shrink:0;color:var(--c);background:color-mix(in srgb,var(--c) 13%,transparent)}
 .cr-track{position:relative}
+.cr-pill-tl{position:absolute;top:50%;transform:translateY(-50%);z-index:3;background:linear-gradient(color-mix(in srgb,var(--c) 13%,transparent),color-mix(in srgb,var(--c) 13%,transparent)),var(--surface)}
 .cr-grid{position:absolute;top:0;bottom:0;border-left:1px solid var(--bdr);opacity:.6}
 .cr-hoje{position:absolute;top:0;bottom:0;width:2px;margin-left:-1px;background:var(--red);opacity:.75;z-index:2}
 .cr-bar-p{position:absolute;top:50%;transform:translateY(-50%);height:18px;border-radius:5px;overflow:hidden;min-width:4px;z-index:1;display:flex;align-items:center;padding:0 6px;font-size:10px;font-weight:700;color:#fff;white-space:nowrap}
@@ -4101,18 +4102,26 @@ function _crLinhaProduto(p, j, hoje){
   const pr = projDoCard(p);
   const temAtiv = (p.etapas||[]).length > 0;
   let barra = '';
+  let bL = null, bR = null; // início e fim visíveis (%) da barra ou do marcador
   if(semFim){
     // Sem nenhuma data final: só um marcador no dia de início/criação
     const d0 = ini ? _crD(ini) : null;
-    if(d0 && d0 >= j.from && d0 < j.to)
+    if(d0 && d0 >= j.from && d0 < j.to){ bL = bR = _crPos(d0,j); }
+    if(bL !== null)
       barra = `<div class="cr-mk" style="left:${_crPos(d0,j)}%;--c:${cor}" title="${esc(p.nome)}: início em ${_crFmt(ini)} · sem prazo definido"></div>`;
   } else {
     // % só aparece se a barra tiver largura para ele (~4 dias no trimestre, ~2 semanas no ano)
     const larg = (_crD(_crAddDia(fim,1)) - _crD(ini)) / (j.to - j.from) * 100;
+    if(ini && fim && _crD(_crAddDia(fim,1)) > j.from && _crD(ini) < j.to){ bL = _crPos(_crD(ini),j); bR = _crPos(_crD(_crAddDia(fim,1)),j); }
     barra = _crBarra(ini, fim, j, 'cr-bar-p' + (sit==='aguardando'?' cr-wait':''), `background:${cor}`,
       `${p.nome}: ${_crFmt(ini)} a ${_crFmt(fim)} · ${pct}%`, `<div class="cr-fill" style="width:${pct}%"></div>${larg >= 4 ? `<span>${pct}%</span>` : ''}`);
   }
   if(sit === 'atrasado' && p.prazo) barra += _crAtraso(p.prazo, j, hoje, 'cr-over');
+  const ESPACO = 13; // % da trilha que a etiqueta precisa
+  const posSit = bL !== null && bL >= ESPACO ? `right:calc(${100-bL}% + 6px)`
+    : bR !== null && bR <= 100-ESPACO ? `left:calc(${bR}% + 6px)`
+    : 'left:6px';
+  barra += `<span class="cr-pill cr-pill-tl" style="--c:${cor};${posSit}">${sitTxt}</span>`;
   const tg = temAtiv
     ? `<button type="button" class="cr-tg" data-cr-id="${p.id}" aria-expanded="${aberto}" aria-label="${aberto?'Fechar':'Abrir'} atividades de ${esc(p.nome)}" onclick="_crToggle(${p.id})"><svg class="ic" aria-hidden="true"><use href="#i-chevron-right"/></svg></button>`
     : '<span class="cr-tg-vazio"></span>';
@@ -4122,7 +4131,6 @@ function _crLinhaProduto(p, j, hoje){
         <button type="button" class="cr-link" onclick="openDet(${p.id})" title="Abrir o card de ${esc(p.nome)}">${esc(p.nome)}</button>
         <small>${_crFmtC(ini)} → ${semFim ? 'sem prazo' : _crFmtC(fim)} · ${esc(pr ? pr.nome : 'Sem projeto')}</small>
       </div>
-      <span class="cr-pill" style="--c:${cor}">${sitTxt}</span>
     </div>${_crTrilha(j, hoje, barra)}</div>`;
 }
 
