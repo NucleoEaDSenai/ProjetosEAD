@@ -3467,7 +3467,7 @@ function rKanban(){
             // Aparece para projetos que estão na coluna Homologação.
             // Leva direto ao card correspondente na aba Homologações.
             if(p.col === 11){
-              return `<button class="btn-medicao" style="background:linear-gradient(135deg,#003DA5,#0060CC)" onclick="event.stopPropagation();irParaCardHomologacao(${p.id})">${icL('badge-check')} Seguir para Homologações</button>`;
+              return `<button class="btn-medicao" style="background:linear-gradient(135deg,#003DA5,#0060CC)" onclick="event.stopPropagation();irParaCardHomologacao(${p.id})">${icL('badge-check')} Lançar Homologação</button>`;
             }
 
             // ── BOTÃO ENVIAR MEDIÇÃO ──────────────────────────────────────────
@@ -5444,7 +5444,7 @@ function openDet(id){
 
   document.getElementById('detFt').innerHTML=`
     <button class="btn bg2" onclick="cm('ovDet')">${icL('x')} Fechar</button>
-    ${(p.col===11 || p.homologPassou || p.homolog?.preenchido)?`<button class="btn" style="background:linear-gradient(135deg,#003DA5,#0060CC);color:#fff" onclick="cm('ovDet');irParaCardHomologacao(${p.id})" title="Seguir para este projeto na aba Homologações">${icL('badge-check')} Seguir para Homologações</button>`:''}
+    ${(p.col===11 || p.homologPassou || p.homolog?.preenchido)?`<button class="btn" style="background:linear-gradient(135deg,#003DA5,#0060CC);color:#fff" onclick="cm('ovDet');irParaCardHomologacao(${p.id})" title="Seguir para este projeto na aba Homologações">${icL('badge-check')} Lançar Homologação</button>`:''}
     <button class="btn bg2" onclick="cm('ovDet');duplicarProjeto(${p.id})" title="Criar cópia deste projeto">Duplicar</button>
     <button class="btn bb" onclick="cm('ovDet');openEdit(${p.id})">${icL('pencil')} Editar</button>
     <button class="btn bpastel" onclick="exportPDFFicha(${p.id})">Exportar PDF</button>
