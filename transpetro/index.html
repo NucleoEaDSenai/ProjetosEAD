@@ -309,6 +309,66 @@ tr:hover td{background:#FAFAF9}
 .gt tr.et-row td.pj{background:rgba(0,0,0,.013);padding-left:28px;font-size:10.5px;color:var(--mu);font-weight:400;cursor:default}
 .gbar{height:18px;border-radius:3px;display:flex;align-items:center;padding-left:5px;font-size:9px;font-weight:700;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.55);overflow:hidden;min-width:4px}
 .gbar-et{height:8px;border-radius:2px;min-width:3px}
+/* Cronograma (produto + atividades) */
+.cr-seg{display:inline-flex;border:1px solid var(--bdr);border-radius:6px;overflow:hidden;min-height:30px}
+.cr-seg button{font:inherit;font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;font-weight:600;border:none;background:var(--bg);color:var(--mu);padding:5px 12px;cursor:pointer}
+.cr-seg button[aria-pressed="true"]{background:var(--blue);color:#fff}
+.cr-bar{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px}
+.cr-legenda{display:flex;gap:12px;flex-wrap:wrap;font-size:11.5px;color:var(--mu)}
+.cr-lg{display:inline-flex;align-items:center;gap:5px}
+.cr-lg i{display:inline-block;width:14px;height:8px;border-radius:3px}
+.cr-lg i.cr-lg-dot{width:9px;height:9px;background:#E8002D;transform:rotate(45deg);border-radius:2px}
+.cr-lg i.cr-lg-dash{border:2px dashed #E8002D;height:10px}
+.cr-lg i.cr-lg-mk{width:9px;height:9px;border-radius:50%;border:2.5px solid var(--mu);background:transparent}
+.cr-acoes{display:flex;align-items:center;gap:8px}
+.cr-count{font-size:12px;color:var(--mu);font-weight:600;margin-right:4px}
+.cr-gw{max-height:calc(100vh - 260px);overflow:auto}
+.cr-g{min-width:1060px}
+.cr-row{display:grid;grid-template-columns:400px 1fr;border-bottom:1px solid var(--bdr);min-height:40px}
+.cr-row:last-child{border-bottom:none}
+.cr-name{position:sticky;left:0;z-index:2;background:var(--surface);display:flex;align-items:center;gap:7px;padding:5px 10px;border-right:1px solid var(--bdr);min-width:0}
+.cr-head{position:sticky;top:0;z-index:4;min-height:32px;background:var(--dark)}
+.cr-head .cr-name{background:var(--dark);color:rgba(255,255,255,.75);font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;border-right-color:rgba(255,255,255,.08)}
+.cr-scale{position:relative}
+.cr-tick{position:absolute;top:0;bottom:0;border-left:1px solid rgba(255,255,255,.1);color:rgba(255,255,255,.7);font-size:10.5px;font-weight:700;padding:9px 0 0 6px;white-space:nowrap}
+.cr-tick-now{color:#fff;background:rgba(232,0,45,.35)}
+.cr-tg,.cr-tg-vazio{width:22px;height:22px;flex-shrink:0}
+.cr-tg{border:none;background:none;color:var(--mu);cursor:pointer;display:grid;place-items:center;border-radius:5px;padding:0}
+.cr-tg:hover{background:var(--s2);color:var(--txt)}
+.cr-tg .ic{width:15px;height:15px;transition:transform .15s}
+.cr-tg[aria-expanded="true"] .ic{transform:rotate(90deg)}
+.cr-tg:focus-visible,.cr-link:focus-visible{outline:2px solid var(--blue);outline-offset:1px}
+.cr-nm{min-width:0;flex:1}
+.cr-nm small{display:block;font-size:10.5px;color:var(--mu);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cr-link{font:inherit;font-family:'Plus Jakarta Sans',sans-serif;font-size:12.5px;font-weight:700;color:var(--txt);background:none;border:none;padding:0;cursor:pointer;text-align:left;display:block;max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cr-link:hover{color:var(--blue);text-decoration:underline}
+.cr-pill{font-size:10px;font-weight:700;border-radius:8px;padding:1px 7px;white-space:nowrap;flex-shrink:0;color:var(--c);background:color-mix(in srgb,var(--c) 13%,transparent)}
+.cr-track{position:relative}
+.cr-pill-tl{position:absolute;top:50%;transform:translateY(-50%);z-index:3;background:linear-gradient(color-mix(in srgb,var(--c) 13%,transparent),color-mix(in srgb,var(--c) 13%,transparent)),var(--surface)}
+.cr-grid{position:absolute;top:0;bottom:0;border-left:1px solid var(--bdr);opacity:.6}
+.cr-hoje{position:absolute;top:0;bottom:0;width:2px;margin-left:-1px;background:var(--red);opacity:.75;z-index:2}
+.cr-bar-p{position:absolute;top:50%;transform:translateY(-50%);height:18px;border-radius:5px;overflow:hidden;min-width:4px;z-index:1;display:flex;align-items:center;padding:0 6px;font-size:10px;font-weight:700;color:#fff;white-space:nowrap}
+.cr-bar-p.cr-wait{color:#1A1A1A}
+.cr-bar-p span{position:relative}
+.cr-fill{position:absolute;inset:0 auto 0 0;background:rgba(255,255,255,.25)}
+.cr-mk{position:absolute;top:50%;width:10px;height:10px;margin:-5px 0 0 -5px;border-radius:50%;background:var(--surface);border:2.5px solid var(--c);z-index:1}
+.cr-over{position:absolute;top:50%;transform:translateY(-50%);height:18px;border:2px dashed #E8002D;border-left:none;border-radius:0 5px 5px 0;z-index:1}
+.cr-act{min-height:32px;background:var(--bg)}
+.cr-act .cr-name{background:var(--bg);padding-left:39px}
+.cr-at{display:flex;align-items:center;gap:4px;font-size:11.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cr-ok{color:var(--green);display:inline-flex}
+.cr-dt{font-size:10.5px;color:var(--mu);white-space:nowrap;flex-shrink:0;display:flex;align-items:center;gap:5px}
+.cr-late-n{background:#FDE2E2;color:#9B1C1C;font-weight:700;border-radius:8px;padding:0 6px}
+.cr-bar-a{position:absolute;top:50%;transform:translateY(-50%);height:10px;border-radius:4px;min-width:3px;z-index:1;background:#5B7FC7}
+.cr-bar-a.cr-a-ok{background:#7FBF98}
+.cr-bar-a.cr-a-late{background:#5B7FC7}
+.cr-bar-a.cr-a-est{opacity:.75;background-image:repeating-linear-gradient(135deg,rgba(255,255,255,.35) 0 3px,transparent 3px 6px)}
+.cr-over-a{height:10px;border-radius:0 4px 4px 0}
+.cr-dot{position:absolute;top:50%;width:11px;height:11px;margin-left:-5.5px;margin-top:-5.5px;transform:rotate(45deg);background:#E8002D;border-radius:2px;z-index:3;box-shadow:0 0 0 2px var(--surface)}
+.cr-vazio{padding:40px 16px;text-align:center;color:var(--mu);font-size:13px}
+body.dark .cr-bar-a{background:#6E93DB}
+body.dark .cr-bar-a.cr-a-ok{background:#4FA373}
+body.dark .cr-late-n{background:rgba(255,84,112,.18);color:#FCA5A5}
 .tl-legend{display:inline-flex;align-items:center;gap:5px;padding:3px 10px 3px 7px;border-radius:12px;font-size:11px;border:1px solid var(--bdr);background:#fff}
 .gt tr:hover td{background:rgba(0,61,165,.04)}
 .gt tr td.pj{background:#fff}
@@ -1911,29 +1971,56 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
       </table></div>
     </div>
 
-    <!-- TIMELINE -->
+    <!-- CRONOGRAMA: produto + atividades expansíveis -->
     <div class="view" id="view-timeline">
-      <div class="sh" style="flex-wrap:wrap;gap:10px;margin-bottom:14px">
-        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
-          <select class="fi-sm" id="tlAno" onchange="rTimeline()" style="width:110px"></select>
-          <select class="fi-sm" id="tlFiltSit" onchange="rTimeline()" style="width:170px">
-            <option value="">Todos os produtos</option>
-            <option value="andamento">Em Andamento</option>
-            <option value="concluido">Concluídos</option>
-            <option value="atrasado">Atrasados</option>
-            <option value="aguardando">Aguardando</option>
-            <option value="cancelado">Cancelados</option>
-          </select>
-          <span id="tlCount" style="font-size:11.5px;color:var(--mu)"></span>
+      <div class="fbox" style="margin-bottom:12px">
+        <div class="fbox-row">
+          <div class="fg-sm" style="min-width:90px"><label class="fl-sm" for="tlAno">Ano</label>
+            <select class="atr-sel" id="tlAno" onchange="rTimeline()" style="min-width:90px"></select>
+          </div>
+          <div class="fg-sm" style="min-width:0"><span class="fl-sm">Escala</span>
+            <div class="cr-seg" role="group" aria-label="Escala do cronograma">
+              <button type="button" data-cr-esc="ano" aria-pressed="true" onclick="_crSetEscala('ano')">Ano</button>
+              <button type="button" data-cr-esc="tri" aria-pressed="false" onclick="_crSetEscala('tri')">Trimestre</button>
+            </div>
+          </div>
+          <div class="fg-sm" id="tlTriWrap" style="min-width:90px;display:none"><label class="fl-sm" for="tlTri">Trimestre</label>
+            <select class="atr-sel" id="tlTri" onchange="rTimeline()" style="min-width:90px">
+              <option value="1">1º (Jan–Mar)</option><option value="2">2º (Abr–Jun)</option>
+              <option value="3">3º (Jul–Set)</option><option value="4">4º (Out–Dez)</option>
+            </select>
+          </div>
+          <div class="fg-sm"><label class="fl-sm" for="tlProj">Projeto</label>
+            <select class="atr-sel" id="tlProj" onchange="rTimeline()"><option value="">Todos</option></select>
+          </div>
+          <div class="fg-sm"><label class="fl-sm" for="tlFiltSit">Situação</label>
+            <select class="atr-sel" id="tlFiltSit" onchange="rTimeline()">
+              <option value="">Todas</option>
+              <option value="andamento">Em Andamento</option>
+              <option value="atrasado">Atrasado</option>
+              <option value="aguardando">Aguardando</option>
+              <option value="concluido">Concluído</option>
+              <option value="cancelado">Cancelado</option>
+            </select>
+          </div>
+          <div class="fg-sm"><label class="fl-sm" for="tlResp">Responsável</label>
+            <select class="atr-sel" id="tlResp" onchange="rTimeline()"><option value="">Todos</option></select>
+          </div>
+          <div class="fg-sm"><label class="fl-sm" for="tlEtapa">Etapa</label>
+            <select class="atr-sel" id="tlEtapa" onchange="rTimeline()"><option value="">Todas</option></select>
+          </div>
+          <button class="btn-lim btn-lim-k" onclick="limparTlFilts()">✕ Limpar Filtros</button>
         </div>
       </div>
-      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px" id="tLegenda"></div>
-      <div class="gw" style="overflow-x:auto">
-        <table style="width:100%;border-collapse:collapse;min-width:900px">
-          <thead id="ganttHead"></thead>
-          <tbody id="ganttBody"></tbody>
-        </table>
+      <div class="cr-bar">
+        <div class="cr-legenda" id="tLegenda"></div>
+        <div class="cr-acoes">
+          <span id="tlCount" class="cr-count"></span>
+          <button type="button" class="btn bg2 bsm" onclick="_crTodos(true)">Abrir todos</button>
+          <button type="button" class="btn bg2 bsm" onclick="_crTodos(false)">Fechar todos</button>
+        </div>
       </div>
+      <div class="gw cr-gw"><div class="cr-g" id="crGantt"></div></div>
     </div>
 
     <!-- KPIs -->
@@ -3894,120 +3981,258 @@ function rList(){
 }
 // lFilt removido — substituído por applyLFilts
 
-// ── TIMELINE ──
+// ── CRONOGRAMA (produto + atividades expansíveis) ──
+// Só leitura. Produto: barra de p.inicio (ou p.criado) até p.termino (ou p.prazo), cor da situação
+// e preenchimento pelo %. Atividades: de e.dataInicial até e.prazo (Data Final). Sem Data Inicial,
+// o início é estimado como o dia seguinte à Data Final da atividade anterior.
+// Atividade atrasada: mesma regra da aba Atrasos (não concluída, Data Final < hoje, sem as isenções).
 const MNS=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+const _crAbertos = new Set();
+let _crEscala = 'ano';
+const _CR_SIT = {andamento:['Em andamento','#003DA5'], atrasado:['Atrasado','#E8002D'], aguardando:['Aguardando','#9CA3AF'], concluido:['Concluído','#1A8A4A'], cancelado:['Cancelado','#6B7280']};
+
+const _crD = s => new Date(s+'T00:00:00');
+const _crFmt = s => s ? s.slice(8,10)+'/'+s.slice(5,7)+'/'+s.slice(0,4) : '—';
+const _crFmtC = s => s ? s.slice(8,10)+'/'+s.slice(5,7) : '—';
+function _crIso(d){ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+function _crAddDia(s, n){ const d = _crD(s); d.setDate(d.getDate()+n); return _crIso(d); }
+function _crHoje(){ const d = new Date(); d.setHours(0,0,0,0); return d; }
+const _crSit = p => p.cancelado ? 'cancelado' : calcSit(p);
+const _crEtapaK = p => COLUNA_REMAP[p.col] ?? p.col;
+
+// Janela visível (ano inteiro ou um trimestre)
+function _crJanela(){
+  const ano = parseInt(document.getElementById('tlAno')?.value) || new Date().getFullYear();
+  if(_crEscala === 'tri'){
+    const m0 = ((parseInt(document.getElementById('tlTri')?.value) || 1) - 1) * 3;
+    return {from:new Date(ano,m0,1), to:new Date(ano,m0+3,1), ano,
+      meses:[m0,m0+1,m0+2].map(m => ({d:new Date(ano,m,1), l:MNS[m]+' '+ano}))};
+  }
+  return {from:new Date(ano,0,1), to:new Date(ano+1,0,1), ano, meses:MNS.map((l,m) => ({d:new Date(ano,m,1), l}))};
+}
+const _crPos = (d, j) => Math.max(0, Math.min(100, (d - j.from) / (j.to - j.from) * 100));
+
+// Período do produto
+// Sem prazo/término no produto, usa as datas das atividades. Sem nenhuma data final → semFim.
+function _crPeriodo(p){
+  const ativ = (p.etapas||[]).flatMap(e => [e.dataInicial, e.prazo]).filter(Boolean).sort();
+  let ini = p.inicio || [ativ[0], p.criado].filter(Boolean).sort()[0] || null;
+  let fim = p.termino || p.prazo || ativ[ativ.length-1] || null;
+  const semFim = !fim;
+  if(!ini) ini = fim; if(!fim) fim = ini;
+  if(ini && fim && ini > fim) [ini, fim] = [fim, ini];
+  return {ini, fim, semFim};
+}
+
+// Atividades com as datas que vão para o gráfico
+function _crAtivAtrasada(p, e, hoje){
+  if(e.done || !e.prazo) return false;
+  if(ETAPAS_SEM_PRAZO_AUTO.has(e.lb) || _isApostilaIsentaAtraso(p, e) || _aguardandoMaterialBase(p)) return false;
+  return _crD(e.prazo) < hoje;
+}
+function _crAtividades(p, hoje){
+  let ant = null;
+  return (p.etapas||[]).map((e, i) => {
+    const fim = e.prazo || (e.done ? e.fim : null) || null;
+    let ini = e.dataInicial || (ant ? _crAddDia(ant, 1) : (p.inicio || p.criado || fim)) || null;
+    if(ini && fim && ini > fim) ini = fim;
+    if(fim) ant = fim;
+    return {e, i, ini, fim, estimado: !e.dataInicial, atrasada: _crAtivAtrasada(p, e, hoje)};
+  });
+}
+
+// Filtros
+function _crLerFiltros(){
+  const v = id => document.getElementById(id)?.value || '';
+  return {proj:v('tlProj'), sit:v('tlFiltSit'), resp:v('tlResp'), etapa:v('tlEtapa')};
+}
+const _crResps = p => [...new Set([...(p.resps||[]), ...(p.etapas||[]).flatMap(e => _respsEtapa(e))])];
+function _crAplicar(lista, f){
+  return lista.filter(p =>
+    (!f.proj  || (p.projCadId || '__sem') === f.proj) &&
+    (!f.sit   || _crSit(p) === f.sit) &&
+    (!f.resp  || _crResps(p).includes(f.resp)) &&
+    (!f.etapa || String(_crEtapaK(p)) === f.etapa));
+}
+function _crSelect(id, opcoes, rotTodos){
+  const sel = document.getElementById(id); if(!sel) return;
+  const atual = sel.value;
+  sel.innerHTML = `<option value="">${rotTodos}</option>` +
+    opcoes.map(o => `<option value="${esc(o.v)}"${o.v===atual?' selected':''}>${esc(o.l)}</option>`).join('');
+  if(!opcoes.some(o => o.v === atual)) sel.value = '';
+}
+function _crOpcoes(lista){
+  const projs = new Map();
+  lista.forEach(p => { const pr = projDoCard(p); projs.set(pr ? pr.id : '__sem', pr ? pr.nome : 'Sem projeto'); });
+  _crSelect('tlProj', [...projs].map(([v,l]) => ({v,l}))
+    .sort((a,b) => (a.v==='__sem') - (b.v==='__sem') || a.l.localeCompare(b.l, 'pt-BR')), 'Todos');
+  const resps = [...new Set(lista.flatMap(_crResps))].sort((a,b) => a.localeCompare(b, 'pt-BR'));
+  _crSelect('tlResp', resps.map(r => ({v:r, l:r})), 'Todos');
+  _crSelect('tlEtapa', COLUNAS.filter(c => !COLUNAS_OCULTAS.has(c.k)).map(c => ({v:String(c.k), l:c.l})), 'Todas');
+  ['tlProj','tlFiltSit','tlResp','tlEtapa'].forEach(id => {
+    const s = document.getElementById(id); if(s) s.classList.toggle('atr-sel-on', !!s.value);
+  });
+}
+
+// Renderização
+function _crTrilha(j, hoje, conteudo){
+  const grid = j.meses.map(m => `<div class="cr-grid" style="left:${_crPos(m.d,j)}%"></div>`).join('');
+  const linhaHoje = hoje >= j.from && hoje < j.to ? `<div class="cr-hoje" style="left:${_crPos(hoje,j)}%" title="Hoje"></div>` : '';
+  return `<div class="cr-track">${grid}${linhaHoje}${conteudo}</div>`;
+}
+// Barra de um período [ini, fim] (fim inclusivo) + tracejado de atraso até hoje
+function _crBarra(ini, fim, j, cls, estilo, titulo, interno){
+  if(!ini || !fim) return '';
+  const a = _crD(ini), b = _crD(_crAddDia(fim, 1));
+  if(b <= j.from || a >= j.to) return '';
+  const l = _crPos(a, j), r = _crPos(b, j);
+  return `<div class="${cls}" style="left:${l}%;width:${Math.max(r-l,.4)}%;${estilo}" title="${esc(titulo)}">${interno||''}</div>`;
+}
+function _crAtraso(prazo, j, hoje, cls){
+  const a = _crD(_crAddDia(prazo, 1));
+  if(a >= hoje || hoje <= j.from || a >= j.to) return '';
+  const l = _crPos(a, j), r = _crPos(hoje, j);
+  return r > l ? `<div class="${cls}" style="left:${l}%;width:${r-l}%" title="Atrasado desde ${_crFmt(prazo)}"></div>` : '';
+}
+
+function _crLinhaProduto(p, j, hoje){
+  const sit = _crSit(p), [sitTxt, cor] = _CR_SIT[sit] || _CR_SIT.aguardando;
+  const {ini, fim, semFim} = _crPeriodo(p);
+  const pct = p.pct || 0, aberto = _crAbertos.has(p.id);
+  const pr = projDoCard(p);
+  const temAtiv = (p.etapas||[]).length > 0;
+  let barra = '';
+  let bL = null, bR = null; // início e fim visíveis (%) da barra ou do marcador
+  if(semFim){
+    // Sem nenhuma data final: só um marcador no dia de início/criação
+    const d0 = ini ? _crD(ini) : null;
+    if(d0 && d0 >= j.from && d0 < j.to){ bL = bR = _crPos(d0,j); }
+    if(bL !== null)
+      barra = `<div class="cr-mk" style="left:${_crPos(d0,j)}%;--c:${cor}" title="${esc(p.nome)}: início em ${_crFmt(ini)} · sem prazo definido"></div>`;
+  } else {
+    // % só aparece se a barra tiver largura para ele (~4 dias no trimestre, ~2 semanas no ano)
+    const larg = (_crD(_crAddDia(fim,1)) - _crD(ini)) / (j.to - j.from) * 100;
+    if(ini && fim && _crD(_crAddDia(fim,1)) > j.from && _crD(ini) < j.to){ bL = _crPos(_crD(ini),j); bR = _crPos(_crD(_crAddDia(fim,1)),j); }
+    barra = _crBarra(ini, fim, j, 'cr-bar-p' + (sit==='aguardando'?' cr-wait':''), `background:${cor}`,
+      `${p.nome}: ${_crFmt(ini)} a ${_crFmt(fim)} · ${pct}%`, `<div class="cr-fill" style="width:${pct}%"></div>${larg >= 4 ? `<span>${pct}%</span>` : ''}`);
+  }
+  if(sit === 'atrasado' && p.prazo) barra += _crAtraso(p.prazo, j, hoje, 'cr-over');
+  const ESPACO = 13; // % da trilha que a etiqueta precisa
+  const posSit = bL !== null && bL >= ESPACO ? `right:calc(${100-bL}% + 6px)`
+    : bR !== null && bR <= 100-ESPACO ? `left:calc(${bR}% + 6px)`
+    : 'left:6px';
+  barra += `<span class="cr-pill cr-pill-tl" style="--c:${cor};${posSit}">${sitTxt}</span>`;
+  const tg = temAtiv
+    ? `<button type="button" class="cr-tg" data-cr-id="${p.id}" aria-expanded="${aberto}" aria-label="${aberto?'Fechar':'Abrir'} atividades de ${esc(p.nome)}" onclick="_crToggle(${p.id})"><svg class="ic" aria-hidden="true"><use href="#i-chevron-right"/></svg></button>`
+    : '<span class="cr-tg-vazio"></span>';
+  return `<div class="cr-row">
+    <div class="cr-name">${tg}
+      <div class="cr-nm">
+        <button type="button" class="cr-link" onclick="openDet(${p.id})" title="Abrir o card de ${esc(p.nome)}">${esc(p.nome)}</button>
+        <small>${_crFmtC(ini)} → ${semFim ? 'sem prazo' : _crFmtC(fim)} · ${esc(pr ? pr.nome : 'Sem projeto')}</small>
+      </div>
+    </div>${_crTrilha(j, hoje, barra)}</div>`;
+}
+
+function _crLinhasAtividades(p, j, hoje){
+  return _crAtividades(p, hoje).map(a => {
+    const e = a.e;
+    const cls = 'cr-bar-a' + (e.done ? ' cr-a-ok' : a.atrasada ? ' cr-a-late' : '') + (a.estimado ? ' cr-a-est' : '');
+    const tit = `${e.lb}: ${_crFmt(a.ini)} a ${_crFmt(a.fim)}${a.estimado && a.ini ? ' (início estimado)' : ''}${e.done ? ' · concluída' : ''}`;
+    let cont = _crBarra(a.ini, a.fim, j, cls, '', tit);
+    if(a.atrasada){
+      cont += _crAtraso(e.prazo, j, hoje, 'cr-over cr-over-a');
+      const pz = _crD(_crAddDia(e.prazo, 1));
+      if(pz > j.from && pz <= j.to) cont += `<div class="cr-dot" style="left:${_crPos(pz,j)}%" title="Atrasada desde ${_crFmt(e.prazo)}"></div>`;
+    }
+    const resp = _respEtapaTxt(e);
+    const ok = e.done ? `<span class="cr-ok" aria-label="Concluída">${icL('circle-check')}</span>` : '';
+    const dias = a.atrasada ? `<span class="cr-late-n">${Math.round((hoje - _crD(e.prazo))/864e5)}d</span>` : '';
+    return `<div class="cr-row cr-act">
+      <div class="cr-name">
+        <div class="cr-nm">
+          <span class="cr-at">${ok}${esc(e.lb)}</span>
+          <small>${esc(resp)}</small>
+        </div>
+        <span class="cr-dt">${dias}${a.fim ? _crFmtC(a.ini)+'–'+_crFmtC(a.fim) : 'sem data'}</span>
+      </div>${_crTrilha(j, hoje, cont)}</div>`;
+  }).join('');
+}
+
+function _crLegenda(){
+  const sw = (cor, txt, extra='') => `<span class="cr-lg"><i style="background:${cor};${extra}"></i>${txt}</span>`;
+  document.getElementById('tLegenda').innerHTML =
+    Object.values(_CR_SIT).map(([t,c]) => sw(c, t)).join('') +
+    sw('#5B7FC7', 'Atividade', 'height:6px') + sw('#7FBF98', 'Atividade concluída', 'height:6px') +
+    `<span class="cr-lg"><i class="cr-lg-dot"></i>Atividade atrasada</span>` +
+    `<span class="cr-lg"><i class="cr-lg-dash"></i>Atraso até hoje</span>` +
+    `<span class="cr-lg"><i class="cr-lg-mk"></i>Sem prazo definido</span>` +
+    `<span class="cr-lg"><i style="background:var(--red);width:2px;height:12px"></i>Hoje</span>`;
+}
+
 function rTimeline(){
-  // Popular select de anos com todos os anos existentes nos projetos
   const todosP = activeDB().concat(cancelDB());
+  const hoje = _crHoje();
+
+  // Anos com algum produto
   const anoAtual = new Date().getFullYear();
   const anosSet = new Set([anoAtual]);
-  todosP.forEach(p => {
-    [p.inicio, p.criado, p.prazo, p.termino, p.cancelEm].forEach(d => {
-      if(d) anosSet.add(new Date(d).getFullYear());
-    });
-  });
+  todosP.forEach(p => [p.inicio, p.criado, p.prazo, p.termino, p.cancelEm].forEach(d => { if(d) anosSet.add(new Date(d).getFullYear()); }));
   const anoEl = document.getElementById('tlAno');
   if(anoEl && (!anoEl.value || !anoEl.options.length)){
-    const sorted = [...anosSet].sort((a,b)=>a-b);
-    anoEl.innerHTML = sorted.map(a =>
-      `<option value="${a}" ${a===anoAtual?'selected':''}>${a}</option>`
-    ).join('');
+    anoEl.innerHTML = [...anosSet].sort((a,b) => a-b).map(a => `<option value="${a}" ${a===anoAtual?'selected':''}>${a}</option>`).join('');
+    const tri = document.getElementById('tlTri'); if(tri) tri.value = String(Math.floor(new Date().getMonth()/3) + 1);
   }
 
-  document.getElementById('ganttBody').innerHTML='';
-
-  const anoSel=parseInt(document.getElementById('tlAno')?.value||anoAtual);
-  const filtSit=document.getElementById('tlFiltSit')?.value||'';
-
-  const hojeD=new Date();
-  const hojeMes=hojeD.getFullYear()===anoSel?hojeD.getMonth():-1;
-  const hojeDay=hojeD.getDate();
-
-  const headCols=MNS.map((m,i)=>i===hojeMes
-    ?'<th style="color:#fff;background:var(--red)">'+m+'</th>'
-    :'<th>'+m+'</th>').join('');
-  document.getElementById('ganttHead').innerHTML=
-    '<tr><th class="pj">Produto</th>'+headCols+
-    '<th style="min-width:65px;text-align:center">Prog.</th>'+
-    '<th style="min-width:48px;text-align:center">Sit.</th></tr>';
-
-  // Inclui projetos cujo período cruza o ano selecionado
-  let projs=todosP.filter(p=>{
-    const ini = p.inicio||p.criado;
-    const fim = p.termino||p.prazo;
-    if(ini && fim){
-      const y1=new Date(ini).getFullYear(), y2=new Date(fim).getFullYear();
-      if(y1<=anoSel && y2>=anoSel) return true;
-    }
-    const datas=[p.inicio,p.criado,p.prazo,p.termino,p.cancelEm].filter(Boolean);
-    if(!datas.length) return true;
-    return datas.some(d=>new Date(d).getFullYear()===anoSel);
+  const j = _crJanela();
+  // Produtos cujo período (ou alguma atividade) cruza a janela
+  const naJanela = todosP.filter(p => {
+    const {ini, fim} = _crPeriodo(p);
+    const datas = [ini, fim, ...(p.etapas||[]).flatMap(e => [e.dataInicial, e.prazo])].filter(Boolean).sort();
+    if(!datas.length) return false;
+    return _crD(datas[0]) < j.to && _crD(_crAddDia(datas[datas.length-1], 1)) > j.from;
   });
-  if(filtSit) projs=projs.filter(p=>(p.cancelado?'cancelado':calcSit(p))===filtSit);
+  _crOpcoes(naJanela);
+  const lista = _crAplicar(naJanela, _crLerFiltros());
 
-  const ordSit={atrasado:0,andamento:1,aguardando:2,concluido:3,cancelado:4};
-  const _ordPrioL={urgente:0,alta:1,media:2,baixa:3};
-  projs.sort((a,b)=>{
-    const sA=ordSit[a.cancelado?'cancelado':calcSit(a)]??5;
-    const sB=ordSit[b.cancelado?'cancelado':calcSit(b)]??5;
-    if(sA!==sB) return sA-sB;
-    // Dentro do mesmo status: prioridade → data de criação
-    const pA=_ordPrioL[a.prioridade]??4, pB=_ordPrioL[b.prioridade]??4;
-    if(pA!==pB) return pA-pB;
-    return new Date(a.criado||0)-new Date(b.criado||0);
-  });
+  const ordSit = {atrasado:0, andamento:1, aguardando:2, concluido:3, cancelado:4};
+  const ordPrio = {urgente:0, alta:1, media:2, baixa:3};
+  lista.sort((a,b) => (ordSit[_crSit(a)]??5) - (ordSit[_crSit(b)]??5)
+    || (ordPrio[a.prioridade]??4) - (ordPrio[b.prioridade]??4)
+    || new Date(a.criado||0) - new Date(b.criado||0));
 
-  function sitColor(p){
-    if(p.cancelado)return '#6B7280';
-    return {concluido:'#1A8A4A',atrasado:'#E8002D',andamento:'#003DA5',aguardando:'#9CA3AF'}[calcSit(p)]||'#9CA3AF';
-  }
-  function sitOpacity(p){
-    if(p.cancelado)return 0.4;
-    return {concluido:1,atrasado:0.9,andamento:0.8,aguardando:0.5}[calcSit(p)]||0.8;
-  }
-  function sitIcon(p){
-    if(p.cancelado)return '<span class="bdg b-canc" style="font-size:10px">🚫</span>';
-    const ico={concluido:'✅',atrasado:'⚠️',andamento:'🔄',aguardando:'⏳'}[calcSit(p)]||'';
-    const cls={concluido:'b-conc',atrasado:'b-atq',andamento:'b-and',aguardando:'b-ag'}[calcSit(p)]||'';
-    return ico?'<span class="bdg '+cls+'" style="font-size:10px">'+ico+'</span>':'';
-  }
-  function todayPct(mes){return Math.round((hojeDay/new Date(anoSel,mes+1,0).getDate())*100);}
+  _crLegenda();
+  const cab = `<div class="cr-row cr-head"><div class="cr-name">Produto / atividade</div><div class="cr-scale">` +
+    j.meses.map(m => {
+      const atual = m.d.getMonth() === hoje.getMonth() && m.d.getFullYear() === hoje.getFullYear();
+      return `<div class="cr-tick${atual?' cr-tick-now':''}" style="left:${_crPos(m.d,j)}%">${m.l}</div>`;
+    }).join('') + '</div></div>';
+  const corpo = lista.map(p => _crLinhaProduto(p, j, hoje) + (_crAbertos.has(p.id) ? _crLinhasAtividades(p, j, hoje) : '')).join('');
+  const periodo = _crEscala === 'tri' ? `no ${document.getElementById('tlTri').value}º trimestre de ${j.ano}` : `em ${j.ano}`;
+  document.getElementById('crGantt').innerHTML = cab + (corpo || `<div class="cr-vazio">Nenhum produto ${periodo} com esses filtros.</div>`);
+  const el = document.getElementById('tlCount');
+  if(el) el.textContent = lista.length + (lista.length === 1 ? ' produto' : ' produtos');
+  window._crListaAtual = lista.map(p => p.id);
+}
 
-  const rowsHtml=projs.map(p=>{
-    const cor=sitColor(p),op=sitOpacity(p),pct=p.pct||0;
-    const concl=calcSit(p)==='concluido';
-    const dtIni=p.inicio||p.criado;
-    const dtFim=p.termino||p.prazo;
-    const nS=p.nome.length>26?p.nome.slice(0,24)+'…':p.nome;
-
-    if(!dtIni&&!dtFim) return '<tr><td class="pj" style="cursor:pointer;color:var(--blue)" onclick="openDet('+p.id+')" title="'+p.nome+'">'+nS+'</td>'+MNS.map(()=>'<td class="bc"></td>').join('')+'<td style="text-align:center;font-size:11px;color:var(--mu)">'+pct+'%</td><td style="text-align:center">'+sitIcon(p)+'</td></tr>';
-
-    const sy=dtIni?new Date(dtIni).getFullYear():anoSel;
-    const sm=dtIni?new Date(dtIni).getMonth():0;
-    const ey=dtFim?new Date(dtFim).getFullYear():sy;
-    const em=dtFim?new Date(dtFim).getMonth():sm;
-    const colS=sy<anoSel?0:sy>anoSel?99:sm;
-    const colE=ey>anoSel?11:ey<anoSel?-1:em;
-    const vencido=dtFim&&!concl&&new Date(dtFim)<new Date();
-
-    const cells=MNS.map((_,i)=>{
-      if(i<colS||i>colE)return'<td class="bc"></td>';
-      const iF=i===colS,iL=i===colE;
-      const bdr='border-radius:'+(iF?'4px':'0')+' '+(iL?'4px':'0')+' '+(iL?'4px':'0')+' '+(iF?'4px':'0');
-      const bs=(iL&&vencido)?'border:2px dashed '+cor+';background:transparent;box-sizing:border-box;'+bdr:'background:'+cor+';opacity:'+op+';'+bdr;
-      let inn=iF?'<span class="gbar-label">'+(p.nome.length>14?p.nome.slice(0,12)+'…':p.nome)+' · '+pct+'%</span>':'';
-      if(i===hojeMes)inn+='<div class="gbar-today" style="left:'+todayPct(i)+'%"></div>';
-      return'<td class="bc"><div class="gbar" style="'+bs+'">'+inn+'</div></td>';
-    }).join('');
-
-    let rb=concl?'background:rgba(26,138,74,.05)':p.cancelado?'opacity:.65':calcSit(p)==='atrasado'?'background:rgba(232,0,45,.03)':'';
-    const pg='<div class="pw" style="min-width:52px"><div class="pb"><div class="pf2" style="width:'+pct+'%;background:'+cor+'"></div></div><span class="pp">'+pct+'%</span></div>';
-    return'<tr style="'+rb+'"><td class="pj" style="cursor:pointer;color:var(--blue)" onclick="openDet('+p.id+')" title="'+p.nome+'">'+nS+'</td>'+cells+'<td style="text-align:center">'+pg+'</td><td style="text-align:center">'+sitIcon(p)+'</td></tr>';
-  }).join('');
-
-  document.getElementById('ganttBody').innerHTML=rowsHtml||'<tr><td colspan="15" style="text-align:center;padding:32px;color:var(--mu)">Nenhum projeto para '+anoSel+'</td></tr>';
-  const el=document.getElementById('tlCount');
-  if(el)el.textContent=projs.length+' produto(s) exibido(s)';
+function _crToggle(id){
+  if(_crAbertos.has(id)) _crAbertos.delete(id); else _crAbertos.add(id);
+  rTimeline();
+  document.querySelector(`.cr-tg[data-cr-id="${id}"]`)?.focus();
+}
+function _crTodos(abrir){
+  (window._crListaAtual || []).forEach(id => abrir ? _crAbertos.add(id) : _crAbertos.delete(id));
+  rTimeline();
+}
+function _crSetEscala(v){
+  _crEscala = v;
+  document.querySelectorAll('[data-cr-esc]').forEach(b => b.setAttribute('aria-pressed', b.dataset.crEsc === v));
+  document.getElementById('tlTriWrap').style.display = v === 'tri' ? '' : 'none';
+  rTimeline();
+}
+function limparTlFilts(){
+  ['tlProj','tlFiltSit','tlResp','tlEtapa'].forEach(id => { const s = document.getElementById(id); if(s) s.value = ''; });
+  rTimeline();
 }
 
 // ── KPIs ──
@@ -5093,7 +5318,7 @@ function openDet(id){
 
       </div>
       <div>
-        ${dl2('Responsável(is)',avList(p.resps)+'<div style="font-size:11.5px;margin-top:3px">'+(p.resps||[]).join(', ')+'</div>')}
+        ${dl2('Responsável(is)','<div style="font-size:11.5px">'+((p.resps||[]).join(', ')||'—')+'</div>')}
         ${dl2('Progresso',progH(p,'110px'))}
         ${p.linkBdoc?dl2('Link BDOC Firjan',`<a href="${esc(p.linkBdoc)}" target="_blank" rel="noopener noreferrer" style="color:var(--blue);text-decoration:underline;word-break:break-all;font-size:12.5px">🔗 ${esc(p.linkBdoc)}</a>`):''}
         ${p.prazObs?dl2('Obs. Prazo',`<em style="color:var(--mu)">${p.prazObs}</em>`):''}
