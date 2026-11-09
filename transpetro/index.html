@@ -1066,6 +1066,8 @@ body.dark .tenant-item.current{background:rgba(34,197,94,.12)}
 .btn-medicao{width:100%;margin-top:8px;padding:7px 10px;background:linear-gradient(135deg,#1A8A4A,#15803d);color:#fff;border:none;border-radius:7px;font-size:11.5px;font-weight:700;font-family:'Plus Jakarta Sans',sans-serif;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;transition:opacity .15s,transform .15s}
 .btn-medicao:hover{opacity:.88;transform:translateY(-1px)}
 .ic.ic-inl{display:inline-block;width:1.15em;height:1.15em;vertical-align:-.2em}
+/* Pasta amarela antes do nome do projeto, no topo do detalhe do card */
+.det-proj-ic .ic{color:#CA8A04;fill:#FDE047;width:13px;height:13px;vertical-align:-2px}
 .badge-medicao-ok{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:12px;background:#DCFCE7;color:#15803D;font-size:11px;font-weight:700}
 .badge-medicao-pend{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:12px;background:#FEF9C3;color:#854D0E;font-size:11px;font-weight:700}
 /* HOMOLOGAÇÕES */
@@ -5246,7 +5248,7 @@ function sitEtapa(e, p){
 function openDet(id){
   const p=DB.find(x=>x.id===id);if(!p)return;
   const _prDet=projDoCard(p);
-  document.getElementById('detTitle').innerHTML=(_prDet?`<div style="font-size:11px;font-weight:700;color:var(--blue);text-transform:uppercase;letter-spacing:.4px;margin-bottom:2px">📁 ${esc(_prDet.nome)}</div>`:'')+esc(p.nome);
+  document.getElementById('detTitle').innerHTML=(_prDet?`<div style="font-size:11px;font-weight:700;color:var(--blue);text-transform:uppercase;letter-spacing:.4px;margin-bottom:2px"><span class="det-proj-ic">${icL('folder')}</span> ${esc(_prDet.nome)}</div>`:'')+esc(p.nome);
 
   const{eq,cl}=delInf(p);
   const eRows=(p.etapas||[]).map((e,i)=>{
