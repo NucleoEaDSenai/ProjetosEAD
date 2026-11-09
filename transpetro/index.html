@@ -5410,7 +5410,7 @@ function openDet(id){
                 <span class="coment-dt">${esc(_ed&&cm.editadoEm?cm.editadoEm:cm.dt)}${_ed?` · <button class="coment-editado" title="Postado originalmente em ${esc(cm.dt)} — ver versões anteriores" onclick="toggleVersoesComent(${p.id},${idx})">editado</button>`:''}</span>
               </div>
               ${_ed?`<div class="coment-versoes" id="comentVers_${p.id}_${idx}" style="display:none">
-                <div class="coment-versoes-tit">🕘 Versões anteriores</div>
+                <div class="coment-versoes-tit">${icL('history')} Versões anteriores</div>
                 ${_vers.length
                   ? _vers.map((v,i,arr)=>{
                       const ate=arr[i+1]?arr[i+1].dt:(cm.editadoEm||'');
