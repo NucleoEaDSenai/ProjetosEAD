@@ -1351,6 +1351,10 @@ body.dark .carga-card-cliente{background:linear-gradient(180deg,rgba(14,165,233,
 .carga-count-lbl{font-size:10px;color:var(--mu);text-transform:uppercase;letter-spacing:.5px;font-weight:600}
 .carga-arrow{font-size:11px;color:var(--mu);transition:transform .25s;flex-shrink:0;margin-left:6px}
 .carga-arrow.open{transform:rotate(180deg)}
+.carga-arrow .ic{width:14px;height:14px}
+.carga-proj-nome .open-icon{display:inline-flex}
+.carga-proj-nome .open-icon .ic{width:12px;height:12px}
+.carga-proj-detail-item .lbl .ic{color:var(--blue)}
 .carga-bar-bg{height:6px;background:var(--bdr);border-radius:3px;overflow:hidden;margin:0 18px 8px;flex-shrink:0}
 .carga-bar-fill{height:100%;border-radius:3px;transition:width .5s ease}
 .carga-stats-row{display:flex;gap:6px;padding:0 18px 14px;flex-wrap:wrap}
@@ -1619,6 +1623,9 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
   <symbol id="i-gamepad" viewBox="0 0 24 24"><line x1="6" x2="10" y1="11" y2="11"/><line x1="8" x2="8" y1="9" y2="13"/><line x1="15" x2="15.01" y1="12" y2="12"/><line x1="18" x2="18.01" y1="10" y2="10"/><path d="M17.32 5H6.68a4 4 0 0 0-3.978 3.59c-.006.052-.01.101-.017.152C2.604 9.416 2 14.456 2 16a3 3 0 0 0 3 3c1 0 1.5-.5 2-1l1.414-1.414A2 2 0 0 1 9.828 16h4.344a2 2 0 0 1 1.414.586L17 18c.5.5 1 1 2 1a3 3 0 0 0 3-3c0-1.545-.604-6.584-.685-7.258-.007-.05-.011-.1-.017-.151A4 4 0 0 0 17.32 5z"/></symbol>
   <symbol id="i-book-open" viewBox="0 0 24 24"><path d="M12 7v14"/><path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"/></symbol>
   <symbol id="i-user" viewBox="0 0 24 24"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></symbol>
+  <symbol id="i-mail" viewBox="0 0 24 24"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></symbol>
+  <symbol id="i-pause" viewBox="0 0 24 24"><rect x="14" y="4" width="4" height="16" rx="1"/><rect x="6" y="4" width="4" height="16" rx="1"/></symbol>
+  <symbol id="i-chevron-down" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></symbol>
   <symbol id="i-check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></symbol>
   <symbol id="i-plus" viewBox="0 0 24 24"><path d="M5 12h14"/><path d="M12 5v14"/></symbol>
   <symbol id="i-grip" viewBox="0 0 24 24"><circle cx="9" cy="12" r="1"/><circle cx="9" cy="5" r="1"/><circle cx="9" cy="19" r="1"/><circle cx="15" cy="12" r="1"/><circle cx="15" cy="5" r="1"/><circle cx="15" cy="19" r="1"/></symbol>
@@ -2417,7 +2424,7 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
 
     <!-- CARGA DA EQUIPE -->
     <div class="view" id="view-carga">
-      <div class="st" style="margin-bottom:6px">👥 Dashboard de Carga da Equipe</div>
+      <div class="st" style="margin-bottom:6px"><svg class="ic ic-inl" aria-hidden="true"><use href="#i-users"/></svg> Dashboard de Carga da Equipe</div>
       <div style="font-size:12.5px;color:var(--mu);margin-bottom:16px">Projetos cuja <strong>etapa atual</strong> está com cada pessoa da equipe. Projetos aguardando cliente ou em etapas de outra pessoa não aparecem aqui.</div>
       <!-- Stats -->
       <div id="cargaStats" style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:18px"></div>
@@ -11821,11 +11828,11 @@ function _etapaAtualEhDaPessoa(p, nome){
 
 function _cargaStatusBadge(status){
   const map = {
-    atraso_equipe:   {lbl:'⚠️ Atrasado',                  bg:'#FEE2E2', cor:'#991B1B'},
-    atraso_cliente:  {lbl:'⏳ Cliente atrasado',          bg:'#FFF7ED', cor:'#9A3412'},
-    aguard_cliente:  {lbl:'📨 Aguardando retorno',        bg:'#E0F2FE', cor:'#0369A1'},
-    andamento:       {lbl:'🔄 Em Andamento',              bg:'#EFF6FF', cor:'#1E40AF'},
-    aguardando:      {lbl:'⏳ Aguardando',                bg:'#F3F4F6', cor:'#374151'},
+    atraso_equipe:   {lbl:icL('triangle-alert')+' Atrasado',     bg:'#FEE2E2', cor:'#991B1B'},
+    atraso_cliente:  {lbl:icL('hourglass')+' Cliente atrasado',  bg:'#FFF7ED', cor:'#9A3412'},
+    aguard_cliente:  {lbl:icL('mail')+' Aguardando retorno',     bg:'#E0F2FE', cor:'#0369A1'},
+    andamento:       {lbl:icL('refresh')+' Em Andamento',        bg:'#EFF6FF', cor:'#1E40AF'},
+    aguardando:      {lbl:icL('hourglass')+' Aguardando',        bg:'#F3F4F6', cor:'#374151'},
   };
   const m = map[status] || map.andamento;
   return `<span class="carga-proj-status-badge" style="background:${m.bg};color:${m.cor}">${m.lbl}</span>`;
@@ -12082,13 +12089,13 @@ function _buildCargaCardPessoa(nome, projs, max, stOpen){
         <div class="carga-count" style="color:${corStatus}">${projs.length}</div>
         <div class="carga-count-lbl">produtos</div>
       </div>
-      <span class="carga-arrow${isOpen?' open':''}" id="${uid}_arrow">▼</span>
+      <span class="carga-arrow${isOpen?' open':''}" id="${uid}_arrow"><svg class="ic" aria-hidden="true"><use href="#i-chevron-down"/></svg></span>
     </div>
     <div class="carga-bar-bg"><div class="carga-bar-fill" style="width:${pct}%;background:${corStatus}"></div></div>
     <div class="carga-stats-row">
-      ${atrasados > 0 ? `<span class="carga-stat-pill red">⚠️ ${atrasados} atraso${atrasados>1?'s':''}</span>` : ''}
-      ${andamento > 0 ? `<span class="carga-stat-pill blue">🔄 ${andamento} andamento</span>` : ''}
-      ${aguard > 0 ? `<span class="carga-stat-pill gray">⏸️ ${aguard} aguardando</span>` : ''}
+      ${atrasados > 0 ? `<span class="carga-stat-pill red">${icL('triangle-alert')} ${atrasados} atraso${atrasados>1?'s':''}</span>` : ''}
+      ${andamento > 0 ? `<span class="carga-stat-pill blue">${icL('refresh')} ${andamento} andamento</span>` : ''}
+      ${aguard > 0 ? `<span class="carga-stat-pill gray">${icL('pause')} ${aguard} aguardando</span>` : ''}
     </div>
     <div class="carga-body${isOpen?' open':''}" id="${uid}_body">
       ${_cargaFiltroCardHtml(uid, projs, filtro)}
@@ -12123,7 +12130,7 @@ function _buildCargaCardCliente(projs, max, stOpen){
   return `<div class="carga-card carga-card-cliente">
     <div class="carga-hd" onclick="toggleCarga('${uid}')">
       <div class="carga-av" style="background:${corStatus};font-size:22px">
-        🏢
+        <svg class="ic" aria-hidden="true" style="width:24px;height:24px;color:#fff"><use href="#i-building"/></svg>
         ${atrasados>0?`<span class="carga-av-badge" style="background:var(--org)">${atrasados}</span>`:''}
       </div>
       <div class="carga-info">
@@ -12134,12 +12141,12 @@ function _buildCargaCardCliente(projs, max, stOpen){
         <div class="carga-count" style="color:${corStatus}">${projs.length}</div>
         <div class="carga-count-lbl">produtos</div>
       </div>
-      <span class="carga-arrow${isOpen?' open':''}" id="${uid}_arrow">▼</span>
+      <span class="carga-arrow${isOpen?' open':''}" id="${uid}_arrow"><svg class="ic" aria-hidden="true"><use href="#i-chevron-down"/></svg></span>
     </div>
     <div class="carga-bar-bg"><div class="carga-bar-fill" style="width:${pct}%;background:${corStatus}"></div></div>
     <div class="carga-stats-row">
-      ${atrasados > 0 ? `<span class="carga-stat-pill org">⏳ ${atrasados} atrasado${atrasados>1?'s':''}</span>` : ''}
-      ${aguardando > 0 ? `<span class="carga-stat-pill blue">📨 ${aguardando} aguardando retorno</span>` : ''}
+      ${atrasados > 0 ? `<span class="carga-stat-pill org">${icL('hourglass')} ${atrasados} atrasado${atrasados>1?'s':''}</span>` : ''}
+      ${aguardando > 0 ? `<span class="carga-stat-pill blue">${icL('mail')} ${aguardando} aguardando retorno</span>` : ''}
     </div>
     <div class="carga-body${isOpen?' open':''}" id="${uid}_body">
       ${_cargaFiltroCardHtml(uid, projs, filtro)}
@@ -12188,7 +12195,7 @@ function _buildCargaProjCard(p, nome){
     <div class="carga-proj-hd" onclick="toggleCargaProj('${uid}')">
       <div class="carga-proj-titulo">
         <div class="carga-proj-nome">
-          <span class="open-icon">▶</span>
+          <span class="open-icon"><svg class="ic" aria-hidden="true"><use href="#i-chevron-right"/></svg></span>
           ${nomeProj}
           ${prioBadge(p.prioridade)}
         </div>
@@ -12202,36 +12209,36 @@ function _buildCargaProjCard(p, nome){
     <div class="carga-proj-detail">
       <div class="carga-proj-detail-grid">
         <div class="carga-proj-detail-item">
-          <span class="lbl">📅 Prazo</span>
+          <span class="lbl">${icL('calendar')} Prazo</span>
           <span class="val ${prazoCls}">${prazoTxt}</span>
         </div>
         <div class="carga-proj-detail-item">
-          <span class="lbl">▶️ Etapa atual</span>
+          <span class="lbl">${icL('clipboard-list')} Etapa atual</span>
           <span class="val">${etAtual ? etAtual.lb : (sit==='concluido'?'Concluído':'—')}</span>
         </div>
         ${p.idCurso?`<div class="carga-proj-detail-item">
-          <span class="lbl">🆔 ID do Curso</span>
+          <span class="lbl">${icL('hash')} ID do Curso</span>
           <span class="val">${esc(p.idCurso)}</span>
         </div>`:''}
         <div class="carga-proj-detail-item">
-          <span class="lbl">🏷️ Categoria de Projeto</span>
+          <span class="lbl">${icL('bookmark')} Categoria de Projeto</span>
           <span class="val">${p.academia || '<span style="color:var(--mu);font-style:italic;font-weight:400">—</span>'}</span>
         </div>
         <div class="carga-proj-detail-item">
-          <span class="lbl">📊 Progresso</span>
+          <span class="lbl">${icL('chart')} Progresso</span>
           <span class="val">${p.pct||0}%
             <div class="carga-progress"><div class="carga-progress-fill" style="width:${p.pct||0}%;background:${corProgresso(sit)}"></div></div>
           </span>
         </div>
         <div class="carga-proj-detail-item">
-          <span class="lbl">⏱️ Atraso</span>
+          <span class="lbl">${icL('timer')} Atraso</span>
           <span class="val ${eq>0?'red':cl>0?'org':''}">
             ${eq>0?`${eq}d equipe`:cl>0?`${cl}d cliente`:'No prazo'}
           </span>
         </div>
         ${nome === '__cliente__' ? `
         <div class="carga-proj-detail-item" style="grid-column:span 2">
-          <span class="lbl">👥 Responsáveis (Equipe)</span>
+          <span class="lbl">${icL('users')} Responsáveis (Equipe)</span>
           <span class="val" style="display:flex;gap:5px;flex-wrap:wrap;align-items:center">
             ${(p.resps||[]).length
               ? (p.resps||[]).map(r=>`<span style="display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:10px;background:var(--s2);font-size:11px;font-weight:600"><span style="width:16px;height:16px;border-radius:50%;background:${NOME_CORES[r]||'var(--blue)'};color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:8px;font-weight:800">${iniciais(r)}</span>${r}</span>`).join('')
@@ -12240,7 +12247,7 @@ function _buildCargaProjCard(p, nome){
         </div>` : ''}
       </div>
       <div class="carga-proj-detail-actions">
-        <button class="carga-proj-action-btn" onclick="event.stopPropagation();openDet(${p.id})">🔎 Abrir Card</button>
+        <button class="carga-proj-action-btn" onclick="event.stopPropagation();openDet(${p.id})">${icL('search')} Abrir Card</button>
       </div>
     </div>
   </div>`;
