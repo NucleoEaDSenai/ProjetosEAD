@@ -822,6 +822,29 @@ body.dark .bmotivo:hover{background:rgba(244,167,174,.28)}
 .motivo-op small{font-size:11.5px;color:var(--mu)}
 .motivo-campo{padding:0 2px 4px 34px;display:grid;gap:4px}
 .motivo-campo[hidden]{display:none}
+/* Modal de confirmação (confirmar) */
+.ov-conf{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:3000;display:none;align-items:center;justify-content:center;backdrop-filter:blur(3px);padding:16px}
+.ov-conf.on{display:flex}
+.conf-box{--cf:#003DA5;--cf-bg:#DBEAFE;--cf-btn:#003DA5;--cf-btn-h:#002F80;background:#fff;border-radius:14px;padding:24px 26px 20px;width:500px;max-width:100%;box-shadow:0 20px 60px rgba(0,0,0,.2);display:grid;grid-template-columns:auto 1fr;gap:4px 16px;animation:confIn .16s ease-out}
+@keyframes confIn{from{opacity:0;transform:translateY(8px) scale(.98)}to{opacity:1;transform:none}}
+.conf-box.perigo{--cf:#B91C1C;--cf-bg:#FEE2E2;--cf-btn:#DC2626;--cf-btn-h:#B91C1C}
+.conf-box.aviso{--cf:#B45309;--cf-bg:#FEF3C7;--cf-btn:#D97706;--cf-btn-h:#B45309}
+.conf-box.ok{--cf:#15803D;--cf-bg:#DCFCE7;--cf-btn:#16A34A;--cf-btn-h:#15803D}
+.conf-ic{width:44px;height:44px;border-radius:50%;background:var(--cf-bg);color:var(--cf);display:flex;align-items:center;justify-content:center;grid-row:span 2}
+.conf-ic .ic{width:22px;height:22px}
+.conf-tx h3{font-family:'Plus Jakarta Sans',sans-serif;font-weight:800;font-size:16px;margin:2px 0 6px;color:var(--txt)}
+#confMsg{font-size:13px;color:var(--mu);line-height:1.55;word-break:break-word}
+#confMsg p{margin:0 0 8px}
+#confMsg p:last-child{margin-bottom:0}
+#confMsg ul{margin:0 0 8px;padding-left:18px;max-height:180px;overflow:auto}
+#confMsg strong{color:var(--txt);font-weight:700}
+.conf-ft{grid-column:1 / -1;display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;margin-top:18px}
+.conf-ok{background:var(--cf-btn);color:#fff;font-weight:600}
+.conf-ok:hover{background:var(--cf-btn-h)}
+.conf-ft .btn:focus-visible{outline:2px solid var(--cf);outline-offset:2px}
+body.dark .conf-box{background:var(--s3)}
+body.dark .conf-box .conf-ic{background:color-mix(in srgb,var(--cf-btn) 24%,transparent);color:color-mix(in srgb,var(--cf-btn) 55%,#fff)}
+@media(max-width:480px){.conf-ft .btn{flex:1;justify-content:center}}
 /* Aba PPU */
 .ppu-th{all:unset;cursor:pointer;display:inline-flex;align-items:center;gap:5px;white-space:nowrap}
 .ppu-th span{opacity:.5;font-size:9px}
@@ -1490,6 +1513,9 @@ body.dark .carga-body{background:var(--s2)}
 .prio-baixa  {background:#EFF6FF;border-color:#2563EB;color:#1E3A8A}
 .prio-select{padding:6px 10px;border:1.5px solid var(--bdr);border-radius:7px;font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;background:var(--bg);outline:none;cursor:pointer}
 .prio-select:focus{border-color:var(--blue)}
+.sel-ic-wrap{display:flex;align-items:center;gap:7px}
+.sel-ic{display:inline-flex;flex-shrink:0;color:#CBD5E1}
+.sel-ic-sm .ic{width:14px;height:14px}
 
 /* ═══ NOTIFICAÇÃO DE PRAZO ═══ */
 .prazo-alerta{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:6px;font-size:10.5px;font-weight:700;animation:prazo-pulse 2s ease-in-out infinite}
@@ -1596,6 +1622,21 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
     <div class="login-hint" id="loginHint"></div>
   </div>
 </div>
+<!-- MODAL DE CONFIRMAÇÃO (substitui o confirm() do navegador) — usar: await confirmar({...}) -->
+<div class="ov-conf" id="ovConf" onclick="if(event.target===this)_confFechar(false)">
+  <div class="conf-box" role="alertdialog" aria-modal="true" aria-labelledby="confTit" aria-describedby="confMsg">
+    <div class="conf-ic" id="confIc" aria-hidden="true"></div>
+    <div class="conf-tx">
+      <h3 id="confTit"></h3>
+      <div id="confMsg"></div>
+    </div>
+    <div class="conf-ft">
+      <button type="button" class="btn bg2" id="confCancel" onclick="_confFechar(false)">Cancelar</button>
+      <button type="button" class="btn conf-ok" id="confOk" onclick="_confFechar(true)">Confirmar</button>
+    </div>
+  </div>
+</div>
+
 <!-- MODAL MOTIVO DE ATRASO -->
 <div class="ov-motivo" id="ovMotivo">
   <div class="motivo-box" role="dialog" aria-modal="true" aria-labelledby="motivoTit">
@@ -1677,6 +1718,9 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
   <symbol id="i-clapper" viewBox="0 0 24 24"><path d="M20.2 6 3 11l-.9-2.4c-.3-1.1.3-2.2 1.3-2.5l13.5-4c1.1-.3 2.2.3 2.5 1.3Z"/><path d="m6.2 5.3 3.1 3.9"/><path d="m12.4 3.4 3.1 4"/><path d="M3 11h18v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"/></symbol>
   <symbol id="i-gamepad" viewBox="0 0 24 24"><line x1="6" x2="10" y1="11" y2="11"/><line x1="8" x2="8" y1="9" y2="13"/><line x1="15" x2="15.01" y1="12" y2="12"/><line x1="18" x2="18.01" y1="10" y2="10"/><path d="M17.32 5H6.68a4 4 0 0 0-3.978 3.59c-.006.052-.01.101-.017.152C2.604 9.416 2 14.456 2 16a3 3 0 0 0 3 3c1 0 1.5-.5 2-1l1.414-1.414A2 2 0 0 1 9.828 16h4.344a2 2 0 0 1 1.414.586L17 18c.5.5 1 1 2 1a3 3 0 0 0 3-3c0-1.545-.604-6.584-.685-7.258-.007-.05-.011-.1-.017-.151A4 4 0 0 0 17.32 5z"/></symbol>
   <symbol id="i-book-open" viewBox="0 0 24 24"><path d="M12 7v14"/><path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"/></symbol>
+  <symbol id="i-circle" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/></symbol>
+  <symbol id="i-log-out" viewBox="0 0 24 24"><path d="m16 17 5-5-5-5"/><path d="M21 12H9"/><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/></symbol>
+  <symbol id="i-copy" viewBox="0 0 24 24"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></symbol>
   <symbol id="i-user" viewBox="0 0 24 24"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></symbol>
   <symbol id="i-mail" viewBox="0 0 24 24"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></symbol>
   <symbol id="i-pause" viewBox="0 0 24 24"><rect x="14" y="4" width="4" height="16" rx="1"/><rect x="6" y="4" width="4" height="16" rx="1"/></symbol>
@@ -2597,13 +2641,16 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
         <div class="fg2" style="grid-template-columns:1fr 1fr 1fr;gap:10px">
           <div class="fg">
             <label class="fl" for="fPrio">Prioridade</label>
-            <select class="prio-select" id="fPrio" aria-label="Prioridade do projeto" style="width:100%">
-              <option value="">— Sem prioridade —</option>
-              <option value="urgente">🔴 Urgente</option>
-              <option value="alta">🟠 Alta</option>
-              <option value="media">🟡 Média</option>
-              <option value="baixa">🔵 Baixa</option>
-            </select>
+            <div class="sel-ic-wrap">
+              <span class="sel-ic" id="fPrioIc" aria-hidden="true"><svg class="ic"><use href="#i-circle"/></svg></span>
+              <select class="prio-select" id="fPrio" aria-label="Prioridade do projeto" style="width:100%" onchange="_prioIcUpd()">
+                <option value="">— Sem prioridade —</option>
+                <option value="urgente">Urgente</option>
+                <option value="alta">Alta</option>
+                <option value="media">Média</option>
+                <option value="baixa">Baixa</option>
+              </select>
+            </div>
           </div>
           <div class="fg">
             <label class="fl" for="fRP">RP</label>
@@ -2706,7 +2753,7 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
   </div>
   <div class="mft">
     <button class="btn bg2" onclick="cm('ovCadProj')">Cancelar</button>
-    <button class="btn br" id="cpSalvarBtn" onclick="salvarCadProj()">💾 Salvar Projeto</button>
+    <button class="btn br" id="cpSalvarBtn" onclick="salvarCadProj()"><svg class="ic ic-inl"><use href="#i-save"/></svg> Salvar Projeto</button>
   </div>
 </div>
 </div>
@@ -2912,6 +2959,16 @@ const COLS_AV = ['#E8002D','#003DA5','#1A8A4A','#D97706','#7C3AED','#0891B2','#b
 
 
 // ── PRIORIDADE ──
+// Círculo pintado ao lado da Prioridade no formulário do produto
+const _PRIO_COR = {urgente:'#DC2626', alta:'#EA580C', media:'#EAB308', baixa:'#2563EB'};
+function _prioIcUpd(){
+  const v = document.getElementById('fPrio')?.value || '', ic = document.getElementById('fPrioIc');
+  if(!ic) return;
+  const cor = _PRIO_COR[v];
+  ic.style.color = cor || '#CBD5E1';
+  ic.querySelector('svg').style.fill = cor ? 'currentColor' : 'none';   // sem prioridade: só o contorno
+}
+
 const PRIO_MAP = {
   urgente:{label:'Urgente', cls:'prio-urgente'},
   alta:   {label:'Alta',    cls:'prio-alta'},
@@ -5515,6 +5572,70 @@ function openDet(id){
   setTimeout(()=>{const m=document.querySelector('#ovDet .modal');if(m)m.focus();},80);
 }
 
+// ══════════════════════════════════════════════
+//  CONFIRMAR — modal no visual do sistema (substitui o confirm() do navegador)
+// ══════════════════════════════════════════════
+// Uso:  if(!await confirmar({titulo:'Excluir comentário?', msg:'...', ok:'Excluir', tipo:'perigo'})) return;
+//   tipo:  'info' (azul, padrão) · 'perigo' (vermelho) · 'aviso' (amarelo) · 'ok' (verde)
+//   msg:   texto simples; linha em branco separa parágrafos e linhas com "• " viram lista.
+//          Trechos entre **asteriscos** ficam em negrito. Tudo é escapado (seguro para nomes digitados).
+//   ic:    ícone do sprite (opcional; cada tipo tem um padrão)
+//   foco:  'cancelar' para começar no botão Cancelar (ações em que o lado seguro é cancelar)
+// Esc, clique fora e Cancelar devolvem false. Pedidos feitos com um modal aberto entram na fila.
+const _CONF_IC = {info:'help', perigo:'trash', aviso:'triangle-alert', ok:'circle-check'};
+let _confFila = Promise.resolve(), _confResolver = null, _confFocoAntes = null;
+
+function confirmar(o){
+  const abrir = () => new Promise(resolve => {
+    const tipo = _CONF_IC[o.tipo] ? o.tipo : 'info';
+    const box = document.querySelector('#ovConf .conf-box');
+    box.className = 'conf-box ' + tipo;
+    document.getElementById('confIc').innerHTML = `<svg class="ic"><use href="#i-${o.ic || _CONF_IC[tipo]}"/></svg>`;
+    document.getElementById('confTit').textContent = o.titulo || 'Confirmar';
+    document.getElementById('confMsg').innerHTML = _confMsgHtml(o.msg || '');
+    document.getElementById('confOk').textContent = o.ok || 'Confirmar';
+    document.getElementById('confCancel').textContent = o.cancelar || 'Cancelar';
+    _confFocoAntes = document.activeElement;
+    _confResolver = resolve;
+    document.getElementById('ovConf').classList.add('on');
+    setTimeout(() => document.getElementById(o.foco === 'cancelar' ? 'confCancel' : 'confOk')?.focus(), 30);
+  });
+  const p = _confFila.then(abrir);
+  _confFila = p.catch(() => {});
+  return p;
+}
+
+function _confMsgHtml(msg){
+  const fmt = t => esc(t).replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+  return String(msg).split(/\n\s*\n/).map(bloco => {
+    const linhas = bloco.split('\n').filter(l => l.trim());
+    if(linhas.length && linhas.every(l => /^\s*•\s/.test(l)))
+      return '<ul>' + linhas.map(l => '<li>' + fmt(l.replace(/^\s*•\s*/, '')) + '</li>').join('') + '</ul>';
+    return '<p>' + linhas.map(fmt).join('<br>') + '</p>';
+  }).join('');
+}
+
+function _confFechar(res){
+  const r = _confResolver; if(!r) return;
+  _confResolver = null;
+  document.getElementById('ovConf').classList.remove('on');
+  try{ _confFocoAntes?.focus?.(); }catch(e){}
+  r(!!res);
+}
+
+// Teclado do modal: Esc cancela; Tab fica entre os dois botões.
+// Roda na captura para que o Esc não feche também o modal que está por baixo.
+window.addEventListener('keydown', e => {
+  if(!_confResolver) return;
+  if(e.key === 'Escape'){ e.preventDefault(); e.stopImmediatePropagation(); _confFechar(false); return; }
+  if(e.key === 'Tab'){
+    const bts = [document.getElementById('confCancel'), document.getElementById('confOk')];
+    const i = bts.indexOf(document.activeElement);
+    e.preventDefault();
+    bts[(i + (e.shiftKey ? -1 : 1) + 2) % 2].focus();
+  }
+}, true);
+
 function dl2(l,v){return`<div class="dl"><div class="dll">${l}</div><div class="dlv">${v}</div></div>`}
 
 // Converte URLs em links clicáveis (abre em nova aba)
@@ -5640,22 +5761,22 @@ function adicionarLinkApoio(pid){
   showToast('🔗 Link adicionado!');
 }
 
-function removerLinkApoio(pid,i){
+async function removerLinkApoio(pid,i){
   const p=DB.find(x=>x.id===pid);
   const lk=p?.linksApoio?.[i];
   if(!_podeRemoverLink(lk)){showToast('⚠️ Você só pode remover links que adicionou');return;}
-  if(!confirm(`Remover o link "${lk.titulo||lk.url}"?`)) return;
+  if(!await confirmar({titulo:'Remover link?', msg:`O link **${lk.titulo||lk.url}** sai dos Links de Apoio deste produto.`, ok:'Remover', tipo:'perigo', ic:'unlink'})) return;
   p.linksApoio.splice(i,1);
   fbSalvarProjeto(p);
   openDet(pid);
   showToast('🗑️ Link removido!');
 }
 
-function excluirComent(pid,i){
+async function excluirComent(pid,i){
   const p=DB.find(x=>x.id===pid);
   const cm=p?.comentarios?.[i];
   if(!_ehMeuComent(cm)){showToast('⚠️ Você só pode alterar os seus próprios comentários');return;}
-  if(!confirm('Excluir este comentário?')) return;
+  if(!await confirmar({titulo:'Excluir comentário?', msg:'O comentário e as versões anteriores dele serão apagados. Esta ação não pode ser desfeita.', ok:'Excluir', tipo:'perigo'})) return;
   p.comentarios.splice(i,1);
   fbSalvarProjeto(p);
   openDet(pid);
@@ -6377,10 +6498,10 @@ function _solicPendente(pid, idx){
   return {p, e, s:e.solicPrazo};
 }
 
-function aprovarSolicPrazo(pid, idx){
+async function aprovarSolicPrazo(pid, idx){
   const r = _solicPendente(pid, idx); if(!r) return;
   const {p, e, s} = r;
-  if(!confirm(`Aprovar "${e.lb}" como concluída em ${fd(s.dataReal)}?\n\nA data de conclusão passa de ${fd(e.fim)} para ${fd(s.dataReal)}.`)) return;
+  if(!await confirmar({titulo:'Aprovar solicitação?', msg:`**${e.lb}** fica como concluída em **${fd(s.dataReal)}**.\n\nA data de conclusão passa de ${fd(e.fim)} para ${fd(s.dataReal)}.`, ok:'Aprovar', tipo:'ok'})) return;
   e.fim = s.dataReal;
   e.atrasoMotivo = null;
   Object.assign(s, {status:'aprovada', decididoPor:nomeUsuarioAtual(), decididoEm:_dtAgora()});
@@ -6390,10 +6511,10 @@ function aprovarSolicPrazo(pid, idx){
   renderAll();
 }
 
-function negarSolicPrazo(pid, idx){
+async function negarSolicPrazo(pid, idx){
   const r = _solicPendente(pid, idx); if(!r) return;
   const {p, e, s} = r;
-  if(!confirm(`Negar a solicitação de "${e.lb}"?\n\nVale a data do check (${fd(s.fimCheck)}) e a etapa continua atrasada, sem motivo registrado.`)) return;
+  if(!await confirmar({titulo:'Negar solicitação?', msg:`Solicitação de **${e.lb}**.\n\nVale a data do check (${fd(s.fimCheck)}) e a etapa continua atrasada, sem motivo registrado.`, ok:'Negar', tipo:'perigo', ic:'ban'})) return;
   Object.assign(s, {status:'negada', decididoPor:nomeUsuarioAtual(), decididoEm:_dtAgora()});
   registrarHistorico(p, 'negou validação', `"${e.lb}": conclusão em ${fd(s.dataReal)} negada — vale ${fd(s.fimCheck)}`);
   fbSalvarProjeto(p);
@@ -7033,7 +7154,7 @@ function _efOnChangePrazo(i){
   }, 150);
 }
 
-function toggleRec(el, recurso){
+async function toggleRec(el, recurso){
   el.classList.toggle('sel');
   atualizarEstadoPrazo();
 
@@ -7060,10 +7181,12 @@ function toggleRec(el, recurso){
       if(!mesmas){
         const nomeModelo = tmplRecurso ? `"${tmplRecurso}"` : 'padrão';
         const manter = alvo.filter(te => _efEtapas.some(e => (e.lb||'').toLowerCase() === te.lb.toLowerCase())).length;
-        if(confirm(`Trocar as etapas deste projeto pelas etapas do recurso ${nomeModelo}?\n\n`
-          + `• ${alvo.length} etapa(s) no novo modelo\n`
-          + `• ${manter} etapa(s) com o mesmo nome mantêm o que já foi feito (concluída, datas, responsável)\n`
-          + `• As demais etapas atuais serão removidas\n\nClique em Cancelar para manter as etapas atuais.`)){
+        if(await confirmar({titulo:'Trocar as etapas?', tipo:'aviso', ic:'refresh', foco:'cancelar',
+            ok:'Trocar etapas', cancelar:'Manter as atuais',
+            msg:`Trocar as etapas deste produto pelas do recurso **${tmplRecurso || 'padrão'}**?\n\n`
+              + `• ${alvo.length} etapa(s) no novo modelo\n`
+              + `• ${manter} etapa(s) com o mesmo nome mantêm o que já foi feito (concluída, datas, responsável)\n`
+              + `• As demais etapas atuais serão removidas`})){
           const antigas = _efEtapas;
           buildEF(alvo.map(te => {
             const old = antigas.find(e => (e.lb||'').toLowerCase() === te.lb.toLowerCase());
@@ -7186,18 +7309,30 @@ function _efRespOpts(valorAtual){
       // Seleciona se: o valor salvo é esse nome, OU o valor é 'eq' e é o primeiro da lista
       const isSel = (valorAtual === nome)
         || (valorAtual === 'eq' && nome === resps[0]);
-      opts.push(`<option value="${nome}" ${isSel?'selected':''}>👤 ${nome}</option>`);
+      opts.push(`<option value="${nome}" ${isSel?'selected':''}>${nome}</option>`);
     });
   } else {
     // Nenhum responsável alocado ainda — mantém fallback genérico
     const isSel = (valorAtual === 'eq' || !valorAtual || valorAtual === '');
-    opts.push(`<option value="eq" ${isSel?'selected':''}>👥 Equipe</option>`);
+    opts.push(`<option value="eq" ${isSel?'selected':''}>Equipe</option>`);
   }
 
   // ── Cliente sempre ao final ──
-  opts.push(`<option value="cl" ${valorAtual==='cl'?'selected':''}>🏢 Cliente</option>`);
+  opts.push(`<option value="cl" ${valorAtual==='cl'?'selected':''}>Cliente</option>`);
 
   return opts.join('');
+}
+
+// Ícone ao lado do responsável da etapa: pessoa, equipe ou cliente
+function _respIcHtml(v){
+  const [id, cor, tit] = v === 'cl' ? ['building', '#B45309', 'Cliente']
+                       : !getSelectedResps().length ? ['users', '#003DA5', 'Equipe']   // sem equipe alocada: opção genérica "Equipe"
+                       : ['user', '#003DA5', 'Pessoa da equipe'];
+  return `<svg class="ic" style="color:${cor}"><title>${tit}</title><use href="#i-${id}"/></svg>`;
+}
+function _respIcUpd(i){
+  const sel = document.getElementById('er'+i), ic = document.getElementById('er_ic_'+i);
+  if(sel && ic) ic.innerHTML = _respIcHtml(sel.value);
 }
 
 function buildEF(etapas){
@@ -7277,9 +7412,12 @@ function _renderEF(){
               placeholder="Nome da etapa" title="Clique para editar o nome">
           </td>
           <td>
-            <select class="iis" id="er${i}" style="width:100%">
+            <div class="sel-ic-wrap">
+              <span class="sel-ic sel-ic-sm" id="er_ic_${i}" aria-hidden="true">${_respIcHtml(e.r)}</span>
+              <select class="iis" id="er${i}" style="width:100%" onchange="_respIcUpd(${i})">
               ${_efRespOpts(e.r)}
-            </select>
+              </select>
+            </div>
           </td>
           <td>
             <input class="fi ii" type="date" id="ef_ini_${i}" value="${e.dataInicial||''}" onchange="_efEtapas[${i}].dataInicial=this.value||null"
@@ -7444,9 +7582,9 @@ function _efSync(){
   });
 }
 
-function _efDel(i){
+async function _efDel(i){
   if(_efEtapas.length <= 1){ showToast('⚠️ O projeto precisa ter ao menos uma etapa.'); return; }
-  if(!confirm(`Remover a etapa "${_efEtapas[i].lb}"?`)) return;
+  if(!await confirmar({titulo:'Remover etapa?', msg:`A etapa **${_efEtapas[i].lb || '(sem nome)'}** sai da lista. A remoção só vale depois de salvar o produto.`, ok:'Remover', tipo:'perigo'})) return;
   _efSync();
   _efEtapas.splice(i,1);
   _efEtapasCustomizadas = true;   // ← marca como customizado
@@ -7483,7 +7621,7 @@ function _efAdd(){
 }
 
 // Remove múltiplas etapas selecionadas via checkbox
-function _efDelSelecionadas(){
+async function _efDelSelecionadas(){
   const checkboxes = document.querySelectorAll('.ef-row-check:checked');
   if(checkboxes.length === 0){
     showToast('⚠️ Nenhuma etapa selecionada.');
@@ -7495,7 +7633,7 @@ function _efDelSelecionadas(){
     return;
   }
   const nomes = indices.slice().reverse().map(i => '• ' + (_efEtapas[i].lb || '(sem nome)')).join('\n');
-  if(!confirm(`Remover ${indices.length} etapa${indices.length>1?'s':''}?\n\n${nomes}`)) return;
+  if(!await confirmar({titulo:`Remover ${indices.length} etapa${indices.length>1?'s':''}?`, msg:`${nomes}\n\nA remoção só vale depois de salvar o produto.`, ok:'Remover', tipo:'perigo'})) return;
   _efSync();
   // Remove de trás pra frente pra não bagunçar índices
   indices.forEach(i => _efEtapas.splice(i, 1));
@@ -7852,7 +7990,7 @@ function openNew(){
   ['fn','fpo'].forEach(id=>document.getElementById(id).value='');
   buildProjSelect(null);
   onChangeProjSel();
-  const prioEl=document.getElementById('fPrio');if(prioEl)prioEl.value='';
+  const prioEl=document.getElementById('fPrio');if(prioEl)prioEl.value='';_prioIcUpd();
   const rpEl=document.getElementById('fRP');if(rpEl)rpEl.value='';
   const acadEl=document.getElementById('fAcademia');if(acadEl)acadEl.value='';
   const relEl=document.getElementById('fRelevancia');if(relEl)relEl.value='';
@@ -7886,7 +8024,7 @@ function openEdit(id){
   document.getElementById('fn').value=p.nome;
   buildProjSelect(p.projCadId||null);
   onChangeProjSel();
-  const _pe=document.getElementById('fPrio');if(_pe)_pe.value=p.prioridade||'';
+  const _pe=document.getElementById('fPrio');if(_pe)_pe.value=p.prioridade||'';_prioIcUpd();
   const _rp=document.getElementById('fRP');if(_rp)_rp.value=p.rp||'';
   const _ac=document.getElementById('fAcademia');if(_ac)_ac.value=p.academia||'';
   const _rel=document.getElementById('fRelevancia');if(_rel)_rel.value=(p.relevancia===0||p.relevancia)?String(p.relevancia):'';
@@ -9611,7 +9749,7 @@ function _recalcMedItens(){
   if(aviso) aviso.textContent = excede.length ? `⚠️ A quantidade passa do saldo do contrato na(s) linha(s) ${excede.join(', ')}.` : '';
 }
 
-function _salvarMedItens(id, edicao){
+async function _salvarMedItens(id, edicao){
   const p = DB.find(x=>x.id===id); if(!p) return;
   const itens = [];
   let faltando = false;
@@ -9626,7 +9764,7 @@ function _salvarMedItens(id, edicao){
   if(faltando){ showToast('⚠️ Informe a quantidade (QTD) de todos os itens'); return; }
   const saldoLinha = l => SERVICOS_CONTRATO.find(x=>x.linha===l).qtdContrato - _qtdUsadaContrato(l, p.id);
   const excede = itens.filter(it => it.qtd > saldoLinha(it.linha));
-  if(excede.length && !confirm(`A quantidade passa do saldo do contrato na(s) linha(s) ${excede.map(i=>i.linha).join(', ')}. Continuar mesmo assim?`)) return;
+  if(excede.length && !await confirmar({titulo:'Saldo do contrato excedido', msg:`A quantidade passa do saldo do contrato na(s) linha(s) **${excede.map(i=>i.linha).join(', ')}**.\n\nContinuar mesmo assim?`, ok:'Continuar', tipo:'aviso', foco:'cancelar'})) return;
 
   p.medicaoItens = itens;
   p.medicaoTotal = Math.round(itens.reduce((a,it)=>a+it.precoParcial,0)*100)/100;
@@ -9646,7 +9784,7 @@ function _salvarMedItens(id, edicao){
   showToast(edicao ? '💾 Itens da medição atualizados!' : `Medição enviada (${fmtBRL(p.medicaoTotal)})! O produto fica em Pré-medição até a confirmação.`);
 }
 
-function confirmarMedicao(id){
+async function confirmarMedicao(id){
   const p = DB.find(x=>x.id===id); if(!p) return;
   // Apenas lideranças podem confirmar/desmarcar medição (regra real no Firebase)
   if(!ehLideranca()){
@@ -9654,7 +9792,7 @@ function confirmarMedicao(id){
     return;
   }
   if(p.medicaoFeita){
-    if(!confirm(`Desmarcar a medição de "${p.nome}"?`)) return;
+    if(!await confirmar({titulo:'Desmarcar medição?', msg:`A medição de **${p.nome}** deixa de constar como realizada e o produto volta para Pré-medição.`, ok:'Desmarcar', tipo:'aviso', ic:'undo'})) return;
     p.medicaoFeita          = false;
     p.medicaoFeitaEm        = null;
     p.medicaoConfirmadaPor  = null;
@@ -9666,7 +9804,7 @@ function confirmarMedicao(id){
     showToast('↩️ Medição desmarcada — produto retornou para ' + _colVolta + '.');
     return;
   }
-  if(!confirm(`Confirmar que a medição de "${p.nome}" foi realizada?`)) return;
+  if(!await confirmar({titulo:'Confirmar medição?', msg:`A medição de **${p.nome}** foi realizada?`, ok:'Confirmar medição', tipo:'ok'})) return;
   p.medicaoFeita          = true;
   p.medicaoFeitaEm        = td();
   p.medicaoConfirmadaPor  = nomeUsuarioAtual();
@@ -9822,13 +9960,13 @@ function abrirMoverRamp(pids){
   document.getElementById('quinzenaSelect').focus();
 }
 
-function _confirmarMoverRamp(pids){
+async function _confirmarMoverRamp(pids){
   if(!ehLideranca()){ showToast('🚫 Apenas a Liderança pode mover produtos entre RAMPs'); return; }
   const destino = document.getElementById('quinzenaSelect')?.value;
   if(!_ehChaveMedicao(destino)) return;
   const projs = pids.map(id => DB.find(x=>x.id===id)).filter(p => p && _medicaoDoProjeto(p) !== destino);
   if(!projs.length){ showToast('ℹ️ Os produtos já estão nesse RAMP'); document.getElementById('quinzenaModal')?.remove(); return; }
-  if(!confirm(`Mover ${projs.length} produto(s) para ${_fmtMedicao(destino)}?`)) return;
+  if(!await confirmar({titulo:'Mover de RAMP?', msg:`Mover **${projs.length} produto(s)** para **${_fmtMedicao(destino)}**?`, ok:'Mover', ic:'arrows'})) return;
   projs.forEach(p => {
     const origem = _medicaoDoProjeto(p);
     p.medicaoMes = destino;
@@ -11163,14 +11301,12 @@ function fbSalvarProjeto(proj, opts){
 
   // OPTIMISTIC LOCKING: compara o _updatedAt do servidor com o desta cópia local.
   // Se o servidor tem uma versão mais nova, outra pessoa salvou nesse meio-tempo.
-  return ref.child('_updatedAt').once('value').then(snap => {
+  return ref.child('_updatedAt').once('value').then(async snap => {
     const remoto = snap.val();
     if(remoto && proj._updatedAt && remoto !== proj._updatedAt && remoto > proj._updatedAt){
-      const ok = confirm(
-        '⚠️ Este projeto foi alterado por outra pessoa enquanto você editava.\n\n' +
-        'OK — sobrescrever com a sua versão\n' +
-        'Cancelar — descartar sua alteração e manter a versão mais recente'
-      );
+      const ok = await confirmar({titulo:'Alterado por outra pessoa', tipo:'aviso', foco:'cancelar',
+        msg:'Este registro foi alterado por outra pessoa enquanto você editava.\n\nVocê pode sobrescrever com a sua versão ou descartar a sua alteração e manter a versão mais recente.',
+        ok:'Sobrescrever com a minha versão', cancelar:'Descartar a minha alteração'});
       if(!ok){
         setStatus('online','Salvamento cancelado');
         showToast('↩️ Alteração descartada — dados recarregados');
@@ -11235,14 +11371,12 @@ function fbSalvarCadProj(pr, novo){
   if(novo) return gravar();
 
   // OPTIMISTIC LOCKING: outra pessoa salvou este projeto enquanto ele estava aberto?
-  return ref.child('_updatedAt').once('value').then(snap => {
+  return ref.child('_updatedAt').once('value').then(async snap => {
     const remoto = snap.val();
     if(remoto && versaoLocal && remoto > versaoLocal){
-      const ok = confirm(
-        '⚠️ Este projeto foi alterado por outra pessoa enquanto você editava.\n\n' +
-        'OK — sobrescrever com a sua versão\n' +
-        'Cancelar — descartar sua alteração e manter a versão mais recente'
-      );
+      const ok = await confirmar({titulo:'Alterado por outra pessoa', tipo:'aviso', foco:'cancelar',
+        msg:'Este registro foi alterado por outra pessoa enquanto você editava.\n\nVocê pode sobrescrever com a sua versão ou descartar a sua alteração e manter a versão mais recente.',
+        ok:'Sobrescrever com a minha versão', cancelar:'Descartar a minha alteração'});
       if(!ok){ setStatus('online','Salvamento cancelado'); showToast('↩️ Alteração descartada'); return false; }
     }
     return gravar();
@@ -12245,9 +12379,9 @@ function corProgresso(sit){
 // ══════════════════════════════════════════════
 //  DUPLICAR PROJETO
 // ══════════════════════════════════════════════
-function duplicarProjeto(id){
+async function duplicarProjeto(id){
   const orig = DB.find(p => p.id === id); if(!orig) return;
-  if(!confirm(`Duplicar "${orig.nome}"?\nUma cópia será criada com as mesmas etapas e dados, sem o histórico de execução.`)) return;
+  if(!await confirmar({titulo:'Duplicar produto?', msg:`Será criada uma cópia de **${orig.nome}** com as mesmas etapas e dados, sem o histórico de execução.`, ok:'Duplicar', ic:'copy'})) return;
   const usuario = nomeUsuarioAtual();
   const novo = JSON.parse(JSON.stringify(orig));
   novo.id = NXT++;
@@ -12708,8 +12842,8 @@ function apagarNotif(notifId){
   atualizarUINotif();
 }
 
-function apagarTodasNotif(){
-  if(!confirm('Apagar todas as notificações?')) return;
+async function apagarTodasNotif(){
+  if(!await confirmar({titulo:'Apagar todas as notificações?', msg:'Todas as notificações deste painel serão removidas.', ok:'Apagar todas', tipo:'perigo', ic:'bell'})) return;
   // Salvar todos os ids nos descartados antes de limpar
   const notifs = _loadNotifs();
   const desc = _loadDescartados();
@@ -12758,8 +12892,8 @@ function fazerLogin(){
     });
 }
 
-function fazerLogout(){
-  if(!confirm('Sair do sistema?')) return;
+async function fazerLogout(){
+  if(!await confirmar({titulo:'Sair do sistema?', msg:'Você precisará entrar de novo para continuar.', ok:'Sair', ic:'log-out'})) return;
   if(fbAuth){
     fbAuth.signOut()
       .then(() => _loginEstado('form'))
@@ -12831,7 +12965,7 @@ document.getElementById('topDate').textContent=
 })();
 
 // ── MIGRAÇÃO DE ETAPAS Web Rise ─────────────────────────────────────────────
-function migrarEtapasWebRise(){
+async function migrarEtapasWebRise(){
   const RECURSOS_WEB_RISE = ['Web Rise Básico','Web Rise Intermediário','Web Rise Avançado'];
 
   // Mapa de renomeação: nome antigo → nome novo
@@ -12892,7 +13026,7 @@ function migrarEtapasWebRise(){
     {lb:'Upload Arquivos Bdoc',                r:'eq'},
   ];
 
-  if(!confirm('Migrar etapas de todos os projetos Web Rise para o novo padrão?\n\nEsta ação não pode ser desfeita. Recomenda-se exportar o XLSX antes.')) return;
+  if(!await confirmar({titulo:'Migrar etapas Web Rise?', msg:'As etapas de todos os produtos Web Rise passam para o novo padrão.\n\nEsta ação não pode ser desfeita. Recomenda-se exportar o XLSX antes.', ok:'Migrar', tipo:'aviso', foco:'cancelar', ic:'database'})) return;
 
   const statusEl = document.getElementById('migracaoStatus') || document.getElementById('migracaoStatus2');
   const statusEl2 = document.getElementById('migracaoStatus2');
