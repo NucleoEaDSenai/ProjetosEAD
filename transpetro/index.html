@@ -10815,7 +10815,7 @@ function buildHomologCard(p){
       </div>
       <div class="hom-foot">
         <span style="font-size:11px;color:var(--mu);align-self:center">
-          ${h.preenchido ? 'Os campos são salvos ao sair de cada um. Use Salvar para registrar no histórico.' : 'Preencha os campos e salve'}
+          ${h.preenchido ? '' : 'Preencha os campos e salve'}
         </span>
         <button type="button" class="hom-salvar" onclick="salvarHomolog(${p.id})">${icL('save')} Salvar</button>
       </div>
