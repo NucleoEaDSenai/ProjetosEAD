@@ -1166,23 +1166,29 @@ body.dark .tenant-item.current{background:rgba(34,197,94,.12)}
 .hom-pj-body .hom-card{margin-bottom:12px}
 .hom-chev{width:16px;height:16px;flex-shrink:0;transition:transform .2s}
 [aria-expanded="true"]>.hom-chev{transform:rotate(90deg)}
-.hom-card-head{color:var(--hc-fg,#1E3A8A);background:var(--hc-bg,#E3EDFF);padding:10px 14px}
+.hom-card-head{color:var(--hc-fg,#1E3A8A);background:var(--hc-bg,var(--surface));padding:10px 14px;border-left:5px solid var(--hc-sc,transparent)}
 .hom-card-head:hover{filter:none}
 .hom-card .hom-card-head{cursor:default}
 .hom-grid .hom-field:nth-child(4n){border-right:1px solid var(--bdr)}
 .hom-grid .hom-field:nth-child(5),.hom-grid .hom-field:nth-child(10),.hom-grid .hom-field-conf{border-right:none}
 .hom-card-title{display:flex;align-items:center;gap:7px;background:none;border:none;color:inherit;font:inherit;font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:13.5px;cursor:pointer;padding:2px 0;text-align:left;flex:1;min-width:0}
-.hom-card .hom-badge{background:rgba(255,255,255,.65);color:inherit}
+.hom-card .hom-badge{background:var(--s2);color:var(--mu)}
 .hom-card .hom-badge .ic,.hom-pj .hom-badge .ic{margin-right:3px}
 .hom-badge.hom-st-pend{background:#FEE2E2;color:#991B1B}
 .hom-badge.hom-st-solic,.hom-badge.hom-st-aguard{background:#FEF3C7;color:#92400E}
 .hom-badge.hom-st-ok{background:#DCFCE7;color:#166534}
-.hom-card .hom-badge.hom-st-pend,.hom-card .hom-badge.hom-st-solic,.hom-card .hom-badge.hom-st-aguard,.hom-card .hom-badge.hom-st-ok{background:#fff}
-.hom-c-pend{--hc-bg:#FEE2E2;--hc-fg:#991B1B;border-color:#FCA5A5}
-.hom-c-solic,.hom-c-aguard{--hc-bg:#FEF3C7;--hc-fg:#92400E;border-color:#FCD34D}
-.hom-c-ok{--hc-bg:#DCFCE7;--hc-fg:#166534;border-color:#86EFAC}
-.hom-ver{display:inline-flex;align-items:center;gap:4px;background:rgba(255,255,255,.7);border:1px solid rgba(0,0,0,.08);color:inherit;padding:3px 10px;border-radius:6px;cursor:pointer;font-size:11.5px;font-weight:600;font-family:'Plus Jakarta Sans',sans-serif}
-.hom-ver:hover{background:#fff}
+/* Card branco com faixa à esquerda na cor do status; selo com fundo leve da mesma cor */
+.hom-c-pend{--hc-fg:#B91C1C;--hc-sc:#DC2626;--hc-tint:rgba(185,28,28,.1)}
+.hom-c-solic,.hom-c-aguard{--hc-fg:#92400E;--hc-sc:#E0A100;--hc-tint:rgba(146,64,14,.1)}
+.hom-c-ok{--hc-fg:#166534;--hc-sc:#16A34A;--hc-tint:rgba(22,101,52,.1)}
+.hom-card .hom-badge.hom-st-pend,.hom-card .hom-badge.hom-st-solic,.hom-card .hom-badge.hom-st-aguard,.hom-card .hom-badge.hom-st-ok{background:var(--hc-tint);color:var(--hc-fg)}
+/* Indicadores do acordeão: fundo branco e texto na cor do status (nos dois temas) */
+.hom-pj-pills .hom-badge{background:#fff}
+.hom-pj-pills .hom-st-pend{color:#B91C1C}
+.hom-pj-pills .hom-st-solic,.hom-pj-pills .hom-st-aguard{color:#92400E}
+.hom-pj-pills .hom-st-ok{color:#166534}
+.hom-ver{display:inline-flex;align-items:center;gap:4px;background:var(--s2);border:1px solid var(--bdr);color:var(--txt);padding:3px 10px;border-radius:6px;cursor:pointer;font-size:11.5px;font-weight:600;font-family:'Plus Jakarta Sans',sans-serif}
+.hom-ver:hover{border-color:var(--blue);color:var(--blue)}
 .hom-sec-title .ic{color:var(--blue);margin-right:2px}
 .hom-field-conf{grid-column:span 4}
 .hom-link-wrap{display:flex;align-items:center;gap:6px}
@@ -1208,10 +1214,9 @@ body.dark .hom-pj{border-color:#22335C}
 body.dark .hom-pj-hd{background:var(--thead);color:#E2E8F0}
 body.dark .hom-pj-hd:hover{background:#2A3F6B}
 body.dark .hom-pj-body{background:var(--bg)}
-body.dark .hom-c-pend{--hc-bg:var(--danger-bg);--hc-fg:var(--danger-fg);border-color:var(--bdr)}
-body.dark .hom-c-solic,body.dark .hom-c-aguard{--hc-bg:var(--warn-bg);--hc-fg:var(--warn-fg);border-color:var(--bdr)}
-body.dark .hom-c-ok{--hc-bg:var(--ok-bg);--hc-fg:var(--ok-fg);border-color:var(--bdr)}
-body.dark .hom-card .hom-badge,body.dark .hom-ver{background:rgba(0,0,0,.2)}
+body.dark .hom-c-pend{--hc-fg:var(--danger-fg);--hc-tint:var(--danger-bg)}
+body.dark .hom-c-solic,body.dark .hom-c-aguard{--hc-fg:var(--warn-fg);--hc-tint:var(--warn-bg)}
+body.dark .hom-c-ok{--hc-fg:var(--ok-fg);--hc-tint:var(--ok-bg)}
 .hom-resumo{display:flex;flex-wrap:wrap;gap:10px;padding:10px 14px;background:var(--s2);border-top:1px solid var(--bdr)}
 .hom-resumo-item{font-size:11.5px;display:flex;gap:4px;align-items:center}
 .hom-resumo-label{color:var(--mu);font-weight:600}
