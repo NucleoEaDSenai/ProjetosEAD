@@ -5604,8 +5604,8 @@ function openDet(id){
     <button class="btn bg2" onclick="cm('ovDet');duplicarProjeto(${p.id})" title="Criar cópia deste projeto">Duplicar</button>
     <button class="btn bb" onclick="cm('ovDet');openEdit(${p.id})">${icL('pencil')} Editar</button>
     <button class="btn bpastel" onclick="exportPDFFicha(${p.id})">Exportar PDF</button>
-    ${podeApagarProjeto()?`<button class="btn bdforte" onclick="cm('ovDet');delP(${p.id})">Deletar Projeto</button>`:''}
-     ${!p.cancelado?`<button class="btn bgray" onclick="abrirCanc(${p.id})">Projeto Cancelado</button>`:''}
+    ${podeApagarProjeto()?`<button class="btn bdforte" onclick="cm('ovDet');delP(${p.id})">Deletar Produto</button>`:''}
+     ${!p.cancelado?`<button class="btn bgray" onclick="abrirCanc(${p.id})">Produto Cancelado</button>`:''}
   `;
   document.getElementById('ovDet').classList.add('on');
   setTimeout(()=>{const m=document.querySelector('#ovDet .modal');if(m)m.focus();},80);
