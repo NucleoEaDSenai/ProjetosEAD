@@ -1150,7 +1150,7 @@ body.dark .tenant-item.current{background:rgba(34,197,94,.12)}
 .hom-chevron{font-size:13px;transition:transform .25s;display:inline-block;margin-left:6px}
 .hom-chevron.open{transform:rotate(180deg)}
 .hom-body{overflow:hidden;transition:max-height .3s ease,opacity .25s ease;max-height:0;opacity:0}
-.hom-body.open{max-height:2000px;opacity:1}
+.hom-body.open{max-height:8000px;opacity:1}
 .hom-sec-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--mu);padding:10px 14px 4px;background:var(--s2);border-bottom:1px solid var(--bdr);grid-column:span 4}
 /* Homologações: acordeão por projeto (azul pastel) e card do produto por status (vermelho, amarelo, verde pastel) */
 .hom-pj{background:var(--surface);border:1px solid #14213D;border-radius:12px;margin-bottom:12px;overflow:hidden}
@@ -1217,6 +1217,36 @@ body.dark .hom-pj-body{background:var(--bg)}
 body.dark .hom-c-pend{--hc-fg:var(--danger-fg);--hc-tint:var(--danger-bg)}
 body.dark .hom-c-solic,body.dark .hom-c-aguard{--hc-fg:var(--warn-fg);--hc-tint:var(--warn-bg)}
 body.dark .hom-c-ok{--hc-fg:var(--ok-fg);--hc-tint:var(--ok-bg)}
+/* Comentários da Homologação */
+.hom-cm{border-top:1px solid var(--bdr);background:var(--surface);padding:12px 14px 14px;display:grid;gap:10px}
+.hom-cm-hd{display:flex;align-items:center;gap:7px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--mu)}
+.hom-cm-hd .ic{color:var(--blue)}
+.hom-cm-cnt{margin-left:auto;font-size:11px;font-weight:800;letter-spacing:0;padding:1px 8px;border-radius:999px;background:var(--s2);color:var(--mu)}
+.hom-cm-list{display:grid;gap:8px}
+.hom-cm-item{border:1px solid var(--bdr);border-radius:9px;padding:9px 11px;background:var(--s2);display:grid;gap:4px}
+.hom-cm-top{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:12px}
+.hom-cm-autor{font-weight:700}
+.hom-cm-dt{color:var(--mu);font-size:11px}
+.hom-cm-editado{background:none;border:none;padding:0;font:inherit;font-size:11px;font-weight:600;color:var(--blue);cursor:pointer;text-decoration:underline;text-underline-offset:2px}
+.hom-cm-acts{margin-left:auto;display:flex;gap:2px}
+.hom-cm-act{background:none;border:none;cursor:pointer;width:26px;height:26px;border-radius:6px;display:inline-flex;align-items:center;justify-content:center;color:var(--mu)}
+.hom-cm-act:hover{background:var(--surface);color:var(--txt)}
+.hom-cm-act.del:hover{color:var(--red)}
+.hom-cm-act:focus-visible,.hom-cm-editado:focus-visible{outline:2px solid var(--blue);outline-offset:1px}
+.hom-cm-txt{font-size:12.5px;line-height:1.5;color:var(--txt);word-break:break-word}
+.hom-cm-vers{border-left:2px solid var(--bdr);padding-left:9px;font-size:11.5px;color:var(--mu);display:grid;gap:4px}
+.hom-cm-vers[hidden]{display:none}
+.hom-cm-vers-tit{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.4px}
+.hom-cm-vazio{font-size:12px;color:var(--mu)}
+.hom-cm-form{display:flex;gap:8px;align-items:stretch}
+.hom-cm-ta{flex:1;min-width:0;resize:vertical;min-height:56px;border:1.5px solid var(--bdr);border-radius:8px;padding:8px 10px;font-family:'Plus Jakarta Sans',sans-serif;font-size:12.5px;background:var(--bg);color:var(--txt);outline:none}
+.hom-cm-ta:focus{border-color:var(--blue)}
+.hom-cm-enviar{align-self:stretch;padding:0 16px}
+.hom-cm-edit{display:grid;gap:6px}
+.hom-cm-edit-bts{display:flex;gap:6px;justify-content:flex-end}
+.hom-cm-dica{font-size:11px;color:var(--mu)}
+.coment-origem{font-size:10px;font-weight:700;padding:1px 7px;border-radius:999px;background:var(--s2);color:var(--mu);border:1px solid var(--bdr)}
+@media(max-width:640px){.hom-cm-form{flex-direction:column}.hom-cm-enviar{padding:8px 16px;justify-content:center}}
 .hom-resumo{display:flex;flex-wrap:wrap;gap:10px;padding:10px 14px;background:var(--s2);border-top:1px solid var(--bdr)}
 .hom-resumo-item{font-size:11.5px;display:flex;gap:4px;align-items:center}
 .hom-resumo-label{color:var(--mu);font-weight:600}
@@ -1727,6 +1757,8 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
   <symbol id="i-circle" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/></symbol>
   <symbol id="i-log-out" viewBox="0 0 24 24"><path d="m16 17 5-5-5-5"/><path d="M21 12H9"/><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/></symbol>
   <symbol id="i-copy" viewBox="0 0 24 24"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></symbol>
+  <symbol id="i-message-square" viewBox="0 0 24 24"><path d="M22 17a2 2 0 0 1-2 2H6.83a2 2 0 0 0-1.41.59l-2.2 2.2A.71.71 0 0 1 2 21.29V5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2z"/></symbol>
+  <symbol id="i-send" viewBox="0 0 24 24"><path d="M14.54 21.69a.5.5 0 0 0 .94-.03l6.5-19a.5.5 0 0 0-.64-.64l-19 6.5a.5.5 0 0 0-.03.94l7.93 3.18a2 2 0 0 1 1.11 1.11z"/><path d="m21.85 2.15-10.94 10.94"/></symbol>
   <symbol id="i-user" viewBox="0 0 24 24"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></symbol>
   <symbol id="i-mail" viewBox="0 0 24 24"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></symbol>
   <symbol id="i-pause" viewBox="0 0 24 24"><rect x="14" y="4" width="4" height="16" rx="1"/><rect x="6" y="4" width="4" height="16" rx="1"/></symbol>
@@ -5536,7 +5568,7 @@ function openDet(id){
             <div class="coment-item" id="coment_${p.id}_${idx}">
               <div class="coment-header">
                 <div class="coment-av">${esc(cm.autor.charAt(0).toUpperCase())}</div>
-                <span class="coment-autor">${esc(cm.autor)}</span>
+                <span class="coment-autor">${esc(cm.autor)}</span>${cm.origem==='homolog'?'<span class="coment-origem" title="Comentário feito na aba Homologações">Homologação</span>':''}
                 <span class="coment-dt">${esc(_ed&&cm.editadoEm?cm.editadoEm:cm.dt)}${_ed?` · <button class="coment-editado" title="Postado originalmente em ${esc(cm.dt)} — ver versões anteriores" onclick="toggleVersoesComent(${p.id},${idx})">editado</button>`:''}</span>
               </div>
               ${_ed?`<div class="coment-versoes" id="comentVers_${p.id}_${idx}" style="display:none">
@@ -10743,6 +10775,96 @@ function _homConfirmacaoHtml(p){
     : `<div class="hom-conf aguard">${icL('calendar-clock')} Aguardando a confirmação da liderança</div>`;
 }
 
+// ══ Comentários da Homologação ══
+// Ficam em p.comentarios com origem:'homolog'. Aqui só aparecem os feitos na Homologação;
+// o detalhe do card mostra todos (os daqui com a etiqueta "Homologação").
+let _homCmEdit = null;   // {pid, idx} do comentário em edição
+function _homComentsDe(p){ return (p.comentarios||[]).map((cm,idx)=>({cm,idx})).filter(x => x.cm && x.cm.origem === 'homolog'); }
+function _homComentsHtml(p){
+  const lista = _homComentsDe(p);
+  const item = ({cm, idx}) => {
+    if(_homCmEdit && _homCmEdit.pid === p.id && _homCmEdit.idx === idx) return `<div class="hom-cm-item"><div class="hom-cm-edit">
+        <label class="hom-cm-dica" for="homCmEd_${p.id}_${idx}">Editando o seu comentário</label>
+        <textarea class="hom-cm-ta" id="homCmEd_${p.id}_${idx}">${esc(cm.txt)}</textarea>
+        <div class="hom-cm-edit-bts"><button type="button" class="btn bg2 bsm" onclick="_homCmCancelar(${p.id})">Cancelar</button><button type="button" class="btn bgreen bsm" onclick="_homCmSalvar(${p.id},${idx})">Salvar</button></div>
+      </div></div>`;
+    const ed = _comentEditado(cm), vers = _versoesComent(cm), meu = _ehMeuComent(cm);
+    return `<div class="hom-cm-item">
+      <div class="hom-cm-top"><span class="hom-cm-autor">${esc(cm.autor)}</span><span class="hom-cm-dt">${esc(ed && cm.editadoEm ? cm.editadoEm : cm.dt)}</span>
+        ${ed ? `<button type="button" class="hom-cm-editado" aria-expanded="false" title="Postado originalmente em ${esc(cm.dt)} — ver versões anteriores" onclick="_homCmVersoes(this,${p.id},${idx})">editado</button>` : ''}
+        ${meu ? `<span class="hom-cm-acts"><button type="button" class="hom-cm-act" title="Editar comentário" aria-label="Editar comentário" onclick="_homCmEditar(${p.id},${idx})">${icL('pencil')}</button><button type="button" class="hom-cm-act del" title="Excluir comentário" aria-label="Excluir comentário" onclick="_homCmExcluir(${p.id},${idx})">${icL('trash')}</button></span>` : ''}
+      </div>
+      <div class="hom-cm-txt">${linkify(cm.txt).replace(/\n/g,'<br>')}</div>
+      ${ed ? `<div class="hom-cm-vers" id="homCmV_${p.id}_${idx}" hidden><div class="hom-cm-vers-tit">${icL('history')} Versões anteriores</div>${vers.length
+          ? vers.slice().reverse().map(v => `<div><span class="hom-cm-dt">${esc(v.dt)}</span> · ${linkify(v.txt).replace(/\n/g,'<br>')}</div>`).join('')
+          : '<div>Nenhuma versão anterior registrada.</div>'}</div>` : ''}
+    </div>`;
+  };
+  return `<div class="hom-cm-hd">${icL('message-square')} Comentários<span class="hom-cm-cnt">${lista.length}</span></div>
+    ${lista.length ? `<div class="hom-cm-list">${lista.map(item).join('')}</div>` : '<div class="hom-cm-vazio">Nenhum comentário ainda.</div>'}
+    <div class="hom-cm-form">
+      <textarea class="hom-cm-ta" id="homCmNovo_${p.id}" placeholder="Escreva um comentário sobre a homologação…" aria-label="Novo comentário em ${esc(p.nome)}"></textarea>
+      <button type="button" class="btn bgreen bsm hom-cm-enviar" onclick="_homCmEnviar(${p.id})">${icL('send')} Enviar</button>
+    </div>`;
+}
+// Redesenha só a área de comentários (o card continua aberto ou fechado como está)
+function _homCmRender(pid){
+  const p = DB.find(x => x.id === pid), el = document.getElementById('hom_cm_'+pid);
+  if(p && el) el.innerHTML = _homComentsHtml(p);
+}
+function _homCmEnviar(pid){
+  const p = DB.find(x => x.id === pid); if(!p) return;
+  const ta = document.getElementById('homCmNovo_'+pid);
+  const txt = (ta?.value||'').trim();
+  if(!txt){ showToast('Escreva algo antes de enviar'); ta?.focus(); return; }
+  if(!p.comentarios) p.comentarios = [];
+  const autorEmail = (fbCurrentUser?.email||localStorage.getItem('firjan_user_email')||'').toLowerCase();
+  p.comentarios.push({autor:nomeUsuarioAtual(), autorEmail, dt:_dtAgora(), txt, origem:'homolog'});
+  fbSalvarProjeto(p);
+  _homCmRender(pid);
+  showToast('Comentário adicionado');
+}
+function _homCmEditar(pid, idx){
+  const p = DB.find(x => x.id === pid), cm = p?.comentarios?.[idx];
+  if(!_ehMeuComent(cm)){ showToast('Você só pode alterar os seus próprios comentários'); return; }
+  _homCmEdit = {pid, idx};
+  _homCmRender(pid);
+  const ta = document.getElementById(`homCmEd_${pid}_${idx}`); if(ta){ ta.focus(); ta.setSelectionRange(ta.value.length, ta.value.length); }
+}
+function _homCmCancelar(pid){ _homCmEdit = null; _homCmRender(pid); }
+function _homCmSalvar(pid, idx){
+  const p = DB.find(x => x.id === pid), cm = p?.comentarios?.[idx];
+  if(!_ehMeuComent(cm)){ showToast('Você só pode alterar os seus próprios comentários'); return; }
+  const txt = (document.getElementById(`homCmEd_${pid}_${idx}`)?.value||'').trim();
+  if(!txt){ showToast('O comentário não pode ficar vazio'); return; }
+  if(txt !== cm.txt){
+    // mesmo formato do detalhe do card: guarda a versão substituída
+    if(!Array.isArray(cm.versoes)) cm.versoes = [..._versoesComent(cm)];
+    delete cm.historico;
+    cm.versoes.push({txt:cm.txt, dt:cm.editadoEm||cm.dt});
+    cm.txt = txt; cm.editado = true; cm.editadoEm = _dtAgora();
+    fbSalvarProjeto(p);
+    showToast('Comentário atualizado');
+  }
+  _homCmEdit = null;
+  _homCmRender(pid);
+}
+async function _homCmExcluir(pid, idx){
+  const p = DB.find(x => x.id === pid), cm = p?.comentarios?.[idx];
+  if(!_ehMeuComent(cm)){ showToast('Você só pode alterar os seus próprios comentários'); return; }
+  if(!await confirmar({titulo:'Excluir comentário?', msg:'O comentário e as versões anteriores dele serão apagados. Esta ação não pode ser desfeita.', ok:'Excluir', tipo:'perigo'})) return;
+  if(p.comentarios[idx] !== cm) return;   // a lista mudou enquanto o modal estava aberto
+  p.comentarios.splice(idx, 1);
+  fbSalvarProjeto(p);
+  _homCmEdit = null;
+  _homCmRender(pid);
+  showToast('Comentário excluído');
+}
+function _homCmVersoes(btn, pid, idx){
+  const el = document.getElementById(`homCmV_${pid}_${idx}`); if(!el) return;
+  el.hidden = !el.hidden; btn.setAttribute('aria-expanded', !el.hidden);
+}
+
 function buildHomologCard(p){
   const h  = p.homolog || {};
   const st = _homStatus(p);
@@ -10825,6 +10947,7 @@ function buildHomologCard(p){
         </span>
         <button type="button" class="hom-salvar" onclick="salvarHomolog(${p.id})">${icL('save')} Salvar</button>
       </div>
+      <div class="hom-cm" id="hom_cm_${p.id}">${_homComentsHtml(p)}</div>
     </div>
   </div>`;
 }
