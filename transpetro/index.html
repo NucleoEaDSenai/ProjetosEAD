@@ -256,7 +256,8 @@ tr:hover td{background:#FAFAF9}
 .mcl:hover{background:var(--s2)}
 .mbody{padding:20px 24px}
 .mft{padding:13px 24px;border-top:1px solid var(--bdr);display:flex;gap:8px;justify-content:flex-end;background:#fff;position:sticky;bottom:0}
-#ovNew .modal{height:92vh;display:flex;flex-direction:column}
+#ovNew .modal{width:70vw;height:92vh;display:flex;flex-direction:column}
+@media (max-width:1000px){#ovNew .modal{width:98vw}}
 #ovNew .mbody{flex:1;overflow-y:auto}
 /* FORM */
 .fg2{display:grid;grid-template-columns:1fr 1fr;gap:13px}
@@ -5604,8 +5605,8 @@ function openDet(id){
     <button class="btn bg2" onclick="cm('ovDet');duplicarProjeto(${p.id})" title="Criar cópia deste projeto">Duplicar</button>
     <button class="btn bb" onclick="cm('ovDet');openEdit(${p.id})">${icL('pencil')} Editar</button>
     <button class="btn bpastel" onclick="exportPDFFicha(${p.id})">Exportar PDF</button>
-    ${podeApagarProjeto()?`<button class="btn bdforte" onclick="cm('ovDet');delP(${p.id})">Deletar Projeto</button>`:''}
-     ${!p.cancelado?`<button class="btn bgray" onclick="abrirCanc(${p.id})">Projeto Cancelado</button>`:''}
+    ${podeApagarProjeto()?`<button class="btn bdforte" onclick="cm('ovDet');delP(${p.id})">Deletar Produto</button>`:''}
+     ${!p.cancelado?`<button class="btn bgray" onclick="abrirCanc(${p.id})">Produto Cancelado</button>`:''}
   `;
   document.getElementById('ovDet').classList.add('on');
   setTimeout(()=>{const m=document.querySelector('#ovDet .modal');if(m)m.focus();},80);
