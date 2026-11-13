@@ -275,6 +275,7 @@ tr:hover td{background:#FAFAF9}
 .et th{background:var(--s2);padding:7px 9px;text-align:left;font-weight:700;font-size:9.5px;letter-spacing:.5px;text-transform:uppercase;color:var(--mu)}
 .et td{padding:6px 9px;border-bottom:1px solid var(--bdr);vertical-align:middle}
 .et tr:last-child td{border-bottom:none}
+.ef-du{display:inline-block;min-width:30px;padding:3px 8px;border-radius:999px;background:var(--s2);border:1px solid var(--bdr);font-weight:700;font-size:11.5px;color:var(--txt);font-variant-numeric:tabular-nums}
 .et tr.done-row td{background:#F0FDF4}
 .et tr.done-row td:first-child span{text-decoration:line-through;color:var(--mu)}
 .et tr.ov-row td{background:#FFF5F5}
@@ -1150,7 +1151,7 @@ body.dark .tenant-item.current{background:rgba(34,197,94,.12)}
 .hom-chevron{font-size:13px;transition:transform .25s;display:inline-block;margin-left:6px}
 .hom-chevron.open{transform:rotate(180deg)}
 .hom-body{overflow:hidden;transition:max-height .3s ease,opacity .25s ease;max-height:0;opacity:0}
-.hom-body.open{max-height:2000px;opacity:1}
+.hom-body.open{max-height:8000px;opacity:1}
 .hom-sec-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--mu);padding:10px 14px 4px;background:var(--s2);border-bottom:1px solid var(--bdr);grid-column:span 4}
 /* Homologações: acordeão por projeto (azul pastel) e card do produto por status (vermelho, amarelo, verde pastel) */
 .hom-pj{background:var(--surface);border:1px solid #14213D;border-radius:12px;margin-bottom:12px;overflow:hidden}
@@ -1166,23 +1167,29 @@ body.dark .tenant-item.current{background:rgba(34,197,94,.12)}
 .hom-pj-body .hom-card{margin-bottom:12px}
 .hom-chev{width:16px;height:16px;flex-shrink:0;transition:transform .2s}
 [aria-expanded="true"]>.hom-chev{transform:rotate(90deg)}
-.hom-card-head{color:var(--hc-fg,#1E3A8A);background:var(--hc-bg,#E3EDFF);padding:10px 14px}
+.hom-card-head{color:var(--hc-fg,#1E3A8A);background:var(--hc-bg,var(--surface));padding:10px 14px;border-left:5px solid var(--hc-sc,transparent)}
 .hom-card-head:hover{filter:none}
 .hom-card .hom-card-head{cursor:default}
 .hom-grid .hom-field:nth-child(4n){border-right:1px solid var(--bdr)}
 .hom-grid .hom-field:nth-child(5),.hom-grid .hom-field:nth-child(10),.hom-grid .hom-field-conf{border-right:none}
 .hom-card-title{display:flex;align-items:center;gap:7px;background:none;border:none;color:inherit;font:inherit;font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:13.5px;cursor:pointer;padding:2px 0;text-align:left;flex:1;min-width:0}
-.hom-card .hom-badge{background:rgba(255,255,255,.65);color:inherit}
+.hom-card .hom-badge{background:var(--s2);color:var(--mu)}
 .hom-card .hom-badge .ic,.hom-pj .hom-badge .ic{margin-right:3px}
 .hom-badge.hom-st-pend{background:#FEE2E2;color:#991B1B}
 .hom-badge.hom-st-solic,.hom-badge.hom-st-aguard{background:#FEF3C7;color:#92400E}
 .hom-badge.hom-st-ok{background:#DCFCE7;color:#166534}
-.hom-card .hom-badge.hom-st-pend,.hom-card .hom-badge.hom-st-solic,.hom-card .hom-badge.hom-st-aguard,.hom-card .hom-badge.hom-st-ok{background:#fff}
-.hom-c-pend{--hc-bg:#FEE2E2;--hc-fg:#991B1B;border-color:#FCA5A5}
-.hom-c-solic,.hom-c-aguard{--hc-bg:#FEF3C7;--hc-fg:#92400E;border-color:#FCD34D}
-.hom-c-ok{--hc-bg:#DCFCE7;--hc-fg:#166534;border-color:#86EFAC}
-.hom-ver{display:inline-flex;align-items:center;gap:4px;background:rgba(255,255,255,.7);border:1px solid rgba(0,0,0,.08);color:inherit;padding:3px 10px;border-radius:6px;cursor:pointer;font-size:11.5px;font-weight:600;font-family:'Plus Jakarta Sans',sans-serif}
-.hom-ver:hover{background:#fff}
+/* Card branco com faixa à esquerda na cor do status; selo com fundo leve da mesma cor */
+.hom-c-pend{--hc-fg:#B91C1C;--hc-sc:#DC2626;--hc-tint:rgba(185,28,28,.1)}
+.hom-c-solic,.hom-c-aguard{--hc-fg:#92400E;--hc-sc:#E0A100;--hc-tint:rgba(146,64,14,.1)}
+.hom-c-ok{--hc-fg:#166534;--hc-sc:#16A34A;--hc-tint:rgba(22,101,52,.1)}
+.hom-card .hom-badge.hom-st-pend,.hom-card .hom-badge.hom-st-solic,.hom-card .hom-badge.hom-st-aguard,.hom-card .hom-badge.hom-st-ok{background:var(--hc-tint);color:var(--hc-fg)}
+/* Indicadores do acordeão: fundo branco e texto na cor do status (nos dois temas) */
+.hom-pj-pills .hom-badge{background:#fff}
+.hom-pj-pills .hom-st-pend{color:#B91C1C}
+.hom-pj-pills .hom-st-solic,.hom-pj-pills .hom-st-aguard{color:#92400E}
+.hom-pj-pills .hom-st-ok{color:#166534}
+.hom-ver{display:inline-flex;align-items:center;gap:4px;background:var(--s2);border:1px solid var(--bdr);color:var(--txt);padding:3px 10px;border-radius:6px;cursor:pointer;font-size:11.5px;font-weight:600;font-family:'Plus Jakarta Sans',sans-serif}
+.hom-ver:hover{border-color:var(--blue);color:var(--blue)}
 .hom-sec-title .ic{color:var(--blue);margin-right:2px}
 .hom-field-conf{grid-column:span 4}
 .hom-link-wrap{display:flex;align-items:center;gap:6px}
@@ -1199,7 +1206,8 @@ body.dark .tenant-item.current{background:rgba(34,197,94,.12)}
 .hom-conf-btn:hover{background:#166534}
 .hom-conf-undo{display:inline-flex;align-items:center;gap:4px;background:none;border:1px solid var(--bdr);color:var(--mu);border-radius:6px;padding:2px 8px;font-size:11px;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif}
 .hom-conf-undo:hover{color:var(--red);border-color:var(--red)}
-.hom-salvar{display:inline-flex;align-items:center;gap:6px;padding:7px 18px;background:var(--blue);color:#fff;border:none;border-radius:7px;cursor:pointer;font-size:12.5px;font-weight:600;font-family:'Plus Jakarta Sans',sans-serif}
+.hom-salvar{display:inline-flex;align-items:center;gap:6px;padding:7px 18px;background:var(--red);color:#fff;border:none;border-radius:7px;cursor:pointer;font-size:12.5px;font-weight:600;font-family:'Plus Jakarta Sans',sans-serif;transition:all .15s}
+.hom-salvar:hover{background:#c4001f;transform:translateY(-1px)}
 .hom-empty-ic{color:var(--mu);margin-bottom:10px}
 .hom-empty-ic .ic{width:30px;height:30px}
 .hom-busca-ic{position:absolute;left:9px;top:50%;transform:translateY(-50%);width:13px;height:13px;color:var(--mu);pointer-events:none;z-index:1}
@@ -1207,10 +1215,39 @@ body.dark .hom-pj{border-color:#22335C}
 body.dark .hom-pj-hd{background:var(--thead);color:#E2E8F0}
 body.dark .hom-pj-hd:hover{background:#2A3F6B}
 body.dark .hom-pj-body{background:var(--bg)}
-body.dark .hom-c-pend{--hc-bg:var(--danger-bg);--hc-fg:var(--danger-fg);border-color:var(--bdr)}
-body.dark .hom-c-solic,body.dark .hom-c-aguard{--hc-bg:var(--warn-bg);--hc-fg:var(--warn-fg);border-color:var(--bdr)}
-body.dark .hom-c-ok{--hc-bg:var(--ok-bg);--hc-fg:var(--ok-fg);border-color:var(--bdr)}
-body.dark .hom-card .hom-badge,body.dark .hom-ver{background:rgba(0,0,0,.2)}
+body.dark .hom-c-pend{--hc-fg:var(--danger-fg);--hc-tint:var(--danger-bg)}
+body.dark .hom-c-solic,body.dark .hom-c-aguard{--hc-fg:var(--warn-fg);--hc-tint:var(--warn-bg)}
+body.dark .hom-c-ok{--hc-fg:var(--ok-fg);--hc-tint:var(--ok-bg)}
+/* Comentários da Homologação */
+.hom-cm{border-top:1px solid var(--bdr);background:var(--surface);padding:12px 14px 14px;display:grid;gap:10px}
+.hom-cm-hd{display:flex;align-items:center;gap:7px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--mu)}
+.hom-cm-hd .ic{color:var(--blue)}
+.hom-cm-cnt{margin-left:auto;font-size:11px;font-weight:800;letter-spacing:0;padding:1px 8px;border-radius:999px;background:var(--s2);color:var(--mu)}
+.hom-cm-list{display:grid;gap:8px}
+.hom-cm-item{border:1px solid var(--bdr);border-radius:9px;padding:9px 11px;background:var(--s2);display:grid;gap:4px}
+.hom-cm-top{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:12px}
+.hom-cm-autor{font-weight:700}
+.hom-cm-dt{color:var(--mu);font-size:11px}
+.hom-cm-editado{background:none;border:none;padding:0;font:inherit;font-size:11px;font-weight:600;color:var(--blue);cursor:pointer;text-decoration:underline;text-underline-offset:2px}
+.hom-cm-acts{margin-left:auto;display:flex;gap:2px}
+.hom-cm-act{background:none;border:none;cursor:pointer;width:26px;height:26px;border-radius:6px;display:inline-flex;align-items:center;justify-content:center;color:var(--mu)}
+.hom-cm-act:hover{background:var(--surface);color:var(--txt)}
+.hom-cm-act.del:hover{color:var(--red)}
+.hom-cm-act:focus-visible,.hom-cm-editado:focus-visible{outline:2px solid var(--blue);outline-offset:1px}
+.hom-cm-txt{font-size:12.5px;line-height:1.5;color:var(--txt);word-break:break-word}
+.hom-cm-vers{border-left:2px solid var(--bdr);padding-left:9px;font-size:11.5px;color:var(--mu);display:grid;gap:4px}
+.hom-cm-vers[hidden]{display:none}
+.hom-cm-vers-tit{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.4px}
+.hom-cm-vazio{font-size:12px;color:var(--mu)}
+.hom-cm-form{display:flex;gap:8px;align-items:stretch}
+.hom-cm-ta{flex:1;min-width:0;resize:vertical;min-height:56px;border:1.5px solid var(--bdr);border-radius:8px;padding:8px 10px;font-family:'Plus Jakarta Sans',sans-serif;font-size:12.5px;background:var(--bg);color:var(--txt);outline:none}
+.hom-cm-ta:focus{border-color:var(--blue)}
+.hom-cm-enviar{align-self:stretch;padding:0 16px}
+.hom-cm-edit{display:grid;gap:6px}
+.hom-cm-edit-bts{display:flex;gap:6px;justify-content:flex-end}
+.hom-cm-dica{font-size:11px;color:var(--mu)}
+.coment-origem{font-size:10px;font-weight:700;padding:1px 7px;border-radius:999px;background:var(--s2);color:var(--mu);border:1px solid var(--bdr)}
+@media(max-width:640px){.hom-cm-form{flex-direction:column}.hom-cm-enviar{padding:8px 16px;justify-content:center}}
 .hom-resumo{display:flex;flex-wrap:wrap;gap:10px;padding:10px 14px;background:var(--s2);border-top:1px solid var(--bdr)}
 .hom-resumo-item{font-size:11.5px;display:flex;gap:4px;align-items:center}
 .hom-resumo-label{color:var(--mu);font-weight:600}
@@ -1721,6 +1758,8 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
   <symbol id="i-circle" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/></symbol>
   <symbol id="i-log-out" viewBox="0 0 24 24"><path d="m16 17 5-5-5-5"/><path d="M21 12H9"/><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/></symbol>
   <symbol id="i-copy" viewBox="0 0 24 24"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></symbol>
+  <symbol id="i-message-square" viewBox="0 0 24 24"><path d="M22 17a2 2 0 0 1-2 2H6.83a2 2 0 0 0-1.41.59l-2.2 2.2A.71.71 0 0 1 2 21.29V5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2z"/></symbol>
+  <symbol id="i-send" viewBox="0 0 24 24"><path d="M14.54 21.69a.5.5 0 0 0 .94-.03l6.5-19a.5.5 0 0 0-.64-.64l-19 6.5a.5.5 0 0 0-.03.94l7.93 3.18a2 2 0 0 1 1.11 1.11z"/><path d="m21.85 2.15-10.94 10.94"/></symbol>
   <symbol id="i-user" viewBox="0 0 24 24"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></symbol>
   <symbol id="i-mail" viewBox="0 0 24 24"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></symbol>
   <symbol id="i-pause" viewBox="0 0 24 24"><rect x="14" y="4" width="4" height="16" rx="1"/><rect x="6" y="4" width="4" height="16" rx="1"/></symbol>
@@ -5530,7 +5569,7 @@ function openDet(id){
             <div class="coment-item" id="coment_${p.id}_${idx}">
               <div class="coment-header">
                 <div class="coment-av">${esc(cm.autor.charAt(0).toUpperCase())}</div>
-                <span class="coment-autor">${esc(cm.autor)}</span>
+                <span class="coment-autor">${esc(cm.autor)}</span>${cm.origem==='homolog'?'<span class="coment-origem" title="Comentário feito na aba Homologações">Homologação</span>':''}
                 <span class="coment-dt">${esc(_ed&&cm.editadoEm?cm.editadoEm:cm.dt)}${_ed?` · <button class="coment-editado" title="Postado originalmente em ${esc(cm.dt)} — ver versões anteriores" onclick="toggleVersoesComent(${p.id},${idx})">editado</button>`:''}</span>
               </div>
               ${_ed?`<div class="coment-versoes" id="comentVers_${p.id}_${idx}" style="display:none">
@@ -5645,7 +5684,7 @@ function linkify(txt){
   return escaped.replace(
     /(https?:\/\/[^\s<>"]+)/g,
     '<a href="$1" target="_blank" rel="noopener noreferrer" style="color:var(--blue);text-decoration:underline;word-break:break-all">$1</a>'
-  );
+  ); 
 }
 
 function adicionarComent(pid){
@@ -7099,6 +7138,16 @@ function aplicarCronograma(recurso, dataInicio){
 }
 
 // Chamada pelo onchange dos campos de data — re-renderiza se data apagada (para mostrar "a definir")
+// Dias úteis da etapa no formulário: só leitura; aparece quando há Data Inicial e Data Final
+function _efDuHtml(e){
+  const d = _duracaoEtapaDU(e);
+  return d == null ? '' : `<span class="ef-du" title="Dias úteis de ${fd(e.dataInicial)} a ${fd(e.prazo)} (contando os dois dias)">${d}</span>`;
+}
+function _efDuUpd(i){
+  const el = document.getElementById('ef_du_'+i);
+  if(el && _efEtapas[i]) el.innerHTML = _efDuHtml(_efEtapas[i]);
+}
+
 function _efOnChangePrazo(i){
   const dEl = document.getElementById('ep_d_'+i);
   const mEl = document.getElementById('ep_m_'+i);
@@ -7111,6 +7160,7 @@ function _efOnChangePrazo(i){
   // Todos os 3 preenchidos → tentar montar a data e agir
   if(dv && mv && av){
     _efSync();
+    _efDuUpd(i);
     const e = _efEtapas[i];
     if(!e.prazo){
       // Valores inválidos (ex: dia 99) → limpar e mostrar "a definir"
@@ -7395,9 +7445,10 @@ function _renderEF(){
         </th>
         <th style="width:28px">#</th>
         <th>Etapa</th>
-        <th style="width:110px">Responsável</th>
+        <th style="width:1%;white-space:nowrap">Responsável</th>
         <th style="width:135px">Data Inicial</th>
         <th style="width:185px">Data Final</th>
+        <th style="width:1%;white-space:nowrap;text-align:center" title="Dias úteis da data inicial até a data final (contando os dois dias)">Dias úteis</th>
         <th style="width:72px;text-align:center">Ações</th>
       </tr></thead>
       <tbody>
@@ -7414,13 +7465,13 @@ function _renderEF(){
           <td>
             <div class="sel-ic-wrap">
               <span class="sel-ic sel-ic-sm" id="er_ic_${i}" aria-hidden="true">${_respIcHtml(e.r)}</span>
-              <select class="iis" id="er${i}" style="width:100%" onchange="_respIcUpd(${i})">
+              <select class="iis" id="er${i}" style="width:auto;min-width:110px" onchange="_respIcUpd(${i})">
               ${_efRespOpts(e.r)}
               </select>
             </div>
           </td>
           <td>
-            <input class="fi ii" type="date" id="ef_ini_${i}" value="${e.dataInicial||''}" onchange="_efEtapas[${i}].dataInicial=this.value||null"
+            <input class="fi ii" type="date" id="ef_ini_${i}" value="${e.dataInicial||''}" onchange="_efEtapas[${i}].dataInicial=this.value||null;_efDuUpd(${i})"
               aria-label="Data inicial de ${esc(e.lb||'')}" style="width:100%;padding:5px 4px;font-size:11.5px">
           </td>
           <td>
@@ -7450,6 +7501,7 @@ function _renderEF(){
               }
             </div>
           </td>
+          <td style="text-align:center" id="ef_du_${i}">${_efDuHtml(e)}</td>
           <td>
             <div style="display:flex;align-items:center;justify-content:center;gap:2px">
               <button type="button" class="et-btn et-btn-del" onclick="_efDel(${i})"
@@ -7458,7 +7510,7 @@ function _renderEF(){
           </td>
         </tr>`).join('')}
         <tr class="et-add-row">
-          <td colspan="7">
+          <td colspan="8">
             <button type="button" onclick="_efAdd()"
               style="background:none;border:none;color:var(--blue);font-size:12px;font-family:'Plus Jakarta Sans',sans-serif;font-weight:600;cursor:pointer;padding:2px 4px;display:flex;align-items:center;gap:5px">
               <svg class="ic" aria-hidden="true"><use href="#i-plus"/></svg> Adicionar etapa
@@ -10737,6 +10789,96 @@ function _homConfirmacaoHtml(p){
     : `<div class="hom-conf aguard">${icL('calendar-clock')} Aguardando a confirmação da liderança</div>`;
 }
 
+// ══ Comentários da Homologação ══
+// Ficam em p.comentarios com origem:'homolog'. Aqui só aparecem os feitos na Homologação;
+// o detalhe do card mostra todos (os daqui com a etiqueta "Homologação").
+let _homCmEdit = null;   // {pid, idx} do comentário em edição
+function _homComentsDe(p){ return (p.comentarios||[]).map((cm,idx)=>({cm,idx})).filter(x => x.cm && x.cm.origem === 'homolog'); }
+function _homComentsHtml(p){
+  const lista = _homComentsDe(p);
+  const item = ({cm, idx}) => {
+    if(_homCmEdit && _homCmEdit.pid === p.id && _homCmEdit.idx === idx) return `<div class="hom-cm-item"><div class="hom-cm-edit">
+        <label class="hom-cm-dica" for="homCmEd_${p.id}_${idx}">Editando o seu comentário</label>
+        <textarea class="hom-cm-ta" id="homCmEd_${p.id}_${idx}">${esc(cm.txt)}</textarea>
+        <div class="hom-cm-edit-bts"><button type="button" class="btn bg2 bsm" onclick="_homCmCancelar(${p.id})">Cancelar</button><button type="button" class="btn bgreen bsm" onclick="_homCmSalvar(${p.id},${idx})">Salvar</button></div>
+      </div></div>`;
+    const ed = _comentEditado(cm), vers = _versoesComent(cm), meu = _ehMeuComent(cm);
+    return `<div class="hom-cm-item">
+      <div class="hom-cm-top"><span class="hom-cm-autor">${esc(cm.autor)}</span><span class="hom-cm-dt">${esc(ed && cm.editadoEm ? cm.editadoEm : cm.dt)}</span>
+        ${ed ? `<button type="button" class="hom-cm-editado" aria-expanded="false" title="Postado originalmente em ${esc(cm.dt)} — ver versões anteriores" onclick="_homCmVersoes(this,${p.id},${idx})">editado</button>` : ''}
+        ${meu ? `<span class="hom-cm-acts"><button type="button" class="hom-cm-act" title="Editar comentário" aria-label="Editar comentário" onclick="_homCmEditar(${p.id},${idx})">${icL('pencil')}</button><button type="button" class="hom-cm-act del" title="Excluir comentário" aria-label="Excluir comentário" onclick="_homCmExcluir(${p.id},${idx})">${icL('trash')}</button></span>` : ''}
+      </div>
+      <div class="hom-cm-txt">${linkify(cm.txt).replace(/\n/g,'<br>')}</div>
+      ${ed ? `<div class="hom-cm-vers" id="homCmV_${p.id}_${idx}" hidden><div class="hom-cm-vers-tit">${icL('history')} Versões anteriores</div>${vers.length
+          ? vers.slice().reverse().map(v => `<div><span class="hom-cm-dt">${esc(v.dt)}</span> · ${linkify(v.txt).replace(/\n/g,'<br>')}</div>`).join('')
+          : '<div>Nenhuma versão anterior registrada.</div>'}</div>` : ''}
+    </div>`;
+  };
+  return `<div class="hom-cm-hd">${icL('message-square')} Comentários<span class="hom-cm-cnt">${lista.length}</span></div>
+    ${lista.length ? `<div class="hom-cm-list">${lista.map(item).join('')}</div>` : '<div class="hom-cm-vazio">Nenhum comentário ainda.</div>'}
+    <div class="hom-cm-form">
+      <textarea class="hom-cm-ta" id="homCmNovo_${p.id}" placeholder="Escreva um comentário sobre a homologação…" aria-label="Novo comentário em ${esc(p.nome)}"></textarea>
+      <button type="button" class="btn bgreen bsm hom-cm-enviar" onclick="_homCmEnviar(${p.id})">${icL('send')} Enviar</button>
+    </div>`;
+}
+// Redesenha só a área de comentários (o card continua aberto ou fechado como está)
+function _homCmRender(pid){
+  const p = DB.find(x => x.id === pid), el = document.getElementById('hom_cm_'+pid);
+  if(p && el) el.innerHTML = _homComentsHtml(p);
+}
+function _homCmEnviar(pid){
+  const p = DB.find(x => x.id === pid); if(!p) return;
+  const ta = document.getElementById('homCmNovo_'+pid);
+  const txt = (ta?.value||'').trim();
+  if(!txt){ showToast('Escreva algo antes de enviar'); ta?.focus(); return; }
+  if(!p.comentarios) p.comentarios = [];
+  const autorEmail = (fbCurrentUser?.email||localStorage.getItem('firjan_user_email')||'').toLowerCase();
+  p.comentarios.push({autor:nomeUsuarioAtual(), autorEmail, dt:_dtAgora(), txt, origem:'homolog'});
+  fbSalvarProjeto(p);
+  _homCmRender(pid);
+  showToast('Comentário adicionado');
+}
+function _homCmEditar(pid, idx){
+  const p = DB.find(x => x.id === pid), cm = p?.comentarios?.[idx];
+  if(!_ehMeuComent(cm)){ showToast('Você só pode alterar os seus próprios comentários'); return; }
+  _homCmEdit = {pid, idx};
+  _homCmRender(pid);
+  const ta = document.getElementById(`homCmEd_${pid}_${idx}`); if(ta){ ta.focus(); ta.setSelectionRange(ta.value.length, ta.value.length); }
+}
+function _homCmCancelar(pid){ _homCmEdit = null; _homCmRender(pid); }
+function _homCmSalvar(pid, idx){
+  const p = DB.find(x => x.id === pid), cm = p?.comentarios?.[idx];
+  if(!_ehMeuComent(cm)){ showToast('Você só pode alterar os seus próprios comentários'); return; }
+  const txt = (document.getElementById(`homCmEd_${pid}_${idx}`)?.value||'').trim();
+  if(!txt){ showToast('O comentário não pode ficar vazio'); return; }
+  if(txt !== cm.txt){
+    // mesmo formato do detalhe do card: guarda a versão substituída
+    if(!Array.isArray(cm.versoes)) cm.versoes = [..._versoesComent(cm)];
+    delete cm.historico;
+    cm.versoes.push({txt:cm.txt, dt:cm.editadoEm||cm.dt});
+    cm.txt = txt; cm.editado = true; cm.editadoEm = _dtAgora();
+    fbSalvarProjeto(p);
+    showToast('Comentário atualizado');
+  }
+  _homCmEdit = null;
+  _homCmRender(pid);
+}
+async function _homCmExcluir(pid, idx){
+  const p = DB.find(x => x.id === pid), cm = p?.comentarios?.[idx];
+  if(!_ehMeuComent(cm)){ showToast('Você só pode alterar os seus próprios comentários'); return; }
+  if(!await confirmar({titulo:'Excluir comentário?', msg:'O comentário e as versões anteriores dele serão apagados. Esta ação não pode ser desfeita.', ok:'Excluir', tipo:'perigo'})) return;
+  if(p.comentarios[idx] !== cm) return;   // a lista mudou enquanto o modal estava aberto
+  p.comentarios.splice(idx, 1);
+  fbSalvarProjeto(p);
+  _homCmEdit = null;
+  _homCmRender(pid);
+  showToast('Comentário excluído');
+}
+function _homCmVersoes(btn, pid, idx){
+  const el = document.getElementById(`homCmV_${pid}_${idx}`); if(!el) return;
+  el.hidden = !el.hidden; btn.setAttribute('aria-expanded', !el.hidden);
+}
+
 function buildHomologCard(p){
   const h  = p.homolog || {};
   const st = _homStatus(p);
@@ -10815,10 +10957,11 @@ function buildHomologCard(p){
       </div>
       <div class="hom-foot">
         <span style="font-size:11px;color:var(--mu);align-self:center">
-          ${h.preenchido ? 'Os campos são salvos ao sair de cada um. Use Salvar para registrar no histórico.' : 'Preencha os campos e salve'}
+          ${h.preenchido ? '' : 'Preencha os campos e salve'}
         </span>
         <button type="button" class="hom-salvar" onclick="salvarHomolog(${p.id})">${icL('save')} Salvar</button>
       </div>
+      <div class="hom-cm" id="hom_cm_${p.id}">${_homComentsHtml(p)}</div>
     </div>
   </div>`;
 }
