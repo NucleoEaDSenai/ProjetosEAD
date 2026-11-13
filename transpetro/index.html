@@ -7433,7 +7433,7 @@ function _renderEF(){
         </th>
         <th style="width:28px">#</th>
         <th>Etapa</th>
-        <th style="width:110px">Responsável</th>
+        <th style="width:1%;white-space:nowrap">Responsável</th>
         <th style="width:135px">Data Inicial</th>
         <th style="width:185px">Data Final</th>
         <th style="width:72px;text-align:center">Ações</th>
@@ -7452,7 +7452,7 @@ function _renderEF(){
           <td>
             <div class="sel-ic-wrap">
               <span class="sel-ic sel-ic-sm" id="er_ic_${i}" aria-hidden="true">${_respIcHtml(e.r)}</span>
-              <select class="iis" id="er${i}" style="width:100%" onchange="_respIcUpd(${i})">
+              <select class="iis" id="er${i}" style="width:auto;min-width:110px" onchange="_respIcUpd(${i})">
               ${_efRespOpts(e.r)}
               </select>
             </div>
