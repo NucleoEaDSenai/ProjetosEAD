@@ -275,6 +275,7 @@ tr:hover td{background:#FAFAF9}
 .et th{background:var(--s2);padding:7px 9px;text-align:left;font-weight:700;font-size:9.5px;letter-spacing:.5px;text-transform:uppercase;color:var(--mu)}
 .et td{padding:6px 9px;border-bottom:1px solid var(--bdr);vertical-align:middle}
 .et tr:last-child td{border-bottom:none}
+.ef-du{display:inline-block;min-width:30px;padding:3px 8px;border-radius:999px;background:var(--s2);border:1px solid var(--bdr);font-weight:700;font-size:11.5px;color:var(--txt);font-variant-numeric:tabular-nums}
 .et tr.done-row td{background:#F0FDF4}
 .et tr.done-row td:first-child span{text-decoration:line-through;color:var(--mu)}
 .et tr.ov-row td{background:#FFF5F5}
@@ -7137,6 +7138,16 @@ function aplicarCronograma(recurso, dataInicio){
 }
 
 // Chamada pelo onchange dos campos de data — re-renderiza se data apagada (para mostrar "a definir")
+// Dias úteis da etapa no formulário: só leitura; aparece quando há Data Inicial e Data Final
+function _efDuHtml(e){
+  const d = _duracaoEtapaDU(e);
+  return d == null ? '' : `<span class="ef-du" title="Dias úteis de ${fd(e.dataInicial)} a ${fd(e.prazo)} (contando os dois dias)">${d}</span>`;
+}
+function _efDuUpd(i){
+  const el = document.getElementById('ef_du_'+i);
+  if(el && _efEtapas[i]) el.innerHTML = _efDuHtml(_efEtapas[i]);
+}
+
 function _efOnChangePrazo(i){
   const dEl = document.getElementById('ep_d_'+i);
   const mEl = document.getElementById('ep_m_'+i);
@@ -7149,6 +7160,7 @@ function _efOnChangePrazo(i){
   // Todos os 3 preenchidos → tentar montar a data e agir
   if(dv && mv && av){
     _efSync();
+    _efDuUpd(i);
     const e = _efEtapas[i];
     if(!e.prazo){
       // Valores inválidos (ex: dia 99) → limpar e mostrar "a definir"
@@ -7436,6 +7448,7 @@ function _renderEF(){
         <th style="width:1%;white-space:nowrap">Responsável</th>
         <th style="width:135px">Data Inicial</th>
         <th style="width:185px">Data Final</th>
+        <th style="width:1%;white-space:nowrap;text-align:center" title="Dias úteis da data inicial até a data final (contando os dois dias)">Dias úteis</th>
         <th style="width:72px;text-align:center">Ações</th>
       </tr></thead>
       <tbody>
@@ -7458,7 +7471,7 @@ function _renderEF(){
             </div>
           </td>
           <td>
-            <input class="fi ii" type="date" id="ef_ini_${i}" value="${e.dataInicial||''}" onchange="_efEtapas[${i}].dataInicial=this.value||null"
+            <input class="fi ii" type="date" id="ef_ini_${i}" value="${e.dataInicial||''}" onchange="_efEtapas[${i}].dataInicial=this.value||null;_efDuUpd(${i})"
               aria-label="Data inicial de ${esc(e.lb||'')}" style="width:100%;padding:5px 4px;font-size:11.5px">
           </td>
           <td>
@@ -7488,6 +7501,7 @@ function _renderEF(){
               }
             </div>
           </td>
+          <td style="text-align:center" id="ef_du_${i}">${_efDuHtml(e)}</td>
           <td>
             <div style="display:flex;align-items:center;justify-content:center;gap:2px">
               <button type="button" class="et-btn et-btn-del" onclick="_efDel(${i})"
@@ -7496,7 +7510,7 @@ function _renderEF(){
           </td>
         </tr>`).join('')}
         <tr class="et-add-row">
-          <td colspan="7">
+          <td colspan="8">
             <button type="button" onclick="_efAdd()"
               style="background:none;border:none;color:var(--blue);font-size:12px;font-family:'Plus Jakarta Sans',sans-serif;font-weight:600;cursor:pointer;padding:2px 4px;display:flex;align-items:center;gap:5px">
               <svg class="ic" aria-hidden="true"><use href="#i-plus"/></svg> Adicionar etapa
