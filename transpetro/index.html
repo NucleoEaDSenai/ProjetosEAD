@@ -5425,7 +5425,7 @@ function sitEtapa(e, p){
   return`<span class="sit sit-and">${icL('refresh')} Em andamento</span>`;
 }
 
-function openDet(id){
+function openDet(id, opts){
   const p=DB.find(x=>x.id===id);if(!p)return;
   _detAbertoId=id; _detPendente=false;
   const _prDet=projDoCard(p);
@@ -5610,7 +5610,7 @@ function openDet(id){
      ${!p.cancelado?`<button class="btn bgray" onclick="abrirCanc(${p.id})">Produto Cancelado</button>`:''}
   `;
   document.getElementById('ovDet').classList.add('on');
-  setTimeout(()=>{const m=document.querySelector('#ovDet .modal');if(m)m.focus();},80);
+  if(!opts?.semFoco) setTimeout(()=>{const m=document.querySelector('#ovDet .modal');if(m)m.focus();},80);  // semFoco: atualização ao vivo não tira o cursor de quem digita
 }
 
 // ══════════════════════════════════════════════
@@ -11594,7 +11594,7 @@ function _detRecarregar(){
   const focoId = document.activeElement && ov.contains(document.activeElement) ? document.activeElement.id : '';
   const versAbertas = [...ov.querySelectorAll('[id^="comentVers_"]')].filter(el => el.style.display !== 'none').map(el => el.id);
 
-  openDet(id);
+  openDet(id, {semFoco:true});
 
   Object.entries(vals).forEach(([k,v]) => { const el = document.getElementById(k); if(el) el.value = v; });
   versAbertas.forEach(k => { const el = document.getElementById(k); if(el) el.style.display = ''; });
