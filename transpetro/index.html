@@ -276,7 +276,6 @@ tr:hover td{background:#FAFAF9}
 .et th{background:var(--s2);padding:7px 9px;text-align:left;font-weight:700;font-size:9.5px;letter-spacing:.5px;text-transform:uppercase;color:var(--mu)}
 .et td{padding:6px 9px;border-bottom:1px solid var(--bdr);vertical-align:middle}
 .et tr:last-child td{border-bottom:none}
-.ef-du{display:inline-block;min-width:30px;padding:3px 8px;border-radius:999px;background:var(--s2);border:1px solid var(--bdr);font-weight:700;font-size:11.5px;color:var(--txt);font-variant-numeric:tabular-nums}
 .et tr.done-row td{background:#F0FDF4}
 .et tr.done-row td:first-child span{text-decoration:line-through;color:var(--mu)}
 .et tr.ov-row td{background:#FFF5F5}
@@ -881,7 +880,10 @@ tr.med-tot td{background:var(--s2);font-weight:800;font-size:12px}
 .val-st.negada{background:var(--danger-bg,#FEE2E2);color:var(--danger-fg,#991B1B)}
 .val-st.pendente{background:var(--warn-bg,#FEF3C7);color:var(--warn-fg,#92400E)}
 /* BADGE DIAS CLIENTE */
-.cl-dias{display:inline-flex;align-items:center;gap:4px;background:#FEF3C7;border:1px solid #F59E0B;color:#92400E;border-radius:6px;padding:3px 9px;font-size:11px;font-weight:700}
+/* Mensagens da coluna Observação (detalhe do card): só texto colorido + ícone, sem fundo nem borda */
+.obs-msg{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:700;line-height:1.35;vertical-align:middle}
+.obs-msg .ic{flex-shrink:0}
+.obs-msg.warn{color:#B45309}.obs-msg.ok{color:#15803D}.obs-msg.danger{color:#B91C1C}.obs-msg.mu{color:var(--mu);font-weight:600;font-style:italic}
 
 /* LOGIN */
 .ov-login{position:fixed;inset:0;background:rgba(13,13,13,.85);z-index:3000;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(6px)}
@@ -1207,8 +1209,8 @@ body.dark .tenant-item.current{background:rgba(34,197,94,.12)}
 .hom-conf-btn:hover{background:#166534}
 .hom-conf-undo{display:inline-flex;align-items:center;gap:4px;background:none;border:1px solid var(--bdr);color:var(--mu);border-radius:6px;padding:2px 8px;font-size:11px;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif}
 .hom-conf-undo:hover{color:var(--red);border-color:var(--red)}
-.hom-salvar{display:inline-flex;align-items:center;gap:6px;padding:7px 18px;background:var(--red);color:#fff;border:none;border-radius:7px;cursor:pointer;font-size:12.5px;font-weight:600;font-family:'Plus Jakarta Sans',sans-serif;transition:all .15s}
-.hom-salvar:hover{background:#c4001f;transform:translateY(-1px)}
+.hom-salvar{display:inline-flex;align-items:center;gap:6px;padding:7px 18px;background:var(--green);color:#fff;border:none;border-radius:7px;cursor:pointer;font-size:12.5px;font-weight:600;font-family:'Plus Jakarta Sans',sans-serif;transition:all .15s}
+.hom-salvar:hover{background:#146C3A;transform:translateY(-1px)}
 .hom-empty-ic{color:var(--mu);margin-bottom:10px}
 .hom-empty-ic .ic{width:30px;height:30px}
 .hom-busca-ic{position:absolute;left:9px;top:50%;transform:translateY(-50%);width:13px;height:13px;color:var(--mu);pointer-events:none;z-index:1}
@@ -1363,7 +1365,7 @@ body.dark .fi-sm:focus{background:var(--surface)}
 body.dark .rec-tag{background:var(--info-bg);color:var(--info-fg)}
 body.dark .fb-status{background:var(--s3)}
 body.dark .motivo-box{background:var(--s3)}
-body.dark .cl-dias{background:var(--warn-bg);color:var(--warn-fg);border-color:var(--warn-bd)}
+body.dark .obs-msg.warn{color:var(--warn-fg)}body.dark .obs-msg.ok{color:var(--ok-fg)}body.dark .obs-msg.danger{color:var(--danger-fg)}
 body.dark .login-box{background:var(--s3)}
 body.dark .tenant-item-check{color:var(--ok-fg)}
 body.dark .kc[data-col="14"] .kc-t{color:var(--purple-fg)}
@@ -2771,7 +2773,7 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
   </div>
   <div class="mft">
     <button class="btn bg2" onclick="cm('ovNew')">Cancelar</button>
-    <button class="btn br" onclick="salvar()"><svg class="ic ic-inl" aria-hidden="true"><use href="#i-save"/></svg> Salvar Produto</button>
+    <button class="btn bgreen" onclick="salvar()">Salvar Produto</button>
   </div>
 </div>
 </div>
@@ -2793,7 +2795,7 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
   </div>
   <div class="mft">
     <button class="btn bg2" onclick="cm('ovCadProj')">Cancelar</button>
-    <button class="btn br" id="cpSalvarBtn" onclick="salvarCadProj()"><svg class="ic ic-inl"><use href="#i-save"/></svg> Salvar Projeto</button>
+    <button class="btn bgreen" id="cpSalvarBtn" onclick="salvarCadProj()">Salvar Projeto</button>
   </div>
 </div>
 </div>
@@ -2816,14 +2818,14 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
 <!-- MODAL: CANCELAR -->
 <div class="ov2" id="ovCanc" role="dialog" aria-modal="true" aria-label="Cancelar projeto">
 <div class="modal" style="width:440px">
-  <div class="mhd"><div class="mt">🚫 Cancelar Projeto</div><button class="mcl" onclick="cm('ovCanc')">✕</button></div>
+  <div class="mhd"><div class="mt"><svg class="ic ic-inl" aria-hidden="true"><use href="#i-ban"/></svg> Cancelar Projeto</div><button class="mcl" onclick="cm('ovCanc')">✕</button></div>
   <div class="mbody">
     <p style="margin-bottom:14px;color:var(--mu);font-size:13px">O projeto ficará visível na aba <strong>Cancelados</strong> para relatórios futuros.</p>
     <div class="fg"><label class="fl">Motivo do Cancelamento</label><textarea class="fta" id="fCancMotivo" placeholder="Descreva o motivo..." style="min-height:90px"></textarea></div>
   </div>
   <div class="mft">
     <button class="btn bg2" onclick="cm('ovCanc')">Voltar</button>
-    <button class="btn bgray" onclick="confirmarCanc()">🚫 Confirmar Cancelamento</button>
+    <button class="btn bgray" onclick="confirmarCanc()"><svg class="ic ic-inl" aria-hidden="true"><use href="#i-ban"/></svg> Confirmar Cancelamento</button>
   </div>
 </div>
 </div>
@@ -2831,14 +2833,14 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
 <!-- MODAL: motivo de exclusão (lixeira) -->
 <div class="ov2" id="ovDelMotivo" role="dialog" aria-modal="true" aria-label="Deletar projeto">
 <div class="modal" style="width:440px">
-  <div class="mhd"><div class="mt">🗑️ Deletar Projeto</div><button class="mcl" onclick="cm('ovDelMotivo')">✕</button></div>
+  <div class="mhd"><div class="mt"><svg class="ic ic-inl" aria-hidden="true"><use href="#i-trash"/></svg> Deletar Projeto</div><button class="mcl" onclick="cm('ovDelMotivo')">✕</button></div>
   <div class="mbody">
     <p style="margin-bottom:14px;color:var(--mu);font-size:13px">O projeto será removido do quadro e enviado para a <strong>Lixeira</strong>, onde poderá ser consultado ou restaurado.</p>
     <div class="fg"><label class="fl">Motivo da exclusão <span style="color:var(--red)">*</span></label><textarea class="fta" id="fDelMotivo" placeholder="Descreva por que este projeto está sendo deletado..." style="min-height:90px"></textarea></div>
   </div>
   <div class="mft">
     <button class="btn bg2" onclick="cm('ovDelMotivo')">Voltar</button>
-    <button class="btn bd" onclick="confirmarDelMotivo()">🗑️ Confirmar Exclusão</button>
+    <button class="btn bd" onclick="confirmarDelMotivo()"><svg class="ic ic-inl" aria-hidden="true"><use href="#i-trash"/></svg> Confirmar Exclusão</button>
   </div>
 </div>
 </div>
@@ -5471,19 +5473,19 @@ function openDet(id, opts){
                onchange="setEObs(${id},${i},this.value)"
                title="Observação livre para esta etapa">`
           : `${e.done && e.solicPrazo?.status==='pendente'
-              ? `<span class="val-st pendente" title="Solicitado por ${esc(nomeExibicao(e.solicPrazo.por)||'')} em ${esc(e.solicPrazo.em||'')}">${icL('hourglass')} Aguardando validação — concluída em ${fd(e.solicPrazo.dataReal)}</span>`
+              ? `<span class="obs-msg warn" title="Solicitado por ${esc(nomeExibicao(e.solicPrazo.por)||'')} em ${esc(e.solicPrazo.em||'')}">${icL('hourglass')} Aguardando validação — concluída em ${fd(e.solicPrazo.dataReal)}</span>`
               : e.done && e.r!=='cl' && e.prazo && e.fim && new Date(e.prazo)<new Date(e.fim)
               ? e.solicPrazo?.status==='negada' && !e.atrasoMotivo
-                ? '<span class="val-st negada">Solicitação negada</span> <span style="color:var(--mu);font-style:italic">sem motivo registrado</span>'
+                ? `<span class="obs-msg danger">${icL('ban')} Solicitação negada</span> <span class="obs-msg mu">${icL('info')} sem motivo registrado</span>`
                 : e.atrasoMotivo
-                ? `<span style="color:var(--red)" title="${esc(e.atrasoMotivo)}">${icL('triangle-alert')} ${esc(e.atrasoMotivo.length>38?e.atrasoMotivo.slice(0,36)+'…':e.atrasoMotivo)}</span>`
-                : '<span style="color:var(--mu);font-style:italic">sem motivo registrado</span>'
+                ? `<span class="obs-msg danger" title="${esc(e.atrasoMotivo)}">${icL('triangle-alert')} ${esc(e.atrasoMotivo.length>38?e.atrasoMotivo.slice(0,36)+'…':e.atrasoMotivo)}</span>`
+                : `<span class="obs-msg mu">${icL('info')} sem motivo registrado</span>`
               : ''
             }
             ${e.r==='cl' && !e.done && e.prazo
-              ? `<span class="cl-dias">${icL('hourglass')} ${Math.max(0,Math.round((new Date()-new Date(e.prazo))/(864e5)))} dias em espera</span>`
+              ? `<span class="obs-msg warn">${icL('hourglass')} ${Math.max(0,Math.round((new Date()-new Date(e.prazo))/(864e5)))} dias em espera</span>`
               : e.r==='cl' && e.done && e.diasCl!=null
-                ? `<span class="cl-dias" style="background:#DCFCE7;border-color:#16A34A;color:#14532D">${icL('circle-check')} ${e.diasCl} dias aguardado</span>`
+                ? `<span class="obs-msg ok">${icL('circle-check')} ${e.diasCl} dias aguardado</span>`
                 : ''
             }`
         }
@@ -5740,7 +5742,7 @@ function editarComent(pid,idx){
     <textarea class="coment-ta" id="comentEdit_${pid}_${idx}"></textarea>
     <div class="coment-edit-btns">
       <button class="btn bg2 bsm" onclick="openDet(${pid})">Cancelar</button>
-      <button class="btn bb bsm" onclick="salvarEdicaoComent(${pid},${idx})">Salvar</button>
+      <button class="btn bgreen bsm" onclick="salvarEdicaoComent(${pid},${idx})">Salvar</button>
     </div>
   </div>`;
   const ta=document.getElementById(`comentEdit_${pid}_${idx}`);
@@ -7154,14 +7156,37 @@ function aplicarCronograma(recurso, dataInicio){
 }
 
 // Chamada pelo onchange dos campos de data — re-renderiza se data apagada (para mostrar "a definir")
-// Dias úteis da etapa no formulário: só leitura; aparece quando há Data Inicial e Data Final
-function _efDuHtml(e){
+// Dias úteis da etapa no formulário — igual ao card: editar a duração recalcula a Data Final
+// (Data Inicial + duração − 1 dias úteis, pulando fins de semana e feriados).
+function _efDuHtml(e, i){
   const d = _duracaoEtapaDU(e);
-  return d == null ? '' : `<span class="ef-du" title="Dias úteis de ${fd(e.dataInicial)} a ${fd(e.prazo)} (contando os dois dias)">${d}</span>`;
+  const dis = ETAPAS_SEM_PRAZO_AUTO.has(e.lb) ? 'disabled title="Etapa sem data definida"'
+            : !e.dataInicial ? 'disabled title="Informe a data inicial primeiro"'
+            : `title="Dias úteis de ${fd(e.dataInicial)} até a data final, contando os dois dias. Altere para recalcular a Data Final."`;
+  return `<input type="number" class="fi ii" id="ef_du_inp_${i}" min="1" step="1" value="${d ?? ''}" placeholder="—"
+    onchange="_efSetDur(${i},this.value)" ${dis} aria-label="Duração em dias úteis de ${esc(e.lb||'')}"
+    style="width:58px;padding:5px 4px;font-size:11.5px;text-align:center">`;
 }
 function _efDuUpd(i){
   const el = document.getElementById('ef_du_'+i);
-  if(el && _efEtapas[i]) el.innerHTML = _efDuHtml(_efEtapas[i]);
+  if(el && _efEtapas[i]) el.innerHTML = _efDuHtml(_efEtapas[i], i);
+}
+function _efSetDur(i, v){
+  const e = _efEtapas[i]; if(!e) return;
+  const inp = document.getElementById('ef_du_inp_'+i);
+  const comFoco = document.activeElement === inp;   // setas/Enter: mantém o foco; Tab para outro campo: não puxa de volta
+  const dur = parseInt(v, 10);
+  if(!e.dataInicial){ showToast('⚠️ Informe a data inicial da etapa primeiro'); _efDuUpd(i); return; }
+  if(!(dur > 0)){ showToast('⚠️ A duração deve ser de pelo menos 1 dia útil'); _efDuUpd(i); return; }
+  const prazo = addDiasUteis(_primeiroDiaUtil(e.dataInicial), dur - 1);
+  // Escreve a nova data nos campos DD/MM/AAAA e segue o mesmo caminho de quem digita a Data Final
+  // (inclui o Cronograma Automático, quando ligado)
+  const [a, m, d] = prazo.split('-');
+  const set = (id, val) => { const el = document.getElementById(id); if(el) el.value = val; };
+  set('ep_d_'+i, parseInt(d)); set('ep_m_'+i, parseInt(m)); set('ep_a_'+i, a);
+  _efCascata(i);
+  _renderEF();
+  if(comFoco){ const n = document.getElementById('ef_du_inp_'+i); if(n){ n.focus(); n.select?.(); } }
 }
 
 function _efOnChangePrazo(i){
@@ -7464,7 +7489,7 @@ function _renderEF(){
         <th style="width:1%;white-space:nowrap">Responsável</th>
         <th style="width:135px">Data Inicial</th>
         <th style="width:185px">Data Final</th>
-        <th style="width:1%;white-space:nowrap;text-align:center" title="Dias úteis da data inicial até a data final (contando os dois dias)">Dias úteis</th>
+        <th style="width:1%;white-space:nowrap;text-align:center" title="Dias úteis da data inicial até a data final (contando os dois dias). Altere para recalcular a Data Final.">Dias úteis</th>
         <th style="width:72px;text-align:center">Ações</th>
       </tr></thead>
       <tbody>
@@ -7517,7 +7542,7 @@ function _renderEF(){
               }
             </div>
           </td>
-          <td style="text-align:center" id="ef_du_${i}">${_efDuHtml(e)}</td>
+          <td style="text-align:center" id="ef_du_${i}">${_efDuHtml(e, i)}</td>
           <td>
             <div style="display:flex;align-items:center;justify-content:center;gap:2px">
               <button type="button" class="et-btn et-btn-del" onclick="_efDel(${i})"
@@ -9792,7 +9817,7 @@ function abrirModalMedicao(id, edicao){
       <div id="medItensAviso" style="font-size:11.5px;color:var(--red);margin-top:8px;min-height:14px"></div>
       <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:10px">
         <button class="btn bg2 bsm" onclick="document.getElementById('medItensModal').remove()">Cancelar</button>
-        ${linhas.length ? `<button class="btn bb bsm" onclick="_salvarMedItens(${p.id},${edicao?'true':'false'})">${edicao?'💾 Salvar itens':icMedicao()+' Enviar Medição'}</button>` : ''}
+        ${linhas.length ? `<button class="btn ${edicao?'bgreen':'bb'} bsm" onclick="_salvarMedItens(${p.id},${edicao?'true':'false'})">${edicao?'Salvar itens':icMedicao()+' Enviar Medição'}</button>` : ''}
       </div>
     </div>`;
   div.addEventListener('click', e => { if(e.target===div) div.remove(); });
@@ -9893,7 +9918,7 @@ function _buildMedRow(p){
   const span = rs > 1 ? ` rowspan="${rs}"` : '';
   const trStyle = p.medicaoFeita ? ' style="opacity:.75"' : '';
   const editar = !p.medicaoFeita
-    ? `<button class="coment-act" style="font-size:11px;opacity:.8" onclick="editarItensMedicao(${p.id})" title="${itens.length?'Editar quantidades':'Informar quantidades'}">${icL('pencil')} ${itens.length?'Editar':'Informar QTD'}</button>`
+    ? `<button class="coment-act" style="font-size:13px;opacity:.8" onclick="editarItensMedicao(${p.id})" title="${itens.length?'Editar quantidades':'Informar quantidades'}">${icL('pencil')} ${itens.length?'Editar':'Informar QTD'}</button>`
     : '';
   const celItem = it => `
     <td class="ppu-n med-it"><span class="med-ln">${it.linha}</span></td>
@@ -10976,7 +11001,7 @@ function buildHomologCard(p){
         <span style="font-size:11px;color:var(--mu);align-self:center">
           ${h.preenchido ? '' : 'Preencha os campos e salve'}
         </span>
-        <button type="button" class="hom-salvar" onclick="salvarHomolog(${p.id})">${icL('save')} Salvar</button>
+        <button type="button" class="hom-salvar" onclick="salvarHomolog(${p.id})">Salvar</button>
       </div>
       <div class="hom-cm" id="hom_cm_${p.id}">${_homComentsHtml(p)}</div>
     </div>
