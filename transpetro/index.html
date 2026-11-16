@@ -881,7 +881,10 @@ tr.med-tot td{background:var(--s2);font-weight:800;font-size:12px}
 .val-st.negada{background:var(--danger-bg,#FEE2E2);color:var(--danger-fg,#991B1B)}
 .val-st.pendente{background:var(--warn-bg,#FEF3C7);color:var(--warn-fg,#92400E)}
 /* BADGE DIAS CLIENTE */
-.cl-dias{display:inline-flex;align-items:center;gap:4px;background:#FEF3C7;border:1px solid #F59E0B;color:#92400E;border-radius:6px;padding:3px 9px;font-size:11px;font-weight:700}
+/* Mensagens da coluna Observação (detalhe do card): só texto colorido + ícone, sem fundo nem borda */
+.obs-msg{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:700;line-height:1.35;vertical-align:middle}
+.obs-msg .ic{flex-shrink:0}
+.obs-msg.warn{color:#B45309}.obs-msg.ok{color:#15803D}.obs-msg.danger{color:#B91C1C}.obs-msg.mu{color:var(--mu);font-weight:600;font-style:italic}
 
 /* LOGIN */
 .ov-login{position:fixed;inset:0;background:rgba(13,13,13,.85);z-index:3000;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(6px)}
@@ -1363,7 +1366,7 @@ body.dark .fi-sm:focus{background:var(--surface)}
 body.dark .rec-tag{background:var(--info-bg);color:var(--info-fg)}
 body.dark .fb-status{background:var(--s3)}
 body.dark .motivo-box{background:var(--s3)}
-body.dark .cl-dias{background:var(--warn-bg);color:var(--warn-fg);border-color:var(--warn-bd)}
+body.dark .obs-msg.warn{color:var(--warn-fg)}body.dark .obs-msg.ok{color:var(--ok-fg)}body.dark .obs-msg.danger{color:var(--danger-fg)}
 body.dark .login-box{background:var(--s3)}
 body.dark .tenant-item-check{color:var(--ok-fg)}
 body.dark .kc[data-col="14"] .kc-t{color:var(--purple-fg)}
@@ -5471,19 +5474,19 @@ function openDet(id, opts){
                onchange="setEObs(${id},${i},this.value)"
                title="Observação livre para esta etapa">`
           : `${e.done && e.solicPrazo?.status==='pendente'
-              ? `<span class="val-st pendente" title="Solicitado por ${esc(nomeExibicao(e.solicPrazo.por)||'')} em ${esc(e.solicPrazo.em||'')}">${icL('hourglass')} Aguardando validação — concluída em ${fd(e.solicPrazo.dataReal)}</span>`
+              ? `<span class="obs-msg warn" title="Solicitado por ${esc(nomeExibicao(e.solicPrazo.por)||'')} em ${esc(e.solicPrazo.em||'')}">${icL('hourglass')} Aguardando validação — concluída em ${fd(e.solicPrazo.dataReal)}</span>`
               : e.done && e.r!=='cl' && e.prazo && e.fim && new Date(e.prazo)<new Date(e.fim)
               ? e.solicPrazo?.status==='negada' && !e.atrasoMotivo
-                ? '<span class="val-st negada">Solicitação negada</span> <span style="color:var(--mu);font-style:italic">sem motivo registrado</span>'
+                ? `<span class="obs-msg danger">${icL('ban')} Solicitação negada</span> <span class="obs-msg mu">${icL('info')} sem motivo registrado</span>`
                 : e.atrasoMotivo
-                ? `<span style="color:var(--red)" title="${esc(e.atrasoMotivo)}">${icL('triangle-alert')} ${esc(e.atrasoMotivo.length>38?e.atrasoMotivo.slice(0,36)+'…':e.atrasoMotivo)}</span>`
-                : '<span style="color:var(--mu);font-style:italic">sem motivo registrado</span>'
+                ? `<span class="obs-msg danger" title="${esc(e.atrasoMotivo)}">${icL('triangle-alert')} ${esc(e.atrasoMotivo.length>38?e.atrasoMotivo.slice(0,36)+'…':e.atrasoMotivo)}</span>`
+                : `<span class="obs-msg mu">${icL('info')} sem motivo registrado</span>`
               : ''
             }
             ${e.r==='cl' && !e.done && e.prazo
-              ? `<span class="cl-dias">${icL('hourglass')} ${Math.max(0,Math.round((new Date()-new Date(e.prazo))/(864e5)))} dias em espera</span>`
+              ? `<span class="obs-msg warn">${icL('hourglass')} ${Math.max(0,Math.round((new Date()-new Date(e.prazo))/(864e5)))} dias em espera</span>`
               : e.r==='cl' && e.done && e.diasCl!=null
-                ? `<span class="cl-dias" style="background:#DCFCE7;border-color:#16A34A;color:#14532D">${icL('circle-check')} ${e.diasCl} dias aguardado</span>`
+                ? `<span class="obs-msg ok">${icL('circle-check')} ${e.diasCl} dias aguardado</span>`
                 : ''
             }`
         }
