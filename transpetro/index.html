@@ -5425,8 +5425,9 @@ function sitEtapa(e, p){
   return`<span class="sit sit-and">${icL('refresh')} Em andamento</span>`;
 }
 
-function openDet(id){
+function openDet(id, opts){
   const p=DB.find(x=>x.id===id);if(!p)return;
+  _detAbertoId=id; _detPendente=false;
   const _prDet=projDoCard(p);
   document.getElementById('detTitle').innerHTML=(_prDet?`<div style="font-size:11px;font-weight:700;color:var(--blue);text-transform:uppercase;letter-spacing:.4px;margin-bottom:2px"><span class="det-proj-ic">${icL('folder')}</span> ${esc(_prDet.nome)}</div>`:'')+esc(p.nome);
 
@@ -5609,7 +5610,7 @@ function openDet(id){
      ${!p.cancelado?`<button class="btn bgray" onclick="abrirCanc(${p.id})">Produto Cancelado</button>`:''}
   `;
   document.getElementById('ovDet').classList.add('on');
-  setTimeout(()=>{const m=document.querySelector('#ovDet .modal');if(m)m.focus();},80);
+  if(!opts?.semFoco) setTimeout(()=>{const m=document.querySelector('#ovDet .modal');if(m)m.focus();},80);  // semFoco: atualização ao vivo não tira o cursor de quem digita
 }
 
 // ══════════════════════════════════════════════
@@ -5801,11 +5802,19 @@ function adicionarLinkApoio(pid){
   showToast('🔗 Link adicionado!');
 }
 
+// Acha de novo, pelo conteúdo, um item de lista depois de um confirmar() — a lista pode ter mudado
+// (outra pessoa adicionou/removeu) enquanto o modal estava aberto. -1 = não existe mais.
+function _reacharItem(lista, alvo, campos){
+  return (lista||[]).findIndex(x => x && campos.every(k => (x[k]??'') === (alvo[k]??'')));
+}
+
 async function removerLinkApoio(pid,i){
   const p=DB.find(x=>x.id===pid);
   const lk=p?.linksApoio?.[i];
   if(!_podeRemoverLink(lk)){showToast('⚠️ Você só pode remover links que adicionou');return;}
   if(!await confirmar({titulo:'Remover link?', msg:`O link **${lk.titulo||lk.url}** sai dos Links de Apoio deste produto.`, ok:'Remover', tipo:'perigo', ic:'unlink'})) return;
+  i = _reacharItem(p.linksApoio, lk, ['url','titulo','autor','dt']);
+  if(i < 0){ showToast('⚠️ Este link já foi removido'); openDet(pid); return; }
   p.linksApoio.splice(i,1);
   fbSalvarProjeto(p);
   openDet(pid);
@@ -5817,6 +5826,8 @@ async function excluirComent(pid,i){
   const cm=p?.comentarios?.[i];
   if(!_ehMeuComent(cm)){showToast('⚠️ Você só pode alterar os seus próprios comentários');return;}
   if(!await confirmar({titulo:'Excluir comentário?', msg:'O comentário e as versões anteriores dele serão apagados. Esta ação não pode ser desfeita.', ok:'Excluir', tipo:'perigo'})) return;
+  i = _reacharItem(p.comentarios, cm, ['autor','dt','txt']);
+  if(i < 0){ showToast('⚠️ Este comentário já foi excluído ou alterado'); openDet(pid); return; }
   p.comentarios.splice(i,1);
   fbSalvarProjeto(p);
   openDet(pid);
@@ -6539,9 +6550,11 @@ function _solicPendente(pid, idx){
 }
 
 async function aprovarSolicPrazo(pid, idx){
-  const r = _solicPendente(pid, idx); if(!r) return;
+  const r0 = _solicPendente(pid, idx); if(!r0) return;
+  const {e:e0, s:s0} = r0;
+  if(!await confirmar({titulo:'Aprovar solicitação?', msg:`**${e0.lb}** fica como concluída em **${fd(s0.dataReal)}**.\n\nA data de conclusão passa de ${fd(e0.fim)} para ${fd(s0.dataReal)}.`, ok:'Aprovar', tipo:'ok'})) return;
+  const r = _solicPendente(pid, idx); if(!r) return;   // pode ter mudado com o modal aberto
   const {p, e, s} = r;
-  if(!await confirmar({titulo:'Aprovar solicitação?', msg:`**${e.lb}** fica como concluída em **${fd(s.dataReal)}**.\n\nA data de conclusão passa de ${fd(e.fim)} para ${fd(s.dataReal)}.`, ok:'Aprovar', tipo:'ok'})) return;
   e.fim = s.dataReal;
   e.atrasoMotivo = null;
   Object.assign(s, {status:'aprovada', decididoPor:nomeUsuarioAtual(), decididoEm:_dtAgora()});
@@ -6552,9 +6565,11 @@ async function aprovarSolicPrazo(pid, idx){
 }
 
 async function negarSolicPrazo(pid, idx){
-  const r = _solicPendente(pid, idx); if(!r) return;
+  const r0 = _solicPendente(pid, idx); if(!r0) return;
+  const {e:e0, s:s0} = r0;
+  if(!await confirmar({titulo:'Negar solicitação?', msg:`Solicitação de **${e0.lb}**.\n\nVale a data do check (${fd(s0.fimCheck)}) e a etapa continua atrasada, sem motivo registrado.`, ok:'Negar', tipo:'perigo', ic:'ban'})) return;
+  const r = _solicPendente(pid, idx); if(!r) return;   // pode ter mudado com o modal aberto
   const {p, e, s} = r;
-  if(!await confirmar({titulo:'Negar solicitação?', msg:`Solicitação de **${e.lb}**.\n\nVale a data do check (${fd(s.fimCheck)}) e a etapa continua atrasada, sem motivo registrado.`, ok:'Negar', tipo:'perigo', ic:'ban'})) return;
   Object.assign(s, {status:'negada', decididoPor:nomeUsuarioAtual(), decididoEm:_dtAgora()});
   registrarHistorico(p, 'negou validação', `"${e.lb}": conclusão em ${fd(s.dataReal)} negada — vale ${fd(s.fimCheck)}`);
   fbSalvarProjeto(p);
@@ -10868,7 +10883,8 @@ async function _homCmExcluir(pid, idx){
   const p = DB.find(x => x.id === pid), cm = p?.comentarios?.[idx];
   if(!_ehMeuComent(cm)){ showToast('Você só pode alterar os seus próprios comentários'); return; }
   if(!await confirmar({titulo:'Excluir comentário?', msg:'O comentário e as versões anteriores dele serão apagados. Esta ação não pode ser desfeita.', ok:'Excluir', tipo:'perigo'})) return;
-  if(p.comentarios[idx] !== cm) return;   // a lista mudou enquanto o modal estava aberto
+  idx = _reacharItem(p.comentarios, cm, ['autor','dt','txt']);   // a lista pode ter mudado com o modal aberto
+  if(idx < 0){ showToast('Este comentário já foi excluído ou alterado'); _homCmRender(pid); return; }
   p.comentarios.splice(idx, 1);
   fbSalvarProjeto(p);
   _homCmEdit = null;
@@ -11549,7 +11565,88 @@ function fbExcluirCadProj(pr){
     .catch(e  => { setStatus('offline','Erro ao remover'); showToast('❌ Não foi possível excluir: '+e.message); console.error(e); return false; });
 }
 
+// ── CARD ABERTO: atualizar ao vivo quando outra pessoa altera o produto ──
+let _detAbertoId = null;   // id do card aberto no modal de detalhe (ovDet)
+let _detPendente = false;  // chegou alteração enquanto a pessoa digitava — aplica quando ela sair do campo
+
+function _detEstaAberto(id){
+  return _detAbertoId === id && document.getElementById('ovDet')?.classList.contains('on');
+}
+// Está digitando/editando dentro do card? Redesenhar agora apagaria o que está sendo feito.
+function _detOcupado(){
+  const ov = document.getElementById('ovDet');
+  if(!ov) return false;
+  if(ov.querySelector('[id^="comentEdit_"]')) return true;           // editando um comentário
+  const a = document.activeElement;
+  return !!(a && ov.contains(a) && a.matches('input,textarea,select') &&
+            !['comentTa','linkApoioTit','linkApoioUrl'].includes(a.id)); // esses três são preservados
+}
+// Redesenha o card aberto mantendo o que não foi salvo: textos digitados, rolagem,
+// versões de comentário abertas e o foco nos campos de comentário/link.
+function _detRecarregar(){
+  const ov = document.getElementById('ovDet');
+  const id = _detAbertoId;
+  if(!ov || id == null) return;
+  const modal = ov.querySelector('.modal');
+  const scroll = modal ? modal.scrollTop : 0;
+  const vals = {};
+  ['comentTa','linkApoioTit','linkApoioUrl'].forEach(k => { const el = document.getElementById(k); if(el) vals[k] = el.value; });
+  const focoId = document.activeElement && ov.contains(document.activeElement) ? document.activeElement.id : '';
+  const versAbertas = [...ov.querySelectorAll('[id^="comentVers_"]')].filter(el => el.style.display !== 'none').map(el => el.id);
+
+  openDet(id, {semFoco:true});
+
+  Object.entries(vals).forEach(([k,v]) => { const el = document.getElementById(k); if(el) el.value = v; });
+  versAbertas.forEach(k => { const el = document.getElementById(k); if(el) el.style.display = ''; });
+  if(modal) modal.scrollTop = scroll;
+  if(focoId){ const el = document.getElementById(focoId); if(el) el.focus({preventScroll:true}); }
+}
+// Chamada quando chega do Firebase uma alteração feita por OUTRA pessoa/aba
+function _detAoMudarRemoto(id, por){
+  if(!_detEstaAberto(id)) return;
+  if(_detOcupado()){ _detPendente = true; return; }
+  _detRecarregar();
+  showToast('🔄 Card atualizado' + (por ? ' por ' + por : ''));
+}
+// Aplica a alteração pendente quando a pessoa sai do campo que estava editando
+document.addEventListener('focusout', e => {
+  if(!_detPendente || !document.getElementById('ovDet')?.contains(e.target)) return;
+  setTimeout(() => {   // espera o foco chegar ao próximo elemento (e o onchange do campo rodar)
+    if(!_detPendente || !_detEstaAberto(_detAbertoId) || _detOcupado()) return;
+    _detPendente = false;
+    _detRecarregar();
+    showToast('🔄 Card atualizado com alterações de outra pessoa');
+  }, 150);
+});
+
 // ── ESCUTAR MUDANÇAS EM TEMPO REAL ──
+// Insere ou atualiza UM produto vindo do Firebase no DB.
+// Atualiza o objeto existente "por dentro" (em vez de trocar por um novo): assim quem
+// estiver segurando a referência — p.ex. uma função esperando um confirmar() — continua
+// apontando para o produto certo e já enxerga os dados novos.
+function _fbAplicarProjeto(v){
+  const novo = normalizar(v);
+  if(!novo || novo.id == null) return;
+  const atual = DB.find(p => p.id === novo.id);
+  // Eco da própria gravação: fbSalvarProjeto já carimbou o mesmo _updatedAt no objeto local
+  const remoto = !!atual && (atual._updatedAt || '') !== (novo._updatedAt || '');
+  if(atual){
+    for(const k of Object.keys(atual)) if(!(k in novo)) delete atual[k];  // campos apagados no servidor
+    Object.assign(atual, novo);
+  } else {
+    DB.push(novo);
+  }
+  _agendarRender();
+  if(remoto) _detAoMudarRemoto(novo.id, novo._updatedBy);
+}
+// Junta vários eventos seguidos (ex.: a carga inicial dispara um child_added por produto) em um só renderAll()
+let _renderPend = false;
+function _agendarRender(){
+  if(_renderPend) return;
+  _renderPend = true;
+  requestAnimationFrame(() => { _renderPend = false; renderAll(); });
+}
+
 function escutarFirebase(db){
   if(fbListening) return;
   fbListening = true;
@@ -11575,18 +11672,21 @@ function escutarFirebase(db){
     renderAll();
   });
 
-  let primeiraVez = true;
+  // Listeners por produto: depois da carga inicial, só trafega o produto que mudou
+  // (antes, o 'value' reenviava TODOS os produtos a cada alteração de qualquer um).
+  fbProjetos.on('child_added',   snap => _fbAplicarProjeto(snap.val()));
+  fbProjetos.on('child_changed', snap => _fbAplicarProjeto(snap.val()));
+  fbProjetos.on('child_removed', snap => {
+    const id = snap.val()?.id ?? parseInt(String(snap.key).replace(/^p/, ''));
+    const estavaNoDB = DB.some(p => p.id === id);
+    DB = DB.filter(p => p.id !== id);
+    _agendarRender();
+    if(estavaNoDB && _detEstaAberto(id)){ cm('ovDet'); _detAbertoId = null; showToast('🗑️ Este produto foi deletado por outra pessoa'); }
+  });
 
-  // Listener único 'value' — recebe snapshot completo sempre que qualquer dado muda.
-  // Para evitar o problema de sobrescrever projetos locais recém-criados,
-  // fazemos um MERGE: mantemos projetos locais que ainda não chegaram no Firebase.
-  fbProjetos.on('value', snap => {
-    const remoto = snap.val();
-    const projetosRemotos = remoto ? Object.values(remoto).map(normalizar) : [];
-
-    if(primeiraVez){
-      DB = projetosRemotos;
-      primeiraVez = false;
+  // Dispara uma vez, depois de todos os child_added iniciais (o SDK reaproveita o mesmo cache,
+  // não baixa de novo). Só cuida da navegação inicial.
+  fbProjetos.once('value', () => {
       // Corrige automaticamente nomes antigos (username) salvos no localStorage
       (function(){
         const _emailLS = (localStorage.getItem('firjan_user_email')||'').toLowerCase();
@@ -11606,17 +11706,7 @@ function escutarFirebase(db){
         });
         document.getElementById('pageTitle').textContent='Cards';
       }
-    } else {
-      // Nas atualizações seguintes: merge inteligente
-      // Pega todos os IDs que estão no servidor
-      const idsRemotos = new Set(projetosRemotos.map(p=>p.id));
-      // Mantém projetos locais que AINDA NÃO chegaram no servidor (recém-criados)
-      const locaisNovos = DB.filter(p => !idsRemotos.has(p.id));
-      // DB final = remotos + locais ainda pendentes
-      DB = [...projetosRemotos, ...locaisNovos];
-    }
-
-    renderAll();
+    _agendarRender();
   });
 
   // NXT — só atualiza se o valor remoto for maior (nunca reduz)
