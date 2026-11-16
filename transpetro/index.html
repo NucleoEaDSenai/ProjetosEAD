@@ -9893,7 +9893,7 @@ function _buildMedRow(p){
   const span = rs > 1 ? ` rowspan="${rs}"` : '';
   const trStyle = p.medicaoFeita ? ' style="opacity:.75"' : '';
   const editar = !p.medicaoFeita
-    ? `<button class="coment-act" style="font-size:11px;opacity:.8" onclick="editarItensMedicao(${p.id})" title="${itens.length?'Editar quantidades':'Informar quantidades'}">${icL('pencil')} ${itens.length?'Editar':'Informar QTD'}</button>`
+    ? `<button class="coment-act" style="font-size:13px;opacity:.8" onclick="editarItensMedicao(${p.id})" title="${itens.length?'Editar quantidades':'Informar quantidades'}">${icL('pencil')} ${itens.length?'Editar':'Informar QTD'}</button>`
     : '';
   const celItem = it => `
     <td class="ppu-n med-it"><span class="med-ln">${it.linha}</span></td>
