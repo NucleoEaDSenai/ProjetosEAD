@@ -180,6 +180,11 @@ tr:hover td{background:#FAFAF9}
 .atr-at td.atr-nw{white-space:nowrap}
 .atr-pessoa{display:inline-flex;align-items:center;gap:6px;margin:2px 10px 2px 0;white-space:nowrap}
 .atr-av{width:24px;height:24px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:#fff;flex-shrink:0;letter-spacing:.2px}
+.atr-av[data-tip]{cursor:default}
+/* Legenda das bolinhas (data-tip) — ver avHtml */
+.av-tip{position:fixed;z-index:100000;pointer-events:none;background:#0F172A;color:#fff;font-size:11.5px;font-weight:600;padding:4px 9px;border-radius:6px;white-space:nowrap;box-shadow:0 4px 12px rgba(0,0,0,.18);opacity:0;transition:opacity .12s}
+.av-tip.on{opacity:1}
+body.dark .av-tip{background:#E2E8F0;color:#0F172A}
 .atr-bdg{display:inline-block;padding:2px 9px;border-radius:999px;font-size:11px;font-weight:700;white-space:nowrap;line-height:1.6}
 .atr-d1{background:#FEF3C7;color:#854D0E}
 .atr-d2{background:#FFEDD5;color:#9A3412}
@@ -3061,15 +3066,33 @@ function recTags(recs){
   if(!recs||!recs.length) return'<span style="color:var(--mu);font-size:11px">—</span>';
   return(recs||[]).map(r=>`<span class="rec-tag">${r}</span>`).join('');
 }
+// Bolinha de responsável sem o nome ao lado (Lista de Produtos, Medição, Produtos Cancelados).
+// Mesmo desenho e cor da aba Atrasos; o nome aparece numa legenda ao passar o mouse (data-tip).
 function avHtml(name){
-  // Usa cor fixa se o nome está no mapa, senão usa hash como fallback
-  const cor = NOME_CORES[name] || (() => { let h=0; for(let c of name)h=(h*31+c.charCodeAt(0))%COLS_AV.length; return COLS_AV[h]; })();
-  const ini = name.split(' ').slice(0,2).map(n=>n[0]).join('').toUpperCase();
-  return `<div class="av" style="background:${cor}" title="${name}">${ini}</div>`;
+  return `<span class="atr-av" role="img" aria-label="${esc(name)}" data-tip="${esc(name)}" style="background:${_atrCorAvatar(name)}">${esc(_atrIniciais(name))}</span>`;
 }
 function avList(resps){
-  return `<div style="display:flex;flex-wrap:wrap;gap:3px">${(resps||[]).map(avHtml).join('')}</div>`;
+  return `<div style="display:flex;flex-wrap:wrap;gap:4px">${(resps||[]).map(avHtml).join('')}</div>`;
 }
+// Legenda ao passar o mouse em qualquer elemento com data-tip (fica fixa na tela,
+// então não é cortada pela rolagem das tabelas)
+(function(){
+  let tip = null;
+  const esconder = () => { if(tip) tip.classList.remove('on'); };
+  document.addEventListener('mouseover', e => {
+    const alvo = e.target.closest && e.target.closest('[data-tip]');
+    if(!alvo){ esconder(); return; }
+    if(!tip){ tip = document.createElement('div'); tip.className = 'av-tip'; tip.setAttribute('aria-hidden','true'); document.body.appendChild(tip); }
+    tip.textContent = alvo.dataset.tip;
+    tip.classList.add('on');
+    const r = alvo.getBoundingClientRect(), w = tip.offsetWidth, h = tip.offsetHeight;
+    let x = r.left + r.width/2 - w/2, y = r.top - h - 6;
+    if(y < 4) y = r.bottom + 6;                                   // sem espaço em cima: mostra embaixo
+    x = Math.max(4, Math.min(x, window.innerWidth - w - 4));
+    tip.style.left = x + 'px'; tip.style.top = y + 'px';
+  });
+  document.addEventListener('scroll', esconder, true);
+})();
 function tagH(t){const m=TIMAP[t]||{l:t,c:'tdi'};return`<span class="tag ${m.c}">${m.l}</span>`}
 // ── ESCAPE HTML — sempre usar em dados digitados pelo usuário dentro de templates ──
 function esc(s){
@@ -5261,6 +5284,9 @@ function _atrBdgDias(d, prefixo){
 function _atrIniciais(n){
   if(n === 'Equipe') return 'EQ';
   if(n === 'Cliente') return 'CL';
+  // RPCI: "R" + inicial do nome — "RPCI - Débora (RT)" → "RD", "RPCI Dedicado - Daniela (DI)" → "RD"
+  const rpci = String(n).match(/^\s*RPCI\b[^-]*-\s*(\S)/i);
+  if(rpci) return ('R' + rpci[1]).toUpperCase();
   const p = String(n).trim().split(/\s+/);
   return ((p[0]?.[0]||'') + (p.length > 1 ? p[p.length-1][0] : (p[0]?.[1]||''))).toUpperCase();
 }
