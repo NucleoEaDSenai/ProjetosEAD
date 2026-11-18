@@ -5465,7 +5465,11 @@ function openDet(id, opts){
   const p=DB.find(x=>x.id===id);if(!p)return;
   _detAbertoId=id; _detPendente=false;
   const _prDet=projDoCard(p);
-  document.getElementById('detTitle').innerHTML=(_prDet?`<div style="font-size:11px;font-weight:700;color:var(--blue);text-transform:uppercase;letter-spacing:.4px;margin-bottom:2px"><span class="det-proj-ic">${icL('folder')}</span> ${esc(_prDet.nome)}</div>`:'')+esc(p.nome);
+  // ID do produto ao lado do nome do projeto (sem projeto vinculado, aparece sozinho na mesma linha)
+  const _idDet=`<span style="color:var(--mu);font-weight:700;margin-left:6px" title="ID do produto">#${esc(p.id)}</span>`;
+  document.getElementById('detTitle').innerHTML=(_prDet
+    ?`<div style="font-size:11px;font-weight:700;color:var(--blue);text-transform:uppercase;letter-spacing:.4px;margin-bottom:2px"><span class="det-proj-ic">${icL('folder')}</span> ${esc(_prDet.nome)}${_idDet}</div>`
+    :`<div style="font-size:11px;letter-spacing:.4px;margin-bottom:2px">${_idDet.replace('margin-left:6px','margin-left:0')}</div>`)+esc(p.nome);
 
   const{eq,cl}=delInf(p);
   const eRows=(p.etapas||[]).map((e,i)=>{
