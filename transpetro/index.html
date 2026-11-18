@@ -1098,6 +1098,14 @@ body.dark .tenant-item.current{background:rgba(34,197,94,.12)}
 .kc[data-col="14"] .kcard{border-left:3px solid #7C3AED}
 .btn-medicao{width:100%;margin-top:8px;padding:7px 10px;background:linear-gradient(135deg,#1A8A4A,#15803d);color:#fff;border:none;border-radius:7px;font-size:11.5px;font-weight:700;font-family:'Plus Jakarta Sans',sans-serif;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;transition:opacity .15s,transform .15s}
 .btn-medicao:hover{opacity:.88;transform:translateY(-1px)}
+/* Coluna do Kanban estreita (< ~215px, p.ex. com o menu lateral aberto): botões e selos do rodapé
+   do card ficam compactos para caber em uma linha. Medido pela largura real da coluna (container query). */
+.kc{container:kcol / inline-size}
+@container kcol (max-width:190px){
+  .btn-medicao{white-space:nowrap;padding:7px 6px;gap:4px;font-size:11px}
+  .badge-medicao-pend,.badge-medicao-ok{white-space:nowrap;padding:3px 6px;gap:3px;font-size:10.5px;max-width:100%}
+  .btn-medicao .ic.ic-inl,.badge-medicao-pend .ic.ic-inl,.badge-medicao-ok .ic.ic-inl{width:1em;height:1em}
+}
 .ic.ic-inl{display:inline-block;width:1.15em;height:1.15em;vertical-align:-.2em}
 /* Pasta amarela antes do nome do projeto, no topo do detalhe do card */
 .det-resp-row{display:inline-flex;align-items:center;gap:5px;vertical-align:middle}
