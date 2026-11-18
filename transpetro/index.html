@@ -5302,7 +5302,9 @@ function _avPar(n){
   return PASTEL_AV[s % PASTEL_AV.length];
 }
 // style="" da bolinha: fundo pastel + letra escura (mesma pessoa = mesma cor em todas as telas)
-function _avEstilo(n){ const [bg, fg] = _avPar(n); return `background:${bg};color:${fg}`; }
+// As cores vão por variável CSS: as regras automáticas do modo escuro (body.dark [style*="background:#DCFCE7"] etc.)
+// procuram "background:#…"/"color:#…" no style e escureceriam só o fundo, sumindo com a bolinha.
+function _avEstilo(n){ const [bg, fg] = _avPar(n); return `--av-bg:${bg};--av-fg:${fg};background:var(--av-bg);color:var(--av-fg)`; }
 function _atrPessoa(n){
   return `<span class="atr-pessoa"><span class="atr-av" style="${_avEstilo(n)}" aria-hidden="true">${esc(_atrIniciais(n))}</span>${esc(n)}</span>`;
 }
