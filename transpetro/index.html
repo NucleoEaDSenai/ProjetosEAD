@@ -5289,17 +5289,37 @@ function _atrIniciais(n){
   const p = String(n).trim().split(/\s+/);
   return ((p[0]?.[0]||'') + (p.length > 1 ? p[p.length-1][0] : (p[0]?.[1]||''))).toUpperCase();
 }
-// Bolinhas de pessoa em cores pastel: [fundo, letra escura do mesmo tom] — contraste ≥ 4.5:1
-const PASTEL_AV = [
-  ['#FDE2E4','#9F1239'], ['#DBEAFE','#1E40AF'], ['#DCFCE7','#166534'], ['#FEF3C7','#92400E'],
-  ['#EDE9FE','#5B21B6'], ['#CFFAFE','#155E75'], ['#FCE7F3','#9D174D'], ['#E0E7FF','#3730A3'],
-  ['#FFEDD5','#9A3412'], ['#D1FAE5','#065F46'], ['#F3E8FF','#6B21A8'], ['#E0F2FE','#075985'],
-];
+// Bolinhas de pessoa em cores pastel, uma cor diferente para cada responsável.
+// Paleta de 36 pastéis: 18 matizes a cada 20° em dois tons (claro e médio, deslocados 10°).
+// Cada pessoa conhecida ocupa uma vaga fixa pela ordem em que aparece nos cadastros abaixo
+// (NOME_CORES, NOMES, EMAIL_NOMES) — pessoa nova vai para o fim, sem mudar a cor de quem já existe.
+// Vagas seguidas ficam longe na roda de cores (passo de 7 matizes), então pessoas vizinhas na lista não se parecem.
+const _AV_MATIZES = 18;
+function _avCorDaVaga(v){
+  const tom = Math.floor(v / _AV_MATIZES) % 2;               // 0 = claro, 1 = médio
+  const h = ((v * 7) % _AV_MATIZES) * 20 + (tom ? 10 : 0);
+  return tom ? [`hsl(${h},62%,78%)`, `hsl(${h},75%,20%)`]
+             : [`hsl(${h},90%,89%)`, `hsl(${h},70%,26%)`];
+}
+let _avVagas = null;
+function _avVagaDe(n){
+  if(!_avVagas){
+    _avVagas = new Map();
+    const conhecidos = [
+      ...(typeof NOME_CORES  !== 'undefined' ? Object.keys(NOME_CORES)    : []),
+      ...(typeof NOMES       !== 'undefined' ? NOMES                      : []),
+      ...(typeof EMAIL_NOMES !== 'undefined' ? Object.values(EMAIL_NOMES) : []),
+    ];
+    for(const nome of conhecidos) if(!_avVagas.has(nome)) _avVagas.set(nome, _avVagas.size);
+  }
+  if(_avVagas.has(n)) return _avVagas.get(n);
+  let s = 0; for(const c of String(n)) s = (s*31 + c.charCodeAt(0)) >>> 0;   // nome fora dos cadastros
+  return s % (_AV_MATIZES * 2);
+}
 function _avPar(n){
   if(n === 'Cliente') return ['#EDE9FE','#5B21B6'];
   if(n === 'Equipe')  return ['#E2E8F0','#334155'];
-  let s = 0; for(const c of String(n)) s = (s*31 + c.charCodeAt(0)) >>> 0;
-  return PASTEL_AV[s % PASTEL_AV.length];
+  return _avCorDaVaga(_avVagaDe(n));
 }
 // style="" da bolinha: fundo pastel + letra escura (mesma pessoa = mesma cor em todas as telas)
 // As cores vão por variável CSS: as regras automáticas do modo escuro (body.dark [style*="background:#DCFCE7"] etc.)
