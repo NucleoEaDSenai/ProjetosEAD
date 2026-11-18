@@ -3068,7 +3068,7 @@ function recTags(recs){
 // Bolinha de responsável sem o nome ao lado (Lista de Produtos, Medição, Produtos Cancelados).
 // Mesmo desenho e cor da aba Atrasos; o nome aparece numa legenda ao passar o mouse (data-tip).
 function avHtml(name){
-  return `<span class="atr-av" role="img" aria-label="${esc(name)}" data-tip="${esc(name)}" style="background:${_atrCorAvatar(name)}">${esc(_atrIniciais(name))}</span>`;
+  return `<span class="atr-av" role="img" aria-label="${esc(name)}" data-tip="${esc(name)}" style="${_avEstilo(name)}">${esc(_atrIniciais(name))}</span>`;
 }
 function avList(resps){
   return `<div style="display:flex;flex-wrap:wrap;gap:4px">${(resps||[]).map(avHtml).join('')}</div>`;
@@ -5289,14 +5289,22 @@ function _atrIniciais(n){
   const p = String(n).trim().split(/\s+/);
   return ((p[0]?.[0]||'') + (p.length > 1 ? p[p.length-1][0] : (p[0]?.[1]||''))).toUpperCase();
 }
-function _atrCorAvatar(n){
-  if(n === 'Cliente') return '#7C3AED';
-  if(n === 'Equipe')  return '#64748B';
+// Bolinhas de pessoa em cores pastel: [fundo, letra escura do mesmo tom] — contraste ≥ 4.5:1
+const PASTEL_AV = [
+  ['#FDE2E4','#9F1239'], ['#DBEAFE','#1E40AF'], ['#DCFCE7','#166534'], ['#FEF3C7','#92400E'],
+  ['#EDE9FE','#5B21B6'], ['#CFFAFE','#155E75'], ['#FCE7F3','#9D174D'], ['#E0E7FF','#3730A3'],
+  ['#FFEDD5','#9A3412'], ['#D1FAE5','#065F46'], ['#F3E8FF','#6B21A8'], ['#E0F2FE','#075985'],
+];
+function _avPar(n){
+  if(n === 'Cliente') return ['#EDE9FE','#5B21B6'];
+  if(n === 'Equipe')  return ['#E2E8F0','#334155'];
   let s = 0; for(const c of String(n)) s = (s*31 + c.charCodeAt(0)) >>> 0;
-  return COLS_AV[s % COLS_AV.length];
+  return PASTEL_AV[s % PASTEL_AV.length];
 }
+// style="" da bolinha: fundo pastel + letra escura (mesma pessoa = mesma cor em todas as telas)
+function _avEstilo(n){ const [bg, fg] = _avPar(n); return `background:${bg};color:${fg}`; }
 function _atrPessoa(n){
-  return `<span class="atr-pessoa"><span class="atr-av" style="background:${_atrCorAvatar(n)}" aria-hidden="true">${esc(_atrIniciais(n))}</span>${esc(n)}</span>`;
+  return `<span class="atr-pessoa"><span class="atr-av" style="${_avEstilo(n)}" aria-hidden="true">${esc(_atrIniciais(n))}</span>${esc(n)}</span>`;
 }
 function _atrAberto(key, filtro){ return filtro ? !_atrFechadosFiltro.has(key) : _atrAbertos.has(key); }
 function _atrDomId(key){ return 'atr-' + String(key).replace(/[^A-Za-z0-9_-]/g, '_'); }
@@ -12504,7 +12512,6 @@ function _buildCargaCardPessoa(nome, projs, max, stOpen){
   const overload = projs.length >= 5 || atrasados >= 2;
   const corStatus = atrasados > 0 ? 'var(--red)' : projs.length >= 5 ? 'var(--yel)' : 'var(--blue)';
   const labelCarga = atrasados > 0 ? 'Atenção' : projs.length >= 5 ? 'Sobrecarga' : projs.length >= 3 ? 'Carga regular' : 'Carga leve';
-  const corPessoal = NOME_CORES[nome] || corStatus;
   const uid = 'carga_' + nome.replace(/\W/g,'_');
   const isOpen = stOpen[uid] === true;
   const filtro = _cargaAplicarFiltroCard(uid, projs);
@@ -12522,7 +12529,7 @@ function _buildCargaCardPessoa(nome, projs, max, stOpen){
 
   return `<div class="carga-card${overload?' over-load':''}">
     <div class="carga-hd" onclick="toggleCarga('${uid}')">
-      <div class="carga-av" style="background:${corPessoal}">
+      <div class="carga-av" style="${_avEstilo(nome)}">
         ${iniciais(nome)}
         ${atrasados>0?`<span class="carga-av-badge">${atrasados}</span>`:''}
       </div>
@@ -12686,7 +12693,7 @@ function _buildCargaProjCard(p, nome){
           <span class="lbl">${icL('users')} Responsáveis (Equipe)</span>
           <span class="val" style="display:flex;gap:5px;flex-wrap:wrap;align-items:center">
             ${(p.resps||[]).length
-              ? (p.resps||[]).map(r=>`<span style="display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:10px;background:var(--s2);font-size:11px;font-weight:600"><span style="width:16px;height:16px;border-radius:50%;background:${NOME_CORES[r]||'var(--blue)'};color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:8px;font-weight:800">${iniciais(r)}</span>${r}</span>`).join('')
+              ? (p.resps||[]).map(r=>`<span style="display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:10px;background:var(--s2);font-size:11px;font-weight:600"><span style="width:16px;height:16px;border-radius:50%;${_avEstilo(r)};display:inline-flex;align-items:center;justify-content:center;font-size:8px;font-weight:800">${iniciais(r)}</span>${r}</span>`).join('')
               : '<span style="color:var(--mu);font-style:italic;font-weight:400">Nenhum responsável</span>'}
           </span>
         </div>` : ''}
