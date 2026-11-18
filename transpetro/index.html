@@ -8187,7 +8187,9 @@ function openEdit(id){
   document.getElementById('ovNew').classList.add('on');
 }
 
-function salvar(){
+let _salvandoNovo = false;  // evita criar dois produtos com duplo clique enquanto o ID é reservado
+async function salvar(){
+  if(_salvandoNovo) return;
   const projCadId=document.getElementById('fProj').value||null;
   const _projAntes=editId?DB.find(x=>x.id===editId):null;
   // Projeto é obrigatório — exceto em card antigo que ainda não tem projeto vinculado.
@@ -8223,8 +8225,24 @@ function salvar(){
 
   const usuarioAtual = nomeUsuarioAtual();
   const projAnterior = editId?DB.find(x=>x.id===editId):null;
+
+  // Produto novo: reserva o ID no servidor (atômico). Sem conexão, não cria — o formulário fica aberto.
+  let novoId = null;
+  if(!editId){
+    _salvandoNovo = true;
+    const btnSalvar = document.querySelector('#ovNew button[onclick="salvar()"]');
+    if(btnSalvar) btnSalvar.disabled = true;
+    try{ novoId = await _reservarId(); }
+    catch(e){
+      console.error('Reserva de ID:', e);
+      showToast('⚠️ Sem conexão com o servidor — não foi possível criar o produto. Tente de novo.');
+      return;
+    }
+    finally{ _salvandoNovo = false; if(btnSalvar) btnSalvar.disabled = false; }
+  }
+
   const proj={
-    id:editId||NXT++, nome, projCadId,
+    id:editId||novoId, nome, projCadId,
     recursos:getSelectedRecs(), desc:projAnterior?.desc||'',
     col, resps,
     criado:getDateField('fcr')||td(),
@@ -8320,7 +8338,6 @@ function salvar(){
   }
   const _editadoId = editId; // guardar antes de renderAll limpar editId
   fbSalvarProjeto(proj);
-  fbSalvarNxt();
   cm('ovNew');
   renderAll(); // atualiza UI imediatamente sem esperar Firebase
   showToast(_editadoId?'✅ Projeto atualizado!':'✅ Projeto criado!');
@@ -11565,9 +11582,24 @@ function fbExcluirProjeto(id, projRef, motivo){
     .catch(e  => { setStatus('offline','Erro ao remover'); console.error(e); });
 }
 
-// ── SALVAR NXT ──
-function fbSalvarNxt(){
-  if(fbNxtRef) fbNxtRef.set(NXT);
+// ── ID DE PRODUTO NOVO ──
+// Maior ID entre os produtos carregados (rede de segurança do contador)
+function _maiorIdLocal(){ return DB.reduce((m, p) => Math.max(m, parseInt(p.id) || 0), 0); }
+
+// Reserva no servidor o próximo ID livre. transaction() é atômica: duas pessoas criando
+// ao mesmo tempo nunca recebem o mesmo número. O contador nunca fica abaixo do maior ID + 1.
+// Rejeita sem conexão (o Firebase só confirma a transação com o servidor).
+function _reservarId(){
+  if(!fbNxtRef) return Promise.reject(new Error('sem Firebase'));
+  const tx = fbNxtRef.transaction(atual => Math.max(parseInt(atual) || 1, _maiorIdLocal() + 1) + 1)
+    .then(r => {
+      if(!r.committed) throw new Error('reserva não confirmada');
+      const prox = parseInt(r.snapshot.val());
+      if(prox > NXT) NXT = prox;
+      return prox - 1;                       // o ID reservado é o anterior ao novo valor do contador
+    });
+  const limite = new Promise((_, rej) => setTimeout(() => rej(new Error('tempo esgotado')), 8000));
+  return Promise.race([tx, limite]);
 }
 
 // ── SALVAR UM PROJETO CADASTRADO (transpetro/cadprojetos/{pushKey}) ──
@@ -11765,10 +11797,13 @@ function escutarFirebase(db){
         });
         document.getElementById('pageTitle').textContent='Cards';
       }
+    // Contador local nunca abaixo do maior ID existente + 1 (só memória, não grava)
+    NXT = Math.max(NXT, _maiorIdLocal() + 1);
     _agendarRender();
   });
 
-  // NXT — só atualiza se o valor remoto for maior (nunca reduz)
+  // NXT — só atualiza se o valor remoto for maior (nunca reduz).
+  // Usado só para exibição/conferência: o ID de produto novo vem sempre de _reservarId().
   fbNxtRef.on('value', snap => {
     const v = parseInt(snap.val()) || 1;
     if(v > NXT) NXT = v;
@@ -12677,7 +12712,12 @@ async function duplicarProjeto(id){
   if(!await confirmar({titulo:'Duplicar produto?', msg:`Será criada uma cópia de **${orig.nome}** com as mesmas etapas e dados, sem o histórico de execução.`, ok:'Duplicar', ic:'copy'})) return;
   const usuario = nomeUsuarioAtual();
   const novo = JSON.parse(JSON.stringify(orig));
-  novo.id = NXT++;
+  try{ novo.id = await _reservarId(); }   // ID reservado no servidor (atômico)
+  catch(e){
+    console.error('Reserva de ID:', e);
+    showToast('⚠️ Sem conexão com o servidor — não foi possível duplicar o produto. Tente de novo.');
+    return;
+  }
   novo.nome = 'Cópia de ' + orig.nome;
   novo.criado = td();
   novo.cancelado = false; novo.cancelEm = ''; novo.cancelMotivo = '';
@@ -12690,7 +12730,7 @@ async function duplicarProjeto(id){
   novo.historico = [{usuario, acao:'duplicou', dt:dtAgora(), desc:`Duplicado de "${orig.nome}"`}];
   novo.etapas = (orig.etapas||[]).map(e => ({...e, done:false, fim:null, atrasoMotivo:null, diasCl:null, solicPrazo:null}));
   DB.push(novo);
-  fbSalvarProjeto(novo); fbSalvarNxt();
+  fbSalvarProjeto(novo);
   renderAll();
   showToast('📋 Projeto duplicado com sucesso!');
 }
