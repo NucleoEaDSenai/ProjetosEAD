@@ -147,8 +147,8 @@ tr:hover td{background:#FAFAF9}
 .atr-resumo{margin-left:auto;align-self:center;font-size:12.5px;color:var(--mu);font-weight:600;white-space:nowrap}
 .atr-resumo strong{color:var(--txt)}
 .atr-scroll{overflow-x:auto;border-radius:12px}
-.atr-tbl{min-width:960px;background:#fff;border:1px solid #E7E5E0;border-radius:12px;overflow:hidden}
-.atr-cols{display:grid;grid-template-columns:28px minmax(220px,2.2fr) 90px 150px minmax(200px,2fr) 110px;gap:12px;align-items:center;padding:0 16px}
+.atr-tbl{min-width:760px;background:#fff;border:1px solid #E7E5E0;border-radius:12px;overflow:hidden}
+.atr-cols{display:grid;grid-template-columns:28px minmax(260px,1fr) 90px 170px 110px;gap:12px;align-items:center;padding:0 16px}
 .atr-hd{padding-top:10px;padding-bottom:10px;background:var(--thead);border-bottom:1px solid var(--thead);font-size:11px;font-weight:700;color:#E2E8F0;text-transform:uppercase;letter-spacing:.4px}
 .atr-pj{border-bottom:1px solid #E7E5E0}
 .atr-pj:last-child{border-bottom:none}
@@ -160,7 +160,6 @@ tr:hover td{background:#FAFAF9}
 [aria-expanded="true"]>.atr-chev,[aria-expanded="true"] .atr-chev{transform:rotate(90deg)}
 .atr-pj-nome{font-weight:700;font-size:13px;color:var(--blue);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .atr-num{font-weight:700;font-variant-numeric:tabular-nums}
-.atr-resps{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--mu)}
 .atr-pj-body{padding:4px 16px 14px 44px;background:#FAFAF8}
 .atr-pd{background:#fff;border:1px solid #E7E5E0;border-radius:12px;margin-top:10px;overflow:hidden}
 .atr-pd-hd{display:flex;align-items:stretch}
@@ -5342,14 +5341,12 @@ function _atrRenderTabela(grupos, filtro){
     return `<div class="atr-vazio">${filtro ? 'Nenhuma atividade em atraso com esses filtros.' : 'Nenhuma atividade em atraso.'}</div>`;
   const linhas = grupos.map(pj => {
     const key = 'pj:' + pj.key, aberto = _atrAberto(key, filtro), bodyId = _atrDomId(key);
-    const resps = pj.resps.join(', ');
     return `<div class="atr-pj">
       <button type="button" class="atr-pj-btn atr-cols" data-atr-key="${esc(key)}" aria-expanded="${aberto}" aria-controls="${bodyId}" onclick="_atrToggle(this)">
         <svg class="ic atr-chev" aria-hidden="true"><use href="#i-chevron-right"/></svg>
         <span class="atr-pj-nome">${esc(pj.nome)}</span>
         <span class="atr-num">${pj.produtos.length}</span>
         <span class="atr-num">${pj.nAtiv}</span>
-        <span class="atr-resps" title="${esc(resps)}">${esc(resps)}</span>
         <span>${_atrBdgDias(pj.max, true)}</span>
       </button>
       <div class="atr-pj-body" id="${bodyId}"${aberto?'':' hidden'}>
@@ -5358,7 +5355,7 @@ function _atrRenderTabela(grupos, filtro){
     </div>`;
   }).join('');
   return `<div class="atr-scroll"><div class="atr-tbl" role="region" aria-label="Atividades em atraso por projeto">
-    <div class="atr-cols atr-hd" aria-hidden="true"><span></span><span>Projeto</span><span>Produtos</span><span>Atividades em atraso</span><span>Responsáveis</span><span>Maior atraso</span></div>
+    <div class="atr-cols atr-hd" aria-hidden="true"><span></span><span>Projeto</span><span>Produtos</span><span>Atividades em atraso</span><span>Maior atraso</span></div>
     ${linhas}
   </div></div>`;
 }
