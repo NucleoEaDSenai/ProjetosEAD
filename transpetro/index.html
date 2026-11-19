@@ -235,6 +235,13 @@ body.dark .av-tip{background:#E2E8F0;color:#0F172A}
 .resp-wrap{display:flex;flex-wrap:wrap;gap:4px;margin-top:4px}
 .resp-chip{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:20px;font-size:11.5px;font-weight:500;border:1px solid var(--bdr);background:var(--s2);cursor:pointer;transition:all .15s;user-select:none}
 .resp-chip.sel{background:var(--blue);color:#fff;border-color:var(--blue)}
+#respChips .resp-chip{font-family:inherit;color:var(--txt);padding:3px 11px 3px 3px;gap:6px;font-size:12px;min-height:30px}
+#respChips .resp-chip.sel{color:#fff}
+body.dark #respChips .resp-chip.sel{color:#0F1115}
+.resp-av{width:24px;height:24px;border-radius:999px;display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;flex-shrink:0;letter-spacing:.2px}
+#respChips{display:block}
+.resp-grupo{margin-bottom:12px}
+.resp-grupo .rec-grupo{margin:0 0 4px}
 /* PROGRESS */
 .pw{display:flex;align-items:center;gap:6px}
 .pb{flex:1;height:6px;background:var(--bdr);border-radius:3px;overflow:hidden;min-width:60px}
@@ -751,6 +758,36 @@ body.dark .btn-lim-n{background:#F9C4C9;color:#3B0D12}
 .rec-wrap{display:flex;flex-wrap:wrap;gap:5px;margin-top:5px}
 .rec-chip{display:inline-flex;align-items:center;gap:3px;padding:4px 10px;border-radius:20px;font-size:12px;font-weight:500;border:1px solid var(--bdr);background:var(--s2);cursor:pointer;transition:all .15s;user-select:none;line-height:1.2}
 .rec-chip.sel{background:var(--blue);color:#fff;border-color:var(--blue)}
+/* Linhas de serviço no formulário do produto: chips do selecionado + categorias + busca + lista */
+.ls-chips{display:flex;flex-wrap:wrap;gap:6px;align-items:center;min-height:30px;margin:5px 0 8px}
+.ls-chip{display:inline-flex;align-items:center;gap:2px;padding:3px 3px 3px 10px;border-radius:999px;background:var(--info-bg);color:var(--info-fg);font-size:12px;font-weight:600}
+.ls-chip button{width:22px;height:22px;border:none;background:transparent;color:inherit;border-radius:999px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center}
+.ls-chip button:hover{background:rgba(0,61,165,.12)}
+.ls-chip .ic{width:12px;height:12px}
+.ls-limpar{border:none;background:transparent;color:var(--blue);font-size:12px;font-weight:700;cursor:pointer;padding:4px 6px;font-family:inherit}
+.ls-vazio{font-size:12.5px;color:var(--mu)}
+.ls-box{display:grid;grid-template-columns:210px minmax(0,1fr);grid-template-rows:minmax(0,1fr);border:1px solid var(--bdr);border-radius:10px;overflow:hidden;height:300px}
+.ls-cats{min-height:0;background:var(--s2);border-right:1px solid var(--bdr);padding:6px;overflow:auto;display:flex;flex-direction:column;gap:2px}
+.ls-cat{display:flex;align-items:center;justify-content:space-between;gap:6px;width:100%;min-height:36px;padding:0 10px;border:none;border-radius:7px;background:transparent;color:var(--txt);font-size:12.5px;font-weight:600;text-align:left;cursor:pointer;font-family:inherit}
+.ls-cat:hover{background:var(--surface)}
+.ls-cat.on{background:var(--surface);color:var(--blue);box-shadow:inset 3px 0 0 var(--blue)}
+.ls-cat small{font-size:11px;font-weight:700;color:var(--mu);white-space:nowrap}
+.ls-cat small.tem{color:var(--blue)}
+.ls-main{display:flex;flex-direction:column;min-width:0;min-height:0}
+.ls-lista{min-height:0;overscroll-behavior:contain}
+.ls-busca{display:flex;align-items:center;gap:8px;padding:0 12px;border-bottom:1px solid var(--bdr)}
+.ls-busca .ic{width:15px;height:15px;color:var(--mu);flex-shrink:0}
+.ls-busca input{flex:1;min-width:0;height:40px;border:none;outline:none;background:transparent;color:var(--txt);font-size:13px;font-family:inherit}
+.ls-lista{flex:1;overflow:auto;padding:4px}
+.ls-item{display:flex;align-items:center;gap:9px;min-height:38px;padding:4px 10px;border-radius:7px;cursor:pointer;font-size:12.5px}
+.ls-item:hover{background:var(--s2)}
+.ls-item.sel{background:var(--info-bg);font-weight:600}
+.ls-item input{width:16px;height:16px;accent-color:var(--blue);margin:0;flex-shrink:0}
+.ls-item small{margin-left:auto;font-size:11px;color:var(--mu);font-weight:500;white-space:nowrap}
+.ls-nada{padding:24px;text-align:center;color:var(--mu);font-size:12.5px}
+@media (max-width:640px){.ls-box{grid-template-columns:1fr;height:auto}.ls-cats{flex-direction:row;flex-wrap:wrap;border-right:none;border-bottom:1px solid var(--bdr)}.ls-cat{width:auto}.ls-lista{max-height:260px}}
+.ef-resumo{display:flex;flex-wrap:wrap;gap:6px 18px;align-items:center;background:var(--info-bg);color:var(--info-fg);border-radius:8px;padding:8px 12px;margin-bottom:10px;font-size:12.5px}
+.ef-resumo b{font-weight:800}
 /* TAG recursos */
 .rec-tag{display:inline-block;padding:1px 6px;border-radius:4px;font-size:10px;font-weight:600;background:#E0F2FE;color:#075985;margin:1px;max-width:100%;white-space:normal;overflow-wrap:anywhere;vertical-align:top}
 @media(max-width:1300px){.sts{grid-template-columns:repeat(3,1fr)}.kg{grid-template-columns:1fr 1fr}}
@@ -2678,7 +2715,7 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
   <div class="mbody">
     <div class="tabs">
       <div class="tab on" onclick="stab(0,this)"><svg class="ic ic-inl" aria-hidden="true"><use href="#i-folder"/></svg> Dados Gerais</div>
-      <div class="tab" onclick="stab(2,this)"><svg class="ic ic-inl" aria-hidden="true"><use href="#i-users"/></svg> Equipe &amp; Etapas</div>
+      <div class="tab" onclick="stab(2,this)"><svg class="ic ic-inl" aria-hidden="true"><use href="#i-users"/></svg> Equipe</div>
       <div class="tab" onclick="stab(1,this)"><svg class="ic ic-inl" aria-hidden="true"><use href="#i-calendar"/></svg> Datas &amp; Prazos</div>
     </div>
     <!-- TAB 0 -->
@@ -2691,7 +2728,7 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
             <button type="button" class="btn bg2 bsm" onclick="openNovoCadProj(true)" title="Cadastrar um novo projeto">+ novo</button>
           </div>
         </div>
-        <div class="fg ff"><label class="fl" for="fn">Nome do Produto *</label><input class="fi" id="fn" placeholder="Ex: Vídeo de abertura — Módulo 3" aria-required="true" aria-label="Nome do produto"></div>
+        <div class="fg ff"><label class="fl" for="fn">Nome do Produto *</label><select class="fs" id="fn" aria-required="true"></select></div>
         <div class="fg2" style="grid-template-columns:1fr 1fr 1fr;gap:10px">
           <div class="fg">
             <label class="fl" for="fPrio">Prioridade</label>
@@ -2737,8 +2774,8 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
           </select>
         </div>
         <div class="fg ff">
-          <label class="fl">Linhas de serviço — selecione uma ou mais</label>
-          <div class="rec-wrap" id="recChips"></div>
+          <label class="fl" for="lsBusca">Linhas de serviço — selecione uma ou mais</label>
+          <div id="recChips"></div>
         </div>
         <!-- Descrição, Objetivo e Público-Alvo vêm do projeto selecionado (só leitura) -->
         <div class="fg ff"><label class="fl">Descrição <span style="font-weight:400;text-transform:none;color:var(--mu)">(do projeto — edite na tela Projetos)</span></label><div class="proj-ro" id="fProjDesc"></div></div>
@@ -2763,24 +2800,23 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
             <option value="14">Projetos Concluídos</option>
           </select>
         </div>
-        <div class="fg"><label class="fl">Data de Início Real</label><div style="display:flex;gap:5px;align-items:center"><input class="fi" type="number" id="fi_d" placeholder="DD" min="1" max="31" style="width:58px" onchange="onDataInicioChange()"><input class="fi" type="number" id="fi_m" placeholder="MM" min="1" max="12" style="width:58px" onchange="onDataInicioChange()"><input class="fi" type="number" id="fi_a" placeholder="AAAA" min="2020" max="2099" style="width:80px" onchange="onDataInicioChange()"><button type="button" class="mcal-btn" title="Abrir calendário" aria-label="Abrir calendário" onclick="_abrirMcalTriplet('fi')"><svg class="ic" aria-hidden="true"><use href="#i-calendar"/></svg></button></div></div>
-        <div class="fg"><label class="fl" id="lblPrazo">Prazo de Entrega</label><div style="display:flex;gap:5px;align-items:center"><input class="fi" type="number" id="fp_d" placeholder="DD" min="1" max="31" style="width:58px"><input class="fi" type="number" id="fp_m" placeholder="MM" min="1" max="12" style="width:58px"><input class="fi" type="number" id="fp_a" placeholder="AAAA" min="2020" max="2099" style="width:80px"><button type="button" class="mcal-btn" title="Abrir calendário" aria-label="Abrir calendário" onclick="_abrirMcalTriplet('fp')"><svg class="ic" aria-hidden="true"><use href="#i-calendar"/></svg></button></div></div>
+        <!-- Início e prazo do produto não são mais digitados: vêm das etapas (1ª Data Inicial e última Data Final).
+             Os campos ficam ocultos porque o cronograma automático ainda os usa. -->
+        <div hidden><input id="fi_d"><input id="fi_m"><input id="fi_a"><input id="fp_d"><input id="fp_m"><input id="fp_a"></div>
         <div class="fg ff"><label class="fl">Observação sobre Prazo</label><textarea class="fta" id="fpo" placeholder="Ex: cliente solicitou extensão..."></textarea></div>
       </div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin:18px 0 10px;flex-wrap:wrap;gap:8px">
+        <div style="font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:11px;color:var(--mu);text-transform:uppercase;letter-spacing:.5px">Etapas de Desenvolvimento</div>
+      </div>
+      <div id="efResumo" class="ef-resumo" aria-live="polite"></div>
+      <div id="etapasForm"></div>
     </div>
     <!-- TAB 2 -->
     <div id="tab2" style="display:none">
-      <div class="fg" style="margin-bottom:16px">
+      <div class="fg">
         <label class="fl">Responsável(is) — selecione um ou mais</label>
         <div class="resp-wrap" id="respChips"></div>
       </div>
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;flex-wrap:wrap;gap:8px">
-        <div style="font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:11px;color:var(--mu);text-transform:uppercase;letter-spacing:.5px">Etapas de Desenvolvimento</div>
-        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
-
-        </div>
-      </div>
-      <div id="etapasForm"></div>
     </div>
   </div>
   <div class="mft">
@@ -5515,7 +5551,7 @@ function openDet(id, opts){
         </select></span>
         ${_etapaRespExtrasHtml(p, e, i)}
       </td>
-      <!-- Datas só para visualizar: a edição fica em Editar → Equipe & Etapas -->
+      <!-- Datas só para visualizar: a edição fica em Editar → Datas & Prazos -->
       <td style="white-space:nowrap;font-size:11.5px;color:${e.dataInicial?'var(--txt)':'#94A3B8'}">${e.dataInicial?fd(e.dataInicial):'—'}</td>
       <td style="white-space:nowrap">
         ${ETAPAS_SEM_PRAZO_AUTO.has(e.lb)
@@ -5525,7 +5561,7 @@ function openDet(id, opts){
       </td>
       <td style="text-align:center">
         <input type="number" class="ii" min="1" step="1" value="${_duracaoEtapaDU(e)||''}" placeholder="—"
-          onchange="setEDur(${id},${i},this.value)" ${e.dataInicial?'':'disabled title="Defina a data inicial em Editar → Equipe & Etapas"'}
+          onchange="setEDur(${id},${i},this.value)" ${e.dataInicial?'':'disabled title="Defina a data inicial em Editar → Datas & Prazos"'}
           aria-label="Duração em dias úteis de ${esc(e.lb)}" style="padding:3px 5px;font-size:11px;width:58px;text-align:center">
       </td>
       <td style="white-space:nowrap;color:var(--green)">${fd(e.fim)||'—'}</td>
@@ -6879,16 +6915,71 @@ function stab(n,el){
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));el.classList.add('on');
 }
 
-function buildRecChips(selected){
+// ── NOME DO PRODUTO (seleção única) ──
+// Futuro: cada nome de produto vai definir quais Linhas de serviço aparecem no formulário.
+const NOMES_PRODUTO = ['PICV','CURSO ONLINE','BANCO DE QUESTÕES DA AVALIAÇÃO','VÍDEO TUTORIAL','CARTAZ'];
+function buildNomeProdutoSelect(atual){
+  const el = document.getElementById('fn'); if(!el) return;
+  // Produto antigo com nome fora da lista: mantém o nome como opção para não trocar sem querer ao salvar
+  const extra = atual && !NOMES_PRODUTO.includes(atual) ? `<option value="${esc(atual)}">${esc(atual)} (nome atual)</option>` : '';
+  el.innerHTML = '<option value="">— Selecione o produto —</option>' + extra
+    + NOMES_PRODUTO.map(n => `<option value="${esc(n)}">${esc(n)}</option>`).join('');
+  el.value = atual || '';
+}
+
+// ── LINHAS DE SERVIÇO (formulário do produto): chips + categorias + busca + lista ──
+let _recSel = [];      // linhas selecionadas, na ordem em que foram escolhidas
+let _recCat = -1;      // categoria aberta (-1 = todas)
+let _recBusca = '';
+let _recVisiveis = []; // linhas mostradas na lista (o índice é usado nos onchange)
+function _recGrupos(){
   const agrupados = new Set(RECURSO_GRUPOS.flatMap(g => g.recursos));
   const outros = RECURSOS.filter(r => !agrupados.has(r));
-  const grupos = outros.length ? [...RECURSO_GRUPOS, {titulo:'Outros', ic:'folder', recursos:outros}] : RECURSO_GRUPOS;
-  document.getElementById('recChips').innerHTML=grupos.map(g=>`
-    <div class="rec-grupo">${g.ic ? icL(g.ic) : ''} ${g.titulo}</div>
-    ${g.recursos.filter(r=>RECURSOS.includes(r)).map(r=>`
-    <div class="rec-chip ${(selected||[]).includes(r)?'sel':''}" onclick="toggleRec(this,'${r}')">${r}</div>`).join('')}
-  `).join('');
+  return (outros.length ? [...RECURSO_GRUPOS, {titulo:'Outros', ic:'folder', recursos:outros}] : RECURSO_GRUPOS)
+    .map(g => ({...g, recursos: g.recursos.filter(r => RECURSOS.includes(r))}));
 }
+function buildRecChips(selected){
+  _recSel = [...new Set(selected||[])];
+  _recCat = -1; _recBusca = '';
+  document.getElementById('recChips').innerHTML = `
+    <div class="ls-chips" id="lsChips"></div>
+    <div class="ls-box">
+      <div class="ls-cats" id="lsCats" role="group" aria-label="Categorias de linhas de serviço"></div>
+      <div class="ls-main">
+        <div class="ls-busca"><svg class="ic" aria-hidden="true"><use href="#i-search"/></svg><input id="lsBusca" type="search" placeholder="Buscar linha de serviço…" autocomplete="off" oninput="_recBusca=this.value;_recRender()"></div>
+        <div class="ls-lista" id="lsLista" role="group" aria-label="Linhas de serviço"></div>
+      </div>
+    </div>`;
+  _recRender();
+}
+function _recRender(focoK){
+  const norm = s => String(s).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'');
+  const grupos = _recGrupos();
+  const todas = grupos.flatMap(g => g.recursos);
+  const catDe = r => grupos.find(g => g.recursos.includes(r))?.titulo || '';
+  const chips = document.getElementById('lsChips'); if(!chips) return;
+  chips.innerHTML = _recSel.length
+    ? _recSel.map((r,i) => `<span class="ls-chip">${esc(r)}<button type="button" onclick="_recRemover(${i})" aria-label="Remover ${esc(r)}"><svg class="ic" aria-hidden="true"><use href="#i-x"/></svg></button></span>`).join('')
+      + '<button type="button" class="ls-limpar" onclick="_recLimpar()">Limpar</button>'
+    : '<span class="ls-vazio">Nenhuma linha selecionada.</span>';
+  const btnCat = (idx, titulo, lista) => {
+    const n = lista.filter(r => _recSel.includes(r)).length, on = _recCat === idx;
+    return `<button type="button" class="ls-cat${on?' on':''}" aria-pressed="${on}" onclick="_recCat=${idx};_recRender()"><span>${esc(titulo)}</span><small class="${n?'tem':''}">${n}/${lista.length}</small></button>`;
+  };
+  document.getElementById('lsCats').innerHTML = btnCat(-1, 'Todas', todas) + grupos.map((g,i) => btnCat(i, g.titulo, g.recursos)).join('');
+  const base = _recCat >= 0 && grupos[_recCat] ? grupos[_recCat].recursos : todas;
+  const termos = norm(_recBusca).split(/\s+/).filter(Boolean);
+  _recVisiveis = base.filter(r => termos.every(t => norm(r + ' ' + catDe(r)).includes(t)));
+  const lista = document.getElementById('lsLista');
+  lista.innerHTML = _recVisiveis.length
+    ? _recVisiveis.map((r,k) => { const on = _recSel.includes(r);
+        return `<label class="ls-item${on?' sel':''}"><input type="checkbox" data-k="${k}"${on?' checked':''} onchange="_recToggleIdx(${k})"><span>${esc(r)}</span>${_recCat < 0 ? `<small>${esc(catDe(r))}</small>` : ''}</label>`; }).join('')
+    : `<div class="ls-nada">Nenhuma linha encontrada${_recBusca ? ` para “${esc(_recBusca)}”` : ''}.</div>`;
+  if(focoK !== undefined) lista.querySelector(`input[data-k="${focoK}"]`)?.focus();
+}
+function _recToggleIdx(k){ const r = _recVisiveis[k]; if(r) toggleRec(r, k); }
+function _recRemover(i){ const r = _recSel[i]; if(r) toggleRec(r); }
+function _recLimpar(){ if(!_recSel.length) return; _recSel = []; _recRender(); _recAposMudar(); }
 // Atualiza visual e estado readonly do campo Prazo conforme recurso selecionado
 function atualizarEstadoPrazo(){
   const selecionados = getSelectedRecs();
@@ -7310,8 +7401,13 @@ function _efOnChangePrazo(i){
   }, 150);
 }
 
-async function toggleRec(el, recurso){
-  el.classList.toggle('sel');
+function toggleRec(recurso, focoK){
+  _recSel = _recSel.includes(recurso) ? _recSel.filter(r => r !== recurso) : [..._recSel, recurso];
+  _recRender(focoK);
+  _recAposMudar();
+}
+// Depois de mudar as linhas de serviço: aplica o modelo de etapas / cronograma do recurso
+async function _recAposMudar(){
   atualizarEstadoPrazo();
 
   const selecionados = getSelectedRecs();
@@ -7424,16 +7520,36 @@ async function toggleRec(el, recurso){
 }
 
 function getSelectedRecs(){
-  return [...document.querySelectorAll('#recChips .rec-chip.sel')].map(el=>el.textContent.trim());
+  return [..._recSel];
 }
+// Grupos da aba Equipe do formulário. Quem não se encaixa em nenhum grupo aparece em "Outros".
+const RESP_GRUPOS = [
+  {titulo:'Designer Instrucional', ic:'pencil',  tem: n => ['Ana Paula','Amanda'].includes(n) || /^RPCI\b.*\(DI\)/i.test(n)},
+  {titulo:'Designer Multimídia',   ic:'monitor', tem: n => n === 'Gabriel'},
+  {titulo:'Revisora',              ic:'book-open', tem: n => n === 'Tatiana'},
+  {titulo:'Liderança',             ic:'users',   tem: n => /^Liderança\b/i.test(n)},
+];
 function buildRespChips(selected){
-  document.getElementById('respChips').innerHTML=NOMES.map(n=>`
-    <div class="resp-chip ${(selected||[]).includes(n)?'sel':''}" onclick="toggleResp(this,'${n}')">${n}</div>
-  `).join('');
+  const sel = selected || [];
+  // Nomes salvos que não estão mais em NOMES continuam aparecendo (em "Outros") para não sumirem ao salvar
+  const todos = [...NOMES, ...sel.filter(n => !NOMES.includes(n))];
+  const usados = new Set();
+  const grupos = RESP_GRUPOS.map(g => { const nomes = todos.filter(n => !usados.has(n) && g.tem(n)); nomes.forEach(n => usados.add(n)); return {...g, nomes}; });
+  const outros = todos.filter(n => !usados.has(n));
+  if(outros.length) grupos.push({titulo:'Outros', ic:'user', nomes:outros});
+  const chip = n => { const on = sel.includes(n);
+    return `<button type="button" class="resp-chip${on?' sel':''}" data-nome="${esc(n)}" aria-pressed="${on}" onclick="toggleResp(this)">`
+      + `<span class="resp-av" aria-hidden="true" style="${_avEstilo(n)}">${esc(_atrIniciais(n))}</span>${esc(n)}</button>`; };
+  document.getElementById('respChips').innerHTML = grupos.filter(g => g.nomes.length).map(g => `
+    <div class="resp-grupo">
+      <div class="rec-grupo">${icL(g.ic)} ${esc(g.titulo)}</div>
+      <div class="resp-wrap">${g.nomes.map(chip).join('')}</div>
+    </div>`).join('');
 }
 
-function toggleResp(el, name){
+function toggleResp(el){
   el.classList.toggle('sel');
+  el.setAttribute('aria-pressed', el.classList.contains('sel'));
   // Se a tabela de etapas já está aberta, re-sincroniza e re-renderiza
   // preservando prazos e nomes já digitados
   if(document.getElementById('etapasForm')?.innerHTML){
@@ -7443,7 +7559,7 @@ function toggleResp(el, name){
 }
 
 function getSelectedResps(){
-  return [...document.querySelectorAll('#respChips .resp-chip.sel')].map(el=>el.textContent);
+  return [...document.querySelectorAll('#respChips .resp-chip.sel')].map(el=>el.dataset.nome);
 }
 
 // Estado temporário das etapas no formulário (array mutável durante edição)
@@ -7577,7 +7693,7 @@ function _renderEF(){
             </div>
           </td>
           <td>
-            <input class="fi ii" type="date" id="ef_ini_${i}" value="${e.dataInicial||''}" onchange="_efEtapas[${i}].dataInicial=this.value||null;_efDuUpd(${i})"
+            <input class="fi ii" type="date" id="ef_ini_${i}" value="${e.dataInicial||''}" onchange="_efEtapas[${i}].dataInicial=this.value||null;_efDuUpd(${i});_efResumoUpd()"
               aria-label="Data inicial de ${esc(e.lb||'')}" style="width:100%;padding:5px 4px;font-size:11.5px">
           </td>
           <td>
@@ -7625,6 +7741,7 @@ function _renderEF(){
         </tr>
       </tbody>
     </table>`;
+  _efResumoUpd();
 }
 
 // Lê estado atual dos inputs para _efEtapas antes de operar
@@ -7738,6 +7855,24 @@ function _efSync(){
       _prazoAntes: e._prazoAntes !== undefined ? e._prazoAntes : novoPrazo,
     };
   });
+  _efResumoUpd();
+}
+
+// Início e prazo do produto vêm das etapas: Data Inicial da 1ª etapa que tem data
+// e Data Final da última etapa que tem data. Sem nenhuma data nas etapas, fica o valor que já estava salvo.
+function _efDatasDerivadas(){
+  const ini = _efEtapas.find(e => e.dataInicial)?.dataInicial || null;
+  const fim = [..._efEtapas].reverse().find(e => e.prazo && !ETAPAS_SEM_PRAZO_AUTO.has(e.lb))?.prazo || null;
+  return {ini, fim};
+}
+function _efResumoUpd(){
+  const {ini, fim} = _efDatasDerivadas();
+  if(ini) iso2dma(ini, 'fi');
+  if(fim) iso2dma(fim, 'fp');
+  const el = document.getElementById('efResumo'); if(!el) return;
+  const i = getDateField('fi'), f = getDateField('fp');
+  el.innerHTML = `<span>Início do produto: <b>${i ? fd(i) : '—'}</b></span><span>Prazo final: <b>${f ? fd(f) : '—'}</b></span>`
+    + '<span style="opacity:.8">Calculados pelas etapas: 1ª Data Inicial e última Data Final</span>';
 }
 
 async function _efDel(i){
@@ -8145,7 +8280,8 @@ function rCadProjExcluidos(){
 function openNew(){
   editId=null;
   document.getElementById('mNewTitle').textContent='Novo Produto';
-  ['fn','fpo'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('fpo').value='';
+  buildNomeProdutoSelect('');
   buildProjSelect(null);
   onChangeProjSel();
   const prioEl=document.getElementById('fPrio');if(prioEl)prioEl.value='';_prioIcUpd();
@@ -8173,13 +8309,13 @@ function openNew(){
   _efTemplateTrocado = false;
   buildEF(ETPS_DEF.map(e=>({...e,prazo:null})));
   document.getElementById('ovNew').classList.add('on');
-  setTimeout(()=>{const f=document.querySelector('#ovNew .fi');if(f)f.focus();},80);
+  setTimeout(()=>{const f=document.getElementById('fProj');if(f)f.focus();},80);
 }
 
 function openEdit(id){
   const p=DB.find(x=>x.id===id);if(!p)return;
   editId=id; document.getElementById('mNewTitle').textContent='Editar Produto';
-  document.getElementById('fn').value=p.nome;
+  buildNomeProdutoSelect(p.nome||'');
   buildProjSelect(p.projCadId||null);
   onChangeProjSel();
   const _pe=document.getElementById('fPrio');if(_pe)_pe.value=p.prioridade||'';_prioIcUpd();
@@ -8235,7 +8371,7 @@ async function salvar(){
     showToast('❌ O projeto selecionado foi excluído — escolha outro');return;
   }
   const nome=document.getElementById('fn').value.trim();
-  if(!nome){showToast('❌ Informe o nome do produto');return;}
+  if(!nome){stab(0,document.querySelectorAll('.tab')[0]);document.getElementById('fn')?.focus();showToast('❌ Selecione o nome do produto');return;}
   const resps=getSelectedResps();
   if(!resps.length){showToast('❌ Selecione ao menos um responsável');return;}
   if(document.getElementById('fAcademia')?.value==='ECorp' && _relevanciaDoForm()===null){
@@ -12326,7 +12462,7 @@ function _populateCargaFiltros(membros, ativos){
       `<label class="ms-opt"><input type="checkbox" value="${r}" onchange="_msChange('cargaResp')"${sel.includes(r)?' checked':''}> ${r}</label>`
     ).join('');
     const itemCliente = hasCliente
-      ? `<label class="ms-opt"><input type="checkbox" value="__cliente__" onchange="_msChange('cargaResp')"${sel.includes('__cliente__')?' checked':''}> 🏢 Cliente</label>`
+      ? `<label class="ms-opt"><input type="checkbox" value="__cliente__" onchange="_msChange('cargaResp')"${sel.includes('__cliente__')?' checked':''}> Cliente</label>`
       : '';
     ddR.innerHTML = itensPessoas + (itensPessoas && itemCliente ? '<div class="ms-sep"></div>' : '') + itemCliente
       + '<div class="ms-sep"></div><div class="ms-clear" data-ms-clear="cargaResp">✕ Limpar</div>';
