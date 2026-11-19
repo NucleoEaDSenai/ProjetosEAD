@@ -8253,13 +8253,13 @@ function rCadProjetos(){
     const podeExcluir = lider && !prods.length;
     const motivoBloq = !lider ? 'Apenas lideranças podem excluir projetos' : 'Projeto com produtos não pode ser excluído';
     return `<tr class="cadproj-row" tabindex="0" title="Clique para ver as informações do projeto" aria-label="Ver informações do projeto ${esc(pr.nome)}"
-      onclick="if(!event.target.closest('button,[onclick*=openDet]'))abrirProjInfo('${esc(pr.id)}')"
+      onclick="if(!event.target.closest('button,.cp-prod'))abrirProjInfo('${esc(pr.id)}')"
       onkeydown="if((event.key==='Enter'||event.key===' ')&&event.target===this){event.preventDefault();abrirProjInfo('${esc(pr.id)}')}">
       <td><strong style="color:var(--blue)">${esc(pr.nome)}</strong><div style="font-size:11px;color:var(--mu);margin-top:2px">Criado em ${fd(pr.criado)}${pr.criadoPor?' · '+esc(nomeExibicao(pr.criadoPor)):''}</div></td>
       <td>${txt(pr.descricao)}</td>
       <td>${txt(pr.objetivo)}</td>
       <td>${txt(pr.publico)}</td>
-      <td>${prods.length ? prods.map(p => `<div><span style="cursor:pointer;color:var(--blue)" onclick="openDet(${p.id})">${esc(p.nome)}</span>${p.cancelado?' <span style="color:var(--mu);font-size:11px">(cancelado)</span>':''}</div>`).join('') : '<span style="color:var(--mu)">Nenhum produto</span>'}</td>
+      <td>${prods.length ? prods.map(p => `<div><span class="cp-prod" style="cursor:pointer;color:var(--blue)" onclick="openDet(${p.id})">${esc(p.nome)}</span>${p.cancelado?' <span style="color:var(--mu);font-size:11px">(cancelado)</span>':''}</div>`).join('') : '<span style="color:var(--mu)">Nenhum produto</span>'}</td>
       <td style="white-space:nowrap">
         <button class="btn bg2 bsm" onclick="openEditCadProj('${esc(pr.id)}')" title="Editar projeto" aria-label="Editar projeto ${esc(pr.nome)}">${icL('pencil')}</button>
         <button class="btn bg2 bsm" onclick="excluirCadProj('${esc(pr.id)}')" ${podeExcluir?'':'disabled style="opacity:.4;cursor:not-allowed"'} title="${podeExcluir?'Excluir projeto':motivoBloq}" aria-label="${podeExcluir?'Excluir projeto '+esc(pr.nome):motivoBloq}">${icL(lider?'trash':'lock')}</button>
