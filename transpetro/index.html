@@ -222,6 +222,9 @@ body.dark .av-tip{background:#E2E8F0;color:#0F172A}
 .rec-grupo .ic{color:var(--blue);width:13px;height:13px;vertical-align:-2px;margin-right:2px}
 .proj-ro{background:var(--s2);border:1px solid var(--bdr);border-radius:7px;padding:8px 10px;font-size:12.5px;color:var(--txt);min-height:36px;white-space:pre-wrap;word-break:break-word}
 .proj-ro.vazio{color:var(--mu);font-style:italic}
+.cadproj-row{cursor:pointer}.cadproj-row:hover td{background:var(--s2)}.cadproj-row:focus-visible{outline:3px solid #005FCC;outline-offset:-3px}
+.projinfo-prod{display:flex;align-items:center;gap:10px;width:100%;min-height:42px;padding:6px 12px;border:1px solid var(--bdr);border-radius:8px;background:var(--surface);color:var(--txt);font:inherit;font-size:13px;text-align:left;cursor:pointer}
+.projinfo-prod:hover{border-color:var(--blue);background:var(--s2)}
 .cadproj-txt{font-size:12px;color:var(--mu);max-width:240px;white-space:pre-wrap;word-break:break-word;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
 .kdates{font-size:10px;color:var(--mu);display:flex;flex-direction:column;gap:2px;margin-bottom:6px}
 .kdates .ov{color:var(--red);font-weight:700}
@@ -2777,10 +2780,6 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
           <label class="fl" for="lsBusca">Linhas de serviço — selecione uma ou mais</label>
           <div id="recChips"></div>
         </div>
-        <!-- Descrição, Objetivo e Público-Alvo vêm do projeto selecionado (só leitura) -->
-        <div class="fg ff"><label class="fl">Descrição <span style="font-weight:400;text-transform:none;color:var(--mu)">(do projeto — edite na tela Projetos)</span></label><div class="proj-ro" id="fProjDesc"></div></div>
-        <div class="fg ff"><label class="fl">Objetivo</label><div class="proj-ro" id="fProjObj"></div></div>
-        <div class="fg ff"><label class="fl">Público-Alvo</label><div class="proj-ro" id="fProjPub"></div></div>
 
       </div>
     </div>
@@ -2890,6 +2889,21 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
     <button class="btn bg2" onclick="cm('ovDelMotivo')">Voltar</button>
     <button class="btn bd" onclick="confirmarDelMotivo()"><svg class="ic ic-inl" aria-hidden="true"><use href="#i-trash"/></svg> Confirmar Exclusão</button>
   </div>
+</div>
+</div>
+
+<!-- MODAL: INFORMAÇÕES DO PROJETO (abre ao clicar num projeto na tela Projetos) -->
+<div class="ov2" id="ovProjInfo" role="dialog" aria-modal="true" aria-labelledby="projInfoTitle">
+<div class="modal" style="width:720px">
+  <div class="mhd">
+    <div style="min-width:0">
+      <div class="mt" id="projInfoTitle"></div>
+      <div id="projInfoSub" style="font-size:12px;color:var(--mu);margin-top:3px"></div>
+    </div>
+    <button class="mcl" onclick="cm('ovProjInfo')" aria-label="Fechar">✕</button>
+  </div>
+  <div class="mbody" id="projInfoBody"></div>
+  <div class="mft" id="projInfoFt"></div>
 </div>
 </div>
 
@@ -7525,9 +7539,10 @@ function getSelectedRecs(){
 // Grupos da aba Equipe do formulário. Quem não se encaixa em nenhum grupo aparece em "Outros".
 const RESP_GRUPOS = [
   {titulo:'Designer Instrucional', ic:'pencil',  tem: n => ['Ana Paula','Amanda'].includes(n) || /^RPCI\b.*\(DI\)/i.test(n)},
-  {titulo:'Designer Multimídia',   ic:'monitor', tem: n => n === 'Gabriel'},
-  {titulo:'Revisora',              ic:'book-open', tem: n => n === 'Tatiana'},
+  {titulo:'Designer Multimídia',   ic:'monitor', tem: n => n === 'Gabriel' || /^RPCI\b.*\(DM\)/i.test(n)},
+  {titulo:'Revisor(a)',            ic:'book-open', tem: n => n === 'Tatiana' || /^RPCI\b.*\(RT\)/i.test(n)},
   {titulo:'Liderança',             ic:'users',   tem: n => /^Liderança\b/i.test(n)},
+  {titulo:'Estagiários(as)',       ic:'graduation', tem: n => ['Pedro','Maycon'].includes(n)},
 ];
 function buildRespChips(selected){
   const sel = selected || [];
@@ -8066,21 +8081,9 @@ function buildProjSelect(selId){
     ordenados.map(c => `<option value="${esc(c.id)}" ${c.id===selId?'selected':''}>${esc(c.nome)}</option>`).join('');
 }
 
-// Preenche Descrição/Objetivo/Público-Alvo (só leitura) com os dados do projeto escolhido
-function onChangeProjSel(){
-  const id = document.getElementById('fProj').value || null;
-  const pr = CADPROJ.find(c => c.id === id);
-  // Card antigo sem projeto: mostra a descrição que ele já tinha
-  const descAntiga = !pr && editId ? (DB.find(x => x.id === editId)?.desc || '') : '';
-  const preencher = (elId, txt) => {
-    const el = document.getElementById(elId);
-    el.textContent = txt || (pr || descAntiga ? '—' : 'Selecione um projeto');
-    el.classList.toggle('vazio', !txt);
-  };
-  preencher('fProjDesc', pr ? pr.descricao : descAntiga);
-  preencher('fProjObj',  pr?.objetivo);
-  preencher('fProjPub',  pr?.publico);
-}
+// Troca de projeto no formulário do produto. Descrição/Objetivo/Público-Alvo saíram do formulário
+// (ficam no pop-up do projeto, na tela Projetos); a função fica como ponto de extensão.
+function onChangeProjSel(){}
 
 function openNovoCadProj(doProduto){
   _cadProjEditId = null;
@@ -8249,18 +8252,61 @@ function rCadProjetos(){
     const prods = DB.filter(p => p.projCadId === pr.id);
     const podeExcluir = lider && !prods.length;
     const motivoBloq = !lider ? 'Apenas lideranças podem excluir projetos' : 'Projeto com produtos não pode ser excluído';
-    return `<tr>
-      <td><strong>${esc(pr.nome)}</strong><div style="font-size:11px;color:var(--mu);margin-top:2px">Criado em ${fd(pr.criado)}${pr.criadoPor?' · '+esc(nomeExibicao(pr.criadoPor)):''}</div></td>
+    return `<tr class="cadproj-row" tabindex="0" title="Clique para ver as informações do projeto" aria-label="Ver informações do projeto ${esc(pr.nome)}"
+      onclick="if(!event.target.closest('button,.cp-prod'))abrirProjInfo('${esc(pr.id)}')"
+      onkeydown="if((event.key==='Enter'||event.key===' ')&&event.target===this){event.preventDefault();abrirProjInfo('${esc(pr.id)}')}">
+      <td><strong style="color:var(--blue)">${esc(pr.nome)}</strong><div style="font-size:11px;color:var(--mu);margin-top:2px">Criado em ${fd(pr.criado)}${pr.criadoPor?' · '+esc(nomeExibicao(pr.criadoPor)):''}</div></td>
       <td>${txt(pr.descricao)}</td>
       <td>${txt(pr.objetivo)}</td>
       <td>${txt(pr.publico)}</td>
-      <td>${prods.length ? prods.map(p => `<div><span style="cursor:pointer;color:var(--blue)" onclick="openDet(${p.id})">${esc(p.nome)}</span>${p.cancelado?' <span style="color:var(--mu);font-size:11px">(cancelado)</span>':''}</div>`).join('') : '<span style="color:var(--mu)">Nenhum produto</span>'}</td>
+      <td>${prods.length ? prods.map(p => `<div><span class="cp-prod" style="cursor:pointer;color:var(--blue)" onclick="openDet(${p.id})">${esc(p.nome)}</span>${p.cancelado?' <span style="color:var(--mu);font-size:11px">(cancelado)</span>':''}</div>`).join('') : '<span style="color:var(--mu)">Nenhum produto</span>'}</td>
       <td style="white-space:nowrap">
         <button class="btn bg2 bsm" onclick="openEditCadProj('${esc(pr.id)}')" title="Editar projeto" aria-label="Editar projeto ${esc(pr.nome)}">${icL('pencil')}</button>
         <button class="btn bg2 bsm" onclick="excluirCadProj('${esc(pr.id)}')" ${podeExcluir?'':'disabled style="opacity:.4;cursor:not-allowed"'} title="${podeExcluir?'Excluir projeto':motivoBloq}" aria-label="${podeExcluir?'Excluir projeto '+esc(pr.nome):motivoBloq}">${icL(lider?'trash':'lock')}</button>
       </td>
     </tr>`;
   }).join('');
+}
+
+// Pop-up com as informações de um projeto (tela Projetos)
+function abrirProjInfo(id){
+  const pr = CADPROJ.find(c => c.id === id); if(!pr) return;
+  const prods = DB.filter(p => p.projCadId === pr.id);
+  const ativos = prods.filter(p => !p.cancelado);
+  const sitLab = {concluido:'Concluído', andamento:'Em Andamento', atrasado:'Atrasado', aguardando:'Aguardando'};
+  const sitCor = {concluido:'var(--ok-bg);color:var(--ok-fg)', andamento:'var(--info-bg);color:var(--info-fg)', atrasado:'var(--danger-bg);color:var(--danger-fg)', aguardando:'var(--neutral-bg);color:var(--neutral-fg)'};
+  const cont = {}; ativos.forEach(p => { const s = calcSit(p); cont[s] = (cont[s]||0) + 1; });
+  const caixa = 'background:var(--s2);border-radius:8px;padding:12px;font-size:13px;line-height:1.5;color:var(--txt);white-space:pre-wrap;word-break:break-word';
+  const bloco = (lb, v) => `<div style="${caixa}"><div class="fl" style="margin-bottom:5px;color:var(--blue);font-weight:800">${lb}</div>${v ? linkify(v) : '<span style="color:var(--mu)">Não informado</span>'}</div>`;
+  const resumo = Object.keys(sitLab).filter(k => cont[k]).map(k =>
+    `<span style="font-size:11.5px;font-weight:700;padding:3px 9px;border-radius:999px;background:${sitCor[k]}">${cont[k]} ${sitLab[k].toLowerCase()}</span>`).join('');
+  const linhaProd = p => {
+    const s = p.cancelado ? null : calcSit(p);
+    return `<button type="button" class="projinfo-prod" onclick="cm('ovProjInfo');openDet(${p.id})">
+      <span style="color:var(--mu);font-weight:700;font-size:12px">#${esc(p.id)}</span>
+      <span style="flex:1;min-width:0;font-weight:600">${esc(p.nome)}</span>
+      <span style="font-size:11.5px;color:var(--mu)">${esc(colLabel(p.col))}</span>
+      ${p.cancelado ? '<span style="font-size:11px;font-weight:700;padding:2px 8px;border-radius:999px;background:var(--neutral-bg);color:var(--neutral-fg)">Cancelado</span>'
+                    : `<span style="font-size:11px;font-weight:700;padding:2px 8px;border-radius:999px;background:${sitCor[s]||sitCor.aguardando}">${sitLab[s]||s}</span>`}
+    </button>`;
+  };
+  document.getElementById('projInfoTitle').textContent = pr.nome;
+  document.getElementById('projInfoSub').textContent = `Criado em ${fd(pr.criado)}${pr.criadoPor ? ' · ' + nomeExibicao(pr.criadoPor) : ''}`;
+  document.getElementById('projInfoBody').innerHTML = `
+    <div style="display:grid;gap:10px;margin-bottom:18px">
+      ${bloco('Descrição', pr.descricao)}
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:10px">${bloco('Objetivo', pr.objetivo)}${bloco('Público-Alvo', pr.publico)}</div>
+    </div>
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;margin-bottom:8px">
+      <div class="fl" style="margin:0">Produtos (${prods.length})</div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap">${resumo}</div>
+    </div>
+    ${prods.length ? `<div style="display:flex;flex-direction:column;gap:4px">${[...ativos, ...prods.filter(p => p.cancelado)].map(linhaProd).join('')}</div>`
+                   : '<div style="color:var(--mu);font-size:13px;padding:14px;text-align:center;background:var(--s2);border-radius:8px">Nenhum produto neste projeto.</div>'}`;
+  document.getElementById('projInfoFt').innerHTML = `
+    <button class="btn bg2" onclick="cm('ovProjInfo')">Fechar</button>
+    <button class="btn bb" onclick="cm('ovProjInfo');openEditCadProj('${esc(pr.id)}')">${icL('pencil')} Editar projeto</button>`;
+  document.getElementById('ovProjInfo').classList.add('on');
 }
 
 // ── TELA DELETADOS: seção "Projetos excluídos" ──
