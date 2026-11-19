@@ -12326,7 +12326,7 @@ function _populateCargaFiltros(membros, ativos){
       `<label class="ms-opt"><input type="checkbox" value="${r}" onchange="_msChange('cargaResp')"${sel.includes(r)?' checked':''}> ${r}</label>`
     ).join('');
     const itemCliente = hasCliente
-      ? `<label class="ms-opt"><input type="checkbox" value="__cliente__" onchange="_msChange('cargaResp')"${sel.includes('__cliente__')?' checked':''}> 🏢 Cliente</label>`
+      ? `<label class="ms-opt"><input type="checkbox" value="__cliente__" onchange="_msChange('cargaResp')"${sel.includes('__cliente__')?' checked':''}> Cliente</label>`
       : '';
     ddR.innerHTML = itensPessoas + (itensPessoas && itemCliente ? '<div class="ms-sep"></div>' : '') + itemCliente
       + '<div class="ms-sep"></div><div class="ms-clear" data-ms-clear="cargaResp">✕ Limpar</div>';
