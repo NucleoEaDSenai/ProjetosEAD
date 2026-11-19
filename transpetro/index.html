@@ -235,6 +235,13 @@ body.dark .av-tip{background:#E2E8F0;color:#0F172A}
 .resp-wrap{display:flex;flex-wrap:wrap;gap:4px;margin-top:4px}
 .resp-chip{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:20px;font-size:11.5px;font-weight:500;border:1px solid var(--bdr);background:var(--s2);cursor:pointer;transition:all .15s;user-select:none}
 .resp-chip.sel{background:var(--blue);color:#fff;border-color:var(--blue)}
+#respChips .resp-chip{font-family:inherit;color:var(--txt);padding:3px 11px 3px 3px;gap:6px;font-size:12px;min-height:30px}
+#respChips .resp-chip.sel{color:#fff}
+body.dark #respChips .resp-chip.sel{color:#0F1115}
+.resp-av{width:24px;height:24px;border-radius:999px;display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;flex-shrink:0;letter-spacing:.2px}
+#respChips{display:block}
+.resp-grupo{margin-bottom:12px}
+.resp-grupo .rec-grupo{margin:0 0 4px}
 /* PROGRESS */
 .pw{display:flex;align-items:center;gap:6px}
 .pb{flex:1;height:6px;background:var(--bdr);border-radius:3px;overflow:hidden;min-width:60px}
@@ -759,14 +766,15 @@ body.dark .btn-lim-n{background:#F9C4C9;color:#3B0D12}
 .ls-chip .ic{width:12px;height:12px}
 .ls-limpar{border:none;background:transparent;color:var(--blue);font-size:12px;font-weight:700;cursor:pointer;padding:4px 6px;font-family:inherit}
 .ls-vazio{font-size:12.5px;color:var(--mu)}
-.ls-box{display:grid;grid-template-columns:210px minmax(0,1fr);border:1px solid var(--bdr);border-radius:10px;overflow:hidden;height:300px}
-.ls-cats{background:var(--s2);border-right:1px solid var(--bdr);padding:6px;overflow:auto;display:flex;flex-direction:column;gap:2px}
+.ls-box{display:grid;grid-template-columns:210px minmax(0,1fr);grid-template-rows:minmax(0,1fr);border:1px solid var(--bdr);border-radius:10px;overflow:hidden;height:300px}
+.ls-cats{min-height:0;background:var(--s2);border-right:1px solid var(--bdr);padding:6px;overflow:auto;display:flex;flex-direction:column;gap:2px}
 .ls-cat{display:flex;align-items:center;justify-content:space-between;gap:6px;width:100%;min-height:36px;padding:0 10px;border:none;border-radius:7px;background:transparent;color:var(--txt);font-size:12.5px;font-weight:600;text-align:left;cursor:pointer;font-family:inherit}
 .ls-cat:hover{background:var(--surface)}
 .ls-cat.on{background:var(--surface);color:var(--blue);box-shadow:inset 3px 0 0 var(--blue)}
 .ls-cat small{font-size:11px;font-weight:700;color:var(--mu);white-space:nowrap}
 .ls-cat small.tem{color:var(--blue)}
-.ls-main{display:flex;flex-direction:column;min-width:0}
+.ls-main{display:flex;flex-direction:column;min-width:0;min-height:0}
+.ls-lista{min-height:0;overscroll-behavior:contain}
 .ls-busca{display:flex;align-items:center;gap:8px;padding:0 12px;border-bottom:1px solid var(--bdr)}
 .ls-busca .ic{width:15px;height:15px;color:var(--mu);flex-shrink:0}
 .ls-busca input{flex:1;min-width:0;height:40px;border:none;outline:none;background:transparent;color:var(--txt);font-size:13px;font-family:inherit}
@@ -7514,14 +7522,34 @@ async function _recAposMudar(){
 function getSelectedRecs(){
   return [..._recSel];
 }
+// Grupos da aba Equipe do formulário. Quem não se encaixa em nenhum grupo aparece em "Outros".
+const RESP_GRUPOS = [
+  {titulo:'Designer Instrucional', ic:'pencil',  tem: n => ['Ana Paula','Amanda'].includes(n) || /^RPCI\b.*\(DI\)/i.test(n)},
+  {titulo:'Designer Multimídia',   ic:'monitor', tem: n => n === 'Gabriel'},
+  {titulo:'Revisora',              ic:'book-open', tem: n => n === 'Tatiana'},
+  {titulo:'Liderança',             ic:'users',   tem: n => /^Liderança\b/i.test(n)},
+];
 function buildRespChips(selected){
-  document.getElementById('respChips').innerHTML=NOMES.map(n=>`
-    <div class="resp-chip ${(selected||[]).includes(n)?'sel':''}" onclick="toggleResp(this,'${n}')">${n}</div>
-  `).join('');
+  const sel = selected || [];
+  // Nomes salvos que não estão mais em NOMES continuam aparecendo (em "Outros") para não sumirem ao salvar
+  const todos = [...NOMES, ...sel.filter(n => !NOMES.includes(n))];
+  const usados = new Set();
+  const grupos = RESP_GRUPOS.map(g => { const nomes = todos.filter(n => !usados.has(n) && g.tem(n)); nomes.forEach(n => usados.add(n)); return {...g, nomes}; });
+  const outros = todos.filter(n => !usados.has(n));
+  if(outros.length) grupos.push({titulo:'Outros', ic:'user', nomes:outros});
+  const chip = n => { const on = sel.includes(n);
+    return `<button type="button" class="resp-chip${on?' sel':''}" data-nome="${esc(n)}" aria-pressed="${on}" onclick="toggleResp(this)">`
+      + `<span class="resp-av" aria-hidden="true" style="${_avEstilo(n)}">${esc(_atrIniciais(n))}</span>${esc(n)}</button>`; };
+  document.getElementById('respChips').innerHTML = grupos.filter(g => g.nomes.length).map(g => `
+    <div class="resp-grupo">
+      <div class="rec-grupo">${icL(g.ic)} ${esc(g.titulo)}</div>
+      <div class="resp-wrap">${g.nomes.map(chip).join('')}</div>
+    </div>`).join('');
 }
 
-function toggleResp(el, name){
+function toggleResp(el){
   el.classList.toggle('sel');
+  el.setAttribute('aria-pressed', el.classList.contains('sel'));
   // Se a tabela de etapas já está aberta, re-sincroniza e re-renderiza
   // preservando prazos e nomes já digitados
   if(document.getElementById('etapasForm')?.innerHTML){
@@ -7531,7 +7559,7 @@ function toggleResp(el, name){
 }
 
 function getSelectedResps(){
-  return [...document.querySelectorAll('#respChips .resp-chip.sel')].map(el=>el.textContent);
+  return [...document.querySelectorAll('#respChips .resp-chip.sel')].map(el=>el.dataset.nome);
 }
 
 // Estado temporário das etapas no formulário (array mutável durante edição)
