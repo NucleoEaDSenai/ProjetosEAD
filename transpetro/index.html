@@ -7525,9 +7525,10 @@ function getSelectedRecs(){
 // Grupos da aba Equipe do formulário. Quem não se encaixa em nenhum grupo aparece em "Outros".
 const RESP_GRUPOS = [
   {titulo:'Designer Instrucional', ic:'pencil',  tem: n => ['Ana Paula','Amanda'].includes(n) || /^RPCI\b.*\(DI\)/i.test(n)},
-  {titulo:'Designer Multimídia',   ic:'monitor', tem: n => n === 'Gabriel'},
-  {titulo:'Revisora',              ic:'book-open', tem: n => n === 'Tatiana'},
+  {titulo:'Designer Multimídia',   ic:'monitor', tem: n => n === 'Gabriel' || /^RPCI\b.*\(DM\)/i.test(n)},
+  {titulo:'Revisor(a)',            ic:'book-open', tem: n => n === 'Tatiana' || /^RPCI\b.*\(RT\)/i.test(n)},
   {titulo:'Liderança',             ic:'users',   tem: n => /^Liderança\b/i.test(n)},
+  {titulo:'Estagiários(as)',       ic:'graduation', tem: n => ['Pedro','Maycon'].includes(n)},
 ];
 function buildRespChips(selected){
   const sel = selected || [];
