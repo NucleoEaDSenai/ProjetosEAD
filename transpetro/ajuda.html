@@ -265,7 +265,17 @@ body.dark .fato .ic{color:var(--tp-y)}
 .clausula .ic{font-size:22px;color:var(--k)}
 .clausula b{display:block;font:700 14.5px/1.3 'Plus Jakarta Sans',sans-serif;margin:8px 0 4px}
 .clausula span{font-size:13px;color:var(--mu);line-height:1.5}
-.esteira{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px;counter-reset:est}
+.esteira-wrap{counter-reset:est}   /* numeração contínua entre os 3 blocos */
+.esteira{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px}
+.est-seta{display:flex;justify-content:center;color:var(--tp);font-size:22px;margin:6px 0}
+body.dark .est-seta{color:var(--tp-y)}
+.est-dev{border:2px dashed var(--tp);border-radius:16px;padding:16px;background:color-mix(in srgb,var(--tp) 6%,var(--bg))}
+.esteira.est-centro{grid-template-columns:minmax(0,320px);justify-content:center}
+.est-dev .esteira{grid-template-columns:repeat(auto-fill,minmax(200px,1fr))}
+.est-dev-hd{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+.est-dev-tag{display:inline-flex;align-items:center;gap:7px;background:var(--tp);color:#fff;font:700 12.5px/1 'Plus Jakarta Sans',sans-serif;letter-spacing:.4px;text-transform:uppercase;padding:8px 12px;border-radius:8px}
+.est-dev-tag .ic{color:var(--tp-y)}
+.est-dev-sub{font-size:13px;color:var(--mu)}
 .esteira li{counter-increment:est;background:var(--surface);border:1px solid var(--bdr);border-radius:12px;padding:14px 16px 14px 60px;position:relative;min-height:84px}
 .esteira li::before{content:counter(est);position:absolute;left:14px;top:14px;width:32px;height:32px;border-radius:50%;background:var(--k,var(--tp));color:var(--ko,#fff);font:800 14px/32px 'Plus Jakarta Sans',sans-serif;text-align:center}
 .esteira b{display:flex;align-items:center;gap:7px;font:700 14.5px/1.3 'Plus Jakarta Sans',sans-serif;margin-bottom:3px}
@@ -499,15 +509,31 @@ body.dark .fato .ic{color:var(--tp-y)}
   <div class="ctr-sec">
     <h2><svg class="ic"><use href="#i-refresh"/></svg>Como uma demanda vira entrega</h2>
     <p>Toda nova necessidade de capacitação passa pela mesma esteira:</p>
-    <ol class="esteira">
-      <li><b><svg class="ic"><use href="#i-mail"/></svg>Demanda</b><span>A Transpetro identifica uma necessidade de capacitação.</span></li>
-      <li class="dest" style="--k:var(--tp-y);--ko:#1B1B1B"><b><svg class="ic"><use href="#i-handshake"/></svg>Reunião de kickoff</b><span>As partes se reúnem e formalizam a entrada da demanda na esteira de produção.</span></li>
-      <li><b><svg class="ic"><use href="#i-clipboard-list"/></svg>Escopo, solução e prazos</b><span>Define-se o que será produzido, em qual formato e até quando.</span></li>
-      <li><b><svg class="ic"><use href="#i-kanban"/></svg>Produção</b><span>A equipe da Firjan SENAI desenvolve os produtos, etapa por etapa.</span></li>
-      <li><b><svg class="ic"><use href="#i-badge-check"/></svg>Entrega e homologação</b><span>Os produtos são entregues e homologados pelo cliente.</span></li>
-      <li class="dest" style="--k:var(--tp-y);--ko:#1B1B1B"><b><svg class="ic"><use href="#i-receipt"/></svg>Medição no RAMP</b><span>Os recursos finalizados e entregues são registrados no <strong>Relatório de Acompanhamento Mensal do Projeto (RAMP)</strong>.</span></li>
-      <li><b><svg class="ic"><use href="#i-circle-dollar"/></svg>Faturamento</b><span>O RAMP é a base do faturamento, conforme as condições de pagamento do contrato.</span></li>
-    </ol>
+    <div class="esteira-wrap">
+      <ol class="esteira est-centro">
+        <li><b><svg class="ic"><use href="#i-mail"/></svg>Demanda</b><span>A Transpetro identifica uma necessidade de capacitação.</span></li>
+      </ol>
+      <div class="est-seta" aria-hidden="true"><svg class="ic"><use href="#i-chevron-down"/></svg></div>
+      <!-- Do kickoff até a entrega: tudo faz parte da Etapa de Desenvolvimento -->
+      <section class="est-dev" aria-labelledby="estDevT">
+        <div class="est-dev-hd">
+          <span class="est-dev-tag" id="estDevT"><svg class="ic"><use href="#i-briefcase"/></svg>Etapa de Desenvolvimento</span>
+          <span class="est-dev-sub">Do kickoff até a entrega</span>
+        </div>
+        <ol class="esteira">
+          <li class="dest" style="--k:var(--tp-y);--ko:#1B1B1B"><b><svg class="ic"><use href="#i-handshake"/></svg>Reunião de kickoff</b><span>As partes se reúnem e formalizam a entrada da demanda na esteira de produção.</span></li>
+          <li><b><svg class="ic"><use href="#i-clipboard-list"/></svg>Escopo, solução e prazos</b><span>Define-se o que será produzido, em qual formato e até quando.</span></li>
+          <li><b><svg class="ic"><use href="#i-kanban"/></svg>Produção</b><span>A equipe da Firjan SENAI desenvolve os produtos, etapa por etapa.</span></li>
+          <li><b><svg class="ic"><use href="#i-package"/></svg>Entrega</b><span>Os produtos finalizados são entregues ao cliente.</span></li>
+        </ol>
+      </section>
+      <div class="est-seta" aria-hidden="true"><svg class="ic"><use href="#i-chevron-down"/></svg></div>
+      <ol class="esteira">
+        <li><b><svg class="ic"><use href="#i-badge-check"/></svg>Homologação</b><span>O cliente avalia e homologa os produtos entregues.</span></li>
+        <li class="dest" style="--k:var(--tp-y);--ko:#1B1B1B"><b><svg class="ic"><use href="#i-receipt"/></svg>Medição no RAMP</b><span>Os recursos finalizados e entregues são registrados no <strong>Relatório de Acompanhamento Mensal do Projeto (RAMP)</strong>.</span></li>
+        <li><b><svg class="ic"><use href="#i-circle-dollar"/></svg>Faturamento</b><span>O RAMP é a base do faturamento, conforme as condições de pagamento do contrato.</span></li>
+      </ol>
+    </div>
   </div>
 
   <div class="ctr-sec">
