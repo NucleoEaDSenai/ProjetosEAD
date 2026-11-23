@@ -2590,12 +2590,6 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
               <div class="ms-dropdown" id="msDd_medConf"></div>
             </div>
           </div>
-          <div class="fg-sm"><label class="fl-sm">Responsável</label>
-            <div class="ms-wrap" id="msWrap_medResp">
-              <button class="ms-btn" id="msBtn_medResp" onclick="_msToggle('medResp')">Todos</button>
-              <div class="ms-dropdown" id="msDd_medResp"></div>
-            </div>
-          </div>
           <div class="fg-sm"><label class="fl-sm">Linha(s) de Serviço(s)</label>
             <div class="ms-wrap" id="msWrap_medRec">
               <button class="ms-btn" id="msBtn_medRec" onclick="_msToggle('medRec')">Todos</button>
@@ -3972,7 +3966,7 @@ function _msUpdateBtn(id){
   if(!btn) return;
   const labels={
     'lProj':'Todos','lResp':'Todos','lSit':'Todas','lRec':'Todos','lPrio':'Todas','lAcad':'Todas','lRel':'Todas','lCol':'Todas','lPrazo':'Todas','lPrazoEt':'Todas',
-    'medConf':'Todos','medResp':'Todos','medRec':'Todos','medStat':'Todos',
+    'medConf':'Todos','medRec':'Todos','medStat':'Todos',
     'cargaResp':'Todos','cargaStat':'Todos','cargaRec':'Todos','cargaPrio':'Todas',
     'kProj':'Todos','kResp':'Todos','kSit':'Todas','kAcad':'Todas','kRel':'Todas','kCol':'Todas','kPrazo':'Todas','kPrazoEt':'Todas',
     'homSol':'Todos','homEnv':'Todos','homMed':'Todos'
@@ -10019,7 +10013,7 @@ function toggleMedGroup(id){
 }
 
 function limparMedFilts(){
-  ['medConf','medResp','medRec','medStat'].forEach(id=>{
+  ['medConf','medRec','medStat'].forEach(id=>{
     const dd=document.getElementById('msDd_'+id);
     if(dd) dd.querySelectorAll('input[type=checkbox]').forEach(cb=>cb.checked=false);
     _msUpdateBtn(id);
@@ -10038,15 +10032,6 @@ function _populateMedFiltros(lista){
       : '<div style="padding:10px 12px;font-size:11.5px;color:var(--mu);font-style:italic">Nenhuma medição confirmada ainda</div>')
       + '<div class="ms-sep"></div><div class="ms-clear" data-ms-clear="medConf">✕ Limpar</div>';
     _msUpdateBtn('medConf');
-  }
-  // Responsável
-  const resps = [...new Set(lista.flatMap(p=>p.resps||[]))].sort();
-  const ddR = document.getElementById('msDd_medResp');
-  if(ddR){
-    const sel = _msGetVals('medResp');
-    ddR.innerHTML = resps.map(r=>`<label class="ms-opt"><input type="checkbox" value="${r}" onchange="_msChange('medResp')"${sel.includes(r)?' checked':''}> ${r}</label>`).join('')
-      + '<div class="ms-sep"></div><div class="ms-clear" data-ms-clear="medResp">✕ Limpar</div>';
-    _msUpdateBtn('medResp');
   }
   // Recurso
   const recs = [...new Set(lista.flatMap(p=>p.recursos||[]))].sort();
@@ -10088,13 +10073,11 @@ function rMedicao(){
 
   // Aplicar filtros multi-select
   const fConf = _msGetVals('medConf');
-  const fResp = _msGetVals('medResp');
   const fRec  = _msGetVals('medRec');
   const fStat = _msGetVals('medStat');
 
   const lista = listaTotal.filter(p => {
     if(fConf.length && !fConf.includes(p.medicaoConfirmadaPor||'')) return false;
-    if(fResp.length && !fResp.some(r => (p.resps||[]).includes(r))) return false;
     if(fRec.length  && !fRec.some(r => (p.recursos||[]).includes(r))) return false;
     if(fStat.length){
       const st = p.medicaoFeita ? 'feita' : 'pendente';
@@ -10106,11 +10089,11 @@ function rMedicao(){
   // Contador de filtros
   const ct=document.getElementById('medFiltroContador');
   if(ct){
-    const ativo = fConf.length || fResp.length || fRec.length || fStat.length;
+    const ativo = fConf.length || fRec.length || fStat.length;
     ct.textContent = ativo ? `${lista.length} de ${listaTotal.length} produto(s)` : '';
   }
 
-  const _filtroAtivo = fConf.length || fResp.length || fRec.length || fStat.length;
+  const _filtroAtivo = fConf.length || fRec.length || fStat.length;
   if(lista.length === 0 && _filtroAtivo){
     el.innerHTML = '<div style="text-align:center;padding:48px;color:var(--mu)">Nenhum resultado para os filtros selecionados.</div>';
     return;
