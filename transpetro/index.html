@@ -789,6 +789,8 @@ body.dark .btn-lim-n{background:#F9C4C9;color:#3B0D12}
 .ls-item small{margin-left:auto;font-size:11px;color:var(--mu);font-weight:500;white-space:nowrap}
 .ls-nada{padding:24px;text-align:center;color:var(--mu);font-size:12.5px}
 @media (max-width:640px){.ls-box{grid-template-columns:1fr;height:auto}.ls-cats{flex-direction:row;flex-wrap:wrap;border-right:none;border-bottom:1px solid var(--bdr)}.ls-cat{width:auto}.ls-lista{max-height:260px}}
+.nome-final{font-size:11.5px;color:var(--mu);margin-top:5px}
+.nome-final b{color:var(--txt);font-weight:700}
 .ef-resumo{display:flex;flex-wrap:wrap;gap:6px 18px;align-items:center;background:var(--info-bg);color:var(--info-fg);border-radius:8px;padding:8px 12px;margin-bottom:10px;font-size:12.5px}
 .ef-resumo b{font-weight:800}
 /* TAG recursos */
@@ -2725,7 +2727,12 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
             <button type="button" class="btn bg2 bsm" onclick="openNovoCadProj(true)" title="Cadastrar um novo projeto">+ novo</button>
           </div>
         </div>
-        <div class="fg ff"><label class="fl" for="fn">Nome do Produto *</label><select class="fs" id="fn" aria-required="true"></select></div>
+        <div class="fg ff"><label class="fl" for="fn">Nome do Produto *</label><select class="fs" id="fn" aria-required="true" onchange="_nomeFinalUpd()"></select></div>
+        <div class="fg ff">
+          <label class="fl" for="fSufixo">Sufixo do Produto *</label>
+          <input class="fi" id="fSufixo" maxlength="40" autocomplete="off" aria-required="true" aria-describedby="fNomeFinal" oninput="_nomeFinalUpd()" style="text-transform:uppercase">
+          <div class="nome-final" id="fNomeFinal" aria-live="polite"></div>
+        </div>
         <div class="fg2" style="grid-template-columns:1fr 1fr 1fr;gap:10px">
           <div class="fg">
             <label class="fl" for="fPrio">Prioridade</label>
@@ -6686,13 +6693,49 @@ function stab(n,el){
 // ── NOME DO PRODUTO (seleção única) ──
 // Futuro: cada nome de produto vai definir quais Linhas de serviço aparecem no formulário.
 const NOMES_PRODUTO = ['PICV','CURSO ONLINE','BANCO DE QUESTÕES DA AVALIAÇÃO','VÍDEO TUTORIAL','CARTAZ'];
+// O nome gravado é "NOME - SUFIXO" (ex.: "PICV - ARROZ INTEGRAL"), no próprio campo nome.
+const SEP_SUFIXO = ' - ';
+function _limparSufixo(v){
+  return String(v||'').replace(/\s+/g,' ').trim().replace(/^[-–\s]+|[-–\s]+$/g,'').toUpperCase();
+}
+// Separa o nome gravado em nome da lista + sufixo. Nome fora da lista (antigo) volta inteiro em `base`.
+function _separarNomeProduto(nome){
+  nome = nome || '';
+  const base = [...NOMES_PRODUTO].sort((a,b) => b.length - a.length)
+    .find(b => nome === b || nome.startsWith(b + SEP_SUFIXO));
+  if(!base) return {base:nome, sufixo:''};
+  return {base, sufixo: nome.slice(base.length + SEP_SUFIXO.length)};
+}
 function buildNomeProdutoSelect(atual){
   const el = document.getElementById('fn'); if(!el) return;
+  const {base, sufixo} = _separarNomeProduto(atual);
   // Produto antigo com nome fora da lista: mantém o nome como opção para não trocar sem querer ao salvar
-  const extra = atual && !NOMES_PRODUTO.includes(atual) ? `<option value="${esc(atual)}">${esc(atual)} (nome atual)</option>` : '';
+  const extra = base && !NOMES_PRODUTO.includes(base) ? `<option value="${esc(base)}">${esc(base)} (nome atual)</option>` : '';
   el.innerHTML = '<option value="">— Selecione o produto —</option>' + extra
     + NOMES_PRODUTO.map(n => `<option value="${esc(n)}">${esc(n)}</option>`).join('');
-  el.value = atual || '';
+  el.value = base || '';
+  const suf = document.getElementById('fSufixo');
+  if(suf) suf.value = sufixo;
+  _nomeFinalUpd();
+}
+// Nome antigo (fora da lista) é mantido como está, sem sufixo
+function _nomeLegadoNoForm(){
+  const base = document.getElementById('fn')?.value || '';
+  return !!base && !NOMES_PRODUTO.includes(base);
+}
+// Atualiza a prévia "Nome final" embaixo do campo Sufixo
+function _nomeFinalUpd(){
+  const base = document.getElementById('fn')?.value || '';
+  const sufEl = document.getElementById('fSufixo');
+  const out = document.getElementById('fNomeFinal');
+  if(!sufEl || !out) return;
+  const legado = _nomeLegadoNoForm();
+  sufEl.disabled = legado;
+  if(legado){ out.innerHTML = 'Nome antigo: fica como está. Para usar sufixo, escolha um nome da lista.'; return; }
+  const suf = _limparSufixo(sufEl.value);
+  out.innerHTML = base && suf
+    ? `Nome final: <b>${esc(base + SEP_SUFIXO + suf)}</b>`
+    : 'Nome final: escolha o nome do produto e digite o sufixo';
 }
 
 // ── LINHAS DE SERVIÇO (formulário do produto): chips + categorias + busca + lista ──
@@ -8063,8 +8106,12 @@ async function salvar(){
     buildProjSelect(null); onChangeProjSel();
     showToast('❌ O projeto selecionado foi excluído — escolha outro');return;
   }
-  const nome=document.getElementById('fn').value.trim();
-  if(!nome){stab(0,document.querySelectorAll('.tab')[0]);document.getElementById('fn')?.focus();showToast('❌ Selecione o nome do produto');return;}
+  const nomeBase=document.getElementById('fn').value.trim();
+  if(!nomeBase){stab(0,document.querySelectorAll('.tab')[0]);document.getElementById('fn')?.focus();showToast('❌ Selecione o nome do produto');return;}
+  // Nome final = "NOME - SUFIXO". Nome antigo (fora da lista) é mantido como está.
+  const sufixo=_limparSufixo(document.getElementById('fSufixo')?.value);
+  if(!_nomeLegadoNoForm() && !sufixo){stab(0,document.querySelectorAll('.tab')[0]);document.getElementById('fSufixo')?.focus();showToast('❌ Informe o sufixo do produto');return;}
+  const nome=_nomeLegadoNoForm() ? nomeBase : nomeBase+SEP_SUFIXO+sufixo;
   const resps=getSelectedResps();
   if(!resps.length){showToast('❌ Selecione ao menos um responsável');return;}
   if(document.getElementById('fAcademia')?.value==='ECorp' && _relevanciaDoForm()===null){
@@ -8072,6 +8119,15 @@ async function salvar(){
     document.getElementById('fRelevancia')?.focus();
     showToast('❌ Projetos ECorp precisam da Relevância (0 a 5)');
     return;
+  }
+
+  // Nome repetido no mesmo projeto: confirma antes de salvar
+  const _nomeIgual = activeDB().find(x => x.id !== editId && (x.projCadId||null) === projCadId
+    && (x.nome||'').trim().toUpperCase() === nome.toUpperCase());
+  if(_nomeIgual && !await confirmar({titulo:'Nome repetido', tipo:'aviso',
+      msg:`Já existe um produto chamado **${_nomeIgual.nome}** neste projeto (#${_nomeIgual.id}).\n\nSalvar mesmo assim?`,
+      ok:'Salvar mesmo assim', cancelar:'Voltar'})){
+    stab(0,document.querySelectorAll('.tab')[0]); document.getElementById('fSufixo')?.focus(); return;
   }
 
   const projAnterior2 = editId ? DB.find(x=>x.id===editId) : null;
