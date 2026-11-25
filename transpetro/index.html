@@ -2590,12 +2590,6 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
               <div class="ms-dropdown" id="msDd_medConf"></div>
             </div>
           </div>
-          <div class="fg-sm"><label class="fl-sm">Responsável</label>
-            <div class="ms-wrap" id="msWrap_medResp">
-              <button class="ms-btn" id="msBtn_medResp" onclick="_msToggle('medResp')">Todos</button>
-              <div class="ms-dropdown" id="msDd_medResp"></div>
-            </div>
-          </div>
           <div class="fg-sm"><label class="fl-sm">Linha(s) de Serviço(s)</label>
             <div class="ms-wrap" id="msWrap_medRec">
               <button class="ms-btn" id="msBtn_medRec" onclick="_msToggle('medRec')">Todos</button>
@@ -3514,12 +3508,6 @@ function sitBdg(p){
 }
 
 
-// Verifica se uma etapa é isenta de atraso para Produção Apostila/E-book
-function _isApostilaIsentaAtraso(p, e){
-  if(!(p.recursos||[]).includes('Produção Apostila/E-book')) return false;
-  const lb = (e.lb||'').toLowerCase();
-  return lb.includes('validação final') || lb.includes('upload');
-}
 // Primeira etapa não concluída do projeto (etapa atual)
 function etapaAtual(p){
   return (p.etapas||[]).find(e => !e.done) || null;
@@ -3557,7 +3545,7 @@ function delInf(p){
   if(_aguardandoMaterialBase(p)) return{eq,cl};
 
   // Etapa atual sem prazo, sem prazo auto ou isenta → sem atraso
-  if(!atual.prazo || ETAPAS_SEM_PRAZO_AUTO.has(atual.lb) || _isApostilaIsentaAtraso(p, atual)){
+  if(!atual.prazo || ETAPAS_SEM_PRAZO_AUTO.has(atual.lb)){
     return{eq,cl};
   }
 
@@ -3717,22 +3705,10 @@ function rKanban(){
             }
 
             // ── BOTÃO MEDIÇÃO ────────────────────────────────────────────────
-            // Para Apostila/E-book: gatilho é a conclusão de "Validação final"
-            // Para todos os demais: gatilho é a conclusão de "Instalação no SIRH"
-            const ehApostila = (p.recursos||[]).includes('Produção Apostila/E-book');
-
-            let gatilhoMedicaoDone = false;
-            if(ehApostila){
-              // Apostila: botão aparece ao concluir "Upload BDOC"
-              gatilhoMedicaoDone = etapas.some(e =>
-                e.lb && e.lb.toLowerCase().includes('upload bdoc') && e.done
-              );
-            } else {
-              // Demais: botão aparece ao concluir "Instalação no SIRH"
-              gatilhoMedicaoDone = etapas.some(e =>
-                e.lb && e.lb.toLowerCase().includes('instalação no sirh') && e.done
-              );
-            }
+            // Gatilho: conclusão da etapa "Instalação no SIRH"
+            const gatilhoMedicaoDone = etapas.some(e =>
+              e.lb && e.lb.toLowerCase().includes('instalação no sirh') && e.done
+            );
 
             if(gatilhoMedicaoDone && !p.enviadoMedicao)
               return `<button class="btn-medicao" onclick="event.stopPropagation();enviarMedicao(${p.id})">${icMedicao()} Enviar para Medição</button>`;
@@ -3990,7 +3966,7 @@ function _msUpdateBtn(id){
   if(!btn) return;
   const labels={
     'lProj':'Todos','lResp':'Todos','lSit':'Todas','lRec':'Todos','lPrio':'Todas','lAcad':'Todas','lRel':'Todas','lCol':'Todas','lPrazo':'Todas','lPrazoEt':'Todas',
-    'medConf':'Todos','medResp':'Todos','medRec':'Todos','medStat':'Todos',
+    'medConf':'Todos','medRec':'Todos','medStat':'Todos',
     'cargaResp':'Todos','cargaStat':'Todos','cargaRec':'Todos','cargaPrio':'Todas',
     'kProj':'Todos','kResp':'Todos','kSit':'Todas','kAcad':'Todas','kRel':'Todas','kCol':'Todas','kPrazo':'Todas','kPrazoEt':'Todas',
     'homSol':'Todos','homEnv':'Todos','homMed':'Todos'
@@ -4291,7 +4267,7 @@ function _crPeriodo(p){
 // Atividades com as datas que vão para o gráfico
 function _crAtivAtrasada(p, e, hoje){
   if(e.done || !e.prazo) return false;
-  if(ETAPAS_SEM_PRAZO_AUTO.has(e.lb) || _isApostilaIsentaAtraso(p, e) || _aguardandoMaterialBase(p)) return false;
+  if(ETAPAS_SEM_PRAZO_AUTO.has(e.lb) || _aguardandoMaterialBase(p)) return false;
   return _crD(e.prazo) < hoje;
 }
 function _crAtividades(p, hoje){
@@ -5184,7 +5160,7 @@ function rKPIs(){
 // → Atividades em atraso (p.etapas). Só leitura: nada é gravado no banco.
 // Atividade em atraso = não concluída, com Data Final (e.prazo) anterior a hoje.
 // Ficam de fora (isenções que já existiam): etapas sem prazo automático (Reunião Inicial,
-// Material Base), validação/upload de Apostila/E-book e produtos aguardando o material base.
+// Material Base) e produtos aguardando o material base.
 // Atraso em dias = hoje − prazo.
 
 // Estado aberto/fechado. Sem filtro: só o que foi clicado fica aberto.
@@ -5229,7 +5205,7 @@ function _atrColetar(){
     const prazoFinalComp = !!(p.prazo && new Date(p.prazo+'T00:00:00') < hoje);
     etapas.forEach((e, i) => {
       if(e.done || !e.prazo) return;
-      if(ETAPAS_SEM_PRAZO_AUTO.has(e.lb) || _isApostilaIsentaAtraso(p, e)) return;
+      if(ETAPAS_SEM_PRAZO_AUTO.has(e.lb)) return;
       const pz = new Date(e.prazo+'T00:00:00');
       if(!(pz < hoje)) return;
       lista.push({
@@ -5523,8 +5499,6 @@ function sitEtapa(e, p){
   if(e.done) return`<span class="sit sit-done">${icL('circle-check')} Concluída</span>`;
   // Etapas sem prazo automático: nunca mostrar atraso
   if(ETAPAS_SEM_PRAZO_AUTO.has(e.lb)) return`<span class="sit sit-pend">Pendente</span>`;
-  // Apostila/E-book: Validação Final e Upload nunca mostram atraso
-  if(p && _isApostilaIsentaAtraso(p, e)) return`<span class="sit sit-pend">Pendente</span>`;
   if(!e.prazo) return`<span class="sit sit-pend">Pendente</span>`;
   const _hoje0=new Date(); _hoje0.setHours(0,0,0,0);
   const _prazo0=new Date(e.prazo+'T00:00:00');
@@ -5552,7 +5526,7 @@ function openDet(id, opts){
   const eRows=(p.etapas||[]).map((e,i)=>{
     const isCl=e.r==='cl';
     const _rh=new Date();_rh.setHours(0,0,0,0);const _rp=new Date(e.prazo+'T00:00:00');
-    const _isentaAtraso = ETAPAS_SEM_PRAZO_AUTO.has(e.lb) || _isApostilaIsentaAtraso(p, e);
+    const _isentaAtraso = ETAPAS_SEM_PRAZO_AUTO.has(e.lb);
     const rowCls=e.done?'done-row':(!e.done&&e.prazo&&_rp<_rh&&!_isentaAtraso?'ov-row':'');
     return`<tr class="${rowCls}">
       <td><div style="display:flex;align-items:center;gap:6px">
@@ -5964,226 +5938,6 @@ let _motivoPid=null, _motivoIdx=null;
 // Recurso não listado aqui usa o fluxo padrão (ETPS_DEF).
 
 const TEMPLATES = {
-  'Encapsulamento': {
-    colInicial: 1,
-    etapas: [
-      {lb:'Material Base Recebido',      r:'cl'},
-      {lb:'Entrega do Review ao Cliente',r:'eq'},
-      {lb:'Solicitação de Ajustes',      r:'cl'},
-      {lb:'Implementação de Ajustes',    r:'eq'},
-      {lb:'Validação Final',             r:'cl'},
-      {lb:'Homologação',                 r:'eq'},
-      {lb:'Instalação no SIRH',          r:'eq'},
-      {lb:'Upload Arquivos',             r:'eq'},
-    ],
-    gatilhos: [
-      {nome:'material base recebido',                      col:6},
-      {nome:'entrega do review',                           col:7},
-      {nome:'validação final',                             col:11},
-      {multi:['homologação','instalação no sirh'],         col:12},
-      {nome:'upload arquivos',                             col:14},
-    ],
-    fimCol: 14,
-  },
-
-  'Manutenção': {
-    colInicial: 0,
-    etapas: [
-      {lb:'Reunião Inicial',             r:'eq'},
-      {lb:'Material Base Recebido',      r:'cl'},
-      {lb:'Realizar Cronograma',         r:'eq'},
-      {lb:'Desenvolvimento',             r:'eq'},
-      {lb:'Entrega do Review ao Cliente',r:'eq'},
-      {lb:'Solicitação de Ajustes',      r:'cl'},
-      {lb:'Implementação de Ajustes',    r:'eq'},
-      {lb:'Validação Final',             r:'cl'},
-      {lb:'Homologação',                 r:'eq'},
-      {lb:'Instalação no SIRH',          r:'eq'},
-      {lb:'Upload Arquivos',              r:'eq'},
-    ],
-    gatilhos: [
-      {nome:'reunião inicial',                             col:1},
-      {nome:'material base recebido',                      col:2},
-      {nome:'realizar cronograma',                         col:5},
-      {nome:'desenvolvimento',                             col:6},
-      {nome:'entrega do review',                           col:7},
-      {nome:'validação final',                             col:11},
-      {multi:['homologação','instalação no sirh'],         col:12},
-      {nome:'upload arquivos',                             col:14},
-    ],
-    fimCol: 14,
-  },
-
-  'Autoria Digital': {
-    colInicial: 0,
-    etapas: [
-      {lb:'Reunião Inicial',  r:'eq'},
-      {lb:'Desenvolvimento',  r:'cl'},
-      {lb:'Homologação',      r:'eq'},
-      {lb:'Instalação no SIRH',r:'eq'},
-      {lb:'Upload Arquivos',    r:'eq'},
-    ],
-    gatilhos: [
-      {nome:'reunião inicial',                             col:6},   // Autoria Digital (coluna 10) não é usada na Transpetro
-      {nome:'desenvolvimento',                             col:11},
-      {multi:['homologação','instalação no sirh'],         col:12},
-      {nome:'upload arquivos',                             col:14},
-    ],
-    fimCol: 14,
-  },
-
-  'Web Rise Básico': {
-    colInicial: 0,
-    etapas: [
-      {lb:'Reunião Inicial',                        r:'eq'},
-      {lb:'Material Base Recebido',                 r:'cl'},
-      {lb:'Análise do material base',               r:'eq'},
-      {lb:'Elaboração do PICV',                     r:'eq'},
-      {lb:'Validação PICV DI/DM Referência',        r:'cl'},
-      {lb:'Validação LD',                           r:'cl'},
-      {lb:'Revisão textual do PICV',                r:'eq'},
-      {lb:'Entrega do PICV ao cliente',             r:'eq'},
-      {lb:'Solicitação de ajustes no PICV',         r:'cl'},
-      {lb:'Implementação de ajustes',               r:'eq'},
-      {lb:'Validação final do PICV',                r:'cl'},
-      {lb:'Desenho/roteirização do onepage',        r:'eq'},
-      {lb:'Validação DI Referência',                r:'cl'},
-      {lb:'Produção de recursos gráficos',          r:'eq'},
-      {lb:'Validação DM Referência',                r:'cl'},
-      {lb:'Validação LD',                           r:'cl'},
-      {lb:'Entrega do review ao cliente',           r:'eq'},
-      {lb:'Solicitação de ajustes',                 r:'cl'},
-      {lb:'Implementação de ajustes',               r:'eq'},
-      {lb:'Validação final do review',              r:'cl'},
-      {lb:'Revisão textual do review',              r:'eq'},
-      {lb:'Homologação',                            r:'eq'},
-      {lb:'Instalação no SIRH',                     r:'eq'},
-      {lb:'Upload Arquivos Bdoc',                   r:'eq'},
-    ],
-    gatilhos: [
-      {nome:'reunião inicial',                       col:1,  exato:true},  // → Aguardando Material Base
-      {nome:'material base recebido',                col:3,  exato:true},  // → Projeto Instrucional (PI)
-      {nome:'entrega do picv ao cliente',            col:4,  exato:true},  // → Validação - PI
-      {nome:'validação final do picv',               col:6,  exato:true},  // → Desenvolvimento
-      {nome:'entrega do review ao cliente',          col:7,  exato:true},  // → Validação - Desenvolvimento
-      {nome:'validação final do review',             col:7,  exato:true},  // → Entrega (Avaliação foi removida)
-      {nome:'revisão textual do review',             col:11, exato:true},  // → Homologação
-      {multi:['homologação','instalação no sirh'],   col:12},              // → Pré-Medição
-      {nome:'upload arquivos bdoc',                  col:14, exato:true},  // → Projetos Concluídos
-    ],
-    fimCol: 14,
-  },
-
-  'Web Rise Intermediário': {
-    colInicial: 0,
-    etapas: [
-      {lb:'Reunião Inicial',                        r:'eq'},
-      {lb:'Material Base Recebido',                 r:'cl'},
-      {lb:'Análise do material base',               r:'eq'},
-      {lb:'Elaboração do PICV',                     r:'eq'},
-      {lb:'Validação PICV DI/DM Referência',        r:'cl'},
-      {lb:'Validação LD',                           r:'cl'},
-      {lb:'Revisão textual do PICV',                r:'eq'},
-      {lb:'Entrega do PICV ao cliente',             r:'eq'},
-      {lb:'Solicitação de ajustes no PICV',         r:'cl'},
-      {lb:'Implementação de ajustes',               r:'eq'},
-      {lb:'Validação final do PICV',                r:'cl'},
-      {lb:'Desenho/roteirização do onepage',        r:'eq'},
-      {lb:'Validação DI Referência',                r:'cl'},
-      {lb:'Produção de recursos gráficos',          r:'eq'},
-      {lb:'Validação DM Referência',                r:'cl'},
-      {lb:'Validação LD',                           r:'cl'},
-      {lb:'Entrega do review ao cliente',           r:'eq'},
-      {lb:'Solicitação de ajustes',                 r:'cl'},
-      {lb:'Implementação de ajustes',               r:'eq'},
-      {lb:'Validação final do review',              r:'cl'},
-      {lb:'Revisão textual do review',              r:'eq'},
-      {lb:'Homologação',                            r:'eq'},
-      {lb:'Instalação no SIRH',                     r:'eq'},
-      {lb:'Upload Arquivos Bdoc',                   r:'eq'},
-    ],
-    gatilhos: [
-      {nome:'reunião inicial',                       col:1,  exato:true},  // → Aguardando Material Base
-      {nome:'material base recebido',                col:3,  exato:true},  // → Projeto Instrucional (PI)
-      {nome:'entrega do picv ao cliente',            col:4,  exato:true},  // → Validação - PI
-      {nome:'validação final do picv',               col:6,  exato:true},  // → Desenvolvimento
-      {nome:'entrega do review ao cliente',          col:7,  exato:true},  // → Validação - Desenvolvimento
-      {nome:'validação final do review',             col:7,  exato:true},  // → Entrega (Avaliação foi removida)
-      {nome:'revisão textual do review',             col:11, exato:true},  // → Homologação
-      {multi:['homologação','instalação no sirh'],   col:12},              // → Pré-Medição
-      {nome:'upload arquivos bdoc',                  col:14, exato:true},  // → Projetos Concluídos
-    ],
-    fimCol: 14,
-  },
-
-  'Web Rise Avançado': {
-    colInicial: 0,
-    etapas: [
-      {lb:'Reunião Inicial',                        r:'eq'},
-      {lb:'Material Base Recebido',                 r:'cl'},
-      {lb:'Análise do material base',               r:'eq'},
-      {lb:'Elaboração do PICV',                     r:'eq'},
-      {lb:'Validação PICV DI/DM Referência',        r:'cl'},
-      {lb:'Validação LD',                           r:'cl'},
-      {lb:'Revisão textual do PICV',                r:'eq'},
-      {lb:'Entrega do PICV ao cliente',             r:'eq'},
-      {lb:'Solicitação de ajustes no PICV',         r:'cl'},
-      {lb:'Implementação de ajustes',               r:'eq'},
-      {lb:'Validação final do PICV',                r:'cl'},
-      {lb:'Desenho/roteirização do onepage',        r:'eq'},
-      {lb:'Validação DI Referência',                r:'cl'},
-      {lb:'Produção de recursos gráficos',          r:'eq'},
-      {lb:'Validação DM Referência',                r:'cl'},
-      {lb:'Validação LD',                           r:'cl'},
-      {lb:'Entrega do review ao cliente',           r:'eq'},
-      {lb:'Solicitação de ajustes',                 r:'cl'},
-      {lb:'Implementação de ajustes',               r:'eq'},
-      {lb:'Validação final do review',              r:'cl'},
-      {lb:'Revisão textual do review',              r:'eq'},
-      {lb:'Homologação',                            r:'eq'},
-      {lb:'Instalação no SIRH',                     r:'eq'},
-      {lb:'Upload Arquivos Bdoc',                   r:'eq'},
-    ],
-    gatilhos: [
-      {nome:'reunião inicial',                       col:1,  exato:true},  // → Aguardando Material Base
-      {nome:'material base recebido',                col:3,  exato:true},  // → Projeto Instrucional (PI)
-      {nome:'entrega do picv ao cliente',            col:4,  exato:true},  // → Validação - PI
-      {nome:'validação final do picv',               col:6,  exato:true},  // → Desenvolvimento
-      {nome:'entrega do review ao cliente',          col:7,  exato:true},  // → Validação - Desenvolvimento
-      {nome:'validação final do review',             col:7,  exato:true},  // → Entrega (Avaliação foi removida)
-      {nome:'revisão textual do review',             col:11, exato:true},  // → Homologação
-      {multi:['homologação','instalação no sirh'],   col:12},              // → Pré-Medição
-      {nome:'upload arquivos bdoc',                  col:14, exato:true},  // → Projetos Concluídos
-    ],
-    fimCol: 14,
-  },
-
-  'Produção Apostila/E-book': {
-    colInicial: 0,
-    etapas: [
-      {lb:'Reunião inicial',                                  r:'cl'},
-      {lb:'Revisão textual',                                  r:'eq'},
-      {lb:'Projeto gráfico',                                  r:'eq'},
-      {lb:'Validação técnica/ajustes > PG',                   r:'eq'},
-      {lb:'Validação/Solicitação de ajustes > rev. textual',  r:'cl'},
-      {lb:'Validação/Solicitação de ajustes > proj. gráfico', r:'cl'},
-      {lb:'Implementação ajustes > revisão textual',          r:'eq'},
-      {lb:'Implementação ajustes > projeto gráfico',          r:'eq'},
-      {lb:'Diagramação',                                      r:'eq'},
-      {lb:'Validação técnica/ajustes > diagramação',         r:'eq'},
-      {lb:'Validação/Solicitação de ajustes > diagramação',  r:'cl'},
-      {lb:'Implementação ajustes > diagramação',             r:'eq'},
-      {lb:'Validação final',                                 r:'cl'},
-      {lb:'Upload BDOC',                                     r:'eq'},
-    ],
-    gatilhos: [
-      {nome:'reunião inicial', col:6},    // → Desenvolvimento (PELD não é usada na Transpetro)
-      {nome:'validação final',  col:12},  // → Pré-medição (coluna Upload SharePoint foi removida)
-      {nome:'upload bdoc',      col:14},  // → Projetos Concluídos
-    ],
-    fimCol: 14,
-  },
-
   // ── TRANSPETRO ──────────────────────────────────────────────────────────────
   'Plano Instrucional e Plano de Identidade Visual': {
     colInicial: 0,                    // nasce em Diagnóstico
@@ -7048,114 +6802,7 @@ function onDataInicioChange(){
 // ── CRONOGRAMAS FIXOS POR RECURSO (dias úteis por etapa) ────────────────────
 // Chave: nome do recurso → array [{lb, dias}] na mesma ordem das etapas
 // Etapas sem entrada no cronograma ficam sem prazo automático
-const CRONOGRAMAS = {
-  // ─── Totais: Encaps=24d | Básico=51d | Inter=64d | Avançado=78d ───────────
-  'Encapsulamento': [
-    // Reunião Inicial e Material Base Recebido: sem prazo automático (dependem do cliente)
-    {lb:'Entrega do Review ao Cliente', dias:8},  // +3d do Material Base Recebido
-    {lb:'Solicitação de Ajustes',       dias:3},
-    {lb:'Implementação de Ajustes',     dias:3},
-    {lb:'Validação Final',              dias:1},
-    {lb:'Homologação',                  dias:3},
-    {lb:'Instalação no SIRH',           dias:2},
-    {lb:'Upload Arquivos',              dias:4},
-  ],  // total: 24d
-  'Web Rise Básico': [
-    // Reunião Inicial e Material Base Recebido: sem prazo automático
-    {lb:'Elaboração do PICV',                  dias:7},
-    {lb:'Validação PICV DI/DM Referência',     dias:3},
-    {lb:'Validação LD',                        dias:2},
-    {lb:'Revisão textual do PICV',             dias:1},
-    {lb:'Entrega do PICV ao cliente',          dias:1},
-    {lb:'Solicitação de ajustes no PICV',      dias:2},
-    {lb:'Implementação de ajustes',            dias:2},
-    {lb:'Validação final do PICV',             dias:1},
-    {lb:'Desenho/roteirização do onepage',     dias:5},
-    {lb:'Validação DI Referência',             dias:3},
-    {lb:'Produção de recursos gráficos',       dias:2},
-    {lb:'Validação DM Referência',             dias:2},
-    {lb:'Validação LD',                        dias:2},
-    {lb:'Entrega do review ao cliente',        dias:1},
-    {lb:'Solicitação de ajustes',              dias:3},
-    {lb:'Implementação de ajustes',            dias:3},
-    {lb:'Validação final do review',           dias:1},
-    {lb:'Revisão textual do review',           dias:2},
-    {lb:'Homologação',                         dias:3},
-    {lb:'Instalação no SIRH',                  dias:2},
-    {lb:'Upload Arquivos Bdoc',                dias:7},
-  ],  // total: 55d
-  'Web Rise Intermediário': [
-    // Reunião Inicial e Material Base Recebido: sem prazo automático
-    {lb:'Elaboração do PICV',                  dias:7},
-    {lb:'Validação PICV DI/DM Referência',     dias:3},
-    {lb:'Validação LD',                        dias:2},
-    {lb:'Revisão textual do PICV',             dias:1},
-    {lb:'Entrega do PICV ao cliente',          dias:1},
-    {lb:'Solicitação de ajustes no PICV',      dias:2},
-    {lb:'Implementação de ajustes',            dias:2},
-    {lb:'Validação final do PICV',             dias:1},
-    {lb:'Desenho/roteirização do onepage',     dias:10},
-    {lb:'Validação DI Referência',             dias:3},
-    {lb:'Produção de recursos gráficos',       dias:8},
-    {lb:'Validação DM Referência',             dias:3},
-    {lb:'Validação LD',                        dias:2},
-    {lb:'Entrega do review ao cliente',        dias:1},
-    {lb:'Solicitação de ajustes',              dias:3},
-    {lb:'Implementação de ajustes',            dias:3},
-    {lb:'Validação final do review',           dias:1},
-    {lb:'Revisão textual do review',           dias:3},
-    {lb:'Homologação',                         dias:3},
-    {lb:'Instalação no SIRH',                  dias:2},
-    {lb:'Upload Arquivos Bdoc',                dias:7},
-  ],  // total: 68d
-  'Web Rise Avançado': [
-    // Reunião Inicial e Material Base Recebido: sem prazo automático
-    {lb:'Elaboração do PICV',                  dias:7},
-    {lb:'Validação PICV DI/DM Referência',     dias:3},
-    {lb:'Validação LD',                        dias:2},
-    {lb:'Revisão textual do PICV',             dias:1},
-    {lb:'Entrega do PICV ao cliente',          dias:1},
-    {lb:'Solicitação de ajustes no PICV',      dias:2},
-    {lb:'Implementação de ajustes',            dias:2},
-    {lb:'Validação final do PICV',             dias:1},
-    {lb:'Desenho/roteirização do onepage',     dias:15},
-    {lb:'Validação DI Referência',             dias:3},
-    {lb:'Produção de recursos gráficos',       dias:16},
-    {lb:'Validação DM Referência',             dias:3},
-    {lb:'Validação LD',                        dias:2},
-    {lb:'Entrega do review ao cliente',        dias:1},
-    {lb:'Solicitação de ajustes',              dias:3},
-    {lb:'Implementação de ajustes',            dias:3},
-    {lb:'Validação final do review',           dias:1},
-    {lb:'Revisão textual do review',           dias:4},
-    {lb:'Homologação',                         dias:3},
-    {lb:'Instalação no SIRH',                  dias:2},
-    {lb:'Upload Arquivos Bdoc',                dias:7},
-  ],  // total: 82d
-  'Produção Apostila/E-book': [
-    {lb:'Reunião inicial',                                  dias:5},
-    {lb:'Revisão textual',                                  dias:5},
-    {lb:'Projeto gráfico',                                  dias:5},
-    {lb:'Validação técnica/ajustes > PG',                   dias:2},
-    {lb:'Validação/Solicitação de ajustes > rev. textual',  dias:4},
-    {lb:'Validação/Solicitação de ajustes > proj. gráfico', dias:3},
-    {lb:'Implementação ajustes > revisão textual',          dias:2},
-    {lb:'Implementação ajustes > projeto gráfico',          dias:2},
-    {lb:'Diagramação',                                      dias:10},
-    {lb:'Validação técnica/ajustes > diagramação',         dias:2},
-    {lb:'Validação/Solicitação de ajustes > diagramação',  dias:4},
-    {lb:'Implementação ajustes > diagramação',             dias:4},
-    {lb:'Validação final',                                 dias:3},
-    {lb:'Upload BDOC',                                     dias:1},
-  ],  // total: 52d
-  'Autoria Digital': [
-    // Reunião Inicial: sem prazo automático (depende do cliente)
-    {lb:'Desenvolvimento',     dias:2},  // +1d da Reunião Inicial
-    {lb:'Homologação',         dias:2},
-    {lb:'Instalação no SIRH',  dias:1},
-    {lb:'Upload Arquivos',     dias:1},
-  ],  // total: 6d
-};
+const CRONOGRAMAS = {};  // nenhuma linha de serviço da Transpetro tem cronograma fixo hoje
 
 // Etapas que ficam sem prazo automático (dependem do cliente)
 const ETAPAS_SEM_PRAZO_AUTO = new Set(['Reunião Inicial','Material Base Recebido','Reunião inicial','Material base recebido']);
@@ -7430,7 +7077,7 @@ async function _recAposMudar(){
   let tmplRecurso = null;
   for(const r of selecionados){ if(TEMPLATES[r]){ tmplRecurso = r; break; } }
 
-  // Primeiro recurso com CRONOGRAMA (pode incluir Web Rise sem template de etapas)
+  // Primeiro recurso com CRONOGRAMA
   let cronRecurso = null;
   for(const r of selecionados){ if(CRONOGRAMAS[r]){ cronRecurso = r; break; } }
 
@@ -10366,7 +10013,7 @@ function toggleMedGroup(id){
 }
 
 function limparMedFilts(){
-  ['medConf','medResp','medRec','medStat'].forEach(id=>{
+  ['medConf','medRec','medStat'].forEach(id=>{
     const dd=document.getElementById('msDd_'+id);
     if(dd) dd.querySelectorAll('input[type=checkbox]').forEach(cb=>cb.checked=false);
     _msUpdateBtn(id);
@@ -10385,15 +10032,6 @@ function _populateMedFiltros(lista){
       : '<div style="padding:10px 12px;font-size:11.5px;color:var(--mu);font-style:italic">Nenhuma medição confirmada ainda</div>')
       + '<div class="ms-sep"></div><div class="ms-clear" data-ms-clear="medConf">✕ Limpar</div>';
     _msUpdateBtn('medConf');
-  }
-  // Responsável
-  const resps = [...new Set(lista.flatMap(p=>p.resps||[]))].sort();
-  const ddR = document.getElementById('msDd_medResp');
-  if(ddR){
-    const sel = _msGetVals('medResp');
-    ddR.innerHTML = resps.map(r=>`<label class="ms-opt"><input type="checkbox" value="${r}" onchange="_msChange('medResp')"${sel.includes(r)?' checked':''}> ${r}</label>`).join('')
-      + '<div class="ms-sep"></div><div class="ms-clear" data-ms-clear="medResp">✕ Limpar</div>';
-    _msUpdateBtn('medResp');
   }
   // Recurso
   const recs = [...new Set(lista.flatMap(p=>p.recursos||[]))].sort();
@@ -10435,13 +10073,11 @@ function rMedicao(){
 
   // Aplicar filtros multi-select
   const fConf = _msGetVals('medConf');
-  const fResp = _msGetVals('medResp');
   const fRec  = _msGetVals('medRec');
   const fStat = _msGetVals('medStat');
 
   const lista = listaTotal.filter(p => {
     if(fConf.length && !fConf.includes(p.medicaoConfirmadaPor||'')) return false;
-    if(fResp.length && !fResp.some(r => (p.resps||[]).includes(r))) return false;
     if(fRec.length  && !fRec.some(r => (p.recursos||[]).includes(r))) return false;
     if(fStat.length){
       const st = p.medicaoFeita ? 'feita' : 'pendente';
@@ -10453,11 +10089,11 @@ function rMedicao(){
   // Contador de filtros
   const ct=document.getElementById('medFiltroContador');
   if(ct){
-    const ativo = fConf.length || fResp.length || fRec.length || fStat.length;
+    const ativo = fConf.length || fRec.length || fStat.length;
     ct.textContent = ativo ? `${lista.length} de ${listaTotal.length} produto(s)` : '';
   }
 
-  const _filtroAtivo = fConf.length || fResp.length || fRec.length || fStat.length;
+  const _filtroAtivo = fConf.length || fRec.length || fStat.length;
   if(lista.length === 0 && _filtroAtivo){
     el.innerHTML = '<div style="text-align:center;padding:48px;color:var(--mu)">Nenhum resultado para os filtros selecionados.</div>';
     return;
@@ -11590,74 +11226,6 @@ const _NOMES_MIGRAR = {
 };
 function _migrarNome(nome){ return _NOMES_MIGRAR[nome] || nome; }
 
-// ── Migração silenciosa de etapas Web Rise ────────────────────────────────────
-const _RECURSOS_WEB_RISE = ['Web Rise Básico','Web Rise Intermediário','Web Rise Avançado'];
-
-const _ETAPAS_RENOMEAR = {
-  'Elaboração do PI':              'Elaboração do PICV',
-  'Revisão Textual do PI':         'Revisão textual do PICV',
-  'Entrega do PI ao cliente':      'Entrega do PICV ao cliente',
-  'Validação do PI':               'Validação PICV DI/DM Referência',
-  'Desenho/Roteirização':          'Desenho/roteirização do onepage',
-  'Produção de Recursos Gráficos': 'Produção de recursos gráficos',
-  'Entrega do Review ao cliente':  'Entrega do review ao cliente',
-  'Solicitação de Ajustes':        'Solicitação de ajustes',
-  'Implementação de Ajustes':      'Implementação de ajustes',
-  'Validação Final':               'Validação final do review',
-  'Revisão Textual':               'Revisão textual do review',
-  'Upload Arquivos':               'Upload Arquivos Bdoc',
-};
-
-// Etapas que indicam projeto já migrado
-const _ETAPAS_NOVAS = new Set([
-  'Validação LD','Validação DM Referência','Validação final do PICV',
-  'Solicitação de ajustes no PICV','Análise do material base',
-]);
-
-// Sequência final correta das etapas Web Rise
-const _SEQUENCIA_WEB_RISE = [
-  {lb:'Reunião Inicial',                     r:'eq'},
-  {lb:'Material Base Recebido',              r:'cl'},
-  {lb:'Análise do material base',            r:'eq'},
-  {lb:'Elaboração do PICV',                  r:'eq'},
-  {lb:'Validação PICV DI/DM Referência',     r:'cl'},
-  {lb:'Validação LD',                        r:'cl'},
-  {lb:'Revisão textual do PICV',             r:'eq'},
-  {lb:'Entrega do PICV ao cliente',          r:'eq'},
-  {lb:'Solicitação de ajustes no PICV',      r:'cl'},
-  {lb:'Implementação de ajustes',            r:'eq'},
-  {lb:'Validação final do PICV',             r:'cl'},
-  {lb:'Desenho/roteirização do onepage',     r:'eq'},
-  {lb:'Validação DI Referência',             r:'cl'},
-  {lb:'Produção de recursos gráficos',       r:'eq'},
-  {lb:'Validação DM Referência',             r:'cl'},
-  {lb:'Validação LD',                        r:'cl'},
-  {lb:'Entrega do review ao cliente',        r:'eq'},
-  {lb:'Solicitação de ajustes',              r:'cl'},
-  {lb:'Implementação de ajustes',            r:'eq'},
-  {lb:'Validação final do review',           r:'cl'},
-  {lb:'Revisão textual do review',           r:'eq'},
-  {lb:'Homologação',                         r:'eq'},
-  {lb:'Instalação no SIRH',                  r:'eq'},
-  {lb:'Upload Arquivos Bdoc',                r:'eq'},
-];
-
-function _migrarEtapasWebRise(etapas){
-  // Mapear dados existentes por nome antigo e novo
-  const dados = {};
-  etapas.forEach(e => {
-    dados[e.lb] = e;
-    const novo = _ETAPAS_RENOMEAR[e.lb];
-    if(novo && !dados[novo]) dados[novo] = e;
-  });
-  // Montar sequência final preservando todos os dados históricos
-  return _SEQUENCIA_WEB_RISE.map(tmpl => {
-    const existente = dados[tmpl.lb];
-    if(existente) return {...existente, lb: tmpl.lb, r: tmpl.r};
-    return {lb: tmpl.lb, r: tmpl.r, prazo: null, done: false, fim: null};
-  });
-}
-
 function normalizar(p){
   if(!p) return p;
   p.resps          = (p.resps || []).map(_migrarNome);
@@ -11673,54 +11241,7 @@ function normalizar(p){
   p.medicaoFeitaEm = p.medicaoFeitaEm || null;
   p.homolog        = p.homolog || {};
 
-  // Migração de etapas Web Rise: roda APENAS em projetos não personalizados pelo usuário.
-  // Se o usuário renomeou, removeu ou reordenou etapas (etapasCustomizadas), a migração
-  // NÃO deve rodar — caso contrário ela reconstrói o template e desfaz a personalização
-  // a cada sync do Firebase (era a causa de "renomear/remover não salva e volta ao original").
-  const ehWebRise = (p.recursos||[]).some(r => _RECURSOS_WEB_RISE.includes(r));
-  if(ehWebRise && p.etapas.length > 0 && !p.etapasCustomizadas){
-    const temAntiga = p.etapas.some(e => _ETAPAS_RENOMEAR[e.lb]);
-    // 'faltaNova' sozinho não é confiável (remover uma etapa dispararia migração).
-    // Só migramos por 'faltaNova' se o projeto NÃO mostra sinais de personalização,
-    // ou seja, se TODAS as etapas atuais ainda batem com o template padrão Web Rise.
-    const nomesPadrao = new Set(_SEQUENCIA_WEB_RISE.map(t => t.lb));
-    const todasNoPadrao = p.etapas.every(e => nomesPadrao.has(e.lb) || _ETAPAS_RENOMEAR[e.lb]);
-    const faltaNova = !p.etapas.some(e => _ETAPAS_NOVAS.has(e.lb));
-    if(temAntiga || (faltaNova && todasNoPadrao)) p.etapas = _migrarEtapasWebRise(p.etapas);
-
-    // Preencher prazos em cascata nas etapas sem prazo (se há data de início)
-    const recursoWR = (p.recursos||[]).find(r => _RECURSOS_WEB_RISE.includes(r));
-    const temEtapasSemPrazo = p.etapas.some(e =>
-      !e.prazo && !ETAPAS_SEM_PRAZO_AUTO.has(e.lb)
-    );
-    if(recursoWR && p.inicio && CRONOGRAMAS[recursoWR] && temEtapasSemPrazo){
-      p.etapas = _cronogramaEtapasSilencioso(p.etapas, CRONOGRAMAS[recursoWR], p.inicio);
-    }
-  }
-
   return p;
-}
-
-// Aplica cronograma diretamente no array de etapas — sem depender do formulário.
-// Preserva prazos já existentes; preenche apenas os que estão null.
-function _cronogramaEtapasSilencioso(etapas, cron, dataInicio){
-  let cursor = dataInicio;
-  const usados = new Set();
-  return etapas.map(e => {
-    if(!e.lb || ETAPAS_SEM_PRAZO_AUTO.has(e.lb)) return e;
-    const lbLow = e.lb.toLowerCase();
-    const idx = cron.findIndex((c, i) =>
-      !usados.has(i) && (
-        lbLow.includes(c.lb.toLowerCase()) ||
-        c.lb.toLowerCase().includes(lbLow)
-      )
-    );
-    if(idx === -1) return e;
-    usados.add(idx);
-    cursor = addDiasUteis(cursor, cron[idx].dias);
-    // Só preenche prazo se ainda não tem — preserva datas já definidas
-    return e.prazo ? {...e} : {...e, prazo: cursor};
-  });
 }
 
 // ── SALVAR UM PROJETO ESPECÍFICO no Firebase ──
@@ -13508,127 +13029,6 @@ document.getElementById('topDate').textContent=
   if(isNaN(d) || Math.abs(Date.now()-d.getTime())<5000) return;
   el.textContent=d.toLocaleDateString('pt-BR')+' às '+d.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
 })();
-
-// ── MIGRAÇÃO DE ETAPAS Web Rise ─────────────────────────────────────────────
-async function migrarEtapasWebRise(){
-  const RECURSOS_WEB_RISE = ['Web Rise Básico','Web Rise Intermediário','Web Rise Avançado'];
-
-  // Mapa de renomeação: nome antigo → nome novo
-  // null = remover a etapa (ex: 'Revisão do PI' foi removida)
-  const RENOMEAR = {
-    'Elaboração do PI':              'Elaboração do PICV',
-    'Revisão do PI':                 null,  // removida
-    'Revisão Textual do PI':         'Revisão textual do PICV',
-    'Entrega do PI ao cliente':      'Entrega do PICV ao cliente',
-    'Validação do PI':               'Validação PICV DI/DM Referência',
-    'Desenho/Roteirização':          'Desenho/roteirização do onepage',
-    'Produção de Recursos Gráficos': 'Produção de recursos gráficos',
-    'Entrega do Review ao cliente':  'Entrega do review ao cliente',
-    'Solicitação de Ajustes':        'Solicitação de ajustes',
-    'Implementação de Ajustes':      'Implementação de ajustes',
-    'Validação Final':               'Validação final do review',
-    'Revisão Textual':               'Revisão textual do review',
-    'Upload Arquivos':               'Upload Arquivos Bdoc',
-  };
-
-  // Etapas novas a inserir (em posição específica relativa a outras etapas)
-  // Formato: { apos: 'nome da etapa anterior', inserir: {lb, r} }
-  const INSERIR = [
-    { apos: 'Material Base Recebido',     lb:'Análise do material base',         r:'eq' },
-    { apos: 'Validação PICV DI/DM Referência', lb:'Validação LD',               r:'cl' },
-    { apos: 'Validação final do PICV',    lb:'Validação final do PICV',          r:'cl', skip:true }, // já existe após renomeação
-    { apos: 'Validação DI Referência',    lb:'Validação DM Referência',          r:'cl' },
-    { apos: 'Validação DM Referência',    lb:'Validação LD',                     r:'cl' },
-    { apos: 'Solicitação de ajustes no PICV', lb:'Implementação de ajustes',    r:'eq', skip:true }, // já existe
-    { apos: 'Implementação de ajustes (PICV)', lb:'Validação final do PICV',    r:'cl' },
-  ];
-
-  // Sequência final esperada (para reordenar se necessário)
-  const SEQUENCIA_FINAL = [
-    {lb:'Reunião Inicial',                     r:'eq'},
-    {lb:'Material Base Recebido',              r:'cl'},
-    {lb:'Análise do material base',            r:'eq'},
-    {lb:'Elaboração do PICV',                  r:'eq'},
-    {lb:'Validação PICV DI/DM Referência',     r:'cl'},
-    {lb:'Validação LD',                        r:'cl'},
-    {lb:'Revisão textual do PICV',             r:'eq'},
-    {lb:'Entrega do PICV ao cliente',          r:'eq'},
-    {lb:'Solicitação de ajustes no PICV',      r:'cl'},
-    {lb:'Implementação de ajustes',            r:'eq'},
-    {lb:'Validação final do PICV',             r:'cl'},
-    {lb:'Desenho/roteirização do onepage',     r:'eq'},
-    {lb:'Validação DI Referência',             r:'cl'},
-    {lb:'Produção de recursos gráficos',       r:'eq'},
-    {lb:'Validação DM Referência',             r:'cl'},
-    {lb:'Validação LD',                        r:'cl'},
-    {lb:'Entrega do review ao cliente',        r:'eq'},
-    {lb:'Solicitação de ajustes',              r:'cl'},
-    {lb:'Implementação de ajustes',            r:'eq'},
-    {lb:'Validação final do review',           r:'cl'},
-    {lb:'Revisão textual do review',           r:'eq'},
-    {lb:'Homologação',                         r:'eq'},
-    {lb:'Instalação no SIRH',                  r:'eq'},
-    {lb:'Upload Arquivos Bdoc',                r:'eq'},
-  ];
-
-  if(!await confirmar({titulo:'Migrar etapas Web Rise?', msg:'As etapas de todos os produtos Web Rise passam para o novo padrão.\n\nEsta ação não pode ser desfeita. Recomenda-se exportar o XLSX antes.', ok:'Migrar', tipo:'aviso', foco:'cancelar', ic:'database'})) return;
-
-  const statusEl = document.getElementById('migracaoStatus') || document.getElementById('migracaoStatus2');
-  const statusEl2 = document.getElementById('migracaoStatus2');
-  if(statusEl) statusEl.textContent = '⏳ Migrando...';
-  if(statusEl2) statusEl2.textContent = '⏳ Migrando...';
-
-  const todosDB = activeDB().concat(cancelDB());
-  const projWebRise = todosDB.filter(p =>
-    (p.recursos||[]).some(r => RECURSOS_WEB_RISE.includes(r))
-  );
-
-  if(projWebRise.length === 0){
-    statusEl.textContent = '⚠️ Nenhum projeto Web Rise encontrado.';
-    return;
-  }
-
-  let migrados = 0;
-  let erros = 0;
-
-  projWebRise.forEach(p => {
-    try {
-      const etapasAntigas = p.etapas || [];
-
-      // Construir mapa de dados existentes (prazo, done, fim, etc.) por nome antigo
-      const dadosEtapa = {};
-      etapasAntigas.forEach(e => { dadosEtapa[e.lb] = {...e}; });
-
-      // Montar novas etapas preservando dados (prazo, done, fim, motivo)
-      const novasEtapas = SEQUENCIA_FINAL.map(tmpl => {
-        // Verificar se já existe com o novo nome
-        if(dadosEtapa[tmpl.lb]){
-          return {...dadosEtapa[tmpl.lb], lb: tmpl.lb, r: tmpl.r};
-        }
-        // Verificar se existe com nome antigo (buscar no mapa de renomeação)
-        const nomeAntigo = Object.entries(RENOMEAR).find(([,novo]) => novo === tmpl.lb)?.[0];
-        if(nomeAntigo && dadosEtapa[nomeAntigo]){
-          return {...dadosEtapa[nomeAntigo], lb: tmpl.lb, r: tmpl.r};
-        }
-        // Etapa nova — sem dados históricos
-        return {lb: tmpl.lb, r: tmpl.r, prazo: null, done: false, fim: null};
-      });
-
-      p.etapas = novasEtapas;
-      fbSalvarProjeto(p,{force:true});
-      migrados++;
-    } catch(e) {
-      console.error('Erro ao migrar projeto', p.nome, e);
-      erros++;
-    }
-  });
-
-  const msg = `✅ ${migrados} projeto(s)${erros > 0 ? ` · ⚠️ ${erros} erro(s)` : ''}`;
-  if(statusEl) statusEl.textContent = msg;
-  if(statusEl2) statusEl2.textContent = msg;
-  showToast(`✅ Migração concluída: ${migrados} projeto(s) Web Rise atualizados`);
-  setTimeout(() => renderAll(), 500);
-}
 
 // ── INIT — sessão gerenciada pelo Firebase Authentication ──────────────────
 // Config web do Firebase — pública por design (a segurança está nas regras do
