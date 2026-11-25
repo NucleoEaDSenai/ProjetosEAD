@@ -2818,7 +2818,8 @@ function rKanban(){
             // ── BOTÃO MEDIÇÃO ────────────────────────────────────────────────
             // Para Apostila/E-book: gatilho é a conclusão de "Validação final"
             // Para todos os demais: gatilho é a conclusão de "Instalação no SIRH"
-            const ehApostila = (p.recursos||[]).includes('Produção Apostila/E-book');
+            // Usa a regra da Apostila só quando o fluxo ativo é o da Apostila (não basta ter o recurso)
+            const ehApostila = getTemplate(p) === TEMPLATES['Produção Apostila/E-book'];
 
             let gatilhoMedicaoDone = false;
             if(ehApostila){
@@ -5002,7 +5003,7 @@ function calcColIdeal(p){
         if(etapaDone(etapas, g.nome, g.exato || false)) melhorCol = Math.max(melhorCol, g.col);
       }
     }
-    const ehApostila = (p.recursos||[]).includes('Produção Apostila/E-book');
+    const ehApostila = tmpl === TEMPLATES['Produção Apostila/E-book'];
     const up = _etapaUpload(etapas);
     if(!ehApostila && up){
       // Regra por posição (não depende do nome exato das etapas):
@@ -7897,7 +7898,7 @@ function confirmarMedicao(id){
     p.medicaoFeita          = false;
     p.medicaoFeitaEm        = null;
     p.medicaoConfirmadaPor  = null;
-    const ehApostilaDesm = (p.recursos||[]).includes('Produção Apostila/E-book');
+    const ehApostilaDesm = getTemplate(p) === TEMPLATES['Produção Apostila/E-book'];
     p.col = ehApostilaDesm ? 13 : 12; // Apostila volta p/ Upload BDOC; demais p/ Pré-Medição
     registrarHistorico(p, 'desmarcou medição', 'Medição desmarcada — retornou para Upload BDOC');
     fbSalvarProjeto(p);
