@@ -1139,6 +1139,9 @@ body.dark .tenant-item.current{background:rgba(34,197,94,.12)}
 .coment-ta{flex:1;padding:9px 12px;border:1.5px solid var(--bdr);border-radius:8px;font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;resize:none;height:64px;outline:none}
 .coment-ta:focus{border-color:var(--blue)}
 /* AUTORIA no card kanban */
+.link-sp{display:inline-flex;align-items:center;gap:5px;margin-top:6px;font-size:11px;font-weight:600;color:var(--blue);text-decoration:none;max-width:100%}
+.link-sp:hover span{text-decoration:underline}
+.link-sp .ic{width:12px;height:12px;flex-shrink:0}
 .kcard-autoria{font-size:10px;color:var(--mu);margin-top:4px;display:flex;gap:8px;flex-wrap:wrap}
 .kc[data-col="14"]{background:linear-gradient(160deg,#F5F3FF 0%,#EDE9FE 100%);border:1.5px solid #C4B5FD}
 .kc[data-col="14"] .kc-t{color:#6D28D9}
@@ -2837,6 +2840,7 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
       <div class="fg ff"><label class="fl" for="cpDesc">Descrição</label><textarea class="fta" id="cpDesc" placeholder="Contexto e escopo do projeto..."></textarea></div>
       <div class="fg ff"><label class="fl" for="cpObj">Objetivo</label><textarea class="fta" id="cpObj" placeholder="O que o projeto deve alcançar..."></textarea></div>
       <div class="fg ff"><label class="fl" for="cpPub">Público-Alvo</label><textarea class="fta" id="cpPub" placeholder="Quem vai usar os produtos deste projeto..."></textarea></div>
+      <div class="fg ff"><label class="fl" for="cpLinkSp">Link SharePoint</label><input class="fi" id="cpLinkSp" type="url" inputmode="url" maxlength="2000" autocomplete="off" aria-describedby="cpLinkSpDica"><div id="cpLinkSpDica" style="font-size:11px;color:var(--mu);margin-top:4px">Link da pasta do projeto. Aparece em todos os produtos deste projeto.</div></div>
     </div>
   </div>
   <div class="mft">
@@ -3692,6 +3696,7 @@ function rKanban(){
           <div style="display:flex;align-items:center;justify-content:space-between;margin-top:6px">
             <span style="font-size:10.5px;font-weight:600;color:var(--mu)">${p.pct}%</span>
           </div>
+          ${_linkSpHtml(_linkSpDoProduto(p))}
           ${p.criadoPor?`<div class="kcard-autoria"><span>${icL('pencil')} ${esc(nomeExibicao(p.criadoPor))}</span>${p.editadoPor&&nomeExibicao(p.editadoPor)!==nomeExibicao(p.criadoPor)?`<span>· editado: ${esc(nomeExibicao(p.editadoPor))}</span>`:''}</div>`:''}
           ${(() => {
             const etapas = p.etapas || [];
@@ -5599,6 +5604,7 @@ function openDet(id, opts){
       <div>
         ${dl2('Responsável(is)','<div style="font-size:11.5px">'+((p.resps||[]).join(', ')||'—')+'</div>')}
         ${dl2('Progresso',progH(p,'110px'))}
+        ${_linkSpDoProduto(p)?dl2('Link SharePoint',_linkSpHtml(_linkSpDoProduto(p))):''}
         ${p.linkBdoc?dl2('Link BDOC Firjan',`<a href="${esc(p.linkBdoc)}" target="_blank" rel="noopener noreferrer" style="color:var(--blue);text-decoration:underline;word-break:break-all;font-size:12.5px">🔗 ${esc(p.linkBdoc)}</a>`):''}
         ${p.prazObs?dl2('Obs. Prazo',`<em style="color:var(--mu)">${p.prazObs}</em>`):''}
       </div>
@@ -7779,7 +7785,7 @@ function openNovoCadProj(doProduto){
   _cadProjEditId = null;
   _cadProjDoProduto = !!doProduto;
   document.getElementById('cadProjTitle').textContent = 'Novo Projeto';
-  ['cpNome','cpDesc','cpObj','cpPub'].forEach(id => document.getElementById(id).value = '');
+  ['cpNome','cpDesc','cpObj','cpPub','cpLinkSp'].forEach(id => document.getElementById(id).value = '');
   document.getElementById('ovCadProj').classList.add('on');
   setTimeout(() => document.getElementById('cpNome').focus(), 80);
 }
@@ -7793,6 +7799,7 @@ function openEditCadProj(id){
   document.getElementById('cpDesc').value = pr.descricao || '';
   document.getElementById('cpObj').value  = pr.objetivo || '';
   document.getElementById('cpPub').value  = pr.publico || '';
+  document.getElementById('cpLinkSp').value = pr.linkSharepoint || '';
   document.getElementById('ovCadProj').classList.add('on');
 }
 
@@ -7803,12 +7810,15 @@ function salvarCadProj(){
   if(duplicado){ showToast('❌ Já existe um projeto com esse nome'); return; }
   const anterior = _cadProjEditId ? CADPROJ.find(c => c.id === _cadProjEditId) : null;
   if(_cadProjEditId && !anterior){ showToast('❌ Este projeto foi excluído por outra pessoa'); cm('ovCadProj'); return; }
+  const linkSharepoint = _normalizarLink(document.getElementById('cpLinkSp').value);
+  if(linkSharepoint === null){ document.getElementById('cpLinkSp').focus(); showToast('❌ Link SharePoint inválido — cole o endereço completo da pasta'); return; }
   const pr = {
     ...(anterior || {}),
     nome,
     descricao: document.getElementById('cpDesc').value.trim(),
     objetivo:  document.getElementById('cpObj').value.trim(),
     publico:   document.getElementById('cpPub').value.trim(),
+    linkSharepoint,
     criado:    anterior?.criado || td(),
     criadoPor: anterior?.criadoPor || nomeUsuarioAtual(),
   };
@@ -7959,6 +7969,26 @@ function rCadProjetos(){
 }
 
 // Pop-up com as informações de um projeto (tela Projetos)
+// ── LINK SHAREPOINT DO PROJETO ──
+// Devolve o link pronto para gravar ('' se vazio) ou null se não for um endereço válido.
+function _normalizarLink(v){
+  v = String(v||'').trim();
+  if(!v) return '';
+  if(!/^https?:\/\//i.test(v)) v = 'https://' + v;
+  try{ const u = new URL(v); return /^https?:$/.test(u.protocol) && u.hostname.includes('.') ? u.href : null; }
+  catch(e){ return null; }
+}
+// Link SharePoint do projeto do produto (só http/https)
+function _linkSpDoProduto(p){
+  const url = projDoCard(p)?.linkSharepoint || '';
+  return /^https?:\/\//i.test(url) ? url : '';
+}
+// Link clicável para o card e o detalhe; abre em nova aba sem abrir o card junto
+function _linkSpHtml(url){
+  if(!url) return '';
+  return `<a class="link-sp" href="${esc(url)}" target="_blank" rel="noopener noreferrer" draggable="false" onclick="event.stopPropagation()" onmousedown="event.stopPropagation()" title="Abrir a pasta do projeto no SharePoint (nova janela)">${icL('link')}<span>Pasta no SharePoint</span></a>`;
+}
+
 function abrirProjInfo(id){
   const pr = CADPROJ.find(c => c.id === id); if(!pr) return;
   const prods = DB.filter(p => p.projCadId === pr.id);
@@ -7985,6 +8015,7 @@ function abrirProjInfo(id){
   document.getElementById('projInfoBody').innerHTML = `
     <div style="display:grid;gap:10px;margin-bottom:18px">
       ${bloco('Descrição', pr.descricao)}
+      ${/^https?:\/\//i.test(pr.linkSharepoint||'') ? `<div>${_linkSpHtml(pr.linkSharepoint)}</div>` : ''}
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:10px">${bloco('Objetivo', pr.objetivo)}${bloco('Público-Alvo', pr.publico)}</div>
     </div>
     <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;margin-bottom:8px">
