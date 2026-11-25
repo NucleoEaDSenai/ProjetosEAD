@@ -1504,9 +1504,6 @@ body.dark .sri-hl{background:rgba(255,202,40,.25)}
 .carga-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(380px,1fr));gap:14px;align-items:start}
 .carga-card{background:var(--surface);border:1px solid var(--bdr);border-radius:14px;overflow:hidden;transition:all .2s;position:relative}
 .carga-card:hover{box-shadow:0 4px 20px rgba(0,0,0,.08);transform:translateY(-1px)}
-.carga-card.over-load{border-color:#FCA5A5;background:linear-gradient(180deg,#FEF2F2 0%,var(--surface) 50px)}
-.carga-card.over-load:not(.dark){border-color:#FCA5A5}
-body.dark .carga-card.over-load{background:linear-gradient(180deg,rgba(220,38,38,.15) 0%,var(--surface) 50px);border-color:#7F1D1D}
 /* Card especial Cliente — visual distinto (azul claro / ciano) */
 .carga-card-cliente{border-color:#BAE6FD;background:linear-gradient(180deg,#F0F9FF 0%,var(--surface) 70px)}
 body.dark .carga-card-cliente{background:linear-gradient(180deg,rgba(14,165,233,.12) 0%,var(--surface) 70px);border-color:rgba(14,165,233,.35)}
@@ -12295,9 +12292,8 @@ function _buildCargaCardPessoa(nome, projs, max, stOpen){
   const aguard = projs.filter(p => calcSit(p) === 'aguardando').length;
 
   const pct = Math.round(projs.length / max * 100);
-  const overload = projs.length >= 5 || atrasados >= 2;
-  const corStatus = atrasados > 0 ? 'var(--red)' : projs.length >= 5 ? 'var(--yel)' : 'var(--blue)';
-  const labelCarga = atrasados > 0 ? 'Atenção' : projs.length >= 5 ? 'Sobrecarga' : projs.length >= 3 ? 'Carga regular' : 'Carga leve';
+  // Sem rótulo de carga (leve/regular/sobrecarga): o card mostra só a quantidade de produtos
+  const corStatus = atrasados > 0 ? 'var(--red)' : 'var(--blue)';
   const uid = 'carga_' + nome.replace(/\W/g,'_');
   const isOpen = stOpen[uid] === true;
   const filtro = _cargaAplicarFiltroCard(uid, projs);
@@ -12313,7 +12309,7 @@ function _buildCargaCardPessoa(nome, projs, max, stOpen){
     return (a.prazo||'9999').localeCompare(b.prazo||'9999');
   });
 
-  return `<div class="carga-card${overload?' over-load':''}">
+  return `<div class="carga-card">
     <div class="carga-hd" onclick="toggleCarga('${uid}')">
       <div class="carga-av" style="${_avEstilo(nome)}">
         ${iniciais(nome)}
@@ -12321,7 +12317,6 @@ function _buildCargaCardPessoa(nome, projs, max, stOpen){
       </div>
       <div class="carga-info">
         <div class="carga-name">${nome}</div>
-        <div class="carga-load-label" style="color:${corStatus}">${labelCarga}</div>
       </div>
       <div class="carga-count-wrap">
         <div class="carga-count" style="color:${corStatus}">${projs.length}</div>
