@@ -862,14 +862,9 @@ body.dark .bmotivo{background:rgba(244,167,174,.18);color:#F9C4C9;border-color:r
 body.dark .bmotivo:hover{background:rgba(244,167,174,.28)}
 .motivo-ft{display:flex;gap:8px;justify-content:flex-end;margin-top:14px}
 /* Opções do pop-up: concluída no prazo × com atraso */
-.motivo-opcoes{display:grid;gap:8px}
-.motivo-op{display:flex;gap:10px;align-items:flex-start;padding:10px 12px;border:1.5px solid var(--bdr);border-radius:9px;cursor:pointer;transition:border-color .15s,background .15s}
-.motivo-op:has(input:checked){border-color:var(--blue);background:var(--info-bg,#EFF6FF)}
-.motivo-op input{margin-top:3px;accent-color:var(--blue);flex-shrink:0}
-.motivo-op span{display:grid;gap:1px;font-size:13px}
-.motivo-op small{font-size:11.5px;color:var(--mu)}
-.motivo-campo{padding:0 2px 4px 34px;display:grid;gap:4px}
+.motivo-campo{padding-top:12px;display:grid;gap:4px}
 .motivo-campo[hidden]{display:none}
+.motivo-nota{font-size:11.5px!important;margin:12px 0 0!important}
 /* Modal de confirmação (confirmar) */
 .ov-conf{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:3000;display:none;align-items:center;justify-content:center;backdrop-filter:blur(3px);padding:16px}
 .ov-conf.on{display:flex}
@@ -919,13 +914,6 @@ td.med-it{border-bottom-style:dashed;font-size:12px}
 .med-ln{font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:11px;color:var(--mu)}
 tr.med-tot td{background:var(--s2);font-weight:800;font-size:12px}
 #ppuTbl tfoot td{font-weight:800;background:var(--s2);border-top:2px solid var(--bdr)}
-/* Aba Validações */
-.val-aviso{display:inline-block;margin-left:6px;font-size:10px;font-weight:700;padding:1px 6px;border-radius:6px;background:var(--warn-bg,#FEF3C7);color:var(--warn-fg,#92400E)}
-.val-acoes{display:flex;gap:6px;white-space:nowrap}
-.val-st{font-size:10.5px;font-weight:700;padding:2px 8px;border-radius:8px;white-space:nowrap}
-.val-st.aprovada{background:var(--ok-bg,#DCFCE7);color:var(--ok-fg,#15803D)}
-.val-st.negada{background:var(--danger-bg,#FEE2E2);color:var(--danger-fg,#991B1B)}
-.val-st.pendente{background:var(--warn-bg,#FEF3C7);color:var(--warn-fg,#92400E)}
 /* BADGE DIAS CLIENTE */
 /* Mensagens da coluna Observação (detalhe do card): só texto colorido + ícone, sem fundo nem borda */
 .obs-msg{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:700;line-height:1.35;vertical-align:middle}
@@ -1735,27 +1723,23 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
 <!-- MODAL MOTIVO DE ATRASO -->
 <div class="ov-motivo" id="ovMotivo">
   <div class="motivo-box" role="dialog" aria-modal="true" aria-labelledby="motivoTit">
-    <h3 id="motivoTit">⚠️ Etapa marcada depois do prazo</h3>
+    <h3 id="motivoTit"><svg class="ic ic-inl" aria-hidden="true"><use href="#i-triangle-alert"/></svg> Etapa marcada depois do prazo</h3>
     <p id="motivoDesc"></p>
-    <div class="motivo-opcoes" role="radiogroup" aria-label="Situação da etapa">
-      <label class="motivo-op">
-        <input type="radio" name="motivoTipo" id="motivoTipoPrazo" value="prazo" onchange="_motivoTipoChange()">
-        <span><strong>Foi concluída no prazo, só estou marcando agora</strong><small>Vai para validação da liderança</small></span>
-      </label>
-      <div class="motivo-campo" id="motivoCampoPrazo">
-        <label class="fl" for="motivoDataReal">Data real da conclusão</label>
-        <input type="date" class="fi" id="motivoDataReal">
-      </div>
-      <label class="motivo-op">
-        <input type="radio" name="motivoTipo" id="motivoTipoAtraso" value="atraso" onchange="_motivoTipoChange()" checked>
-        <span><strong>Foi concluída com atraso</strong><small>Registre o motivo para o histórico</small></span>
-      </label>
-      <div class="motivo-campo" id="motivoCampoAtraso">
-        <textarea id="motivoTxt" placeholder="Descreva o motivo do atraso..."></textarea>
-      </div>
+    <label class="fl" for="motivoSel" style="display:block;margin-bottom:5px">Motivo do atraso *</label>
+    <select class="fs" id="motivoSel" aria-required="true" onchange="_motivoSelChange()" style="width:100%">
+      <option value="">— Selecione o motivo —</option>
+      <option value="Atraso Cliente">Atraso Cliente</option>
+      <option value="Atraso Data Final">Atraso Data Final</option>
+      <option value="Esqueceu de marcar">Esqueceu de marcar</option>
+      <option value="outro">Outro</option>
+    </select>
+    <div class="motivo-campo" id="motivoCampoOutro" hidden>
+      <label class="fl" for="motivoTxt" style="display:block">Descreva o motivo *</label>
+      <textarea id="motivoTxt" maxlength="300"></textarea>
     </div>
+    <p class="motivo-nota">A etapa fica concluída na data de hoje e conta como atrasada. O motivo aparece na Observação da atividade.</p>
     <div class="motivo-ft">
-      <button class="btn bg2" onclick="fecharMotivo(false)">Pular</button>
+      <button class="btn bg2" onclick="fecharMotivo('desfazer')" title="Marquei sem querer: a etapa volta a ficar aberta">Desmarcar etapa</button>
       <button class="btn bmotivo" onclick="fecharMotivo(true)">Confirmar</button>
     </div>
   </div>
@@ -1858,7 +1842,6 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
         <div class="si" role="menuitem" tabindex="0" aria-label="Projetos cadastrados" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();nav('cadprojetos')}" onclick="nav('cadprojetos')"><span class="si-ic" style="--ic:#FBBF24"><svg class="ic"><use href="#i-folder"/></svg></span><span>Projetos</span></div>
         <div class="si" role="menuitem" tabindex="0" aria-label="Homologações" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();nav('homologacoes')}" onclick="nav('homologacoes')"><span class="si-ic" style="--ic:#A3E635"><svg class="ic"><use href="#i-badge-check"/></svg></span><span>Homologações</span><span class="si-badge" id="badgeHomolog" style="display:none"></span></div>
         <div class="si" role="menuitem" tabindex="0" aria-label="Lista de Produtos" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();nav('projetos')}" onclick="nav('projetos')"><span class="si-ic" style="--ic:#22D3EE"><svg class="ic"><use href="#i-list"/></svg></span><span>Lista de Produtos</span></div>
-        <div class="si" id="siValidacoes" style="display:none" role="menuitem" tabindex="0" aria-label="Validações" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();nav('validacoes')}" onclick="nav('validacoes')"><span class="si-ic" style="--ic:#34D399"><svg class="ic"><use href="#i-circle-check"/></svg></span><span>Validações</span><span class="si-badge" id="badgeValidacoes" style="display:none"></span></div>
         <div class="si" role="menuitem" tabindex="0" aria-label="Cronograma" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();nav('timeline')}" onclick="nav('timeline')"><span class="si-ic" style="--ic:#A78BFA"><svg class="ic"><use href="#i-calendar-range"/></svg></span><span>Cronograma</span></div>
       </div>
     </div>
@@ -2080,23 +2063,6 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
     </div>
 
     <!-- LISTA -->
-    <!-- VALIDAÇÕES (só liderança): etapas marcadas depois do prazo que o responsável declarou como concluídas no prazo -->
-    <div class="view" id="view-validacoes">
-      <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-bottom:18px" id="valResumo"></div>
-      <div class="fbox" style="font-size:12.5px;color:var(--mu)">Etapas que o responsável marcou depois do prazo informando que foram <strong style="color:var(--txt)">concluídas no prazo</strong>. Ao <strong style="color:var(--txt)">aprovar</strong>, a data de conclusão passa a ser a data real informada e a etapa deixa de contar como atrasada. Ao <strong style="color:var(--txt)">negar</strong>, vale a data em que o check foi dado e a etapa continua atrasada.</div>
-      <div class="tw" style="margin-bottom:22px"><table>
-        <thead><tr><th>Produto</th><th>Etapa</th><th>Responsável</th><th>Prazo</th><th>Concluída em (informado)</th><th>Check dado em</th><th>Solicitado por</th><th>Ações</th></tr></thead>
-        <tbody id="valTbl"></tbody>
-      </table></div>
-      <details id="valDecididas">
-        <summary style="cursor:pointer;font-weight:700;font-size:13px;margin-bottom:10px">Decididas recentemente</summary>
-        <div class="tw"><table>
-          <thead><tr><th>Produto</th><th>Etapa</th><th>Concluída em (informado)</th><th>Check dado em</th><th>Solicitado por</th><th>Decisão</th><th>Decidido por</th></tr></thead>
-          <tbody id="valTblDec"></tbody>
-        </table></div>
-      </details>
-    </div>
-
     <div class="view" id="view-projetos">
       <div class="fbox">
         <div class="fbox-row" style="flex-wrap:wrap;gap:10px;align-items:flex-end">
@@ -3595,8 +3561,8 @@ function icL(id){ return '<svg class="ic ic-inl" aria-hidden="true"><use href="#
 function nomeCompleto(p){ const pr = projDoCard(p); return pr ? pr.nome + ' — ' + p.nome : p.nome; }
 
 // ── NAV ──
-const PT={kanban:'Cards',cadprojetos:'Projetos',homologacoes:'Homologações',projetos:'Lista de Produtos',validacoes:'Validações',ppu:'PPU',timeline:'Cronograma',kpis:'KPIs & Indicadores',atrasos:'Relatório de Atrasos',cancelados:'Produtos Cancelados',medicao:'Medição',carga:'Carga da Equipe',historico:'Histórico de Edições',lixeira:'Produtos Deletados'};
-const ABAS_LIDERANCA = ['validacoes','ppu','kpis','cancelados','lixeira'];
+const PT={kanban:'Cards',cadprojetos:'Projetos',homologacoes:'Homologações',projetos:'Lista de Produtos',ppu:'PPU',timeline:'Cronograma',kpis:'KPIs & Indicadores',atrasos:'Relatório de Atrasos',cancelados:'Produtos Cancelados',medicao:'Medição',carga:'Carga da Equipe',historico:'Histórico de Edições',lixeira:'Produtos Deletados'};
+const ABAS_LIDERANCA = ['ppu','kpis','cancelados','lixeira'];
 function nav(id){
   if(ABAS_LIDERANCA.includes(id) && !ehLideranca()) id='kanban';  // abas exclusivas da liderança
   document.querySelectorAll('.view').forEach(v=>v.classList.remove('on'));
@@ -5571,12 +5537,8 @@ function openDet(id, opts){
                style="width:100%;font-size:11.5px;padding:4px 7px"
                onchange="setEObs(${id},${i},this.value)"
                title="Observação livre para esta etapa">`
-          : `${e.done && e.solicPrazo?.status==='pendente'
-              ? `<span class="obs-msg warn" title="Solicitado por ${esc(nomeExibicao(e.solicPrazo.por)||'')} em ${esc(e.solicPrazo.em||'')}">${icL('hourglass')} Aguardando validação — concluída em ${fd(e.solicPrazo.dataReal)}</span>`
-              : e.done && e.r!=='cl' && e.prazo && e.fim && new Date(e.prazo)<new Date(e.fim)
-              ? e.solicPrazo?.status==='negada' && !e.atrasoMotivo
-                ? `<span class="obs-msg danger">${icL('ban')} Solicitação negada</span> <span class="obs-msg mu">${icL('info')} sem motivo registrado</span>`
-                : e.atrasoMotivo
+          : `${e.done && e.r!=='cl' && e.prazo && e.fim && new Date(e.prazo)<new Date(e.fim)
+                ? e.atrasoMotivo
                 ? `<span class="obs-msg danger" title="${esc(e.atrasoMotivo)}">${icL('triangle-alert')} ${esc(e.atrasoMotivo.length>38?e.atrasoMotivo.slice(0,36)+'…':e.atrasoMotivo)}</span>`
                 : `<span class="obs-msg mu">${icL('info')} sem motivo registrado</span>`
               : ''
@@ -6241,7 +6203,7 @@ function toggleE(pid,idx){
 
   e.done=!e.done;
   e.fim=e.done?td():null;
-  if(!e.done){e.atrasoMotivo=null;e.diasCl=null;e.solicPrazo=null;}
+  if(!e.done){e.atrasoMotivo=null;e.diasCl=null;}
 
   // Etapa do cliente concluída: registrar quantos dias ficou em espera
   if(e.done && e.r==='cl' && e.prazo){
@@ -6293,172 +6255,65 @@ function toggleE(pid,idx){
     const d=Math.round((_mh-_mp)/(864e5));
     document.getElementById('motivoDesc').textContent=
       '"'+e.lb+'" está sendo marcada '+d+' dia(s) depois do prazo ('+fd(e.prazo)+'). Informe o que aconteceu.';
-    document.getElementById('motivoTxt').value=e.atrasoMotivo||'';
-    const dtReal=document.getElementById('motivoDataReal');
-    dtReal.max=td(); dtReal.value=e.prazo<=td()?e.prazo:td();
-    document.getElementById('motivoTipoAtraso').checked=true;
-    _motivoTipoChange();
+    // Motivo já registrado antes (etapa remarcada): volta preenchido
+    const sel=document.getElementById('motivoSel');
+    const fixo=[...sel.options].some(o=>o.value&&o.value!=='outro'&&o.value===e.atrasoMotivo);
+    sel.value = !e.atrasoMotivo ? '' : fixo ? e.atrasoMotivo : 'outro';
+    document.getElementById('motivoTxt').value = e.atrasoMotivo && !fixo ? e.atrasoMotivo : '';
+    _motivoSelChange();
     document.getElementById('ovMotivo').classList.add('on');
     return; // fecharMotivo() reabre o detalhe
   }
   openDet(pid);
 }
 
-// Mostra o campo da opção escolhida no pop-up (data real × motivo)
-function _motivoTipoChange(){
-  const noPrazo=document.getElementById('motivoTipoPrazo').checked;
-  document.getElementById('motivoCampoPrazo').hidden=!noPrazo;
-  document.getElementById('motivoCampoAtraso').hidden=noPrazo;
+// "Outro" mostra a caixa de texto
+function _motivoSelChange(){
+  const outro=document.getElementById('motivoSel').value==='outro';
+  document.getElementById('motivoCampoOutro').hidden=!outro;
+  if(outro) setTimeout(()=>document.getElementById('motivoTxt').focus(),30);
 }
 
-function fecharMotivo(salvar){
+// acao: true = confirmar o motivo (obrigatório) · 'desfazer' = desmarcar a etapa
+function fecharMotivo(acao){
   if(_motivoPid===null){document.getElementById('ovMotivo').classList.remove('on');return;}
-  if(salvar){
-    const p=DB.find(x=>x.id===_motivoPid);
-    const e=p?.etapas[_motivoIdx];
-    if(e && document.getElementById('motivoTipoPrazo').checked){
-      // Opção 1: concluída no prazo → solicitação para a liderança validar
-      const dataReal=document.getElementById('motivoDataReal').value;
-      if(!dataReal){showToast('⚠️ Informe a data real da conclusão');return;}
-      if(dataReal>td()){showToast('⚠️ A data real não pode ser no futuro');return;}
-      e.solicPrazo={dataReal, fimCheck:e.fim, por:nomeUsuarioAtual(), em:_dtAgora(),
-        status:'pendente', decididoPor:null, decididoEm:null};
-      e.atrasoMotivo=null;
-      registrarHistorico(p, 'solicitou validação', `"${e.lb}": concluída no prazo em ${fd(dataReal)} (marcada em ${fd(e.fim)})`);
-      fbSalvarProjeto(p);
-      showToast('📨 Enviado para validação da liderança');
-    } else if(e){
-      // Opção 2: concluída com atraso → motivo, como antes
-      const motivoAnt = e.atrasoMotivo||'';
-      const motivoNov = document.getElementById('motivoTxt').value.trim()||null;
-      e.atrasoMotivo = motivoNov;
-      if(motivoNov && motivoNov !== motivoAnt)
-        registrarHistorico(p, 'registrou motivo', `Atraso em "${e.lb}": ${motivoNov}`);
-      fbSalvarProjeto(p);
-    }
+  const pid=_motivoPid, idx=_motivoIdx;
+  const p=DB.find(x=>x.id===pid);
+  const e=p?.etapas[idx];
+  if(acao==='desfazer'){
+    document.getElementById('ovMotivo').classList.remove('on');
+    _motivoPid=null; _motivoIdx=null;
+    if(e && e.done) toggleE(pid, idx);   // reabre a etapa (registra no histórico e recalcula a coluna)
+    else openDet(pid);
+    return;
+  }
+  if(e){
+    const opc=document.getElementById('motivoSel').value;
+    if(!opc){showToast('⚠️ Selecione o motivo do atraso');document.getElementById('motivoSel').focus();return;}
+    const txt=document.getElementById('motivoTxt').value.trim();
+    if(opc==='outro' && !txt){showToast('⚠️ Descreva o motivo do atraso');document.getElementById('motivoTxt').focus();return;}
+    const motivoNov = opc==='outro' ? txt : opc;
+    const motivoAnt = e.atrasoMotivo||'';
+    e.atrasoMotivo = motivoNov;
+    if(motivoNov !== motivoAnt) registrarHistorico(p, 'registrou motivo', `Atraso em "${e.lb}": ${motivoNov}`);
+    fbSalvarProjeto(p);
   }
   document.getElementById('ovMotivo').classList.remove('on');
-  const pid=_motivoPid;
   _motivoPid=null; _motivoIdx=null;
   openDet(pid);
 }
 
-// ══════════════════════════════════════════════
-//  VALIDAÇÕES — "concluída no prazo, só marquei depois"
-// ══════════════════════════════════════════════
-// Lista as solicitações (etapa.solicPrazo) de todos os produtos ativos, opcionalmente por status
-function _solicitacoesPrazo(status){
-  const lista = [];
-  activeDB().forEach(p => (p.etapas||[]).forEach((e, idx) => {
-    if(e.solicPrazo && (!status || e.solicPrazo.status === status)) lista.push({p, e, idx, s:e.solicPrazo});
-  }));
-  return lista;
-}
-
-// Mostra o item "Validações" só para a liderança e atualiza o badge de pendentes
+// Mostra/esconde os itens exclusivos da liderança
 function _atualizarMenuLideranca(){
   const lider = ehLideranca();
   document.body.classList.toggle('lider', lider);  // mostra/esconde os itens .so-lider
-  const si = document.getElementById('siValidacoes');
-  if(si) si.style.display = lider ? '' : 'none';
   const bkp = document.getElementById('relGrpBackup');  // backup JSON na aba Relatórios dos KPIs
   if(bkp) bkp.style.display = lider ? '' : 'none';
   const siP = document.getElementById('siPPU');
   if(siP) siP.style.display = lider ? '' : 'none';
-  const b = document.getElementById('badgeValidacoes');
-  if(b){
-    const n = lider ? _solicitacoesPrazo('pendente').length : 0;
-    b.style.display = n > 0 ? 'inline-flex' : 'none';
-    b.textContent = n || '';
-  }
   if(!lider && ABAS_LIDERANCA.includes(currentViewId())) nav('kanban');
 }
 
-function rValidacoes(){
-  if(!ehLideranca()) return;
-  const pend = _solicitacoesPrazo('pendente');
-  const aprov = _solicitacoesPrazo('aprovada').length;
-  const neg = _solicitacoesPrazo('negada').length;
-
-  document.getElementById('valResumo').innerHTML = `
-    <div class="sc cy"><div class="sc-l">Pendentes</div><div class="sc-v">${pend.length}</div><div class="sc-s">aguardando decisão</div><div class="sc-i"><svg class="ic"><use href="#i-hourglass"/></svg></div></div>
-    <div class="sc cg"><div class="sc-l">Aprovadas</div><div class="sc-v">${aprov}</div><div class="sc-s">valem a data real</div><div class="sc-i"><svg class="ic"><use href="#i-circle-check"/></svg></div></div>
-    <div class="sc cr"><div class="sc-l">Negadas</div><div class="sc-v">${neg}</div><div class="sc-s">continuam atrasadas</div><div class="sc-i"><svg class="ic"><use href="#i-ban"/></svg></div></div>`;
-
-  // Pendentes: mais antigas primeiro (pela data do check)
-  pend.sort((a,b) => (a.s.fimCheck||'').localeCompare(b.s.fimCheck||''));
-  document.getElementById('valTbl').innerHTML = pend.length ? pend.map(({p,e,idx,s}) => `
-    <tr>
-      <td><strong>${esc(nomeCompleto(p))}</strong></td>
-      <td>${esc(e.lb)}</td>
-      <td>${esc(_respEtapaTxt(e))}</td>
-      <td style="white-space:nowrap">${fd(e.prazo)}</td>
-      <td style="white-space:nowrap">${fd(s.dataReal)}${e.prazo && s.dataReal > e.prazo ? '<span class="val-aviso" title="A data informada é posterior ao prazo">após o prazo</span>' : ''}</td>
-      <td style="white-space:nowrap">${fd(s.fimCheck)}</td>
-      <td style="font-size:11.5px">${esc(nomeExibicao(s.por)||'—')}<div style="color:var(--mu)">${esc(s.em||'')}</div></td>
-      <td><div class="val-acoes">
-        <button class="btn bgreen bsm" onclick="aprovarSolicPrazo(${p.id},${idx})">Aprovar</button>
-        <button class="btn bd bsm" onclick="negarSolicPrazo(${p.id},${idx})">Negar</button>
-        <button class="btn bg2 bsm" onclick="openDet(${p.id})">Ver</button>
-      </div></td>
-    </tr>`).join('')
-    : '<tr><td colspan="8" style="text-align:center;color:var(--mu);padding:26px">Nenhuma solicitação pendente.</td></tr>';
-
-  // Decididas: as 10 mais recentes
-  const dec = _solicitacoesPrazo().filter(x => x.s.status !== 'pendente');
-  const _ord = t => { const m = (t||'').match(/(\d{2})\/(\d{2})\/(\d{4})\s*(\d{2}:\d{2})?/); return m ? `${m[3]}${m[2]}${m[1]}${m[4]||''}` : ''; };
-  dec.sort((a,b) => _ord(b.s.decididoEm).localeCompare(_ord(a.s.decididoEm)));
-  document.getElementById('valTblDec').innerHTML = dec.length ? dec.slice(0,10).map(({p,e,s}) => `
-    <tr>
-      <td>${esc(nomeCompleto(p))}</td>
-      <td>${esc(e.lb)}</td>
-      <td style="white-space:nowrap">${fd(s.dataReal)}</td>
-      <td style="white-space:nowrap">${fd(s.fimCheck)}</td>
-      <td>${esc(nomeExibicao(s.por)||'—')}</td>
-      <td><span class="val-st ${s.status}">${s.status==='aprovada'?'Aprovada':'Negada'}</span></td>
-      <td style="font-size:11.5px">${esc(nomeExibicao(s.decididoPor)||'—')}<div style="color:var(--mu)">${esc(s.decididoEm||'')}</div></td>
-    </tr>`).join('')
-    : '<tr><td colspan="7" style="text-align:center;color:var(--mu);padding:20px">Nenhuma decisão ainda.</td></tr>';
-}
-
-// Busca a solicitação pendente e confere a permissão antes de aprovar/negar
-function _solicPendente(pid, idx){
-  if(!ehLideranca()){ showToast('🔒 Apenas lideranças podem validar'); return null; }
-  const p = DB.find(x => x.id === pid);
-  const e = p?.etapas?.[idx];
-  if(!e?.solicPrazo || e.solicPrazo.status !== 'pendente' || !e.done){
-    showToast('⚠️ Esta solicitação não está mais pendente'); renderAll(); return null;
-  }
-  return {p, e, s:e.solicPrazo};
-}
-
-async function aprovarSolicPrazo(pid, idx){
-  const r0 = _solicPendente(pid, idx); if(!r0) return;
-  const {e:e0, s:s0} = r0;
-  if(!await confirmar({titulo:'Aprovar solicitação?', msg:`**${e0.lb}** fica como concluída em **${fd(s0.dataReal)}**.\n\nA data de conclusão passa de ${fd(e0.fim)} para ${fd(s0.dataReal)}.`, ok:'Aprovar', tipo:'ok'})) return;
-  const r = _solicPendente(pid, idx); if(!r) return;   // pode ter mudado com o modal aberto
-  const {p, e, s} = r;
-  e.fim = s.dataReal;
-  e.atrasoMotivo = null;
-  Object.assign(s, {status:'aprovada', decididoPor:nomeUsuarioAtual(), decididoEm:_dtAgora()});
-  registrarHistorico(p, 'aprovou validação', `"${e.lb}": conclusão em ${fd(s.dataReal)} aprovada (check dado em ${fd(s.fimCheck)})`);
-  fbSalvarProjeto(p);
-  showToast('✅ Solicitação aprovada');
-  renderAll();
-}
-
-async function negarSolicPrazo(pid, idx){
-  const r0 = _solicPendente(pid, idx); if(!r0) return;
-  const {e:e0, s:s0} = r0;
-  if(!await confirmar({titulo:'Negar solicitação?', msg:`Solicitação de **${e0.lb}**.\n\nVale a data do check (${fd(s0.fimCheck)}) e a etapa continua atrasada, sem motivo registrado.`, ok:'Negar', tipo:'perigo', ic:'ban'})) return;
-  const r = _solicPendente(pid, idx); if(!r) return;   // pode ter mudado com o modal aberto
-  const {p, e, s} = r;
-  Object.assign(s, {status:'negada', decididoPor:nomeUsuarioAtual(), decididoEm:_dtAgora()});
-  registrarHistorico(p, 'negou validação', `"${e.lb}": conclusão em ${fd(s.dataReal)} negada — vale ${fd(s.fimCheck)}`);
-  fbSalvarProjeto(p);
-  showToast('🚫 Solicitação negada');
-  renderAll();
-}
 // Aplica cascata: desloca todas as etapas após idx pelo delta de dias úteis
 function cascatarEtapas(etapas, idx, novaData){
   const prazoAnt = etapas[idx].prazo;
@@ -7709,7 +7564,6 @@ function getEtapasDoForm(projAnterior){
       fim:   (e.fim !== undefined ? e.fim : ant.fim) || null,
       done:  (e.done !== undefined ? e.done : ant.done) || false,
       atrasoMotivo: (e.atrasoMotivo !== undefined ? e.atrasoMotivo : ant.atrasoMotivo) || null,
-      solicPrazo: (e.solicPrazo !== undefined ? e.solicPrazo : ant.solicPrazo) || null,  // validação de conclusão no prazo (aba Validações)
       diasCl: (e.diasCl !== undefined ? e.diasCl : ant.diasCl) || null,
       rExtras: (e.rExtras !== undefined ? e.rExtras : ant.rExtras) || [],   // responsáveis adicionais da etapa
       dataInicial: (e.dataInicial !== undefined ? e.dataInicial : ant.dataInicial) || null,  // data inicial informada no card
@@ -11256,7 +11110,6 @@ function renderAll(){
 const VIEW_RENDERERS = {
   kanban:        () => { rDash(); rKanban(); },
   projetos:      () => rList(),
-  validacoes:    () => rValidacoes(),
   ppu:           () => rPPU(),
   timeline:      () => rTimeline(),
   kpis:          () => rKPIs(),
@@ -12549,7 +12402,7 @@ async function duplicarProjeto(id){
   novo.medicaoMes = ''; novo.medicaoQuinzena = ''; novo.medicaoItens = []; novo.medicaoTotal = 0;
   novo.tags = orig.tags ? [...orig.tags] : [];
   novo.historico = [{usuario, acao:'duplicou', dt:dtAgora(), desc:`Duplicado de "${orig.nome}"`}];
-  novo.etapas = (orig.etapas||[]).map(e => ({...e, done:false, fim:null, atrasoMotivo:null, diasCl:null, solicPrazo:null}));
+  novo.etapas = (orig.etapas||[]).map(e => ({...e, done:false, fim:null, atrasoMotivo:null, diasCl:null}));
   DB.push(novo);
   fbSalvarProjeto(novo);
   renderAll();
@@ -13096,7 +12949,7 @@ function mostrarLogin(){
 // ── ACESSIBILIDADE: fechar modal com Escape ──
 document.addEventListener('keydown', function(e){
   if(e.key !== 'Escape') return;
-  ['ovNew','ovDet','ovCanc','ovMotivo','ovDelMotivo'].forEach(id => {
+  ['ovNew','ovDet','ovCanc','ovDelMotivo'].forEach(id => {  // ovMotivo fica de fora: o motivo é obrigatório
     const el = document.getElementById(id);
     if(el && el.classList.contains('on')) { el.classList.remove('on'); }
     if(el && el.style.display === 'flex') { el.style.display = 'none'; }
