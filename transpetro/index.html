@@ -50,6 +50,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
 .sb-sub{font-size:11px;color:rgba(255,255,255,.75);margin-top:2px}
 .sb-nav{flex:1;padding:10px 0;overflow-y:auto}
 .sb-sec{font-size:10px;letter-spacing:1.5px;color:rgba(255,255,255,.5);padding:10px 18px 3px;font-weight:700;text-transform:uppercase}
+body:not(.lider) .so-lider{display:none !important}
 .si{display:flex;align-items:center;gap:8px;padding:9px 18px;color:rgba(255,255,255,.78);cursor:pointer;font-size:13px;border-left:3px solid transparent;transition:all .15s}
 .si:hover{background:rgba(255,255,255,.05);color:#fff}
 .si.on{color:#fff;background:rgba(232,0,45,.12);border-left-color:var(--red)}
@@ -1842,9 +1843,9 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
     <div class="sb-sub">Educação a Distância · 2026</div>
   </div>
   <nav class="sb-nav">
-    <div class="sb-sec">Ações</div>
-    <div class="si" role="menuitem" tabindex="0" aria-label="Novo Produto" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openNew()}" onclick="openNew()"><span class="si-ic" style="--ic:#60A5FA"><svg class="ic"><use href="#i-square-plus"/></svg></span><span>Novo Produto</span></div>
-    <div class="si" role="menuitem" tabindex="0" aria-label="Novo Projeto" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openNovoCadProj()}" onclick="openNovoCadProj()"><span class="si-ic" style="--ic:#FBBF24"><svg class="ic"><use href="#i-folder-plus"/></svg></span><span>Novo Projeto</span></div>
+    <div class="sb-sec so-lider">Ações</div>
+    <div class="si so-lider" role="menuitem" tabindex="0" aria-label="Novo Produto" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openNew()}" onclick="openNew()"><span class="si-ic" style="--ic:#60A5FA"><svg class="ic"><use href="#i-square-plus"/></svg></span><span>Novo Produto</span></div>
+    <div class="si so-lider" role="menuitem" tabindex="0" aria-label="Novo Projeto" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openNovoCadProj()}" onclick="openNovoCadProj()"><span class="si-ic" style="--ic:#FBBF24"><svg class="ic"><use href="#i-folder-plus"/></svg></span><span>Novo Projeto</span></div>
 
     <!-- Grupo Principal -->
     <div class="sb-group" id="sbg-principal">
@@ -1869,12 +1870,12 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
         <span class="sb-sec-chevron">▼</span>
       </div>
       <div class="sb-group-items">
-        <div class="si" role="menuitem" tabindex="0" aria-label="KPIs e Indicadores" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();nav('kpis')}" onclick="nav('kpis')"><span class="si-ic" style="--ic:#F472B6"><svg class="ic"><use href="#i-chart"/></svg></span><span>KPIs &amp; Indicadores</span></div>
+        <div class="si so-lider" role="menuitem" tabindex="0" aria-label="KPIs e Indicadores" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();nav('kpis')}" onclick="nav('kpis')"><span class="si-ic" style="--ic:#F472B6"><svg class="ic"><use href="#i-chart"/></svg></span><span>KPIs &amp; Indicadores</span></div>
         <div class="si" role="menuitem" tabindex="0" aria-label="Relatório de Atrasos" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();nav('atrasos')}" onclick="nav('atrasos')"><span class="si-ic" style="--ic:#F87171"><svg class="ic"><use href="#i-alarm"/></svg></span><span>Atrasos</span><span class="si-badge" id="badgeAtrasos" style="display:none"></span></div>
         <div class="si" role="menuitem" tabindex="0" aria-label="Medição" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();nav('medicao')}" onclick="nav('medicao')"><span class="si-ic" style="--ic:#4ADE80"><svg class="ic"><use href="#i-receipt"/></svg></span><span>Medição</span><span class="si-badge" id="badgeMedicao" style="display:none"></span></div>
         <div class="si" id="siPPU" style="display:none" role="menuitem" tabindex="0" aria-label="PPU" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();nav('ppu')}" onclick="nav('ppu')"><span class="si-ic" style="--ic:#FB923C"><svg class="ic"><use href="#i-clipboard-list"/></svg></span><span>PPU</span></div>
-        <div class="si" role="menuitem" tabindex="0" aria-label="Produtos Cancelados" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();nav('cancelados')}" onclick="nav('cancelados')"><span class="si-ic" style="--ic:#FB923C"><svg class="ic"><use href="#i-ban"/></svg></span><span>Cancelados</span></div>
-        <div class="si" role="menuitem" tabindex="0" aria-label="Histórico de Produtos Deletados" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();nav('lixeira')}" onclick="nav('lixeira')"><span class="si-ic" style="--ic:#94A3B8"><svg class="ic"><use href="#i-trash"/></svg></span><span>Deletados</span></div>
+        <div class="si so-lider" role="menuitem" tabindex="0" aria-label="Produtos Cancelados" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();nav('cancelados')}" onclick="nav('cancelados')"><span class="si-ic" style="--ic:#FB923C"><svg class="ic"><use href="#i-ban"/></svg></span><span>Cancelados</span></div>
+        <div class="si so-lider" role="menuitem" tabindex="0" aria-label="Histórico de Produtos Deletados" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();nav('lixeira')}" onclick="nav('lixeira')"><span class="si-ic" style="--ic:#94A3B8"><svg class="ic"><use href="#i-trash"/></svg></span><span>Deletados</span></div>
       </div>
     </div>
 
@@ -3594,8 +3595,9 @@ function nomeCompleto(p){ const pr = projDoCard(p); return pr ? pr.nome + ' — 
 
 // ── NAV ──
 const PT={kanban:'Cards',cadprojetos:'Projetos',homologacoes:'Homologações',projetos:'Lista de Produtos',validacoes:'Validações',ppu:'PPU',timeline:'Cronograma',kpis:'KPIs & Indicadores',atrasos:'Relatório de Atrasos',cancelados:'Produtos Cancelados',medicao:'Medição',carga:'Carga da Equipe',historico:'Histórico de Edições',lixeira:'Produtos Deletados'};
+const ABAS_LIDERANCA = ['validacoes','ppu','kpis','cancelados','lixeira'];
 function nav(id){
-  if((id==='validacoes'||id==='ppu') && !ehLideranca()) id='kanban';  // abas exclusivas da liderança
+  if(ABAS_LIDERANCA.includes(id) && !ehLideranca()) id='kanban';  // abas exclusivas da liderança
   document.querySelectorAll('.view').forEach(v=>v.classList.remove('on'));
   document.getElementById('view-'+id).classList.add('on');
   document.querySelectorAll('.si').forEach(n=>n.classList.remove('on'));
@@ -3629,7 +3631,7 @@ function rDash(){
     <div class="sc cg"><div class="sc-l">Produtos Concluídos</div><div class="sc-v">${conc}</div><div class="sc-s">produtos entregues</div><div class="sc-i"><svg class="ic"><use href="#i-circle-check"/></svg></div></div>
     <div class="sc cy"><div class="sc-l">Produtos Atrasados - Equipe</div><div class="sc-v">${atq}</div><div class="sc-s">em atraso</div><div class="sc-i"><svg class="ic"><use href="#i-triangle-alert"/></svg></div></div>
     <div class="sc cp"><div class="sc-l">Produtos Atrasados - Cliente</div><div class="sc-v">${waitCl}</div><div class="sc-s">em atraso</div><div class="sc-i"><svg class="ic"><use href="#i-hourglass"/></svg></div></div>
-    <div class="sc cgr"><div class="sc-l">Produtos Cancelados</div><div class="sc-v">${canc}</div><div class="sc-s"><a href="#" onclick="nav('cancelados');return false" style="color:var(--mu)">ver relatório</a></div><div class="sc-i"><svg class="ic"><use href="#i-ban"/></svg></div></div>
+    <div class="sc cgr"><div class="sc-l">Produtos Cancelados</div><div class="sc-v">${canc}</div><div class="sc-s">${ehLideranca()?`<a href="#" onclick="nav('cancelados');return false" style="color:var(--mu)">ver relatório</a>`:''}</div><div class="sc-i"><svg class="ic"><use href="#i-ban"/></svg></div></div>
   `;
 }
 
@@ -4220,7 +4222,6 @@ function rList(){
       <td style="white-space:nowrap">
         <div style="display:flex;align-items:stretch;gap:4px">
           <button class="btn bg2 bsm" onclick="openDet(${p.id})">Ver</button>
-          <button class="btn bd bsm" style="padding:0 7px" onclick="delP(${p.id})" title="Excluir produto" aria-label="Excluir produto"><svg class="ic" style="width:14px;height:14px"><use href="#i-trash"/></svg></button>
         </div>
       </td>
     </tr>`;
@@ -5701,11 +5702,11 @@ function openDet(id, opts){
   document.getElementById('detFt').innerHTML=`
     <button class="btn bg2" onclick="cm('ovDet')">${icL('x')} Fechar</button>
     ${(p.col===11 || p.homologPassou || p.homolog?.preenchido)?`<button class="btn" style="background:linear-gradient(135deg,#003DA5,#0060CC);color:#fff" onclick="cm('ovDet');irParaCardHomologacao(${p.id})" title="Seguir para este projeto na aba Homologações">${icL('badge-check')} Lançar Homologação</button>`:''}
-    <button class="btn bg2" onclick="cm('ovDet');duplicarProjeto(${p.id})" title="Criar cópia deste projeto">Duplicar</button>
-    <button class="btn bb" onclick="cm('ovDet');openEdit(${p.id})">${icL('pencil')} Editar</button>
+    ${ehLideranca()?`<button class="btn bg2" onclick="cm('ovDet');duplicarProjeto(${p.id})" title="Criar cópia deste projeto">Duplicar</button>
+    <button class="btn bb" onclick="cm('ovDet');openEdit(${p.id})">${icL('pencil')} Editar</button>`:''}
     <button class="btn bpastel" onclick="exportPDFFicha(${p.id})">Exportar PDF</button>
     ${podeApagarProjeto()?`<button class="btn bdforte" onclick="cm('ovDet');delP(${p.id})">Deletar Produto</button>`:''}
-     ${!p.cancelado?`<button class="btn bgray" onclick="abrirCanc(${p.id})">Produto Cancelado</button>`:''}
+     ${!p.cancelado && ehLideranca()?`<button class="btn bgray" onclick="abrirCanc(${p.id})">Produto Cancelado</button>`:''}
   `;
   document.getElementById('ovDet').classList.add('on');
   if(!opts?.semFoco) setTimeout(()=>{const m=document.querySelector('#ovDet .modal');if(m)m.focus();},80);  // semFoco: atualização ao vivo não tira o cursor de quem digita
@@ -6354,6 +6355,7 @@ function _solicitacoesPrazo(status){
 // Mostra o item "Validações" só para a liderança e atualiza o badge de pendentes
 function _atualizarMenuLideranca(){
   const lider = ehLideranca();
+  document.body.classList.toggle('lider', lider);  // mostra/esconde os itens .so-lider
   const si = document.getElementById('siValidacoes');
   if(si) si.style.display = lider ? '' : 'none';
   const bkp = document.getElementById('relGrpBackup');  // backup JSON na aba Relatórios dos KPIs
@@ -6366,7 +6368,7 @@ function _atualizarMenuLideranca(){
     b.style.display = n > 0 ? 'inline-flex' : 'none';
     b.textContent = n || '';
   }
-  if(!lider && ['validacoes','ppu'].includes(currentViewId())) nav('kanban');
+  if(!lider && ABAS_LIDERANCA.includes(currentViewId())) nav('kanban');
 }
 
 function rValidacoes(){
@@ -6669,7 +6671,7 @@ function setER(pid,idx,v){
 }
 
 // ── CANCELAR ──
-function abrirCanc(id){cancId=id;document.getElementById('fCancMotivo').value='';cm('ovDet');document.getElementById('ovCanc').classList.add('on');}
+function abrirCanc(id){if(!ehLideranca()){showToast('🔒 Apenas a Liderança pode cancelar produtos');return;}cancId=id;document.getElementById('fCancMotivo').value='';cm('ovDet');document.getElementById('ovCanc').classList.add('on');}
 function confirmarCanc(){
   const p=DB.find(x=>x.id===cancId);if(!p)return;
   p.cancelado=true; p.cancelEm=td(); p.cancelMotivo=document.getElementById('fCancMotivo').value;
@@ -7776,6 +7778,7 @@ function buildProjSelect(selId){
 function onChangeProjSel(){}
 
 function openNovoCadProj(doProduto){
+  if(!ehLideranca()){ showToast('🔒 Apenas a Liderança pode cadastrar projetos'); return; }
   _cadProjEditId = null;
   _cadProjDoProduto = !!doProduto;
   document.getElementById('cadProjTitle').textContent = 'Novo Projeto';
@@ -8014,6 +8017,7 @@ function rCadProjExcluidos(){
 }
 
 function openNew(){
+  if(!ehLideranca()){ showToast('🔒 Apenas a Liderança pode criar produtos'); return; }
   editId=null;
   document.getElementById('mNewTitle').textContent='Novo Produto';
   document.getElementById('fpo').value='';
@@ -8049,6 +8053,7 @@ function openNew(){
 }
 
 function openEdit(id){
+  if(!ehLideranca()){ showToast('🔒 Apenas a Liderança pode editar produtos'); return; }
   const p=DB.find(x=>x.id===id);if(!p)return;
   editId=id; document.getElementById('mNewTitle').textContent='Editar Produto';
   buildNomeProdutoSelect(p.nome||'');
@@ -12497,6 +12502,7 @@ function corProgresso(sit){
 //  DUPLICAR PROJETO
 // ══════════════════════════════════════════════
 async function duplicarProjeto(id){
+  if(!ehLideranca()){ showToast('🔒 Apenas a Liderança pode duplicar produtos'); return; }
   const orig = DB.find(p => p.id === id); if(!orig) return;
   if(!await confirmar({titulo:'Duplicar produto?', msg:`Será criada uma cópia de **${orig.nome}** com as mesmas etapas e dados, sem o histórico de execução.`, ok:'Duplicar', ic:'copy'})) return;
   const usuario = nomeUsuarioAtual();
