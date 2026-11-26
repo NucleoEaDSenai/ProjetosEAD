@@ -2905,7 +2905,7 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
 // ══════════════════════════════════════════════
 //  CONSTANTS
 // ══════════════════════════════════════════════
-const NOMES = ['Tatiana','Ana Paula','Amanda','Gabriel','Pedro','Maycon','Liderança Flavia','Liderança Julia','Liderança Maria Emilia','RPCI - Cristina (DI)','RPCI - Carla (DI)','RPCI - Leo (DM)','RPCI - Rafael (DM)','RPCI - Rubio (RT)','RPCI - Débora (RT)','RPCI - Patricia (RT)'];
+const NOMES = ['Tatiana','Ana Paula','Amanda','Gabriel','Pedro','Maycon','Liderança Flavia','Liderança Julia','Liderança Emilia','RPCI - Cristina (DI)','RPCI - Carla (DI)','RPCI - Leo (DM)','RPCI - Rafael (DM)','RPCI - Rubio (RT)','RPCI - Débora (RT)','RPCI - Patricia (RT)'];
 
 // Categorias de Projetos da Transpetro (campo "academia" no banco)
 const CATEGORIAS_PROJETO = ['ECorp','PQDT','PQTM'];
@@ -11164,7 +11164,8 @@ const _NOMES_MIGRAR = {
   'Maria Julia':   'Liderança Julia',
   'Fabiana':       'Liderança Fabiana',
   'Marise':        'Liderança Marise',
-  'Maria Emilia':  'Liderança Maria Emilia',
+  'Maria Emilia':  'Liderança Emilia',
+  'Liderança Maria Emilia': 'Liderança Emilia',  // renomeada (nov/2026)
 };
 function _migrarNome(nome){ return _NOMES_MIGRAR[nome] || nome; }
 
@@ -11174,7 +11175,9 @@ function normalizar(p){
   p.recursos       = [...new Set((p.recursos || []).map(r => (r==='Plano Instrucional'|| r==='Plano de Identidade Visual' || r==='Plano Instrucional e Plano de Identidade Visual (PICV)') ? 'Plano Instrucional e Plano de Identidade Visual' : r)
                        .map(r => String(r).replace(/(\d) mim\b/g, '$1 min')))];  // recursos unificados no PICV · "mim" → "min"
   if(Array.isArray(p.medicaoItens)) p.medicaoItens.forEach(it => { if(it.desc) it.desc = it.desc.replace(/(\d) mim\b/g, '$1 min'); });
-  p.etapas         = (p.etapas || []).map(e => ({...e, r: _migrarNome(e.r||'')}));
+  p.etapas         = (p.etapas || []).map(e => ({...e, r: _migrarNome(e.r||''),
+                       ...(Array.isArray(e.rExtras) ? {rExtras: e.rExtras.map(_migrarNome)} : {})}));
+  if(p.medicaoConfirmadaPor) p.medicaoConfirmadaPor = _migrarNome(p.medicaoConfirmadaPor);
   p.col            = typeof p.col === 'string' ? parseInt(p.col) : (p.col || 0);
   if(COLUNA_REMAP[p.col] !== undefined) p.col = COLUNA_REMAP[p.col];  // colunas ocultas → coluna visível equivalente
   p.cancelado      = !!p.cancelado;
@@ -11182,6 +11185,7 @@ function normalizar(p){
   p.medicaoFeita   = !!p.medicaoFeita;
   p.medicaoFeitaEm = p.medicaoFeitaEm || null;
   p.homolog        = p.homolog || {};
+  ['solicitante','enviadaPor','homologConfirmadaPor'].forEach(k => { if(p.homolog[k]) p.homolog[k] = _migrarNome(p.homolog[k]); });
 
   return p;
 }
@@ -12430,7 +12434,7 @@ const EMAIL_NOMES = {
   'mrgrodrigues@firjan.com.br':'Mariana',
   'mlpeixoto@firjan.com.br':   'Mateus',
   'mgouffier@firjan.com.br':   'Liderança Julia',
-  'mepessanha@firjan.com.br':  'Liderança Maria Emilia',
+  'mepessanha@firjan.com.br':  'Liderança Emilia',
   'mclopes@firjan.com.br':     'Liderança Marise',
   'fiino@firjan.com.br':       'Fatima',
   'fcribeiro@firjan.com.br':   'Liderança Fabiana',
@@ -12457,7 +12461,7 @@ const NOME_CORES = {
   'Mariana':     '#0891B2',  // ciano
   'Mateus':      '#7e22ce',  // violeta
   'Liderança Julia': '#D97706',  // laranja
-  'Liderança Maria Emilia':'#EC4899',  // rosa
+  'Liderança Emilia':'#EC4899',        // rosa
   'Liderança Marise':  '#0f766e',  // teal
   'Fatima':      '#E8002D',  // vermelho
   'Liderança Fabiana': '#1A8A4A',  // verde
