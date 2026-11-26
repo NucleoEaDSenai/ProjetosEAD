@@ -713,12 +713,14 @@ body.dark .est-seta{color:var(--tp-y)}
       </div></div>
     </div></li>
     <li class="step"><div class="step-b">
-      <h3>Marcou depois do prazo? Explique</h3>
-      <p>Ao concluir uma etapa da equipe depois do prazo, o sistema pergunta o que aconteceu:</p>
-      <ul>
-        <li><strong>Foi concluída no prazo, só marquei depois</strong>: informe a data real. O pedido vai para a Liderança aprovar em <a href="#t09">Validações</a>.</li>
-        <li><strong>Foi concluída com atraso</strong>: descreva o motivo. Ele aparece no relatório de <a href="#t12">Atrasos</a>.</li>
-      </ul>
+      <h3>Marcou depois do prazo? Escolha o motivo</h3>
+      <p>Ao concluir uma etapa da equipe depois do prazo, o sistema pede o <strong>motivo do atraso</strong> (obrigatório): <strong>Atraso Cliente</strong>, <strong>Atraso Data Final</strong>, <strong>Esqueceu de marcar</strong> ou <strong>Outro</strong>, que abre uma caixa para escrever. A etapa fica concluída na data do check e conta como atrasada; o motivo aparece na <strong>Observação</strong> da atividade e no relatório de <a href="#t12">Atrasos</a>.</p>
+      <div class="mock"><div class="mock-hd"><svg class="ic"><use href="#i-triangle-alert"/></svg>Etapa marcada depois do prazo</div><div class="mock-bd">
+        <div class="m-lb">Motivo do atraso *</div><div class="m-in foco">Outro <svg class="ic"><use href="#i-chevron-down"/></svg></div>
+        <div class="m-lb">Descreva o motivo *</div><div class="m-in" style="min-height:46px;align-items:flex-start">Equipe de férias</div>
+        <div style="display:flex;justify-content:flex-end;gap:8px"><span class="m-btn sec">Desmarcar etapa</span><span class="m-btn">Confirmar</span></div>
+      </div></div>
+      <p style="margin-top:12px">Marcou sem querer? Use <strong>Desmarcar etapa</strong>: ela volta a ficar aberta.</p>
     </div></li>
     <li class="step"><div class="step-b">
       <h3>Use os botões e os filtros</h3>
@@ -903,44 +905,6 @@ body.dark .est-seta{color:var(--tp-y)}
     </div></li>
   </ol>
   <aside class="dica"><svg class="ic"><use href="#i-lightbulb"/></svg><div><strong>Dica:</strong> o <strong>Relatório de Medições</strong> em PDF fica em <a href="#t11">KPIs &amp; Indicadores</a>, aba Relatórios. Para entender o RAMP no contrato, veja <a href="#contrato">O contrato Transpetro</a>.</div></aside>
-</section>
-
-<!-- ══════════════════ 09 · VALIDAÇÕES ══════════════════ -->
-<section class="pg g-lid" id="pg-t09">
-  <div class="tag"><i></i>Liderança</div>
-  <h1>Como usar as Validações</h1>
-  <p class="intro">Aqui a Liderança decide os pedidos de quem marcou uma etapa <strong>depois do prazo</strong>, informando que ela foi <strong>concluída no prazo</strong>.</p>
-  <ol class="steps">
-    <li class="step"><div class="step-b">
-      <h3>Entenda como o pedido chega</h3>
-      <p>Quem conclui uma etapa da equipe depois do prazo vê esta janela. Ao escolher a primeira opção e informar a data real, o pedido vai para a Liderança.</p>
-      <div class="mock"><div class="mock-hd"><svg class="ic"><use href="#i-alarm"/></svg>Etapa concluída depois do prazo</div><div class="mock-bd">
-        <div class="opt on"><span class="radio"></span><div><b>Foi concluída no prazo, só marquei depois</b><div style="color:var(--mu)">Informe a data real. A Liderança valida.</div></div></div>
-        <div class="opt"><span class="radio"></span><div><b>Foi concluída com atraso</b><div style="color:var(--mu)">Descreva o motivo do atraso.</div></div></div>
-      </div></div>
-    </div></li>
-    <li class="step"><div class="step-b">
-      <h3>Veja os pedidos pendentes</h3>
-      <p>No topo, os totais de <strong>Pendentes</strong>, <strong>Aprovadas</strong> e <strong>Negadas</strong>. A tabela mostra o produto, a etapa, o responsável, o prazo, a data informada, a data em que o check foi dado e quem pediu. O aviso <strong>após o prazo</strong> indica que a data informada também passou do prazo.</p>
-      <div class="mock"><div class="tbl-wrap"><table class="m-tbl">
-        <thead><tr><th>Etapa</th><th>Prazo</th><th>Concluída em (informado)</th><th>Check dado em</th><th>Ações</th></tr></thead>
-        <tbody><tr><td>Revisão do PI</td><td>13/11/2026</td><td>12/11/2026</td><td>17/11/2026</td><td style="white-space:nowrap"><span class="st ok">Aprovar</span> <span class="st bad">Negar</span> <span class="st neu">Ver</span></td></tr></tbody>
-      </table></div></div>
-    </div></li>
-    <li class="step"><div class="step-b">
-      <h3>Aprove ou negue</h3>
-      <ul>
-        <li><strong>Aprovar</strong>: a data de conclusão passa a ser a data real informada e a etapa deixa de contar como atrasada.</li>
-        <li><strong>Negar</strong>: vale a data em que o check foi dado e a etapa continua atrasada.</li>
-        <li><strong>Ver</strong>: abre o card do produto.</li>
-      </ul>
-    </div></li>
-    <li class="step"><div class="step-b">
-      <h3>Consulte as decisões</h3>
-      <p>Em <strong>Decididas recentemente</strong>, as últimas 10 decisões, com quem decidiu e quando.</p>
-    </div></li>
-  </ol>
-  <aside class="dica"><svg class="ic"><use href="#i-lightbulb"/></svg><div><strong>Dica:</strong> o número ao lado de <strong>Validações</strong> no menu mostra quantos pedidos estão esperando decisão.</div></aside>
 </section>
 
 <!-- ══════════════════ 10 · PPU ══════════════════ -->
@@ -1150,7 +1114,6 @@ const PAGINAS = [
   {id:'t06', g:'dia', ic:'calendar-range', titulo:'Acompanhar o cronograma',     desc:'Prazos dos produtos e atividades no Gantt.'},
   {id:'t07', g:'dia', ic:'badge-check',    titulo:'Lançar as homologações',      desc:'Datas, status e confirmação da homologação.'},
   {id:'t08', g:'dia', ic:'receipt',        titulo:'Medição (RAMP)',              desc:'Envie para a medição e acompanhe cada RAMP.'},
-  {id:'t09', g:'lid', ic:'circle-check',   titulo:'Validações',                  desc:'Aprove ou negue conclusões marcadas depois do prazo.'},
   {id:'t10', g:'lid', ic:'clipboard-list', titulo:'PPU',                         desc:'Saldo de cada linha do contrato, em quantidade e R$.'},
   {id:'t11', g:'acp', ic:'chart',          titulo:'KPIs e indicadores',          desc:'Números da produção e relatórios para baixar.'},
   {id:'t12', g:'acp', ic:'alarm',          titulo:'Acompanhar os atrasos',       desc:'Atrasos da equipe e do cliente, e o prazo final.'},
@@ -1160,7 +1123,7 @@ const PAGINAS = [
   {id:'t16', g:'adm', ic:'history',        titulo:'Histórico de edições',        desc:'Quem alterou o quê e quando.'},
 ];
 const ic = (n, extra='') => `<svg class="ic"${extra}><use href="#i-${n}"/></svg>`;
-const num = p => p.id.startsWith('t') ? p.id.slice(1) : '';
+const num = p => { const i = PAGINAS.filter(x => x.g).indexOf(p); return i < 0 ? '' : String(i + 1).padStart(2, '0'); };
 
 // ── Menu ───────────────────────────────────────────────────────────
 function montarMenu(){

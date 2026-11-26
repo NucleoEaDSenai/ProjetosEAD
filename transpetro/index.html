@@ -50,6 +50,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
 .sb-sub{font-size:11px;color:rgba(255,255,255,.75);margin-top:2px}
 .sb-nav{flex:1;padding:10px 0;overflow-y:auto}
 .sb-sec{font-size:10px;letter-spacing:1.5px;color:rgba(255,255,255,.5);padding:10px 18px 3px;font-weight:700;text-transform:uppercase}
+body:not(.lider) .so-lider{display:none !important}
 .si{display:flex;align-items:center;gap:8px;padding:9px 18px;color:rgba(255,255,255,.78);cursor:pointer;font-size:13px;border-left:3px solid transparent;transition:all .15s}
 .si:hover{background:rgba(255,255,255,.05);color:#fff}
 .si.on{color:#fff;background:rgba(232,0,45,.12);border-left-color:var(--red)}
@@ -861,14 +862,9 @@ body.dark .bmotivo{background:rgba(244,167,174,.18);color:#F9C4C9;border-color:r
 body.dark .bmotivo:hover{background:rgba(244,167,174,.28)}
 .motivo-ft{display:flex;gap:8px;justify-content:flex-end;margin-top:14px}
 /* Opções do pop-up: concluída no prazo × com atraso */
-.motivo-opcoes{display:grid;gap:8px}
-.motivo-op{display:flex;gap:10px;align-items:flex-start;padding:10px 12px;border:1.5px solid var(--bdr);border-radius:9px;cursor:pointer;transition:border-color .15s,background .15s}
-.motivo-op:has(input:checked){border-color:var(--blue);background:var(--info-bg,#EFF6FF)}
-.motivo-op input{margin-top:3px;accent-color:var(--blue);flex-shrink:0}
-.motivo-op span{display:grid;gap:1px;font-size:13px}
-.motivo-op small{font-size:11.5px;color:var(--mu)}
-.motivo-campo{padding:0 2px 4px 34px;display:grid;gap:4px}
+.motivo-campo{padding-top:12px;display:grid;gap:4px}
 .motivo-campo[hidden]{display:none}
+.motivo-nota{font-size:11.5px!important;margin:12px 0 0!important}
 /* Modal de confirmação (confirmar) */
 .ov-conf{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:3000;display:none;align-items:center;justify-content:center;backdrop-filter:blur(3px);padding:16px}
 .ov-conf.on{display:flex}
@@ -918,13 +914,6 @@ td.med-it{border-bottom-style:dashed;font-size:12px}
 .med-ln{font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:11px;color:var(--mu)}
 tr.med-tot td{background:var(--s2);font-weight:800;font-size:12px}
 #ppuTbl tfoot td{font-weight:800;background:var(--s2);border-top:2px solid var(--bdr)}
-/* Aba Validações */
-.val-aviso{display:inline-block;margin-left:6px;font-size:10px;font-weight:700;padding:1px 6px;border-radius:6px;background:var(--warn-bg,#FEF3C7);color:var(--warn-fg,#92400E)}
-.val-acoes{display:flex;gap:6px;white-space:nowrap}
-.val-st{font-size:10.5px;font-weight:700;padding:2px 8px;border-radius:8px;white-space:nowrap}
-.val-st.aprovada{background:var(--ok-bg,#DCFCE7);color:var(--ok-fg,#15803D)}
-.val-st.negada{background:var(--danger-bg,#FEE2E2);color:var(--danger-fg,#991B1B)}
-.val-st.pendente{background:var(--warn-bg,#FEF3C7);color:var(--warn-fg,#92400E)}
 /* BADGE DIAS CLIENTE */
 /* Mensagens da coluna Observação (detalhe do card): só texto colorido + ícone, sem fundo nem borda */
 .obs-msg{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:700;line-height:1.35;vertical-align:middle}
@@ -1138,6 +1127,9 @@ body.dark .tenant-item.current{background:rgba(34,197,94,.12)}
 .coment-ta{flex:1;padding:9px 12px;border:1.5px solid var(--bdr);border-radius:8px;font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;resize:none;height:64px;outline:none}
 .coment-ta:focus{border-color:var(--blue)}
 /* AUTORIA no card kanban */
+.link-sp{display:inline-flex;align-items:center;gap:5px;margin-top:6px;font-size:11px;font-weight:600;color:var(--blue);text-decoration:none;max-width:100%}
+.link-sp:hover span{text-decoration:underline}
+.link-sp .ic{width:12px;height:12px;flex-shrink:0}
 .kcard-autoria{font-size:10px;color:var(--mu);margin-top:4px;display:flex;gap:8px;flex-wrap:wrap}
 .kc[data-col="14"]{background:linear-gradient(160deg,#F5F3FF 0%,#EDE9FE 100%);border:1.5px solid #C4B5FD}
 .kc[data-col="14"] .kc-t{color:#6D28D9}
@@ -1503,9 +1495,6 @@ body.dark .sri-hl{background:rgba(255,202,40,.25)}
 .carga-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(380px,1fr));gap:14px;align-items:start}
 .carga-card{background:var(--surface);border:1px solid var(--bdr);border-radius:14px;overflow:hidden;transition:all .2s;position:relative}
 .carga-card:hover{box-shadow:0 4px 20px rgba(0,0,0,.08);transform:translateY(-1px)}
-.carga-card.over-load{border-color:#FCA5A5;background:linear-gradient(180deg,#FEF2F2 0%,var(--surface) 50px)}
-.carga-card.over-load:not(.dark){border-color:#FCA5A5}
-body.dark .carga-card.over-load{background:linear-gradient(180deg,rgba(220,38,38,.15) 0%,var(--surface) 50px);border-color:#7F1D1D}
 /* Card especial Cliente — visual distinto (azul claro / ciano) */
 .carga-card-cliente{border-color:#BAE6FD;background:linear-gradient(180deg,#F0F9FF 0%,var(--surface) 70px)}
 body.dark .carga-card-cliente{background:linear-gradient(180deg,rgba(14,165,233,.12) 0%,var(--surface) 70px);border-color:rgba(14,165,233,.35)}
@@ -1734,27 +1723,23 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
 <!-- MODAL MOTIVO DE ATRASO -->
 <div class="ov-motivo" id="ovMotivo">
   <div class="motivo-box" role="dialog" aria-modal="true" aria-labelledby="motivoTit">
-    <h3 id="motivoTit">⚠️ Etapa marcada depois do prazo</h3>
+    <h3 id="motivoTit"><svg class="ic ic-inl" aria-hidden="true"><use href="#i-triangle-alert"/></svg> Etapa marcada depois do prazo</h3>
     <p id="motivoDesc"></p>
-    <div class="motivo-opcoes" role="radiogroup" aria-label="Situação da etapa">
-      <label class="motivo-op">
-        <input type="radio" name="motivoTipo" id="motivoTipoPrazo" value="prazo" onchange="_motivoTipoChange()">
-        <span><strong>Foi concluída no prazo, só estou marcando agora</strong><small>Vai para validação da liderança</small></span>
-      </label>
-      <div class="motivo-campo" id="motivoCampoPrazo">
-        <label class="fl" for="motivoDataReal">Data real da conclusão</label>
-        <input type="date" class="fi" id="motivoDataReal">
-      </div>
-      <label class="motivo-op">
-        <input type="radio" name="motivoTipo" id="motivoTipoAtraso" value="atraso" onchange="_motivoTipoChange()" checked>
-        <span><strong>Foi concluída com atraso</strong><small>Registre o motivo para o histórico</small></span>
-      </label>
-      <div class="motivo-campo" id="motivoCampoAtraso">
-        <textarea id="motivoTxt" placeholder="Descreva o motivo do atraso..."></textarea>
-      </div>
+    <label class="fl" for="motivoSel" style="display:block;margin-bottom:5px">Motivo do atraso *</label>
+    <select class="fs" id="motivoSel" aria-required="true" onchange="_motivoSelChange()" style="width:100%">
+      <option value="">— Selecione o motivo —</option>
+      <option value="Atraso Cliente">Atraso Cliente</option>
+      <option value="Atraso Data Final">Atraso Data Final</option>
+      <option value="Esqueceu de marcar">Esqueceu de marcar</option>
+      <option value="outro">Outro</option>
+    </select>
+    <div class="motivo-campo" id="motivoCampoOutro" hidden>
+      <label class="fl" for="motivoTxt" style="display:block">Descreva o motivo *</label>
+      <textarea id="motivoTxt" maxlength="300"></textarea>
     </div>
+    <p class="motivo-nota">A etapa fica concluída na data de hoje e conta como atrasada. O motivo aparece na Observação da atividade.</p>
     <div class="motivo-ft">
-      <button class="btn bg2" onclick="fecharMotivo(false)">Pular</button>
+      <button class="btn bg2" onclick="fecharMotivo('desfazer')" title="Marquei sem querer: a etapa volta a ficar aberta">Desmarcar etapa</button>
       <button class="btn bmotivo" onclick="fecharMotivo(true)">Confirmar</button>
     </div>
   </div>
@@ -1842,9 +1827,9 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
     <div class="sb-sub">Educação a Distância · 2026</div>
   </div>
   <nav class="sb-nav">
-    <div class="sb-sec">Ações</div>
-    <div class="si" role="menuitem" tabindex="0" aria-label="Novo Produto" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openNew()}" onclick="openNew()"><span class="si-ic" style="--ic:#60A5FA"><svg class="ic"><use href="#i-square-plus"/></svg></span><span>Novo Produto</span></div>
-    <div class="si" role="menuitem" tabindex="0" aria-label="Novo Projeto" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openNovoCadProj()}" onclick="openNovoCadProj()"><span class="si-ic" style="--ic:#FBBF24"><svg class="ic"><use href="#i-folder-plus"/></svg></span><span>Novo Projeto</span></div>
+    <div class="sb-sec so-lider">Ações</div>
+    <div class="si so-lider" role="menuitem" tabindex="0" aria-label="Novo Produto" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openNew()}" onclick="openNew()"><span class="si-ic" style="--ic:#60A5FA"><svg class="ic"><use href="#i-square-plus"/></svg></span><span>Novo Produto</span></div>
+    <div class="si so-lider" role="menuitem" tabindex="0" aria-label="Novo Projeto" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openNovoCadProj()}" onclick="openNovoCadProj()"><span class="si-ic" style="--ic:#FBBF24"><svg class="ic"><use href="#i-folder-plus"/></svg></span><span>Novo Projeto</span></div>
 
     <!-- Grupo Principal -->
     <div class="sb-group" id="sbg-principal">
@@ -1857,7 +1842,6 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
         <div class="si" role="menuitem" tabindex="0" aria-label="Projetos cadastrados" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();nav('cadprojetos')}" onclick="nav('cadprojetos')"><span class="si-ic" style="--ic:#FBBF24"><svg class="ic"><use href="#i-folder"/></svg></span><span>Projetos</span></div>
         <div class="si" role="menuitem" tabindex="0" aria-label="Homologações" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();nav('homologacoes')}" onclick="nav('homologacoes')"><span class="si-ic" style="--ic:#A3E635"><svg class="ic"><use href="#i-badge-check"/></svg></span><span>Homologações</span><span class="si-badge" id="badgeHomolog" style="display:none"></span></div>
         <div class="si" role="menuitem" tabindex="0" aria-label="Lista de Produtos" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();nav('projetos')}" onclick="nav('projetos')"><span class="si-ic" style="--ic:#22D3EE"><svg class="ic"><use href="#i-list"/></svg></span><span>Lista de Produtos</span></div>
-        <div class="si" id="siValidacoes" style="display:none" role="menuitem" tabindex="0" aria-label="Validações" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();nav('validacoes')}" onclick="nav('validacoes')"><span class="si-ic" style="--ic:#34D399"><svg class="ic"><use href="#i-circle-check"/></svg></span><span>Validações</span><span class="si-badge" id="badgeValidacoes" style="display:none"></span></div>
         <div class="si" role="menuitem" tabindex="0" aria-label="Cronograma" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();nav('timeline')}" onclick="nav('timeline')"><span class="si-ic" style="--ic:#A78BFA"><svg class="ic"><use href="#i-calendar-range"/></svg></span><span>Cronograma</span></div>
       </div>
     </div>
@@ -1869,12 +1853,12 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
         <span class="sb-sec-chevron">▼</span>
       </div>
       <div class="sb-group-items">
-        <div class="si" role="menuitem" tabindex="0" aria-label="KPIs e Indicadores" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();nav('kpis')}" onclick="nav('kpis')"><span class="si-ic" style="--ic:#F472B6"><svg class="ic"><use href="#i-chart"/></svg></span><span>KPIs &amp; Indicadores</span></div>
+        <div class="si so-lider" role="menuitem" tabindex="0" aria-label="KPIs e Indicadores" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();nav('kpis')}" onclick="nav('kpis')"><span class="si-ic" style="--ic:#F472B6"><svg class="ic"><use href="#i-chart"/></svg></span><span>KPIs &amp; Indicadores</span></div>
         <div class="si" role="menuitem" tabindex="0" aria-label="Relatório de Atrasos" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();nav('atrasos')}" onclick="nav('atrasos')"><span class="si-ic" style="--ic:#F87171"><svg class="ic"><use href="#i-alarm"/></svg></span><span>Atrasos</span><span class="si-badge" id="badgeAtrasos" style="display:none"></span></div>
         <div class="si" role="menuitem" tabindex="0" aria-label="Medição" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();nav('medicao')}" onclick="nav('medicao')"><span class="si-ic" style="--ic:#4ADE80"><svg class="ic"><use href="#i-receipt"/></svg></span><span>Medição</span><span class="si-badge" id="badgeMedicao" style="display:none"></span></div>
         <div class="si" id="siPPU" style="display:none" role="menuitem" tabindex="0" aria-label="PPU" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();nav('ppu')}" onclick="nav('ppu')"><span class="si-ic" style="--ic:#FB923C"><svg class="ic"><use href="#i-clipboard-list"/></svg></span><span>PPU</span></div>
-        <div class="si" role="menuitem" tabindex="0" aria-label="Produtos Cancelados" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();nav('cancelados')}" onclick="nav('cancelados')"><span class="si-ic" style="--ic:#FB923C"><svg class="ic"><use href="#i-ban"/></svg></span><span>Cancelados</span></div>
-        <div class="si" role="menuitem" tabindex="0" aria-label="Histórico de Produtos Deletados" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();nav('lixeira')}" onclick="nav('lixeira')"><span class="si-ic" style="--ic:#94A3B8"><svg class="ic"><use href="#i-trash"/></svg></span><span>Deletados</span></div>
+        <div class="si so-lider" role="menuitem" tabindex="0" aria-label="Produtos Cancelados" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();nav('cancelados')}" onclick="nav('cancelados')"><span class="si-ic" style="--ic:#FB923C"><svg class="ic"><use href="#i-ban"/></svg></span><span>Cancelados</span></div>
+        <div class="si so-lider" role="menuitem" tabindex="0" aria-label="Histórico de Produtos Deletados" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();nav('lixeira')}" onclick="nav('lixeira')"><span class="si-ic" style="--ic:#94A3B8"><svg class="ic"><use href="#i-trash"/></svg></span><span>Deletados</span></div>
       </div>
     </div>
 
@@ -2079,23 +2063,6 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
     </div>
 
     <!-- LISTA -->
-    <!-- VALIDAÇÕES (só liderança): etapas marcadas depois do prazo que o responsável declarou como concluídas no prazo -->
-    <div class="view" id="view-validacoes">
-      <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-bottom:18px" id="valResumo"></div>
-      <div class="fbox" style="font-size:12.5px;color:var(--mu)">Etapas que o responsável marcou depois do prazo informando que foram <strong style="color:var(--txt)">concluídas no prazo</strong>. Ao <strong style="color:var(--txt)">aprovar</strong>, a data de conclusão passa a ser a data real informada e a etapa deixa de contar como atrasada. Ao <strong style="color:var(--txt)">negar</strong>, vale a data em que o check foi dado e a etapa continua atrasada.</div>
-      <div class="tw" style="margin-bottom:22px"><table>
-        <thead><tr><th>Produto</th><th>Etapa</th><th>Responsável</th><th>Prazo</th><th>Concluída em (informado)</th><th>Check dado em</th><th>Solicitado por</th><th>Ações</th></tr></thead>
-        <tbody id="valTbl"></tbody>
-      </table></div>
-      <details id="valDecididas">
-        <summary style="cursor:pointer;font-weight:700;font-size:13px;margin-bottom:10px">Decididas recentemente</summary>
-        <div class="tw"><table>
-          <thead><tr><th>Produto</th><th>Etapa</th><th>Concluída em (informado)</th><th>Check dado em</th><th>Solicitado por</th><th>Decisão</th><th>Decidido por</th></tr></thead>
-          <tbody id="valTblDec"></tbody>
-        </table></div>
-      </details>
-    </div>
-
     <div class="view" id="view-projetos">
       <div class="fbox">
         <div class="fbox-row" style="flex-wrap:wrap;gap:10px;align-items:flex-end">
@@ -2839,6 +2806,7 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
       <div class="fg ff"><label class="fl" for="cpDesc">Descrição</label><textarea class="fta" id="cpDesc" placeholder="Contexto e escopo do projeto..."></textarea></div>
       <div class="fg ff"><label class="fl" for="cpObj">Objetivo</label><textarea class="fta" id="cpObj" placeholder="O que o projeto deve alcançar..."></textarea></div>
       <div class="fg ff"><label class="fl" for="cpPub">Público-Alvo</label><textarea class="fta" id="cpPub" placeholder="Quem vai usar os produtos deste projeto..."></textarea></div>
+      <div class="fg ff"><label class="fl" for="cpLinkSp">Link SharePoint</label><input class="fi" id="cpLinkSp" type="url" inputmode="url" maxlength="2000" autocomplete="off" aria-describedby="cpLinkSpDica"><div id="cpLinkSpDica" style="font-size:11px;color:var(--mu);margin-top:4px">Link da pasta do projeto. Aparece em todos os produtos deste projeto.</div></div>
     </div>
   </div>
   <div class="mft">
@@ -2937,7 +2905,7 @@ button:focus-visible,a:focus-visible,.si:focus-visible,.chip:focus-visible,.kcar
 // ══════════════════════════════════════════════
 //  CONSTANTS
 // ══════════════════════════════════════════════
-const NOMES = ['Tatiana','Ana Paula','Amanda','Gabriel','Pedro','Maycon','Liderança Flavia','Liderança Julia','Liderança Maria Emilia','RPCI - Cristina (DI)','RPCI - Carla (DI)','RPCI - Leo (DM)','RPCI - Rafael (DM)','RPCI - Rubio (RT)','RPCI - Débora (RT)'];
+const NOMES = ['Tatiana','Ana Paula','Amanda','Gabriel','Pedro','Maycon','Liderança Flavia','Liderança Julia','Liderança Emilia','RPCI - Cristina (DI)','RPCI - Carla (DI)','RPCI - Leo (DM)','RPCI - Rafael (DM)','RPCI - Rubio (RT)','RPCI - Débora (RT)','RPCI - Patricia (RT)'];
 
 // Categorias de Projetos da Transpetro (campo "academia" no banco)
 const CATEGORIAS_PROJETO = ['ECorp','PQDT','PQTM'];
@@ -3593,9 +3561,10 @@ function icL(id){ return '<svg class="ic ic-inl" aria-hidden="true"><use href="#
 function nomeCompleto(p){ const pr = projDoCard(p); return pr ? pr.nome + ' — ' + p.nome : p.nome; }
 
 // ── NAV ──
-const PT={kanban:'Cards',cadprojetos:'Projetos',homologacoes:'Homologações',projetos:'Lista de Produtos',validacoes:'Validações',ppu:'PPU',timeline:'Cronograma',kpis:'KPIs & Indicadores',atrasos:'Relatório de Atrasos',cancelados:'Produtos Cancelados',medicao:'Medição',carga:'Carga da Equipe',historico:'Histórico de Edições',lixeira:'Produtos Deletados'};
+const PT={kanban:'Cards',cadprojetos:'Projetos',homologacoes:'Homologações',projetos:'Lista de Produtos',ppu:'PPU',timeline:'Cronograma',kpis:'KPIs & Indicadores',atrasos:'Relatório de Atrasos',cancelados:'Produtos Cancelados',medicao:'Medição',carga:'Carga da Equipe',historico:'Histórico de Edições',lixeira:'Produtos Deletados'};
+const ABAS_LIDERANCA = ['ppu','kpis','cancelados','lixeira'];
 function nav(id){
-  if((id==='validacoes'||id==='ppu') && !ehLideranca()) id='kanban';  // abas exclusivas da liderança
+  if(ABAS_LIDERANCA.includes(id) && !ehLideranca()) id='kanban';  // abas exclusivas da liderança
   document.querySelectorAll('.view').forEach(v=>v.classList.remove('on'));
   document.getElementById('view-'+id).classList.add('on');
   document.querySelectorAll('.si').forEach(n=>n.classList.remove('on'));
@@ -3629,7 +3598,7 @@ function rDash(){
     <div class="sc cg"><div class="sc-l">Produtos Concluídos</div><div class="sc-v">${conc}</div><div class="sc-s">produtos entregues</div><div class="sc-i"><svg class="ic"><use href="#i-circle-check"/></svg></div></div>
     <div class="sc cy"><div class="sc-l">Produtos Atrasados - Equipe</div><div class="sc-v">${atq}</div><div class="sc-s">em atraso</div><div class="sc-i"><svg class="ic"><use href="#i-triangle-alert"/></svg></div></div>
     <div class="sc cp"><div class="sc-l">Produtos Atrasados - Cliente</div><div class="sc-v">${waitCl}</div><div class="sc-s">em atraso</div><div class="sc-i"><svg class="ic"><use href="#i-hourglass"/></svg></div></div>
-    <div class="sc cgr"><div class="sc-l">Produtos Cancelados</div><div class="sc-v">${canc}</div><div class="sc-s"><a href="#" onclick="nav('cancelados');return false" style="color:var(--mu)">ver relatório</a></div><div class="sc-i"><svg class="ic"><use href="#i-ban"/></svg></div></div>
+    <div class="sc cgr"><div class="sc-l">Produtos Cancelados</div><div class="sc-v">${canc}</div><div class="sc-s">${ehLideranca()?`<a href="#" onclick="nav('cancelados');return false" style="color:var(--mu)">ver relatório</a>`:''}</div><div class="sc-i"><svg class="ic"><use href="#i-ban"/></svg></div></div>
   `;
 }
 
@@ -3693,6 +3662,7 @@ function rKanban(){
           <div style="display:flex;align-items:center;justify-content:space-between;margin-top:6px">
             <span style="font-size:10.5px;font-weight:600;color:var(--mu)">${p.pct}%</span>
           </div>
+          ${_linkSpHtml(_linkSpDoProduto(p))}
           ${p.criadoPor?`<div class="kcard-autoria"><span>${icL('pencil')} ${esc(nomeExibicao(p.criadoPor))}</span>${p.editadoPor&&nomeExibicao(p.editadoPor)!==nomeExibicao(p.criadoPor)?`<span>· editado: ${esc(nomeExibicao(p.editadoPor))}</span>`:''}</div>`:''}
           ${(() => {
             const etapas = p.etapas || [];
@@ -4220,7 +4190,6 @@ function rList(){
       <td style="white-space:nowrap">
         <div style="display:flex;align-items:stretch;gap:4px">
           <button class="btn bg2 bsm" onclick="openDet(${p.id})">Ver</button>
-          <button class="btn bd bsm" style="padding:0 7px" onclick="delP(${p.id})" title="Excluir produto" aria-label="Excluir produto"><svg class="ic" style="width:14px;height:14px"><use href="#i-trash"/></svg></button>
         </div>
       </td>
     </tr>`;
@@ -5568,12 +5537,8 @@ function openDet(id, opts){
                style="width:100%;font-size:11.5px;padding:4px 7px"
                onchange="setEObs(${id},${i},this.value)"
                title="Observação livre para esta etapa">`
-          : `${e.done && e.solicPrazo?.status==='pendente'
-              ? `<span class="obs-msg warn" title="Solicitado por ${esc(nomeExibicao(e.solicPrazo.por)||'')} em ${esc(e.solicPrazo.em||'')}">${icL('hourglass')} Aguardando validação — concluída em ${fd(e.solicPrazo.dataReal)}</span>`
-              : e.done && e.r!=='cl' && e.prazo && e.fim && new Date(e.prazo)<new Date(e.fim)
-              ? e.solicPrazo?.status==='negada' && !e.atrasoMotivo
-                ? `<span class="obs-msg danger">${icL('ban')} Solicitação negada</span> <span class="obs-msg mu">${icL('info')} sem motivo registrado</span>`
-                : e.atrasoMotivo
+          : `${e.done && e.r!=='cl' && e.prazo && e.fim && new Date(e.prazo)<new Date(e.fim)
+                ? e.atrasoMotivo
                 ? `<span class="obs-msg danger" title="${esc(e.atrasoMotivo)}">${icL('triangle-alert')} ${esc(e.atrasoMotivo.length>38?e.atrasoMotivo.slice(0,36)+'…':e.atrasoMotivo)}</span>`
                 : `<span class="obs-msg mu">${icL('info')} sem motivo registrado</span>`
               : ''
@@ -5601,6 +5566,7 @@ function openDet(id, opts){
       <div>
         ${dl2('Responsável(is)','<div style="font-size:11.5px">'+((p.resps||[]).join(', ')||'—')+'</div>')}
         ${dl2('Progresso',progH(p,'110px'))}
+        ${_linkSpDoProduto(p)?dl2('Link SharePoint',_linkSpHtml(_linkSpDoProduto(p))):''}
         ${p.linkBdoc?dl2('Link BDOC Firjan',`<a href="${esc(p.linkBdoc)}" target="_blank" rel="noopener noreferrer" style="color:var(--blue);text-decoration:underline;word-break:break-all;font-size:12.5px">🔗 ${esc(p.linkBdoc)}</a>`):''}
         ${p.prazObs?dl2('Obs. Prazo',`<em style="color:var(--mu)">${p.prazObs}</em>`):''}
       </div>
@@ -5701,11 +5667,11 @@ function openDet(id, opts){
   document.getElementById('detFt').innerHTML=`
     <button class="btn bg2" onclick="cm('ovDet')">${icL('x')} Fechar</button>
     ${(p.col===11 || p.homologPassou || p.homolog?.preenchido)?`<button class="btn" style="background:linear-gradient(135deg,#003DA5,#0060CC);color:#fff" onclick="cm('ovDet');irParaCardHomologacao(${p.id})" title="Seguir para este projeto na aba Homologações">${icL('badge-check')} Lançar Homologação</button>`:''}
-    <button class="btn bg2" onclick="cm('ovDet');duplicarProjeto(${p.id})" title="Criar cópia deste projeto">Duplicar</button>
-    <button class="btn bb" onclick="cm('ovDet');openEdit(${p.id})">${icL('pencil')} Editar</button>
+    ${ehLideranca()?`<button class="btn bg2" onclick="cm('ovDet');duplicarProjeto(${p.id})" title="Criar cópia deste projeto">Duplicar</button>
+    <button class="btn bb" onclick="cm('ovDet');openEdit(${p.id})">${icL('pencil')} Editar</button>`:''}
     <button class="btn bpastel" onclick="exportPDFFicha(${p.id})">Exportar PDF</button>
     ${podeApagarProjeto()?`<button class="btn bdforte" onclick="cm('ovDet');delP(${p.id})">Deletar Produto</button>`:''}
-     ${!p.cancelado?`<button class="btn bgray" onclick="abrirCanc(${p.id})">Produto Cancelado</button>`:''}
+     ${!p.cancelado && ehLideranca()?`<button class="btn bgray" onclick="abrirCanc(${p.id})">Produto Cancelado</button>`:''}
   `;
   document.getElementById('ovDet').classList.add('on');
   if(!opts?.semFoco) setTimeout(()=>{const m=document.querySelector('#ovDet .modal');if(m)m.focus();},80);  // semFoco: atualização ao vivo não tira o cursor de quem digita
@@ -6237,7 +6203,7 @@ function toggleE(pid,idx){
 
   e.done=!e.done;
   e.fim=e.done?td():null;
-  if(!e.done){e.atrasoMotivo=null;e.diasCl=null;e.solicPrazo=null;}
+  if(!e.done){e.atrasoMotivo=null;e.diasCl=null;}
 
   // Etapa do cliente concluída: registrar quantos dias ficou em espera
   if(e.done && e.r==='cl' && e.prazo){
@@ -6289,171 +6255,65 @@ function toggleE(pid,idx){
     const d=Math.round((_mh-_mp)/(864e5));
     document.getElementById('motivoDesc').textContent=
       '"'+e.lb+'" está sendo marcada '+d+' dia(s) depois do prazo ('+fd(e.prazo)+'). Informe o que aconteceu.';
-    document.getElementById('motivoTxt').value=e.atrasoMotivo||'';
-    const dtReal=document.getElementById('motivoDataReal');
-    dtReal.max=td(); dtReal.value=e.prazo<=td()?e.prazo:td();
-    document.getElementById('motivoTipoAtraso').checked=true;
-    _motivoTipoChange();
+    // Motivo já registrado antes (etapa remarcada): volta preenchido
+    const sel=document.getElementById('motivoSel');
+    const fixo=[...sel.options].some(o=>o.value&&o.value!=='outro'&&o.value===e.atrasoMotivo);
+    sel.value = !e.atrasoMotivo ? '' : fixo ? e.atrasoMotivo : 'outro';
+    document.getElementById('motivoTxt').value = e.atrasoMotivo && !fixo ? e.atrasoMotivo : '';
+    _motivoSelChange();
     document.getElementById('ovMotivo').classList.add('on');
     return; // fecharMotivo() reabre o detalhe
   }
   openDet(pid);
 }
 
-// Mostra o campo da opção escolhida no pop-up (data real × motivo)
-function _motivoTipoChange(){
-  const noPrazo=document.getElementById('motivoTipoPrazo').checked;
-  document.getElementById('motivoCampoPrazo').hidden=!noPrazo;
-  document.getElementById('motivoCampoAtraso').hidden=noPrazo;
+// "Outro" mostra a caixa de texto
+function _motivoSelChange(){
+  const outro=document.getElementById('motivoSel').value==='outro';
+  document.getElementById('motivoCampoOutro').hidden=!outro;
+  if(outro) setTimeout(()=>document.getElementById('motivoTxt').focus(),30);
 }
 
-function fecharMotivo(salvar){
+// acao: true = confirmar o motivo (obrigatório) · 'desfazer' = desmarcar a etapa
+function fecharMotivo(acao){
   if(_motivoPid===null){document.getElementById('ovMotivo').classList.remove('on');return;}
-  if(salvar){
-    const p=DB.find(x=>x.id===_motivoPid);
-    const e=p?.etapas[_motivoIdx];
-    if(e && document.getElementById('motivoTipoPrazo').checked){
-      // Opção 1: concluída no prazo → solicitação para a liderança validar
-      const dataReal=document.getElementById('motivoDataReal').value;
-      if(!dataReal){showToast('⚠️ Informe a data real da conclusão');return;}
-      if(dataReal>td()){showToast('⚠️ A data real não pode ser no futuro');return;}
-      e.solicPrazo={dataReal, fimCheck:e.fim, por:nomeUsuarioAtual(), em:_dtAgora(),
-        status:'pendente', decididoPor:null, decididoEm:null};
-      e.atrasoMotivo=null;
-      registrarHistorico(p, 'solicitou validação', `"${e.lb}": concluída no prazo em ${fd(dataReal)} (marcada em ${fd(e.fim)})`);
-      fbSalvarProjeto(p);
-      showToast('📨 Enviado para validação da liderança');
-    } else if(e){
-      // Opção 2: concluída com atraso → motivo, como antes
-      const motivoAnt = e.atrasoMotivo||'';
-      const motivoNov = document.getElementById('motivoTxt').value.trim()||null;
-      e.atrasoMotivo = motivoNov;
-      if(motivoNov && motivoNov !== motivoAnt)
-        registrarHistorico(p, 'registrou motivo', `Atraso em "${e.lb}": ${motivoNov}`);
-      fbSalvarProjeto(p);
-    }
+  const pid=_motivoPid, idx=_motivoIdx;
+  const p=DB.find(x=>x.id===pid);
+  const e=p?.etapas[idx];
+  if(acao==='desfazer'){
+    document.getElementById('ovMotivo').classList.remove('on');
+    _motivoPid=null; _motivoIdx=null;
+    if(e && e.done) toggleE(pid, idx);   // reabre a etapa (registra no histórico e recalcula a coluna)
+    else openDet(pid);
+    return;
+  }
+  if(e){
+    const opc=document.getElementById('motivoSel').value;
+    if(!opc){showToast('⚠️ Selecione o motivo do atraso');document.getElementById('motivoSel').focus();return;}
+    const txt=document.getElementById('motivoTxt').value.trim();
+    if(opc==='outro' && !txt){showToast('⚠️ Descreva o motivo do atraso');document.getElementById('motivoTxt').focus();return;}
+    const motivoNov = opc==='outro' ? txt : opc;
+    const motivoAnt = e.atrasoMotivo||'';
+    e.atrasoMotivo = motivoNov;
+    if(motivoNov !== motivoAnt) registrarHistorico(p, 'registrou motivo', `Atraso em "${e.lb}": ${motivoNov}`);
+    fbSalvarProjeto(p);
   }
   document.getElementById('ovMotivo').classList.remove('on');
-  const pid=_motivoPid;
   _motivoPid=null; _motivoIdx=null;
   openDet(pid);
 }
 
-// ══════════════════════════════════════════════
-//  VALIDAÇÕES — "concluída no prazo, só marquei depois"
-// ══════════════════════════════════════════════
-// Lista as solicitações (etapa.solicPrazo) de todos os produtos ativos, opcionalmente por status
-function _solicitacoesPrazo(status){
-  const lista = [];
-  activeDB().forEach(p => (p.etapas||[]).forEach((e, idx) => {
-    if(e.solicPrazo && (!status || e.solicPrazo.status === status)) lista.push({p, e, idx, s:e.solicPrazo});
-  }));
-  return lista;
-}
-
-// Mostra o item "Validações" só para a liderança e atualiza o badge de pendentes
+// Mostra/esconde os itens exclusivos da liderança
 function _atualizarMenuLideranca(){
   const lider = ehLideranca();
-  const si = document.getElementById('siValidacoes');
-  if(si) si.style.display = lider ? '' : 'none';
+  document.body.classList.toggle('lider', lider);  // mostra/esconde os itens .so-lider
   const bkp = document.getElementById('relGrpBackup');  // backup JSON na aba Relatórios dos KPIs
   if(bkp) bkp.style.display = lider ? '' : 'none';
   const siP = document.getElementById('siPPU');
   if(siP) siP.style.display = lider ? '' : 'none';
-  const b = document.getElementById('badgeValidacoes');
-  if(b){
-    const n = lider ? _solicitacoesPrazo('pendente').length : 0;
-    b.style.display = n > 0 ? 'inline-flex' : 'none';
-    b.textContent = n || '';
-  }
-  if(!lider && ['validacoes','ppu'].includes(currentViewId())) nav('kanban');
+  if(!lider && ABAS_LIDERANCA.includes(currentViewId())) nav('kanban');
 }
 
-function rValidacoes(){
-  if(!ehLideranca()) return;
-  const pend = _solicitacoesPrazo('pendente');
-  const aprov = _solicitacoesPrazo('aprovada').length;
-  const neg = _solicitacoesPrazo('negada').length;
-
-  document.getElementById('valResumo').innerHTML = `
-    <div class="sc cy"><div class="sc-l">Pendentes</div><div class="sc-v">${pend.length}</div><div class="sc-s">aguardando decisão</div><div class="sc-i"><svg class="ic"><use href="#i-hourglass"/></svg></div></div>
-    <div class="sc cg"><div class="sc-l">Aprovadas</div><div class="sc-v">${aprov}</div><div class="sc-s">valem a data real</div><div class="sc-i"><svg class="ic"><use href="#i-circle-check"/></svg></div></div>
-    <div class="sc cr"><div class="sc-l">Negadas</div><div class="sc-v">${neg}</div><div class="sc-s">continuam atrasadas</div><div class="sc-i"><svg class="ic"><use href="#i-ban"/></svg></div></div>`;
-
-  // Pendentes: mais antigas primeiro (pela data do check)
-  pend.sort((a,b) => (a.s.fimCheck||'').localeCompare(b.s.fimCheck||''));
-  document.getElementById('valTbl').innerHTML = pend.length ? pend.map(({p,e,idx,s}) => `
-    <tr>
-      <td><strong>${esc(nomeCompleto(p))}</strong></td>
-      <td>${esc(e.lb)}</td>
-      <td>${esc(_respEtapaTxt(e))}</td>
-      <td style="white-space:nowrap">${fd(e.prazo)}</td>
-      <td style="white-space:nowrap">${fd(s.dataReal)}${e.prazo && s.dataReal > e.prazo ? '<span class="val-aviso" title="A data informada é posterior ao prazo">após o prazo</span>' : ''}</td>
-      <td style="white-space:nowrap">${fd(s.fimCheck)}</td>
-      <td style="font-size:11.5px">${esc(nomeExibicao(s.por)||'—')}<div style="color:var(--mu)">${esc(s.em||'')}</div></td>
-      <td><div class="val-acoes">
-        <button class="btn bgreen bsm" onclick="aprovarSolicPrazo(${p.id},${idx})">Aprovar</button>
-        <button class="btn bd bsm" onclick="negarSolicPrazo(${p.id},${idx})">Negar</button>
-        <button class="btn bg2 bsm" onclick="openDet(${p.id})">Ver</button>
-      </div></td>
-    </tr>`).join('')
-    : '<tr><td colspan="8" style="text-align:center;color:var(--mu);padding:26px">Nenhuma solicitação pendente.</td></tr>';
-
-  // Decididas: as 10 mais recentes
-  const dec = _solicitacoesPrazo().filter(x => x.s.status !== 'pendente');
-  const _ord = t => { const m = (t||'').match(/(\d{2})\/(\d{2})\/(\d{4})\s*(\d{2}:\d{2})?/); return m ? `${m[3]}${m[2]}${m[1]}${m[4]||''}` : ''; };
-  dec.sort((a,b) => _ord(b.s.decididoEm).localeCompare(_ord(a.s.decididoEm)));
-  document.getElementById('valTblDec').innerHTML = dec.length ? dec.slice(0,10).map(({p,e,s}) => `
-    <tr>
-      <td>${esc(nomeCompleto(p))}</td>
-      <td>${esc(e.lb)}</td>
-      <td style="white-space:nowrap">${fd(s.dataReal)}</td>
-      <td style="white-space:nowrap">${fd(s.fimCheck)}</td>
-      <td>${esc(nomeExibicao(s.por)||'—')}</td>
-      <td><span class="val-st ${s.status}">${s.status==='aprovada'?'Aprovada':'Negada'}</span></td>
-      <td style="font-size:11.5px">${esc(nomeExibicao(s.decididoPor)||'—')}<div style="color:var(--mu)">${esc(s.decididoEm||'')}</div></td>
-    </tr>`).join('')
-    : '<tr><td colspan="7" style="text-align:center;color:var(--mu);padding:20px">Nenhuma decisão ainda.</td></tr>';
-}
-
-// Busca a solicitação pendente e confere a permissão antes de aprovar/negar
-function _solicPendente(pid, idx){
-  if(!ehLideranca()){ showToast('🔒 Apenas lideranças podem validar'); return null; }
-  const p = DB.find(x => x.id === pid);
-  const e = p?.etapas?.[idx];
-  if(!e?.solicPrazo || e.solicPrazo.status !== 'pendente' || !e.done){
-    showToast('⚠️ Esta solicitação não está mais pendente'); renderAll(); return null;
-  }
-  return {p, e, s:e.solicPrazo};
-}
-
-async function aprovarSolicPrazo(pid, idx){
-  const r0 = _solicPendente(pid, idx); if(!r0) return;
-  const {e:e0, s:s0} = r0;
-  if(!await confirmar({titulo:'Aprovar solicitação?', msg:`**${e0.lb}** fica como concluída em **${fd(s0.dataReal)}**.\n\nA data de conclusão passa de ${fd(e0.fim)} para ${fd(s0.dataReal)}.`, ok:'Aprovar', tipo:'ok'})) return;
-  const r = _solicPendente(pid, idx); if(!r) return;   // pode ter mudado com o modal aberto
-  const {p, e, s} = r;
-  e.fim = s.dataReal;
-  e.atrasoMotivo = null;
-  Object.assign(s, {status:'aprovada', decididoPor:nomeUsuarioAtual(), decididoEm:_dtAgora()});
-  registrarHistorico(p, 'aprovou validação', `"${e.lb}": conclusão em ${fd(s.dataReal)} aprovada (check dado em ${fd(s.fimCheck)})`);
-  fbSalvarProjeto(p);
-  showToast('✅ Solicitação aprovada');
-  renderAll();
-}
-
-async function negarSolicPrazo(pid, idx){
-  const r0 = _solicPendente(pid, idx); if(!r0) return;
-  const {e:e0, s:s0} = r0;
-  if(!await confirmar({titulo:'Negar solicitação?', msg:`Solicitação de **${e0.lb}**.\n\nVale a data do check (${fd(s0.fimCheck)}) e a etapa continua atrasada, sem motivo registrado.`, ok:'Negar', tipo:'perigo', ic:'ban'})) return;
-  const r = _solicPendente(pid, idx); if(!r) return;   // pode ter mudado com o modal aberto
-  const {p, e, s} = r;
-  Object.assign(s, {status:'negada', decididoPor:nomeUsuarioAtual(), decididoEm:_dtAgora()});
-  registrarHistorico(p, 'negou validação', `"${e.lb}": conclusão em ${fd(s.dataReal)} negada — vale ${fd(s.fimCheck)}`);
-  fbSalvarProjeto(p);
-  showToast('🚫 Solicitação negada');
-  renderAll();
-}
 // Aplica cascata: desloca todas as etapas após idx pelo delta de dias úteis
 function cascatarEtapas(etapas, idx, novaData){
   const prazoAnt = etapas[idx].prazo;
@@ -6669,7 +6529,7 @@ function setER(pid,idx,v){
 }
 
 // ── CANCELAR ──
-function abrirCanc(id){cancId=id;document.getElementById('fCancMotivo').value='';cm('ovDet');document.getElementById('ovCanc').classList.add('on');}
+function abrirCanc(id){if(!ehLideranca()){showToast('🔒 Apenas a Liderança pode cancelar produtos');return;}cancId=id;document.getElementById('fCancMotivo').value='';cm('ovDet');document.getElementById('ovCanc').classList.add('on');}
 function confirmarCanc(){
   const p=DB.find(x=>x.id===cancId);if(!p)return;
   p.cancelado=true; p.cancelEm=td(); p.cancelMotivo=document.getElementById('fCancMotivo').value;
@@ -6692,7 +6552,7 @@ function stab(n,el){
 
 // ── NOME DO PRODUTO (seleção única) ──
 // Futuro: cada nome de produto vai definir quais Linhas de serviço aparecem no formulário.
-const NOMES_PRODUTO = ['PICV','CURSO ONLINE','BANCO DE QUESTÕES DA AVALIAÇÃO','VÍDEO TUTORIAL','CARTAZ'];
+const NOMES_PRODUTO = ['PICV','CURSO ONLINE','BANCO DE QUESTÕES DA AVALIAÇÃO','VÍDEO TUTORIAL','CARTAZ', 'VÍDEO ANIMAÇÃO'];
 // O nome gravado é "NOME - SUFIXO" (ex.: "PICV - ARROZ INTEGRAL"), no próprio campo nome.
 const SEP_SUFIXO = ' - ';
 function _limparSufixo(v){
@@ -7704,7 +7564,6 @@ function getEtapasDoForm(projAnterior){
       fim:   (e.fim !== undefined ? e.fim : ant.fim) || null,
       done:  (e.done !== undefined ? e.done : ant.done) || false,
       atrasoMotivo: (e.atrasoMotivo !== undefined ? e.atrasoMotivo : ant.atrasoMotivo) || null,
-      solicPrazo: (e.solicPrazo !== undefined ? e.solicPrazo : ant.solicPrazo) || null,  // validação de conclusão no prazo (aba Validações)
       diasCl: (e.diasCl !== undefined ? e.diasCl : ant.diasCl) || null,
       rExtras: (e.rExtras !== undefined ? e.rExtras : ant.rExtras) || [],   // responsáveis adicionais da etapa
       dataInicial: (e.dataInicial !== undefined ? e.dataInicial : ant.dataInicial) || null,  // data inicial informada no card
@@ -7776,10 +7635,11 @@ function buildProjSelect(selId){
 function onChangeProjSel(){}
 
 function openNovoCadProj(doProduto){
+  if(!ehLideranca()){ showToast('🔒 Apenas a Liderança pode cadastrar projetos'); return; }
   _cadProjEditId = null;
   _cadProjDoProduto = !!doProduto;
   document.getElementById('cadProjTitle').textContent = 'Novo Projeto';
-  ['cpNome','cpDesc','cpObj','cpPub'].forEach(id => document.getElementById(id).value = '');
+  ['cpNome','cpDesc','cpObj','cpPub','cpLinkSp'].forEach(id => document.getElementById(id).value = '');
   document.getElementById('ovCadProj').classList.add('on');
   setTimeout(() => document.getElementById('cpNome').focus(), 80);
 }
@@ -7793,6 +7653,7 @@ function openEditCadProj(id){
   document.getElementById('cpDesc').value = pr.descricao || '';
   document.getElementById('cpObj').value  = pr.objetivo || '';
   document.getElementById('cpPub').value  = pr.publico || '';
+  document.getElementById('cpLinkSp').value = pr.linkSharepoint || '';
   document.getElementById('ovCadProj').classList.add('on');
 }
 
@@ -7803,12 +7664,15 @@ function salvarCadProj(){
   if(duplicado){ showToast('❌ Já existe um projeto com esse nome'); return; }
   const anterior = _cadProjEditId ? CADPROJ.find(c => c.id === _cadProjEditId) : null;
   if(_cadProjEditId && !anterior){ showToast('❌ Este projeto foi excluído por outra pessoa'); cm('ovCadProj'); return; }
+  const linkSharepoint = _normalizarLink(document.getElementById('cpLinkSp').value);
+  if(linkSharepoint === null){ document.getElementById('cpLinkSp').focus(); showToast('❌ Link SharePoint inválido — cole o endereço completo da pasta'); return; }
   const pr = {
     ...(anterior || {}),
     nome,
     descricao: document.getElementById('cpDesc').value.trim(),
     objetivo:  document.getElementById('cpObj').value.trim(),
     publico:   document.getElementById('cpPub').value.trim(),
+    linkSharepoint,
     criado:    anterior?.criado || td(),
     criadoPor: anterior?.criadoPor || nomeUsuarioAtual(),
   };
@@ -7959,6 +7823,26 @@ function rCadProjetos(){
 }
 
 // Pop-up com as informações de um projeto (tela Projetos)
+// ── LINK SHAREPOINT DO PROJETO ──
+// Devolve o link pronto para gravar ('' se vazio) ou null se não for um endereço válido.
+function _normalizarLink(v){
+  v = String(v||'').trim();
+  if(!v) return '';
+  if(!/^https?:\/\//i.test(v)) v = 'https://' + v;
+  try{ const u = new URL(v); return /^https?:$/.test(u.protocol) && u.hostname.includes('.') ? u.href : null; }
+  catch(e){ return null; }
+}
+// Link SharePoint do projeto do produto (só http/https)
+function _linkSpDoProduto(p){
+  const url = projDoCard(p)?.linkSharepoint || '';
+  return /^https?:\/\//i.test(url) ? url : '';
+}
+// Link clicável para o card e o detalhe; abre em nova aba sem abrir o card junto
+function _linkSpHtml(url){
+  if(!url) return '';
+  return `<a class="link-sp" href="${esc(url)}" target="_blank" rel="noopener noreferrer" draggable="false" onclick="event.stopPropagation()" onmousedown="event.stopPropagation()" title="Abrir a pasta do projeto no SharePoint (nova janela)">${icL('link')}<span>Pasta no SharePoint</span></a>`;
+}
+
 function abrirProjInfo(id){
   const pr = CADPROJ.find(c => c.id === id); if(!pr) return;
   const prods = DB.filter(p => p.projCadId === pr.id);
@@ -7985,6 +7869,7 @@ function abrirProjInfo(id){
   document.getElementById('projInfoBody').innerHTML = `
     <div style="display:grid;gap:10px;margin-bottom:18px">
       ${bloco('Descrição', pr.descricao)}
+      ${/^https?:\/\//i.test(pr.linkSharepoint||'') ? `<div>${_linkSpHtml(pr.linkSharepoint)}</div>` : ''}
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:10px">${bloco('Objetivo', pr.objetivo)}${bloco('Público-Alvo', pr.publico)}</div>
     </div>
     <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;margin-bottom:8px">
@@ -8014,6 +7899,7 @@ function rCadProjExcluidos(){
 }
 
 function openNew(){
+  if(!ehLideranca()){ showToast('🔒 Apenas a Liderança pode criar produtos'); return; }
   editId=null;
   document.getElementById('mNewTitle').textContent='Novo Produto';
   document.getElementById('fpo').value='';
@@ -8049,6 +7935,7 @@ function openNew(){
 }
 
 function openEdit(id){
+  if(!ehLideranca()){ showToast('🔒 Apenas a Liderança pode editar produtos'); return; }
   const p=DB.find(x=>x.id===id);if(!p)return;
   editId=id; document.getElementById('mNewTitle').textContent='Editar Produto';
   buildNomeProdutoSelect(p.nome||'');
@@ -11223,7 +11110,6 @@ function renderAll(){
 const VIEW_RENDERERS = {
   kanban:        () => { rDash(); rKanban(); },
   projetos:      () => rList(),
-  validacoes:    () => rValidacoes(),
   ppu:           () => rPPU(),
   timeline:      () => rTimeline(),
   kpis:          () => rKPIs(),
@@ -11278,7 +11164,8 @@ const _NOMES_MIGRAR = {
   'Maria Julia':   'Liderança Julia',
   'Fabiana':       'Liderança Fabiana',
   'Marise':        'Liderança Marise',
-  'Maria Emilia':  'Liderança Maria Emilia',
+  'Maria Emilia':  'Liderança Emilia',
+  'Liderança Maria Emilia': 'Liderança Emilia',  // renomeada (nov/2026)
 };
 function _migrarNome(nome){ return _NOMES_MIGRAR[nome] || nome; }
 
@@ -11288,7 +11175,9 @@ function normalizar(p){
   p.recursos       = [...new Set((p.recursos || []).map(r => (r==='Plano Instrucional'|| r==='Plano de Identidade Visual' || r==='Plano Instrucional e Plano de Identidade Visual (PICV)') ? 'Plano Instrucional e Plano de Identidade Visual' : r)
                        .map(r => String(r).replace(/(\d) mim\b/g, '$1 min')))];  // recursos unificados no PICV · "mim" → "min"
   if(Array.isArray(p.medicaoItens)) p.medicaoItens.forEach(it => { if(it.desc) it.desc = it.desc.replace(/(\d) mim\b/g, '$1 min'); });
-  p.etapas         = (p.etapas || []).map(e => ({...e, r: _migrarNome(e.r||'')}));
+  p.etapas         = (p.etapas || []).map(e => ({...e, r: _migrarNome(e.r||''),
+                       ...(Array.isArray(e.rExtras) ? {rExtras: e.rExtras.map(_migrarNome)} : {})}));
+  if(p.medicaoConfirmadaPor) p.medicaoConfirmadaPor = _migrarNome(p.medicaoConfirmadaPor);
   p.col            = typeof p.col === 'string' ? parseInt(p.col) : (p.col || 0);
   if(COLUNA_REMAP[p.col] !== undefined) p.col = COLUNA_REMAP[p.col];  // colunas ocultas → coluna visível equivalente
   p.cancelado      = !!p.cancelado;
@@ -11296,6 +11185,7 @@ function normalizar(p){
   p.medicaoFeita   = !!p.medicaoFeita;
   p.medicaoFeitaEm = p.medicaoFeitaEm || null;
   p.homolog        = p.homolog || {};
+  ['solicitante','enviadaPor','homologConfirmadaPor'].forEach(k => { if(p.homolog[k]) p.homolog[k] = _migrarNome(p.homolog[k]); });
 
   return p;
 }
@@ -12290,9 +12180,8 @@ function _buildCargaCardPessoa(nome, projs, max, stOpen){
   const aguard = projs.filter(p => calcSit(p) === 'aguardando').length;
 
   const pct = Math.round(projs.length / max * 100);
-  const overload = projs.length >= 5 || atrasados >= 2;
-  const corStatus = atrasados > 0 ? 'var(--red)' : projs.length >= 5 ? 'var(--yel)' : 'var(--blue)';
-  const labelCarga = atrasados > 0 ? 'Atenção' : projs.length >= 5 ? 'Sobrecarga' : projs.length >= 3 ? 'Carga regular' : 'Carga leve';
+  // Sem rótulo de carga (leve/regular/sobrecarga): o card mostra só a quantidade de produtos
+  const corStatus = atrasados > 0 ? 'var(--red)' : 'var(--blue)';
   const uid = 'carga_' + nome.replace(/\W/g,'_');
   const isOpen = stOpen[uid] === true;
   const filtro = _cargaAplicarFiltroCard(uid, projs);
@@ -12308,7 +12197,7 @@ function _buildCargaCardPessoa(nome, projs, max, stOpen){
     return (a.prazo||'9999').localeCompare(b.prazo||'9999');
   });
 
-  return `<div class="carga-card${overload?' over-load':''}">
+  return `<div class="carga-card">
     <div class="carga-hd" onclick="toggleCarga('${uid}')">
       <div class="carga-av" style="${_avEstilo(nome)}">
         ${iniciais(nome)}
@@ -12316,7 +12205,6 @@ function _buildCargaCardPessoa(nome, projs, max, stOpen){
       </div>
       <div class="carga-info">
         <div class="carga-name">${nome}</div>
-        <div class="carga-load-label" style="color:${corStatus}">${labelCarga}</div>
       </div>
       <div class="carga-count-wrap">
         <div class="carga-count" style="color:${corStatus}">${projs.length}</div>
@@ -12497,6 +12385,7 @@ function corProgresso(sit){
 //  DUPLICAR PROJETO
 // ══════════════════════════════════════════════
 async function duplicarProjeto(id){
+  if(!ehLideranca()){ showToast('🔒 Apenas a Liderança pode duplicar produtos'); return; }
   const orig = DB.find(p => p.id === id); if(!orig) return;
   if(!await confirmar({titulo:'Duplicar produto?', msg:`Será criada uma cópia de **${orig.nome}** com as mesmas etapas e dados, sem o histórico de execução.`, ok:'Duplicar', ic:'copy'})) return;
   const usuario = nomeUsuarioAtual();
@@ -12517,7 +12406,7 @@ async function duplicarProjeto(id){
   novo.medicaoMes = ''; novo.medicaoQuinzena = ''; novo.medicaoItens = []; novo.medicaoTotal = 0;
   novo.tags = orig.tags ? [...orig.tags] : [];
   novo.historico = [{usuario, acao:'duplicou', dt:dtAgora(), desc:`Duplicado de "${orig.nome}"`}];
-  novo.etapas = (orig.etapas||[]).map(e => ({...e, done:false, fim:null, atrasoMotivo:null, diasCl:null, solicPrazo:null}));
+  novo.etapas = (orig.etapas||[]).map(e => ({...e, done:false, fim:null, atrasoMotivo:null, diasCl:null}));
   DB.push(novo);
   fbSalvarProjeto(novo);
   renderAll();
@@ -12545,7 +12434,7 @@ const EMAIL_NOMES = {
   'mrgrodrigues@firjan.com.br':'Mariana',
   'mlpeixoto@firjan.com.br':   'Mateus',
   'mgouffier@firjan.com.br':   'Liderança Julia',
-  'mepessanha@firjan.com.br':  'Liderança Maria Emilia',
+  'mepessanha@firjan.com.br':  'Liderança Emilia',
   'mclopes@firjan.com.br':     'Liderança Marise',
   'fiino@firjan.com.br':       'Fatima',
   'fcribeiro@firjan.com.br':   'Liderança Fabiana',
@@ -12561,6 +12450,7 @@ const EMAIL_NOMES = {
   'ssnmart71@firjan.com.br':   'RPCI Dedicado - Wagner (DM)',
   'fnmartins@firjan.com.br':   'Liderança Flavia',
   'pmelo@firjan.com.br':       'Pedro Melo',
+  'ssnmart58@firjan.com.br':   'RPCI - Patricia (RT)',
 };
 
 // Cores fixas por nome — garante que cada pessoa tenha sempre a mesma cor única
@@ -12571,7 +12461,7 @@ const NOME_CORES = {
   'Mariana':     '#0891B2',  // ciano
   'Mateus':      '#7e22ce',  // violeta
   'Liderança Julia': '#D97706',  // laranja
-  'Liderança Maria Emilia':'#EC4899',  // rosa
+  'Liderança Emilia':'#EC4899',        // rosa
   'Liderança Marise':  '#0f766e',  // teal
   'Fatima':      '#E8002D',  // vermelho
   'Liderança Fabiana': '#1A8A4A',  // verde
@@ -13064,7 +12954,7 @@ function mostrarLogin(){
 // ── ACESSIBILIDADE: fechar modal com Escape ──
 document.addEventListener('keydown', function(e){
   if(e.key !== 'Escape') return;
-  ['ovNew','ovDet','ovCanc','ovMotivo','ovDelMotivo'].forEach(id => {
+  ['ovNew','ovDet','ovCanc','ovDelMotivo'].forEach(id => {  // ovMotivo fica de fora: o motivo é obrigatório
     const el = document.getElementById(id);
     if(el && el.classList.contains('on')) { el.classList.remove('on'); }
     if(el && el.style.display === 'flex') { el.style.display = 'none'; }
